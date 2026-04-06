@@ -246,6 +246,64 @@
 const OMDB_KEY = "b9bd48a6";
 const ANTHROPIC_KEY = ""; // Paste your Anthropic API key here for AI picks
 
+// ── Supabase ──────────────────────────────────────────────────────────────────
+const SB_URL = "https://ubjafkxdybiwgcupassu.supabase.co";
+const SB_KEY = "sb_publishable_Ep9kQs8XcfgUoK2ACiIo8w_CLDGkZJf";
+
+async function sbFetch(path, opts = {}) {
+  const res = await fetch(SB_URL + "/rest/v1/" + path, {
+    ...opts,
+    headers: {
+      "apikey": SB_KEY,
+      "Authorization": "Bearer " + SB_KEY,
+      "Content-Type": "application/json",
+      "Prefer": opts.prefer || "",
+      ...(opts.headers || {})
+    }
+  });
+  if (!res.ok) throw new Error(await res.text());
+  const text = await res.text();
+  return text ? JSON.parse(text) : [];
+}
+
+async function loadHistoryFromDB() {
+  try {
+    const rows = await sbFetch("watchlist?order=created_at.desc");
+    return rows.map(r => ({
+      id: r.id,
+      imdbID: r.imdb_id,
+      title: r.title,
+      year: r.year,
+      poster: r.poster,
+      stars: r.stars || 0,
+      comment: r.comment || "",
+      date: new Date(r.created_at).toLocaleDateString("en-GB")
+    }));
+  } catch(e) {
+    console.error("Failed to load history:", e);
+    return [];
+  }
+}
+
+async function saveEntryToDB(entry) {
+  await sbFetch("watchlist", {
+    method: "POST",
+    prefer: "return=representation",
+    body: JSON.stringify({
+      imdb_id: entry.imdbID,
+      title: entry.title,
+      year: entry.year,
+      poster: entry.poster,
+      stars: entry.stars,
+      comment: entry.comment
+    })
+  });
+}
+
+async function deleteEntryFromDB(id) {
+  await sbFetch(`watchlist?id=eq.${id}`, { method: "DELETE" });
+}
+
 // Verified quotes with accurate attribution
 const QUOTES = [
   { text: "I'll be back.", source: "The Terminator (1984)" },
@@ -269,7 +327,7 @@ function randQuote() {
   return QUOTES[Math.floor(Math.random() * QUOTES.length)];
 }
 
-let watchHistory = JSON.parse(localStorage.getItem("mn_history") || "[]");
+let watchHistory = [];
 let currentAddMovie = null;
 let currentStars = 0;
 
@@ -439,18 +497,28 @@ async function confirmAdd() {
   const m = currentAddMovie;
   let detail = m;
   if (m.imdbID) { try { detail = await omdbDetail(m.imdbID); } catch(e) {} }
+
+  const btn = document.querySelector("#add-overlay .btn-add-history");
+  if (btn) { btn.textContent = "SAVING..."; btn.disabled = true; }
+
   const entry = {
-    id: Date.now(),
     imdbID: m.imdbID || "",
     title: detail.Title || m.Title || "",
     year: detail.Year || m.Year || "",
     poster: detail.Poster || m.Poster || "",
     stars: currentStars,
     comment: document.getElementById("add-note").value,
-    date: new Date().toLocaleDateString("en-GB")
   };
-  watchHistory.unshift(entry);
-  localStorage.setItem("mn_history", JSON.stringify(watchHistory));
+
+  try {
+    await saveEntryToDB(entry);
+    watchHistory = await loadHistoryFromDB();
+  } catch(e) {
+    alert("Could not save: " + e.message);
+    if (btn) { btn.textContent = "SAVE"; btn.disabled = false; }
+    return;
+  }
+
   closeAdd();
   closeDetail();
   if (document.querySelector(".tab-btn:nth-child(3)").classList.contains("active")) renderHistory();
@@ -546,10 +614,14 @@ function renderHistory() {
     </div>`;
 }
 
-function deleteItem(id) {
-  watchHistory = watchHistory.filter(h => h.id !== id);
-  localStorage.setItem("mn_history", JSON.stringify(watchHistory));
-  renderHistory();
+async function deleteItem(id) {
+  try {
+    await deleteEntryFromDB(id);
+    watchHistory = watchHistory.filter(h => h.id !== id);
+    renderHistory();
+  } catch(e) {
+    alert("Could not delete: " + e.message);
+  }
 }
 
 // Init
@@ -565,6 +637,15 @@ document.getElementById("rec-results").innerHTML = `
     <div class="title">GET PERSONALISED PICKS</div>
     <div class="sub">Enter a prompt or leave blank and hit Find</div>
   </div>`;
+
+// Load history from Supabase on startup
+(async () => {
+  try {
+    watchHistory = await loadHistoryFromDB();
+  } catch(e) {
+    console.warn("Could not load history:", e);
+  }
+})();
 
 // Register service worker for PWA / offline support
 if ("serviceWorker" in navigator) {
