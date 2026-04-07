@@ -494,12 +494,21 @@ function getEntryStatus(tmdbID) {
   return e ? e.status : null;
 }
 
+// Movie registry to avoid JSON-in-onclick issues
+const _movieRegistry = {};
+let _regCounter = 0;
+function regMovie(m) {
+  const key = 'mv' + (_regCounter++);
+  _movieRegistry[key] = m;
+  return key;
+}
+
 function movieCardHTML(m, why) {
   const status = getEntryStatus(m.tmdbID || m.id);
   const rating = m.Rating ? ` · ★ ${m.Rating}` : "";
   const genre = m.Genre ? ` · ${m.Genre.split(",")[0]}` : "";
   const mediaTag = m.type === "tv" ? ` · TV` : "";
-  const safeM = encodeURIComponent(JSON.stringify(m));
+  const key = regMovie(m);
   let actionBtns = "";
   if (status === "watched") {
     actionBtns = `<span class="badge-watched">✓ Watched</span>`;
@@ -507,8 +516,8 @@ function movieCardHTML(m, why) {
     actionBtns = `<span class="badge-plan">🕐 Watchlist</span>`;
   } else {
     actionBtns = `
-      <button class="btn-watchlist" onclick="openAdd('${safeM}','plan')">+ WATCHLIST</button>
-      <button class="btn-watched" onclick="openAdd('${safeM}','watched')">✓ WATCHED</button>`;
+      <button class="btn-watchlist" onclick="openAdd(_movieRegistry['${key}'],'plan')">+ WATCHLIST</button>
+      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">✓ WATCHED</button>`;
   }
   const topRadius = why ? "12px 12px 0 0" : "12px";
   const idVal = m.tmdbID || m.id;
@@ -533,27 +542,65 @@ function movieCardHTML(m, why) {
 }
 
 // ── Search ────────────────────────────────────────────────────────────────────
+
+// Parse query: extract year if present, return { title, year }
+function parseQuery(raw) {
+  const yearOnly = raw.match(/^(\d{4})$/);
+  if (yearOnly) return { title: "", year: yearOnly[1] };
+  const withYear = raw.match(/^(.+?)\s+(\d{4})$/);
+  if (withYear) return { title: withYear[1].trim(), year: withYear[2] };
+  return { title: raw, year: null };
+}
+
+async function tmdbSearchWithYear(title, year) {
+  // If year-only, search popular movies/shows of that year
+  if (!title && year) {
+    const [movies, tv] = await Promise.all([
+      tmdbFetch(`/discover/movie?sort_by=popularity.desc&primary_release_year=${year}&language=en-US`),
+      tmdbFetch(`/discover/tv?sort_by=popularity.desc&first_air_date_year=${year}&language=en-US`)
+    ]);
+    const all = [
+      ...(movies.results||[]).map(r => ({ ...r, media_type: "movie" })),
+      ...(tv.results||[]).map(r => ({ ...r, media_type: "tv" }))
+    ].sort((a,b) => b.popularity - a.popularity).slice(0, 12);
+    return all.map(r => ({
+      id: r.id, tmdbID: String(r.id), type: r.media_type,
+      Title: r.title || r.name,
+      Year: (r.release_date || r.first_air_date || "").slice(0,4),
+      Poster: r.poster_path ? TMDB_IMG + r.poster_path : "",
+      Rating: r.vote_average ? r.vote_average.toFixed(1) : null,
+      Genre: ""
+    }));
+  }
+  // Title + optional year: search normally then filter by year
+  let results = await tmdbSearch(title);
+  if (year) results = results.filter(r => r.Year === year);
+  // If year filter left nothing, fall back to unfiltered (year may be slightly off)
+  if (year && !results.length) results = await tmdbSearch(title);
+  return results;
+}
+
 async function doSearch() {
   const raw = document.getElementById("search-input").value.trim();
   if (!raw) return;
   const el = document.getElementById("search-results");
   el.innerHTML = loadingHTML(randQuote(), false);
   try {
-    // If Cyrillic and Anthropic key available, translate first
-    let q = raw;
-    if (hasCyrillic(raw) && ANTHROPIC_KEY) {
-      q = await translateQuery(raw);
-    }
-    // Search with both original and translated query
-    let results = await tmdbSearch(q);
-    if (hasCyrillic(raw) && q !== raw) {
-      // also search original Russian to catch titles registered in Russian
-      const ruResults = await tmdbSearch(raw);
+    const { title, year } = parseQuery(raw);
+    let q = title;
+    if (hasCyrillic(q) && ANTHROPIC_KEY) q = await translateQuery(q);
+
+    let results = await tmdbSearchWithYear(q, year);
+
+    // Also search original Cyrillic if translated
+    if (hasCyrillic(title) && q !== title) {
+      const ruResults = await tmdbSearchWithYear(title, year);
       const seen = new Set(results.map(r => r.tmdbID));
       ruResults.forEach(r => { if (!seen.has(r.tmdbID)) results.push(r); });
     }
+
     if (!results.length) {
-      el.innerHTML = `<div class="empty"><div class="icon">🤷</div><div class="title">NO RESULTS</div><div class="sub">Try a different title or spelling</div></div>`;
+      el.innerHTML = `<div class="empty"><div class="icon">🤷</div><div class="title">NO RESULTS</div><div class="sub">Try just the title without the year</div></div>`;
       return;
     }
     el.innerHTML = `<div class="card-list">${results.map(m => movieCardHTML(m)).join("")}</div>`;
@@ -582,10 +629,10 @@ async function openDetail(id, type) {
       actionBtns += `<div class="already-badge">✓ Already watched</div>`;
     } else if (status === "plan") {
       actionBtns += `<div class="already-badge" style="color:#888">🕐 In your watchlist</div>`;
-      actionBtns += `<button class="btn-add-watched" onclick="openAdd(${encodeURIComponent(JSON.stringify(d))},'watched')">MARK WATCHED</button>`;
+      actionBtns += `<button class="btn-add-watched" onclick="openAdd(window._detailMovie,'watched')">MARK WATCHED</button>`;
     } else {
-      actionBtns += `<button class="btn-add-plan" onclick="openAdd(${encodeURIComponent(JSON.stringify(d))},'plan')">🕐 WATCH LATER</button>`;
-      actionBtns += `<button class="btn-add-watched" onclick="openAdd(${encodeURIComponent(JSON.stringify(d))},'watched')">+ WATCHED</button>`;
+      actionBtns += `<button class="btn-add-plan" onclick="openAdd(window._detailMovie,'plan')">+ WATCHLIST</button>`;
+      actionBtns += `<button class="btn-add-watched" onclick="openAdd(window._detailMovie,'watched')">✓ WATCHED</button>`;
     }
 
     document.getElementById("detail-content").innerHTML = `
