@@ -1,7 +1,8 @@
-const CACHE = "movie-night-v1";
+const CACHE = "movie-night-v2";
 const ASSETS = [
-  "./movie-night.html",
-  "./manifest.json"
+  "./index.html",
+  "./manifest.json",
+  "./icon.png",
 ];
 
 self.addEventListener("install", e => {
@@ -21,12 +22,35 @@ self.addEventListener("activate", e => {
 });
 
 self.addEventListener("fetch", e => {
-  // For OMDb API calls — always try network first
-  if (e.request.url.includes("omdbapi.com") || e.request.url.includes("anthropic.com")) {
+  const url = e.request.url;
+
+  // API calls — always network first, no caching
+  if (
+    url.includes("themoviedb.org") ||
+    url.includes("anthropic.com") ||
+    url.includes("supabase.co")
+  ) {
     e.respondWith(fetch(e.request).catch(() => new Response("offline", { status: 503 })));
     return;
   }
-  // For app shell — cache first
+
+  // Google Fonts — cache first, then network (so fonts work offline)
+  if (url.includes("fonts.googleapis.com") || url.includes("fonts.gstatic.com")) {
+    e.respondWith(
+      caches.open(CACHE).then(cache =>
+        cache.match(e.request).then(cached => {
+          if (cached) return cached;
+          return fetch(e.request).then(response => {
+            cache.put(e.request, response.clone());
+            return response;
+          });
+        })
+      )
+    );
+    return;
+  }
+
+  // App shell — cache first
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request))
   );

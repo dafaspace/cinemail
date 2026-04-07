@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Movie Night</title>
-
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,7 +11,6 @@
 <meta name="apple-mobile-web-app-title" content="Movie Night">
 <meta name="theme-color" content="#0d0d1a">
 <link rel="apple-touch-icon" href="icon.png">
-
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -49,7 +47,7 @@
   .empty { text-align: center; color: #444; padding: 50px 0; }
   .empty .icon { font-size: 36px; margin-bottom: 8px; }
   .empty .title { font-family: 'Bebas Neue', cursive; font-size: 16px; letter-spacing: 1px; color: #555; }
-  .empty .sub { font-size: 12px; margin-top: 4px; }
+  .empty .sub { font-size: 12px; margin-top: 4px; color: #444; }
 
   .card-list { display: flex; flex-direction: column; gap: 9px; }
   .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
@@ -58,22 +56,34 @@
   .card:hover { background: rgba(255,255,255,0.07); }
 
   .poster { width: 56px; height: 80px; flex-shrink: 0; border-radius: 8px; overflow: hidden;
-    background: #1a1a2e; display: flex; align-items: center; justify-content: center; }
+    background: #1a1a2e; display: flex; align-items: center; justify-content: center; font-size: 22px; }
   .poster img { width: 100%; height: 100%; object-fit: cover; }
 
   .card-body { flex: 1; min-width: 0; }
   .card-title { font-family: 'Bebas Neue', cursive; font-size: 16px; letter-spacing: .5px; line-height: 1.2; }
   .card-meta { color: #666; font-size: 11px; margin-top: 2px; }
-  .card-actions { display: flex; align-items: center; gap: 8px; margin-top: 7px; }
-  .btn-add { padding: 3px 10px; border-radius: 6px; background: #F5C518; border: none;
+  .card-actions { display: flex; align-items: center; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
+  .btn-watched { padding: 3px 10px; border-radius: 6px; background: #F5C518; border: none;
     color: #111; font-size: 11px; font-weight: 700; cursor: pointer;
     font-family: 'Bebas Neue', cursive; letter-spacing: 1px; }
+  .btn-watchlist { padding: 3px 10px; border-radius: 6px; background: transparent;
+    border: 1px solid rgba(255,255,255,0.2); color: #aaa; font-size: 11px; font-weight: 700; cursor: pointer;
+    font-family: 'Bebas Neue', cursive; letter-spacing: 1px; transition: all .15s; }
+  .btn-watchlist:hover { border-color: #F5C518; color: #F5C518; }
   .hint { color: #444; font-size: 11px; }
-  .watched-badge { color: #F5C518; font-size: 11px; }
+  .badge-watched { color: #F5C518; font-size: 11px; }
+  .badge-plan { color: #888; font-size: 11px; }
 
   .why-strip { padding: 6px 12px; background: rgba(245,197,24,0.04);
     border: 1px solid rgba(255,255,255,0.08); border-top: none;
     border-radius: 0 0 12px 12px; color: #998; font-size: 12px; font-style: italic; }
+
+  /* Filter pills */
+  .filter-row { display: flex; gap: 8px; margin-bottom: 14px; }
+  .filter-pill { padding: 5px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
+    background: transparent; color: #666; font-size: 12px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all .15s; }
+  .filter-pill.active { background: #F5C518; border-color: #F5C518; color: #111; font-weight: 600; }
 
   /* Loading */
   .loading-box { margin: 8px 0 20px; padding: 24px 20px;
@@ -108,10 +118,6 @@
   .modal { background: #13131f; border: 1px solid rgba(255,255,255,0.08);
     border-radius: 20px 20px 0 0; width: 100%; max-width: 480px;
     max-height: 88vh; overflow-y: auto; padding: 20px 18px 32px; }
-  .modal-top { display: flex; gap: 14px; margin-bottom: 16px; }
-  .modal-poster { width: 90px; height: 134px; flex-shrink: 0; border-radius: 8px;
-    overflow: hidden; background: #1a1a2e; display: flex; align-items: center; justify-content: center; }
-  .modal-poster img { width: 100%; height: 100%; object-fit: cover; }
   .modal-title { font-family: 'Bebas Neue', cursive; font-size: 22px;
     letter-spacing: .5px; line-height: 1.15; color: #fff; }
   .chips { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
@@ -125,19 +131,24 @@
   .awards-box { margin-bottom: 14px; padding: 8px 12px;
     background: rgba(245,197,24,0.05); border-radius: 8px;
     border: 1px solid rgba(245,197,24,0.15); color: #F5C518; font-size: 12px; }
-  .modal-actions { display: flex; gap: 9px; margin-top: 18px; }
-  .btn-close { flex: 1; padding: 10px; border-radius: 9px;
+  .modal-actions { display: flex; gap: 9px; margin-top: 18px; flex-wrap: wrap; }
+  .btn-close { flex: 1; min-width: 80px; padding: 10px; border-radius: 9px;
     background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
     color: #777; cursor: pointer; font-size: 13px; font-family: 'DM Sans', sans-serif; }
-  .btn-add-history { flex: 2; padding: 10px; border-radius: 9px; background: #F5C518;
+  .btn-add-watched { flex: 2; padding: 10px; border-radius: 9px; background: #F5C518;
     border: none; color: #111; font-family: 'Bebas Neue', cursive;
-    font-size: 15px; letter-spacing: 1px; cursor: pointer; }
-  .watched-confirm { flex: 2; padding: 10px; text-align: center; color: #F5C518; font-size: 13px; font-weight: 600; }
+    font-size: 14px; letter-spacing: 1px; cursor: pointer; }
+  .btn-add-plan { flex: 2; padding: 10px; border-radius: 9px;
+    background: transparent; border: 1px solid rgba(255,255,255,0.2);
+    color: #aaa; font-family: 'Bebas Neue', cursive;
+    font-size: 14px; letter-spacing: 1px; cursor: pointer; }
+  .already-badge { flex: 2; padding: 10px; text-align: center; color: #F5C518; font-size: 13px; font-weight: 600; }
 
   /* Add modal */
   .add-modal { background: #13131f; border: 1px solid rgba(245,197,24,.2);
     border-radius: 16px; padding: 22px; width: 100%; max-width: 380px; }
-  .add-label { color: #555; font-size: 11px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .5px; }
+  .add-label { color: #555; font-size: 11px; margin-bottom: 5px;
+    text-transform: uppercase; letter-spacing: .5px; }
   .stars-row { display: flex; gap: 4px; margin-bottom: 14px; }
   .star { font-size: 26px; cursor: pointer; color: #333; transition: color .15s; user-select: none; }
   .star.on { color: #F5C518; }
@@ -147,21 +158,29 @@
     resize: vertical; min-height: 65px; font-family: 'DM Sans', sans-serif;
     outline: none; margin-bottom: 18px; }
 
+  /* History cards */
   .history-header { display: flex; justify-content: space-between;
     margin-bottom: 10px; color: #555; font-size: 11px; }
   .hist-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
     border-radius: 12px; padding: 11px; display: flex; gap: 11px;
     cursor: pointer; transition: background .15s; }
   .hist-card:hover { background: rgba(255,255,255,0.07); }
+  .hist-card.plan { border-color: rgba(255,255,255,0.05); opacity: 0.85; }
   .hist-poster { width: 44px; height: 64px; flex-shrink: 0; border-radius: 6px;
-    overflow: hidden; background: #1a1a2e; display: flex; align-items: center; justify-content: center; font-size:18px; }
+    overflow: hidden; background: #1a1a2e; display: flex; align-items: center;
+    justify-content: center; font-size: 18px; }
   .hist-poster img { width: 100%; height: 100%; object-fit: cover; }
   .hist-top { display: flex; justify-content: space-between; align-items: flex-start; }
   .hist-title { font-family: 'Bebas Neue', cursive; font-size: 15px; letter-spacing: .5px; }
   .hist-meta { color: #555; font-size: 10px; }
-  .hist-del { background: none; border: none; color: #444; cursor: pointer; font-size: 18px; line-height: 1; padding: 0 0 0 8px; }
+  .hist-del { background: none; border: none; color: #444; cursor: pointer;
+    font-size: 18px; line-height: 1; padding: 0 0 0 8px; }
   .hist-del:hover { color: #888; }
   .hist-note { color: #999; font-size: 12px; margin-top: 3px; font-style: italic; }
+  .status-tag { display: inline-block; padding: 1px 7px; border-radius: 10px;
+    font-size: 10px; font-weight: 600; margin-top: 4px; }
+  .status-tag.watched { background: rgba(245,197,24,0.12); color: #F5C518; }
+  .status-tag.plan { background: rgba(255,255,255,0.06); color: #777; }
 
   @keyframes bounce { 0%,80%,100%{transform:scale(0.6);opacity:.3} 40%{transform:scale(1);opacity:1} }
   @keyframes shimmer { 0%,100%{opacity:.5} 50%{opacity:1} }
@@ -172,20 +191,20 @@
 <div class="app">
   <div class="header">
     <h1><span class="gold">MOVIE</span> NIGHT</h1>
-    <p>IMDb Search · AI Picks · Watch History</p>
+    <p>TMDB · AI Picks · Watch History</p>
   </div>
 
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('search')">🔍 Search</button>
     <button class="tab-btn" onclick="switchTab('recs')">✨ Picks</button>
-    <button class="tab-btn" onclick="switchTab('history')">📋 History</button>
+    <button class="tab-btn" onclick="switchTab('history')">📋 My List</button>
   </div>
 
   <div class="content">
     <!-- SEARCH -->
     <div id="tab-search">
       <div class="search-row">
-        <input id="search-input" type="text" placeholder="Movie title..." onkeydown="if(event.key==='Enter')doSearch()">
+        <input id="search-input" type="text" placeholder="Movie or series title..." onkeydown="if(event.key==='Enter')doSearch()">
         <button class="btn-gold" onclick="doSearch()">SEARCH</button>
       </div>
       <div id="search-results"></div>
@@ -196,7 +215,7 @@
       <div style="margin-bottom:12px">
         <div style="color:#555;font-size:11px;margin-bottom:5px;font-weight:600;letter-spacing:.5px">OPTIONAL PROMPT</div>
         <div class="search-row">
-          <input id="rec-input" type="text" placeholder="Genre, mood, a film you love..." onkeydown="if(event.key==='Enter')loadRecs()">
+          <input id="rec-input" type="text" placeholder="Genre, mood, a film you love...">
           <button class="btn-gold" id="rec-btn" onclick="loadRecs()">FIND</button>
         </div>
         <div id="rec-history-hint" style="color:#444;font-size:11px;margin-top:5px"></div>
@@ -204,8 +223,13 @@
       <div id="rec-results"></div>
     </div>
 
-    <!-- HISTORY -->
+    <!-- MY LIST -->
     <div id="tab-history" style="display:none">
+      <div class="filter-row">
+        <button class="filter-pill active" id="pill-all" onclick="setFilter('all')">All</button>
+        <button class="filter-pill" id="pill-plan" onclick="setFilter('plan')">🕐 Want to Watch</button>
+        <button class="filter-pill" id="pill-watched" onclick="setFilter('watched')">✓ Watched</button>
+      </div>
       <div id="history-list"></div>
     </div>
   </div>
@@ -222,89 +246,39 @@
 <div id="add-overlay" class="overlay" style="display:none" onclick="closeAdd()">
   <div style="padding:20px;width:100%;display:flex;justify-content:center" onclick="event.stopPropagation()">
     <div class="add-modal">
-      <div style="font-family:'Bebas Neue',cursive;color:#F5C518;font-size:12px;letter-spacing:2px;margin-bottom:3px">ADD TO HISTORY</div>
+      <div style="font-family:'Bebas Neue',cursive;color:#F5C518;font-size:12px;letter-spacing:2px;margin-bottom:3px" id="add-modal-label">ADD TO HISTORY</div>
       <div id="add-movie-title" style="font-family:'Bebas Neue',cursive;font-size:19px;margin-bottom:14px;line-height:1.2"></div>
-      <div class="add-label">Your Rating</div>
-      <div class="stars-row" id="stars-row">
-        <span class="star" onclick="setStar(1)">★</span>
-        <span class="star" onclick="setStar(2)">★</span>
-        <span class="star" onclick="setStar(3)">★</span>
-        <span class="star" onclick="setStar(4)">★</span>
-        <span class="star" onclick="setStar(5)">★</span>
+      <div id="add-stars-section">
+        <div class="add-label">Your Rating</div>
+        <div class="stars-row" id="stars-row">
+          <span class="star" onclick="setStar(1)">★</span>
+          <span class="star" onclick="setStar(2)">★</span>
+          <span class="star" onclick="setStar(3)">★</span>
+          <span class="star" onclick="setStar(4)">★</span>
+          <span class="star" onclick="setStar(5)">★</span>
+        </div>
+        <div class="add-label">Notes</div>
+        <textarea id="add-note" placeholder="What did you think?"></textarea>
       </div>
-      <div class="add-label">Notes</div>
-      <textarea id="add-note" placeholder="What did you think?"></textarea>
       <div style="display:flex;gap:9px">
         <button class="btn-close" onclick="closeAdd()">Cancel</button>
-        <button class="btn-add-history" onclick="confirmAdd()">SAVE</button>
+        <button class="btn-add-watched" id="add-confirm-btn" onclick="confirmAdd()">SAVE</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-const OMDB_KEY = "b9bd48a6";
-const ANTHROPIC_KEY = ""; // Paste your Anthropic API key here for AI picks
+// ── Config ────────────────────────────────────────────────────────────────────
+const TMDB_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkMzZlNzE1NWJmMGM3YTEwZWU3ZDZhMzQ3NTRjZGIwZiIsIm5iZiI6MTc3NTU0MzgzNi45MDIwMDAyLCJzdWIiOiI2OWQ0YTYxY2UzMmYxZGQ5NjVmOGE0NTYiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.LQNp1b9CpMzuO2J5XknQ4osUtiqoG9VRsZpGg0oAY4U";
+const TMDB_BASE = "https://api.themoviedb.org/3";
+const TMDB_IMG  = "https://image.tmdb.org/t/p/w300";
+const ANTHROPIC_KEY = ""; // Optional: paste your Anthropic key for AI picks
 
-// ── Supabase ──────────────────────────────────────────────────────────────────
 const SB_URL = "https://ubjafkxdybiwgcupassu.supabase.co";
 const SB_KEY = "sb_publishable_Ep9kQs8XcfgUoK2ACiIo8w_CLDGkZJf";
 
-async function sbFetch(path, opts = {}) {
-  const res = await fetch(SB_URL + "/rest/v1/" + path, {
-    ...opts,
-    headers: {
-      "apikey": SB_KEY,
-      "Authorization": "Bearer " + SB_KEY,
-      "Content-Type": "application/json",
-      "Prefer": opts.prefer || "",
-      ...(opts.headers || {})
-    }
-  });
-  if (!res.ok) throw new Error(await res.text());
-  const text = await res.text();
-  return text ? JSON.parse(text) : [];
-}
-
-async function loadHistoryFromDB() {
-  try {
-    const rows = await sbFetch("watchlist?order=created_at.desc");
-    return rows.map(r => ({
-      id: r.id,
-      imdbID: r.imdb_id,
-      title: r.title,
-      year: r.year,
-      poster: r.poster,
-      stars: r.stars || 0,
-      comment: r.comment || "",
-      date: new Date(r.created_at).toLocaleDateString("en-GB")
-    }));
-  } catch(e) {
-    console.error("Failed to load history:", e);
-    return [];
-  }
-}
-
-async function saveEntryToDB(entry) {
-  await sbFetch("watchlist", {
-    method: "POST",
-    prefer: "return=representation",
-    body: JSON.stringify({
-      imdb_id: entry.imdbID,
-      title: entry.title,
-      year: entry.year,
-      poster: entry.poster,
-      stars: entry.stars,
-      comment: entry.comment
-    })
-  });
-}
-
-async function deleteEntryFromDB(id) {
-  await sbFetch(`watchlist?id=eq.${id}`, { method: "DELETE" });
-}
-
-// Verified quotes with accurate attribution
+// ── Quotes ────────────────────────────────────────────────────────────────────
 const QUOTES = [
   { text: "I'll be back.", source: "The Terminator (1984)" },
   { text: "You can't handle the truth!", source: "A Few Good Men (1992)" },
@@ -322,14 +296,151 @@ const QUOTES = [
   { text: "Here's looking at you, kid.", source: "Casablanca (1942)" },
   { text: "Get busy living, or get busy dying.", source: "The Shawshank Redemption (1994)" },
 ];
+const randQuote = () => QUOTES[Math.floor(Math.random() * QUOTES.length)];
 
-function randQuote() {
-  return QUOTES[Math.floor(Math.random() * QUOTES.length)];
+// ── Supabase ──────────────────────────────────────────────────────────────────
+async function sbFetch(path, opts = {}) {
+  const res = await fetch(SB_URL + "/rest/v1/" + path, {
+    ...opts,
+    headers: {
+      "apikey": SB_KEY,
+      "Authorization": "Bearer " + SB_KEY,
+      "Content-Type": "application/json",
+      "Prefer": opts.prefer || "",
+      ...(opts.headers || {})
+    }
+  });
+  if (!res.ok) throw new Error(await res.text());
+  const text = await res.text();
+  return text ? JSON.parse(text) : [];
 }
 
+async function loadHistoryFromDB() {
+  const rows = await sbFetch("watchlist?order=created_at.desc");
+  return rows.map(r => ({
+    id: r.id,
+    tmdbID: r.imdb_id,
+    title: r.title,
+    year: r.year,
+    poster: r.poster,
+    stars: r.stars || 0,
+    comment: r.comment || "",
+    status: r.status || "watched",
+    date: new Date(r.created_at).toLocaleDateString("en-GB")
+  }));
+}
+
+async function saveEntryToDB(entry) {
+  await sbFetch("watchlist", {
+    method: "POST",
+    prefer: "return=representation",
+    body: JSON.stringify({
+      imdb_id: entry.tmdbID,
+      title: entry.title,
+      year: entry.year,
+      poster: entry.poster,
+      stars: entry.stars,
+      comment: entry.comment,
+      status: entry.status
+    })
+  });
+}
+
+async function deleteEntryFromDB(id) {
+  await sbFetch(`watchlist?id=eq.${id}`, { method: "DELETE" });
+}
+
+// ── TMDB ──────────────────────────────────────────────────────────────────────
+async function tmdbFetch(path) {
+  const res = await fetch(TMDB_BASE + path, {
+    headers: { "Authorization": "Bearer " + TMDB_TOKEN, "accept": "application/json" }
+  });
+  return res.json();
+}
+
+// Detect if query contains Cyrillic
+function hasCyrillic(str) { return /[а-яёА-ЯЁ]/.test(str); }
+
+async function translateQuery(q) {
+  if (!ANTHROPIC_KEY) return q;
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-api-key": ANTHROPIC_KEY, "anthropic-version": "2023-06-01" },
+      body: JSON.stringify({
+        model: "claude-haiku-4-5-20251001", max_tokens: 100,
+        messages: [{ role: "user", content: `Translate this movie/show title to English for searching. Reply with ONLY the English title, nothing else: "${q}"` }]
+      })
+    });
+    const d = await res.json();
+    return d.content?.[0]?.text?.trim() || q;
+  } catch { return q; }
+}
+
+async function tmdbSearch(q) {
+  // Search in both English and original language simultaneously
+  const [enRes, multiRes] = await Promise.all([
+    tmdbFetch(`/search/multi?query=${encodeURIComponent(q)}&include_adult=false&language=en-US`),
+    tmdbFetch(`/search/multi?query=${encodeURIComponent(q)}&include_adult=false`)
+  ]);
+  // Merge and deduplicate
+  const all = [...(enRes.results||[]), ...(multiRes.results||[])];
+  const seen = new Set();
+  return all.filter(r => {
+    if ((r.media_type !== "movie" && r.media_type !== "tv") || seen.has(r.id)) return false;
+    seen.add(r.id);
+    return true;
+  }).slice(0, 10).map(r => ({
+    id: r.id,
+    tmdbID: String(r.id),
+    type: r.media_type,
+    Title: r.title || r.name,
+    Year: (r.release_date || r.first_air_date || "").slice(0,4),
+    Poster: r.poster_path ? TMDB_IMG + r.poster_path : "",
+    Rating: r.vote_average ? r.vote_average.toFixed(1) : null,
+    Genre: ""
+  }));
+}
+
+async function tmdbDetail(id, type) {
+  type = type || "movie";
+  const [detail, credits] = await Promise.all([
+    tmdbFetch(`/${type}/${id}?language=en-US`),
+    tmdbFetch(`/${type}/${id}/credits?language=en-US`)
+  ]);
+  const director = credits.crew?.filter(c => c.job === "Director").map(c => c.name).join(", ") || "";
+  const cast = credits.cast?.slice(0,6).map(c => c.name).join(", ") || "";
+  const writers = credits.crew?.filter(c => ["Screenplay","Writer","Story"].includes(c.job)).slice(0,3).map(c => c.name).join(", ") || "";
+  return {
+    tmdbID: String(id),
+    type,
+    Title: detail.title || detail.name || "",
+    OriginalTitle: detail.original_title || detail.original_name || "",
+    Year: (detail.release_date || detail.first_air_date || "").slice(0,4),
+    Poster: detail.poster_path ? TMDB_IMG + detail.poster_path : "",
+    Runtime: detail.runtime ? `${detail.runtime} min` : (detail.episode_run_time?.[0] ? `${detail.episode_run_time[0]} min/ep` : ""),
+    Rating: detail.vote_average ? detail.vote_average.toFixed(1) : null,
+    Plot: detail.overview || "",
+    Genre: (detail.genres||[]).map(g=>g.name).join(", "),
+    Director: director,
+    Cast: cast,
+    Writers: writers,
+    Country: (detail.production_countries||[]).map(c=>c.name).join(", "),
+    Language: (detail.spoken_languages||[]).map(l=>l.english_name).join(", "),
+    Tagline: detail.tagline || "",
+    Status: detail.status || "",
+    Seasons: detail.number_of_seasons || null,
+    Episodes: detail.number_of_episodes || null,
+    Networks: (detail.networks||[]).map(n=>n.name).join(", "),
+  };
+}
+
+// ── State ─────────────────────────────────────────────────────────────────────
 let watchHistory = [];
 let currentAddMovie = null;
+let currentAddStatus = "watched";
 let currentStars = 0;
+let historyFilter = "all";
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
 function switchTab(name) {
@@ -341,30 +452,18 @@ function switchTab(name) {
   });
   if (name === "history") renderHistory();
   if (name === "recs") {
-    const hint = document.getElementById("rec-history-hint");
-    hint.textContent = watchHistory.length > 0
-      ? `Based on ${watchHistory.length} film${watchHistory.length > 1 ? "s" : ""} in your history`
-      : "Add films to your history for personalised picks";
+    const watched = watchHistory.filter(h => h.status === "watched");
+    document.getElementById("rec-history-hint").textContent = watched.length > 0
+      ? `Based on ${watched.length} watched film${watched.length > 1 ? "s" : ""}`
+      : "Add watched films for personalised picks";
   }
-}
-
-// ── OMDb ──────────────────────────────────────────────────────────────────────
-async function omdbSearch(q) {
-  const r = await fetch(`https://www.omdbapi.com/?apikey=${OMDB_KEY}&s=${encodeURIComponent(q)}&type=movie`);
-  const d = await r.json();
-  return d.Search || [];
-}
-
-async function omdbDetail(id) {
-  const r = await fetch(`https://www.omdbapi.com/?apikey=${OMDB_KEY}&i=${id}&plot=full`);
-  return r.json();
 }
 
 // ── UI helpers ────────────────────────────────────────────────────────────────
 function posterHTML(src, title, w=56, h=80) {
-  const s = `width:${w}px;height:${h}px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#1a1a2e;display:flex;align-items:center;justify-content:center`;
-  if (src && src !== "N/A") return `<div style="${s}"><img src="${src}" alt="${title}" style="width:100%;height:100%;object-fit:cover"></div>`;
-  return `<div style="${s}"><span style="font-size:22px">🎬</span></div>`;
+  const s = `width:${w}px;height:${h}px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#1a1a2e;display:flex;align-items:center;justify-content:center;font-size:22px`;
+  if (src && src !== "N/A") return `<div style="${s}"><img src="${src}" alt="${title||''}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='🎬'"></div>`;
+  return `<div style="${s}">🎬</div>`;
 }
 
 function starsHTML(n, size=13) {
@@ -382,7 +481,7 @@ function loadingHTML(quote, withSkeletons) {
     </div>`).join("") : "";
   return `
     <div class="loading-box">
-      <div class="dots">${[0,1,2,3,4].map(i=>`<div class="dot"></div>`).join("")}</div>
+      <div class="dots">${[0,1,2,3,4].map(()=>`<div class="dot"></div>`).join("")}</div>
       <div class="progress-track"><div class="progress-bar"></div></div>
       <div class="loading-quote">"${quote.text}"</div>
       <div class="loading-source">— ${quote.source}</div>
@@ -390,24 +489,39 @@ function loadingHTML(quote, withSkeletons) {
     </div>${skels}`;
 }
 
+function getEntryStatus(tmdbID) {
+  const e = watchHistory.find(h => h.tmdbID === String(tmdbID));
+  return e ? e.status : null;
+}
+
 function movieCardHTML(m, why) {
-  const inHist = watchHistory.some(h => h.imdbID === m.imdbID);
-  const rating = m.imdbRating && m.imdbRating !== "N/A" ? ` · ★ ${m.imdbRating}` : "";
+  const status = getEntryStatus(m.tmdbID || m.id);
+  const rating = m.Rating ? ` · ★ ${m.Rating}` : "";
   const genre = m.Genre ? ` · ${m.Genre.split(",")[0]}` : "";
+  const mediaTag = m.type === "tv" ? ` · TV` : "";
   const safeM = encodeURIComponent(JSON.stringify(m));
-  const actionBtn = inHist
-    ? `<span class="watched-badge">✓ Watched</span>`
-    : `<button class="btn-add" onclick="event.stopPropagation();openAddEncoded('${safeM}')">+ WATCHED</button>`;
-  const hint = m.imdbID ? `<span class="hint">tap for details →</span>` : "";
+  let actionBtns = "";
+  if (status === "watched") {
+    actionBtns = `<span class="badge-watched">✓ Watched</span>`;
+  } else if (status === "plan") {
+    actionBtns = `<span class="badge-plan">🕐 Want to watch</span>`;
+  } else {
+    actionBtns = `
+      <button class="btn-watched" onclick="event.stopPropagation();openAdd(${safeM},'watched')">+ WATCHED</button>
+      <button class="btn-watchlist" onclick="event.stopPropagation();openAdd(${safeM},'plan')">🕐 LATER</button>`;
+  }
+  const hint = (m.tmdbID||m.id) ? `<span class="hint">tap for details →</span>` : "";
   const topRadius = why ? "12px 12px 0 0" : "12px";
+  const idVal = m.tmdbID || m.id;
+  const typeVal = m.type || "movie";
   return `
     <div>
-      <div class="card" style="border-radius:${topRadius}" onclick="${m.imdbID ? `openDetail('${m.imdbID}')` : ''}">
+      <div class="card" style="border-radius:${topRadius}" onclick="${idVal ? `openDetail('${idVal}','${typeVal}')` : ''}">
         ${posterHTML(m.Poster, m.Title)}
         <div class="card-body">
-          <div class="card-title">${m.Title}</div>
-          <div class="card-meta">${m.Year}${rating}${genre}</div>
-          <div class="card-actions">${actionBtn}${hint}</div>
+          <div class="card-title">${m.Title||""}</div>
+          <div class="card-meta">${m.Year||""}${rating}${genre}${mediaTag}</div>
+          <div class="card-actions">${actionBtns}${hint}</div>
         </div>
       </div>
       ${why ? `<div class="why-strip">💡 ${why}</div>` : ""}
@@ -416,12 +530,24 @@ function movieCardHTML(m, why) {
 
 // ── Search ────────────────────────────────────────────────────────────────────
 async function doSearch() {
-  const q = document.getElementById("search-input").value.trim();
-  if (!q) return;
+  const raw = document.getElementById("search-input").value.trim();
+  if (!raw) return;
   const el = document.getElementById("search-results");
   el.innerHTML = loadingHTML(randQuote(), false);
   try {
-    const results = await omdbSearch(q);
+    // If Cyrillic and Anthropic key available, translate first
+    let q = raw;
+    if (hasCyrillic(raw) && ANTHROPIC_KEY) {
+      q = await translateQuery(raw);
+    }
+    // Search with both original and translated query
+    let results = await tmdbSearch(q);
+    if (hasCyrillic(raw) && q !== raw) {
+      // also search original Russian to catch titles registered in Russian
+      const ruResults = await tmdbSearch(raw);
+      const seen = new Set(results.map(r => r.tmdbID));
+      ruResults.forEach(r => { if (!seen.has(r.tmdbID)) results.push(r); });
+    }
     if (!results.length) {
       el.innerHTML = `<div class="empty"><div class="icon">🤷</div><div class="title">NO RESULTS</div><div class="sub">Try a different title or spelling</div></div>`;
       return;
@@ -433,55 +559,66 @@ async function doSearch() {
 }
 
 // ── Detail ────────────────────────────────────────────────────────────────────
-async function openDetail(id) {
+async function openDetail(id, type) {
   document.getElementById("detail-overlay").style.display = "flex";
   document.getElementById("detail-content").innerHTML = loadingHTML(randQuote(), false);
-  const d = await omdbDetail(id);
-  const inHist = watchHistory.some(h => h.imdbID === id);
-  const chips = (d.Genre||"").split(", ").map(g => `<span class="chip">${g}</span>`).join("");
-  const crew = [
-    d.Director && d.Director!=="N/A" ? `<div class="crew-label">🎬 Director</div><div class="crew-val">${d.Director}</div>` : "",
-    d.Writer && d.Writer!=="N/A" ? `<div class="crew-label">✍️ Screenplay</div><div class="crew-val">${d.Writer}</div>` : "",
-    d.Actors && d.Actors!=="N/A" ? `<div class="crew-label">🌟 Cast</div><div class="crew-val">${d.Actors}</div>` : "",
-  ].join("");
-  const addBtn = inHist
-    ? `<div class="watched-confirm">✓ Already in history</div>`
-    : `<button class="btn-add-history" onclick="openAddFromDetail()">+ ADD TO HISTORY</button>`;
+  try {
+    const d = await tmdbDetail(id, type || "movie");
+    const status = getEntryStatus(id);
+    const chips = d.Genre.split(", ").filter(Boolean).map(g => `<span class="chip">${g}</span>`).join("");
+    const crew = [
+      d.Director ? `<div class="crew-label">🎬 Director</div><div class="crew-val">${d.Director}</div>` : "",
+      d.Writers  ? `<div class="crew-label">✍️ Screenplay</div><div class="crew-val">${d.Writers}</div>` : "",
+      d.Cast     ? `<div class="crew-label">🌟 Cast</div><div class="crew-val">${d.Cast}</div>` : "",
+    ].join("");
+    const tvInfo = d.Seasons ? `<div class="crew-label">SEASONS / EPISODES</div><div class="crew-val">${d.Seasons} seasons · ${d.Episodes} episodes${d.Networks ? ` · ${d.Networks}` : ""}</div>` : "";
 
-  document.getElementById("detail-content").innerHTML = `
-    <div class="modal-top">
-      ${posterHTML(d.Poster, d.Title, 90, 134)}
-      <div style="flex:1;min-width:0">
-        <div class="modal-title">${d.Title||""}</div>
-        <div style="color:#666;font-size:12px;margin-top:3px">${d.Year||""} · ${d.Runtime||""} · ${d.Rated||""}</div>
-        ${d.imdbRating&&d.imdbRating!=="N/A" ? `<div style="color:#F5C518;font-weight:700;font-size:15px;margin-top:4px">★ ${d.imdbRating} <span style="color:#555;font-weight:400;font-size:12px">/ 10 IMDb</span></div>` : ""}
-        ${d.Metascore&&d.Metascore!=="N/A" ? `<div style="font-size:12px;color:#888;margin-top:2px">Metascore: ${d.Metascore}</div>` : ""}
-        <div class="chips">${chips}</div>
+    let actionBtns = `<button class="btn-close" onclick="closeDetail()">Close</button>`;
+    if (status === "watched") {
+      actionBtns += `<div class="already-badge">✓ Already watched</div>`;
+    } else if (status === "plan") {
+      actionBtns += `<div class="already-badge" style="color:#888">🕐 In your watchlist</div>`;
+      actionBtns += `<button class="btn-add-watched" onclick="openAdd(${encodeURIComponent(JSON.stringify(d))},'watched')">MARK WATCHED</button>`;
+    } else {
+      actionBtns += `<button class="btn-add-plan" onclick="openAdd(${encodeURIComponent(JSON.stringify(d))},'plan')">🕐 WATCH LATER</button>`;
+      actionBtns += `<button class="btn-add-watched" onclick="openAdd(${encodeURIComponent(JSON.stringify(d))},'watched')">+ WATCHED</button>`;
+    }
+
+    document.getElementById("detail-content").innerHTML = `
+      <div style="display:flex;gap:14px;margin-bottom:16px">
+        ${posterHTML(d.Poster, d.Title, 90, 134)}
+        <div style="flex:1;min-width:0">
+          <div class="modal-title">${d.Title}</div>
+          ${d.OriginalTitle && d.OriginalTitle !== d.Title ? `<div style="color:#555;font-size:11px;margin-top:1px">${d.OriginalTitle}</div>` : ""}
+          <div style="color:#666;font-size:12px;margin-top:3px">${d.Year}${d.Runtime ? ` · ${d.Runtime}` : ""}</div>
+          ${d.Rating ? `<div style="color:#F5C518;font-weight:700;font-size:15px;margin-top:4px">★ ${d.Rating} <span style="color:#555;font-weight:400;font-size:12px">/ 10 TMDB</span></div>` : ""}
+          ${d.Tagline ? `<div style="color:#555;font-size:12px;margin-top:3px;font-style:italic">"${d.Tagline}"</div>` : ""}
+          <div class="chips">${chips}</div>
+        </div>
       </div>
-    </div>
-    ${d.Plot&&d.Plot!=="N/A" ? `<div class="plot">${d.Plot}</div>` : ""}
-    ${crew}
-    ${d.Awards&&d.Awards!=="N/A" ? `<div class="awards-box">🏆 ${d.Awards}</div>` : ""}
-    ${d.Country&&d.Country!=="N/A" ? `<div style="margin-bottom:18px"><div class="crew-label">COUNTRY / LANGUAGE</div><div class="crew-val">${d.Country} · ${d.Language||""}</div></div>` : ""}
-    <div class="modal-actions">
-      <button class="btn-close" onclick="closeDetail()">Close</button>
-      ${addBtn}
-    </div>`;
-  window._detailMovie = d;
+      ${d.Plot ? `<div class="plot">${d.Plot}</div>` : ""}
+      ${crew}${tvInfo}
+      ${d.Country ? `<div style="margin-bottom:14px"><div class="crew-label">COUNTRY / LANGUAGE</div><div class="crew-val">${d.Country} · ${d.Language}</div></div>` : ""}
+      <div class="modal-actions">${actionBtns}</div>`;
+    window._detailMovie = d;
+  } catch(e) {
+    document.getElementById("detail-content").innerHTML = `<div class="empty"><div class="title">ERROR</div><div class="sub">${e.message}</div></div>`;
+  }
 }
 
-function openAddFromDetail() { openAdd(window._detailMovie); }
 function closeDetail() { document.getElementById("detail-overlay").style.display = "none"; }
 
-// ── Add to history ────────────────────────────────────────────────────────────
-function openAddEncoded(encoded) {
-  openAdd(JSON.parse(decodeURIComponent(encoded)));
-}
-
-function openAdd(movie) {
+// ── Add modal ─────────────────────────────────────────────────────────────────
+function openAdd(movie, status) {
+  if (typeof movie === "string") movie = JSON.parse(decodeURIComponent(movie));
   currentAddMovie = movie;
+  currentAddStatus = status || "watched";
   currentStars = 0;
   document.getElementById("add-movie-title").textContent = `${movie.Title} (${movie.Year})`;
+  document.getElementById("add-modal-label").textContent = status === "plan" ? "SAVE TO WATCHLIST" : "ADD TO HISTORY";
+  document.getElementById("add-confirm-btn").textContent = status === "plan" ? "SAVE" : "SAVE";
+  // Hide stars/notes for plan entries
+  document.getElementById("add-stars-section").style.display = status === "plan" ? "none" : "block";
   document.getElementById("add-note").value = "";
   renderStars(0);
   document.getElementById("add-overlay").style.display = "flex";
@@ -495,19 +632,17 @@ function renderStars(n) {
 
 async function confirmAdd() {
   const m = currentAddMovie;
-  let detail = m;
-  if (m.imdbID) { try { detail = await omdbDetail(m.imdbID); } catch(e) {} }
-
-  const btn = document.querySelector("#add-overlay .btn-add-history");
-  if (btn) { btn.textContent = "SAVING..."; btn.disabled = true; }
+  const btn = document.getElementById("add-confirm-btn");
+  btn.textContent = "SAVING..."; btn.disabled = true;
 
   const entry = {
-    imdbID: m.imdbID || "",
-    title: detail.Title || m.Title || "",
-    year: detail.Year || m.Year || "",
-    poster: detail.Poster || m.Poster || "",
-    stars: currentStars,
-    comment: document.getElementById("add-note").value,
+    tmdbID: String(m.tmdbID || m.id || ""),
+    title: m.Title || "",
+    year: m.Year || "",
+    poster: m.Poster || "",
+    stars: currentAddStatus === "plan" ? 0 : currentStars,
+    comment: currentAddStatus === "plan" ? "" : document.getElementById("add-note").value,
+    status: currentAddStatus
   };
 
   try {
@@ -515,13 +650,14 @@ async function confirmAdd() {
     watchHistory = await loadHistoryFromDB();
   } catch(e) {
     alert("Could not save: " + e.message);
-    if (btn) { btn.textContent = "SAVE"; btn.disabled = false; }
+    btn.textContent = "SAVE"; btn.disabled = false;
     return;
   }
 
   closeAdd();
   closeDetail();
   if (document.querySelector(".tab-btn:nth-child(3)").classList.contains("active")) renderHistory();
+  btn.textContent = "SAVE"; btn.disabled = false;
 }
 
 // ── Picks ─────────────────────────────────────────────────────────────────────
@@ -529,76 +665,84 @@ async function loadRecs() {
   const q = document.getElementById("rec-input").value.trim();
   const btn = document.getElementById("rec-btn");
   const el = document.getElementById("rec-results");
-  btn.disabled = true;
-  btn.textContent = "SEARCHING...";
+  btn.disabled = true; btn.textContent = "SEARCHING...";
   el.innerHTML = loadingHTML(randQuote(), true);
 
   try {
     let suggestions = [];
-
     if (ANTHROPIC_KEY) {
-      const watched = watchHistory.slice(-8).map(m => `${m.title} (${m.year}) ${m.stars}★`).join(", ");
+      const watched = watchHistory.filter(h=>h.status==="watched").slice(-8)
+        .map(m => `${m.title} (${m.year}) ${m.stars}★`).join(", ");
       const prompt = q
-        ? `Suggest 5 movies similar to: "${q}". User watched: ${watched||"nothing yet"}. Reply ONLY with a JSON array: [{"title":"...","year":"...","why":"one sentence"}]`
-        : `Based on this watch history: ${watched||"no history yet"}. Suggest 5 great movies to watch next. Reply ONLY with a JSON array: [{"title":"...","year":"...","why":"one sentence"}]`;
+        ? `Suggest 5 movies or TV shows similar to: "${q}". User watched: ${watched||"nothing yet"}. Reply ONLY with JSON array: [{"title":"...","year":"...","why":"one sentence"}]`
+        : `Based on watch history: ${watched||"no history"}. Suggest 5 films or shows. Reply ONLY with JSON array: [{"title":"...","year":"...","why":"one sentence"}]`;
       const res = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": ANTHROPIC_KEY,
-          "anthropic-version": "2023-06-01"
-        },
-        body: JSON.stringify({ model: "claude-opus-4-6", max_tokens: 800, messages: [{ role: "user", content: prompt }] })
+        headers: { "Content-Type": "application/json", "x-api-key": ANTHROPIC_KEY, "anthropic-version": "2023-06-01" },
+        body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 800, messages: [{ role: "user", content: prompt }] })
       });
       const data = await res.json();
       const text = (data.content||[]).map(b=>b.text||"").join("");
       suggestions = JSON.parse(text.replace(/```json|```/g,"").trim());
     } else {
-      // Fallback without API key
-      const term = q || (watchHistory.length > 0 ? watchHistory[0].title : "award winning films");
-      const found = await omdbSearch(term);
+      const term = q || (watchHistory.filter(h=>h.status==="watched")[0]?.title) || "best films";
+      const found = await tmdbSearch(term);
       suggestions = found.slice(0,5).map(m => ({ title: m.Title, year: m.Year, why: null }));
     }
 
     const details = await Promise.all(suggestions.map(async s => {
-      const found = await omdbSearch(`${s.title} ${s.year}`);
+      const found = await tmdbSearch(s.title + " " + s.year);
       const pick = found[0];
-      if (!pick) return { Title: s.title, Year: s.year, Poster: "", imdbID: null, imdbRating: "N/A", why: s.why };
-      const d = await omdbDetail(pick.imdbID);
-      return { ...d, why: s.why };
+      if (!pick) return { Title: s.title, Year: s.year, Poster: "", tmdbID: null, Rating: null, why: s.why };
+      return { ...pick, why: s.why };
     }));
 
-    if (!details.length) {
-      el.innerHTML = `<div class="empty"><div class="icon">🤷</div><div class="title">NO PICKS FOUND</div><div class="sub">Try a different prompt</div></div>`;
-    } else {
-      el.innerHTML = `<div class="card-list">${details.map(m => movieCardHTML(m, m.why)).join("")}</div>`;
-    }
+    el.innerHTML = details.length
+      ? `<div class="card-list">${details.map(m => movieCardHTML(m, m.why)).join("")}</div>`
+      : `<div class="empty"><div class="icon">🤷</div><div class="title">NO PICKS FOUND</div><div class="sub">Try a different prompt</div></div>`;
   } catch(e) {
     el.innerHTML = `<div class="empty"><div class="title">ERROR</div><div class="sub">${e.message}</div></div>`;
   }
-
-  btn.disabled = false;
-  btn.textContent = "FIND";
+  btn.disabled = false; btn.textContent = "FIND";
 }
 
 // ── History ───────────────────────────────────────────────────────────────────
+function setFilter(f) {
+  historyFilter = f;
+  ["all","watched","plan"].forEach(p => {
+    document.getElementById("pill-"+p).classList.toggle("active", p === f);
+  });
+  renderHistory();
+}
+
 function renderHistory() {
   const el = document.getElementById("history-list");
+  const filtered = historyFilter === "all" ? watchHistory
+    : watchHistory.filter(h => h.status === historyFilter);
+
   if (!watchHistory.length) {
-    el.innerHTML = `<div class="empty"><div class="icon">📋</div><div class="title">NO HISTORY YET</div><div class="sub">Find a film and mark it as watched</div></div>`;
+    el.innerHTML = `<div class="empty"><div class="icon">📋</div><div class="title">YOUR LIST IS EMPTY</div><div class="sub">Search for films and add them</div></div>`;
     return;
   }
-  const rated = watchHistory.filter(h => h.stars > 0);
-  const avg = rated.length ? (rated.reduce((a,b) => a+b.stars, 0) / rated.length).toFixed(1) + "★" : "—";
+  if (!filtered.length) {
+    el.innerHTML = `<div class="empty"><div class="icon">🔍</div><div class="title">NOTHING HERE YET</div><div class="sub">${historyFilter === "watched" ? "Mark films as watched" : "Save films to watch later"}</div></div>`;
+    return;
+  }
+
+  const watched = watchHistory.filter(h => h.status === "watched");
+  const plan = watchHistory.filter(h => h.status === "plan");
+  const rated = watched.filter(h => h.stars > 0);
+  const avg = rated.length ? (rated.reduce((a,b)=>a+b.stars,0)/rated.length).toFixed(1)+"★" : "—";
+
   el.innerHTML = `
     <div class="history-header">
-      <span>${watchHistory.length} film${watchHistory.length>1?"s":""} watched</span>
-      <span>Avg rating: ${avg}</span>
+      <span>${watched.length} watched · ${plan.length} planned</span>
+      <span>Avg: ${avg}</span>
     </div>
     <div class="card-list">
-      ${watchHistory.map(item => `
-        <div class="hist-card" onclick="${item.imdbID ? `openDetail('${item.imdbID}')` : ''}">
-          <div class="hist-poster">${item.poster&&item.poster!=="N/A" ? `<img src="${item.poster}" alt="">` : "🎬"}</div>
+      ${filtered.map(item => `
+        <div class="hist-card ${item.status === 'plan' ? 'plan' : ''}" onclick="${item.tmdbID ? `openDetail('${item.tmdbID}','movie')` : ''}">
+          <div class="hist-poster">${item.poster&&item.poster!=="N/A" ? `<img src="${item.poster}" alt="" onerror="this.parentNode.innerHTML='🎬'">` : "🎬"}</div>
           <div style="flex:1;min-width:0">
             <div class="hist-top">
               <div>
@@ -607,7 +751,9 @@ function renderHistory() {
               </div>
               <button class="hist-del" onclick="event.stopPropagation();deleteItem(${item.id})">×</button>
             </div>
-            <div style="display:flex;gap:2px;margin-top:3px">${starsHTML(item.stars)}</div>
+            ${item.status === "watched"
+              ? `<div style="display:flex;gap:2px;margin-top:3px">${starsHTML(item.stars)}</div>`
+              : `<span class="status-tag plan">🕐 Want to watch</span>`}
             ${item.comment ? `<div class="hist-note">"${item.comment}"</div>` : ""}
           </div>
         </div>`).join("")}
@@ -619,35 +765,23 @@ async function deleteItem(id) {
     await deleteEntryFromDB(id);
     watchHistory = watchHistory.filter(h => h.id !== id);
     renderHistory();
-  } catch(e) {
-    alert("Could not delete: " + e.message);
-  }
+  } catch(e) { alert("Could not delete: " + e.message); }
 }
 
-// Init
+// ── Init ──────────────────────────────────────────────────────────────────────
 document.getElementById("search-results").innerHTML = `
-  <div class="empty">
-    <div class="icon">🎬</div>
-    <div class="title">FIND YOUR NEXT FILM</div>
-    <div class="sub">Type a title and press Search or Enter</div>
-  </div>`;
+  <div class="empty"><div class="icon">🎬</div>
+  <div class="title">FIND YOUR NEXT FILM</div>
+  <div class="sub">Search in English or Russian</div></div>`;
 document.getElementById("rec-results").innerHTML = `
-  <div class="empty">
-    <div class="icon">✨</div>
-    <div class="title">GET PERSONALISED PICKS</div>
-    <div class="sub">Enter a prompt or leave blank and hit Find</div>
-  </div>`;
+  <div class="empty"><div class="icon">✨</div>
+  <div class="title">GET PERSONALISED PICKS</div>
+  <div class="sub">Enter a prompt or leave blank and hit Find</div></div>`;
 
-// Load history from Supabase on startup
 (async () => {
-  try {
-    watchHistory = await loadHistoryFromDB();
-  } catch(e) {
-    console.warn("Could not load history:", e);
-  }
+  try { watchHistory = await loadHistoryFromDB(); } catch(e) { console.warn("History load failed:", e); }
 })();
 
-// Register service worker for PWA / offline support
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./sw.js").catch(err => console.warn("SW:", err));
 }
