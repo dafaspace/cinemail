@@ -504,24 +504,28 @@ function movieCardHTML(m, why) {
   if (status === "watched") {
     actionBtns = `<span class="badge-watched">✓ Watched</span>`;
   } else if (status === "plan") {
-    actionBtns = `<span class="badge-plan">🕐 Want to watch</span>`;
+    actionBtns = `<span class="badge-plan">🕐 Watchlist</span>`;
   } else {
     actionBtns = `
-      <button class="btn-watched" onclick="event.stopPropagation();openAdd(${safeM},'watched')">+ WATCHED</button>
-      <button class="btn-watchlist" onclick="event.stopPropagation();openAdd(${safeM},'plan')">🕐 LATER</button>`;
+      <button class="btn-watchlist" onclick="openAdd('${safeM}','plan')">+ WATCHLIST</button>
+      <button class="btn-watched" onclick="openAdd('${safeM}','watched')">✓ WATCHED</button>`;
   }
-  const hint = (m.tmdbID||m.id) ? `<span class="hint">tap for details →</span>` : "";
   const topRadius = why ? "12px 12px 0 0" : "12px";
   const idVal = m.tmdbID || m.id;
   const typeVal = m.type || "movie";
   return `
     <div>
-      <div class="card" style="border-radius:${topRadius}" onclick="${idVal ? `openDetail('${idVal}','${typeVal}')` : ''}">
-        ${posterHTML(m.Poster, m.Title)}
-        <div class="card-body">
-          <div class="card-title">${m.Title||""}</div>
-          <div class="card-meta">${m.Year||""}${rating}${genre}${mediaTag}</div>
-          <div class="card-actions">${actionBtns}${hint}</div>
+      <div class="card" style="border-radius:${topRadius};cursor:default;align-items:center">
+        <div onclick="${idVal ? `openDetail('${idVal}','${typeVal}')` : ''}" style="display:flex;gap:11px;flex:1;min-width:0;cursor:${idVal?'pointer':'default'}">
+          ${posterHTML(m.Poster, m.Title)}
+          <div class="card-body">
+            <div class="card-title">${m.Title||""}</div>
+            <div class="card-meta">${m.Year||""}${rating}${genre}${mediaTag}</div>
+            ${idVal ? `<div class="hint" style="margin-top:5px">tap for details →</div>` : ""}
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;margin-left:6px">
+          ${actionBtns}
         </div>
       </div>
       ${why ? `<div class="why-strip">💡 ${why}</div>` : ""}
