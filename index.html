@@ -350,6 +350,14 @@ async function deleteEntryFromDB(id) {
   await sbFetch(`watchlist?id=eq.${id}`, { method: "DELETE" });
 }
 
+async function updateEntryInDB(id, fields) {
+  await sbFetch(`watchlist?id=eq.${id}`, {
+    method: "PATCH",
+    prefer: "return=representation",
+    body: JSON.stringify(fields)
+  });
+}
+
 // ── TMDB ──────────────────────────────────────────────────────────────────────
 async function tmdbFetch(path) {
   const res = await fetch(TMDB_BASE + path, {
@@ -513,7 +521,9 @@ function movieCardHTML(m, why) {
   if (status === "watched") {
     actionBtns = `<span class="badge-watched">✓ Watched</span>`;
   } else if (status === "plan") {
-    actionBtns = `<span class="badge-plan">🕐 Watchlist</span>`;
+    actionBtns = `
+      <span class="badge-plan" style="margin-bottom:2px">🕐 Watchlist</span>
+      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">✓ WATCHED</button>`;
   } else {
     actionBtns = `
       <button class="btn-watchlist" onclick="openAdd(_movieRegistry['${key}'],'plan')">+ WATCHLIST</button>
@@ -686,18 +696,29 @@ async function confirmAdd() {
   const btn = document.getElementById("add-confirm-btn");
   btn.textContent = "SAVING..."; btn.disabled = true;
 
-  const entry = {
-    tmdbID: String(m.tmdbID || m.id || ""),
-    title: m.Title || "",
-    year: m.Year || "",
-    poster: m.Poster || "",
-    stars: currentAddStatus === "plan" ? 0 : currentStars,
-    comment: currentAddStatus === "plan" ? "" : document.getElementById("add-note").value,
-    status: currentAddStatus
-  };
+  const tmdbID = String(m.tmdbID || m.id || "");
+  const existing = watchHistory.find(h => h.tmdbID === tmdbID);
 
   try {
-    await saveEntryToDB(entry);
+    if (existing) {
+      // Update existing entry instead of creating a duplicate
+      const fields = { status: currentAddStatus };
+      if (currentAddStatus === "watched") {
+        fields.stars = currentStars;
+        fields.comment = document.getElementById("add-note").value;
+      }
+      await updateEntryInDB(existing.id, fields);
+    } else {
+      await saveEntryToDB({
+        tmdbID,
+        title: m.Title || "",
+        year: m.Year || "",
+        poster: m.Poster || "",
+        stars: currentAddStatus === "plan" ? 0 : currentStars,
+        comment: currentAddStatus === "plan" ? "" : document.getElementById("add-note").value,
+        status: currentAddStatus
+      });
+    }
     watchHistory = await loadHistoryFromDB();
   } catch(e) {
     alert("Could not save: " + e.message);
