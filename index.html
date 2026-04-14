@@ -1306,7 +1306,7 @@ Reply ONLY with a JSON array, no other text:
     }));
 
     el.innerHTML = details.length
-      ? `<div class="card-list">${details.map(m => movieCardHTML(m, m.why)).join("")}</div>`
+      ? `<div class="card-list">${details.map(m => { console.log("pick:", m.Title, "tmdbID:", m.tmdbID, "Poster:", m.Poster?.slice(0,40)); return movieCardHTML(m, m.why); }).join("")}</div>`
       : `<div class="empty"><div class="icon">🤷</div><div class="title">NO PICKS FOUND</div><div class="sub">Try a different prompt</div></div>`;
 
   } catch(e) {
