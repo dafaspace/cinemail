@@ -766,43 +766,64 @@ async function confirmAdd() {
 }
 
 // ── Picks ─────────────────────────────────────────────────────────────────────
-const _shownSurprises = []; // tracks recently shown titles to avoid repeats
+const _shownSurprises = [];
+
+const _surpriseModes = ["taste","taste","random","seasonal","taste","random"];
+let _surpriseModeIdx = 0;
+
+function getSurpriseMode() {
+  return _surpriseModes[(_surpriseModeIdx++) % _surpriseModes.length];
+}
+
+function getSeasonalContext() {
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const day = now.getDay();
+  const hour = now.getHours();
+  const parts = [];
+  if (month === 12 || month === 1) parts.push("winter / holiday season");
+  else if (month >= 3 && month <= 5) parts.push("spring");
+  else if (month >= 6 && month <= 8) parts.push("summer");
+  else parts.push("autumn");
+  if (day === 5 || day === 6) parts.push("weekend");
+  else if (day === 0) parts.push("Sunday");
+  else parts.push("weekday evening");
+  if (hour >= 22) parts.push("late night");
+  else if (hour >= 20) parts.push("evening");
+  return parts.join(", ");
+}
 
 async function surpriseMe() {
   const el = document.getElementById("rec-results");
   el.innerHTML = loadingHTML(randQuote(), true);
-
   try {
+    const mode = getSurpriseMode();
+    const recentlyShown = _shownSurprises.slice(-9).join(", ");
     const watched = watchHistory.filter(h=>h.status==="watched").slice(-12)
-      .map(m => `${m.title} (${m.year})${m.stars ? " "+m.stars+"★" : ""}${m.comment ? ` — "${m.comment}"` : ""}`)
-      .join("\n");
+      .map(m => `${m.title} (${m.year})${m.stars?" "+m.stars+"\u2605":""}`).join(", ");
     const planned = watchHistory.filter(h=>h.status==="plan").slice(-6)
       .map(m => m.title).join(", ");
 
-    // Add randomness seed so Claude doesn't repeat the same picks
-    const seed = Math.floor(Math.random() * 10000);
-
-    const prompt = `You are a film expert. Suggest 3 films or shows for this person to watch tonight. Make them DIFFERENT from each other — vary the genre, mood, era, and country of origin deliberately.
-
-${watched ? `Already watched — DO NOT suggest any of these:\n${watched}` : "No watch history yet."}
-${planned ? `\nAlready on watchlist — DO NOT suggest any of these: ${planned}` : ""}
-
-CRITICAL: None of your 3 suggestions may appear in either list above.
-Randomness seed: ${seed} — use this to vary your picks each time you're called.
-
-For each pick write 1-2 sentences explaining why it suits this person tonight. Be specific to their taste.
-
-Reply ONLY with a JSON array, no other text:
-[{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
+    let prompt = "";
+    if (mode === "random") {
+      prompt = `Pick 3 great films or shows completely at random — pure instinct, no context. Make them wildly different in genre, era, country.${recentlyShown ? "\nDO NOT repeat: "+recentlyShown : ""}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why it's a must-watch"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
+    } else if (mode === "seasonal") {
+      const ctx = getSeasonalContext();
+      prompt = `Suggest 3 films perfectly suited for right now: ${ctx}. Match the mood of the moment.${recentlyShown ? "\nDO NOT repeat: "+recentlyShown : ""}${watched ? "\nAlready watched — skip: "+watched : ""}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why it fits tonight"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
+    } else {
+      prompt = `Suggest 3 films based on taste. Vary genre, era, country.${watched ? "\nWatch history: "+watched : "No history — use acclaimed films."}${planned ? "\nDO NOT suggest from watchlist: "+planned : ""}${recentlyShown ? "\nDO NOT repeat recently shown: "+recentlyShown : ""}${watched ? "\nDO NOT suggest already watched: "+watched : ""}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why they'd love it"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
+    }
 
     const res = await fetch(PROXY_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 600, messages: [{ role: "user", content: prompt }] })
+      body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 700, messages: [{ role: "user", content: prompt }] })
     });
     const data = await res.json();
     const text = (data.content||[]).map(b=>b.text||"").join("");
-    const suggestions = JSON.parse(text.replace(/```json|```/g,"").trim());
+    const cleaned = text.replace(/```json|```/g,"").trim();
+    let suggestions = JSON.parse(cleaned);
+    if (!Array.isArray(suggestions)) suggestions = [suggestions];
 
     const details = await Promise.all(suggestions.map(async s => {
       const found = await tmdbSearch(s.title + " " + s.year);
@@ -810,16 +831,18 @@ Reply ONLY with a JSON array, no other text:
       return pick ? { ...pick, why: s.why } : { Title: s.title, Year: s.year, Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
     }));
 
+    details.forEach(m => { if (m.Title) _shownSurprises.push(m.Title); });
+
+    const modeLabel = mode === "random" ? "✨ RANDOM PICKS" : mode === "seasonal" ? "✨ PICKS FOR TONIGHT" : "✨ PICKS FOR YOU";
     el.innerHTML = `
       <div style="margin-bottom:12px;padding:10px 14px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:12px">
-        <div style="color:#a78bfa;font-size:11px;font-weight:600;letter-spacing:1px">✨ 3 PICKS FOR TONIGHT</div>
+        <div style="color:#a78bfa;font-size:11px;font-weight:600;letter-spacing:1px">${modeLabel}</div>
       </div>
       <div class="card-list">${details.map(m => movieCardHTML(m, m.why)).join("")}</div>`;
   } catch(e) {
     el.innerHTML = `<div class="empty"><div class="title">ERROR</div><div class="sub">${e.message}</div></div>`;
   }
 }
-
 async function loadRecs() {
   const q = document.getElementById("rec-input").value.trim();
   const btn = document.getElementById("rec-btn");
