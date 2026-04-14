@@ -483,21 +483,12 @@ async function onSignedIn(user) {
   });
   document.getElementById("main-app").style.display = "block";
   try { watchHistory = await loadHistoryFromDB(); } catch(e) { console.warn(e); }
-  // Load display name via RPC (bypasses RLS)
+  // Load display name
   try {
     const { data, error } = await sbClient.rpc("get_my_profile");
     console.log("[profile load] data:", data, "error:", error);
-    if (data?.[0]?.display_name) {
-      currentUser.displayName = data[0].display_name;
-    } else {
-      // Profile row missing — derive name from email as fallback
-      currentUser.displayName = user.email?.split("@")[0] || "";
-    }
-  } catch(e) {
-    // RPC not created yet — fall back to email prefix
-    currentUser.displayName = user.email?.split("@")[0] || "";
-    console.warn("[profile load] RPC not available:", e.message);
-  }
+    if (data?.[0]?.display_name) currentUser.displayName = data[0].display_name;
+  } catch(e) { console.warn("[profile load]", e.message); }
   // Check inbox for pending invites
   try {
     const { data } = await sbClient.from("invites").select("id").eq("to_user_id", user.id).eq("status", "pending");
@@ -742,7 +733,6 @@ async function searchUsers(q) {
   el.innerHTML = `<div style="padding:10px 12px;color:#555;font-size:13px">Searching...</div>`;
   el.style.display = "block";
   try {
-    // Call RPC function that runs with SECURITY DEFINER (bypasses RLS)
     const { data, error } = await sbClient.rpc("search_profiles", {
       search_query: q,
       exclude_id: currentUser.id
@@ -761,18 +751,8 @@ async function searchUsers(q) {
       </div>`;
     }).join("");
   } catch(e) {
-    console.error("[searchUsers]", e);
-    // Fallback: try direct fetch with service key hint
-    el.innerHTML = `<div style="padding:10px 12px;color:#f87171;font-size:12px">⚠ ${e.message}<br><span style="color:#555;font-size:10px">Run SQL fix in Supabase (see console)</span></div>`;
-    console.warn("Fix: run this SQL in Supabase SQL Editor:\n\n" +
-      "CREATE OR REPLACE FUNCTION search_profiles(search_query TEXT, exclude_id UUID)\n" +
-      "RETURNS TABLE(id UUID, display_name TEXT)\n" +
-      "LANGUAGE sql SECURITY DEFINER AS $$\n" +
-      "  SELECT id, display_name FROM profiles\n" +
-      "  WHERE display_name ILIKE '%' || search_query || '%'\n" +
-      "  AND id != exclude_id\n" +
-      "  LIMIT 8;\n" +
-      "$$;");
+    console.error("[searchUsers]", e.message);
+    el.innerHTML = `<div style="padding:10px 12px;color:#f87171;font-size:12px">⚠ Нужно выполнить SQL в Supabase (см. README)</div>`;
   }
 }
 
@@ -1384,14 +1364,16 @@ function renderHistory() {
           <div class="hist-poster">${item.poster&&item.poster!=="N/A" ? `<img src="${item.poster}" alt="" onerror="this.parentNode.innerHTML='🎬'">` : "🎬"}</div>
           <div style="flex:1;min-width:0">
             <div class="hist-top">
-              <div>
+              <div style="flex:1;min-width:0">
                 <div class="hist-title">${item.title}</div>
                 <div class="hist-meta">${item.year} · ${item.date}</div>
               </div>
-              <div style="display:flex;gap:4px;align-items:center">
-                <button onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" style="background:none;border:1px solid rgba(124,58,237,0.35);border-radius:5px;color:#9d6ef5;font-size:11px;cursor:pointer;padding:2px 7px;font-family:'Bebas Neue',cursive;letter-spacing:.5px" title="Share">↗ SHARE</button>
-                ${item.status === "watched" ? `<button class="hist-del" style="font-size:13px;color:#555" onclick="event.stopPropagation();openEdit(${item.id})">✏️</button>` : ""}
-                <button class="hist-del" onclick="event.stopPropagation();deleteItem(${item.id})">×</button>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;margin-left:8px;flex-shrink:0">
+                <div style="display:flex;gap:4px;align-items:center">
+                  ${item.status === "watched" ? `<button class="hist-del" style="font-size:12px;color:#555" onclick="event.stopPropagation();openEdit(${item.id})">✏️</button>` : ""}
+                  <button class="hist-del" onclick="event.stopPropagation();deleteItem(${item.id})">×</button>
+                </div>
+                <button onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" style="background:none;border:1px solid rgba(124,58,237,0.35);border-radius:5px;color:#9d6ef5;font-size:10px;cursor:pointer;padding:2px 7px;font-family:'Bebas Neue',cursive;letter-spacing:.5px;white-space:nowrap">↗ SHARE</button>
               </div>
             </div>
             ${item.status === "watched"
@@ -1457,6 +1439,7 @@ async function deleteItem(id) {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 function initUI() {
+  // Show username in header
   const nameEl = document.getElementById("header-username");
   if (nameEl && currentUser) {
     const name = currentUser.displayName || "";
