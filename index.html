@@ -1208,14 +1208,15 @@ async function surpriseMe() {
         const found = await tmdbSearch(s.title + (s.year ? " " + s.year : ""));
         const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
         if (!pick) return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
+        const pickId = (pick.tmdbID && pick.tmdbID !== "null") ? pick.tmdbID : (pick.id ? String(pick.id) : null);
+        if (!pickId) return { ...pick, why: s.why };
         try {
-          const d = await tmdbDetail(pick.tmdbID || String(pick.id), pick.type || "movie");
-          // Use poster from search result if detail didn't return one
+          const d = await tmdbDetail(pickId, pick.type || "movie");
           if (!d.Poster && pick.Poster) d.Poster = pick.Poster;
           return { ...d, why: s.why };
         } catch(e) {
-          console.warn("tmdbDetail failed for", s.title, e.message);
-          return { ...pick, why: s.why };
+          console.warn("tmdbDetail failed for", s.title, "pickId:", pickId, "error:", e.message);
+          return { ...pick, tmdbID: pickId, why: s.why };
         }
       } catch(e) {
         return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
@@ -1223,7 +1224,7 @@ async function surpriseMe() {
     }));
 
     details.forEach(m => { if (m.Title) _shownSurprises.push(m.Title); });
-    sessionStorage.setItem("shownSurprises", JSON.stringify(_shownSurprises.slice(-18)));
+    localStorage.setItem("shownSurprises", JSON.stringify(_shownSurprises.slice(-30)));
 
     const modeLabel = mode === "random" ? "✨ RANDOM PICKS" : mode === "seasonal" ? "✨ PICKS FOR TONIGHT" : "✨ PICKS FOR YOU";
     el.innerHTML = `
@@ -1292,13 +1293,15 @@ Reply ONLY with a JSON array, no other text:
         const found = await tmdbSearch(s.title + (s.year ? " " + s.year : ""));
         const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
         if (!pick) return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
+        const pickId = (pick.tmdbID && pick.tmdbID !== "null") ? pick.tmdbID : (pick.id ? String(pick.id) : null);
+        if (!pickId) return { ...pick, why: s.why };
         try {
-          const d = await tmdbDetail(pick.tmdbID || String(pick.id), pick.type || "movie");
+          const d = await tmdbDetail(pickId, pick.type || "movie");
           if (!d.Poster && pick.Poster) d.Poster = pick.Poster;
           return { ...d, why: s.why };
         } catch(e) {
           console.warn("tmdbDetail failed for", s.title, e.message);
-          return { ...pick, why: s.why };
+          return { ...pick, tmdbID: pickId, why: s.why };
         }
       } catch(e) {
         return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
