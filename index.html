@@ -766,9 +766,11 @@ async function confirmAdd() {
 }
 
 // ── Picks ─────────────────────────────────────────────────────────────────────
+const _shownSurprises = []; // tracks recently shown titles to avoid repeats
+
 async function surpriseMe() {
   const el = document.getElementById("rec-results");
-  el.innerHTML = loadingHTML(randQuote(), false);
+  el.innerHTML = loadingHTML(randQuote(), true);
 
   try {
     const watched = watchHistory.filter(h=>h.status==="watched").slice(-12)
@@ -777,39 +779,42 @@ async function surpriseMe() {
     const planned = watchHistory.filter(h=>h.status==="plan").slice(-6)
       .map(m => m.title).join(", ");
 
-    const prompt = `You are a film expert. Pick ONE perfect film or show for this person to watch tonight.
+    // Add randomness seed so Claude doesn't repeat the same picks
+    const seed = Math.floor(Math.random() * 10000);
+
+    const prompt = `You are a film expert. Suggest 3 films or shows for this person to watch tonight. Make them DIFFERENT from each other — vary the genre, mood, era, and country of origin deliberately.
 
 ${watched ? `Already watched — DO NOT suggest any of these:\n${watched}` : "No watch history yet."}
 ${planned ? `\nAlready on watchlist — DO NOT suggest any of these: ${planned}` : ""}
 
-CRITICAL RULE: Your suggestion must be a film or show that does NOT appear in either list above. Suggesting anything already watched or on the watchlist is a complete failure.
+CRITICAL: None of your 3 suggestions may appear in either list above.
+Randomness seed: ${seed} — use this to vary your picks each time you're called.
 
-Pick something new and unexpected. Be bold — avoid obvious blockbusters unless they truly fit.
-Occasionally go outside their comfort zone with something they might not have considered.
-Write 2-3 sentences explaining exactly why THIS specific film is the right choice for them tonight.
+For each pick write 1-2 sentences explaining why it suits this person tonight. Be specific to their taste.
 
-Reply ONLY with JSON (no other text):
-{"title":"...","year":"...","type":"movie or tv","why":"2-3 sentence explanation"}`;
+Reply ONLY with a JSON array, no other text:
+[{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
 
     const res = await fetch(PROXY_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 400, messages: [{ role: "user", content: prompt }] })
+      body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 600, messages: [{ role: "user", content: prompt }] })
     });
     const data = await res.json();
     const text = (data.content||[]).map(b=>b.text||"").join("");
-    const s = JSON.parse(text.replace(/```json|```/g,"").trim());
+    const suggestions = JSON.parse(text.replace(/```json|```/g,"").trim());
 
-    const found = await tmdbSearch(s.title + " " + s.year);
-    const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
-    const m = pick ? { ...pick, why: s.why } : { Title: s.title, Year: s.year, Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
+    const details = await Promise.all(suggestions.map(async s => {
+      const found = await tmdbSearch(s.title + " " + s.year);
+      const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
+      return pick ? { ...pick, why: s.why } : { Title: s.title, Year: s.year, Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
+    }));
 
     el.innerHTML = `
-      <div style="margin-bottom:12px;padding:12px 14px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:12px">
-        <div style="color:#a78bfa;font-size:11px;font-weight:600;letter-spacing:1px;margin-bottom:4px">✨ TONIGHT'S PICK</div>
-        <div style="color:#ddd;font-size:13px;line-height:1.6">${s.why}</div>
+      <div style="margin-bottom:12px;padding:10px 14px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:12px">
+        <div style="color:#a78bfa;font-size:11px;font-weight:600;letter-spacing:1px">✨ 3 PICKS FOR TONIGHT</div>
       </div>
-      <div class="card-list">${movieCardHTML(m)}</div>`;
+      <div class="card-list">${details.map(m => movieCardHTML(m, m.why)).join("")}</div>`;
   } catch(e) {
     el.innerHTML = `<div class="empty"><div class="title">ERROR</div><div class="sub">${e.message}</div></div>`;
   }
