@@ -335,7 +335,7 @@ const SB_URL = "https://ubjafkxdybiwgcupassu.supabase.co";
 const SB_KEY = "sb_publishable_Ep9kQs8XcfgUoK2ACiIo8w_CLDGkZJf";
 
 // ── Supabase Auth client ──────────────────────────────────────────────────────
-let supabase = null;
+let sbClient = null;
 let currentUser = null;
 let authMode = "signin";
 
@@ -358,14 +358,14 @@ async function authSubmit() {
   try {
     let result;
     if (authMode === "signup") {
-      result = await supabase.auth.signUp({ email, password });
+      result = await sbClient.auth.signUp({ email, password });
       if (result.error) throw result.error;
       if (result.data.user && !result.data.session) {
         showAuthError("Check your email to confirm your account, then sign in.");
         btn.textContent = "SIGN UP"; btn.disabled = false; return;
       }
     } else {
-      result = await supabase.auth.signInWithPassword({ email, password });
+      result = await sbClient.auth.signInWithPassword({ email, password });
       if (result.error) throw result.error;
     }
     await onSignedIn(result.data.user);
@@ -391,7 +391,7 @@ async function onSignedIn(user) {
 }
 
 async function signOut() {
-  await supabase.auth.signOut();
+  await sbClient.auth.signOut();
   currentUser = null;
   watchHistory = [];
   document.getElementById("main-app").style.display = "none";
@@ -422,7 +422,7 @@ const randQuote = () => QUOTES[Math.floor(Math.random() * QUOTES.length)];
 
 // ── Supabase ──────────────────────────────────────────────────────────────────
 async function sbFetch(path, opts = {}) {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await sbClient.auth.getSession();
   const token = session ? session.access_token : SB_KEY;
   const res = await fetch(SB_URL + "/rest/v1/" + path, {
     ...opts,
@@ -1134,17 +1134,17 @@ function initUI() {
 
 (async () => {
   // Wait for Supabase SDK then initialize
-  supabase = window.supabase.createClient(SB_URL, SB_KEY);
+  sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
   // Check if user already has a session
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await sbClient.auth.getSession();
   if (session) {
     await onSignedIn(session.user);
   } else {
     document.getElementById("auth-screen").style.display = "flex";
   }
   // Listen for auth changes
-  supabase.auth.onAuthStateChange(async (event, session) => {
+  sbClient.auth.onAuthStateChange(async (event, session) => {
     if (event === "SIGNED_IN" && session) {
       await onSignedIn(session.user);
     } else if (event === "SIGNED_OUT") {
