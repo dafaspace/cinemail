@@ -137,9 +137,13 @@
   .btn-close { flex: 1; min-width: 80px; padding: 10px; border-radius: 9px;
     background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
     color: #777; cursor: pointer; font-size: 13px; font-family: 'DM Sans', sans-serif; }
-  .btn-add-watched { flex: 2; padding: 10px; border-radius: 9px; background: #F5C518;
+  .btn-add-watched { flex: 2; padding: 10px; border-radius: 9px; background: transparent;
+    border: 1px solid rgba(245,197,24,0.5); color: #F5C518; font-family: 'Bebas Neue', cursive;
+    font-size: 14px; letter-spacing: 1px; cursor: pointer; transition: all .15s; }
+  .btn-add-watched:hover { background: rgba(245,197,24,0.1); border-color: #F5C518; }
+  .btn-save { flex: 2; padding: 10px; border-radius: 9px; background: #F5C518;
     border: none; color: #111; font-family: 'Bebas Neue', cursive;
-    font-size: 14px; letter-spacing: 1px; cursor: pointer; }
+    font-size: 15px; letter-spacing: 1px; cursor: pointer; }
   .btn-add-plan { flex: 2; padding: 10px; border-radius: 9px;
     background: transparent; border: 1px solid rgba(255,255,255,0.2);
     color: #aaa; font-family: 'Bebas Neue', cursive;
@@ -254,7 +258,10 @@
     <h1><span class="gold">MOVIE</span> NIGHT</h1>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px">
       <p style="margin:0">TMDB · AI Picks · Watch History</p>
-      <button onclick="signOut()" style="background:none;border:none;color:#444;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0">Sign out</button>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span id="header-username" style="color:#555;font-size:11px"></span>
+        <button onclick="signOut()" style="background:none;border:none;color:#444;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0">Sign out</button>
+      </div>
     </div>
   </div>
 
@@ -347,7 +354,7 @@
       <textarea id="edit-note" placeholder="What did you think?"></textarea>
       <div style="display:flex;gap:9px">
         <button class="btn-close" onclick="closeEdit()">Cancel</button>
-        <button class="btn-add-watched" id="edit-confirm-btn" onclick="confirmEdit()">SAVE</button>
+        <button class="btn-save" id="edit-confirm-btn" onclick="confirmEdit()">SAVE</button>
       </div>
     </div>
   </div>
@@ -380,7 +387,7 @@
       </div>
       <div style="display:flex;gap:9px">
         <button class="btn-close" onclick="closeAdd()">Cancel</button>
-        <button class="btn-add-watched" id="add-confirm-btn" onclick="confirmAdd()">SAVE</button>
+        <button class="btn-save" id="add-confirm-btn" onclick="confirmAdd()">SAVE</button>
       </div>
     </div>
   </div>
@@ -911,11 +918,11 @@ function movieCardHTML(m, why) {
   } else if (status === "plan") {
     actionBtns = `
       <span class="badge-plan" style="margin-bottom:2px">🕐 Watchlist</span>
-      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">✓ WATCHED</button>`;
+      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">WATCHED</button>`;
   } else {
     actionBtns = `
       <button class="btn-watchlist" onclick="openAdd(_movieRegistry['${key}'],'plan')">+ WATCHLIST</button>
-      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">✓ WATCHED</button>`;
+      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">WATCHED</button>`;
   }
   const topRadius = why ? "12px 12px 0 0" : "12px";
   const idVal = m.tmdbID || m.id;
@@ -1033,7 +1040,7 @@ async function openDetail(id, type) {
       actionBtns += `<button class="btn-add-watched" onclick="openAdd(window._detailMovie,'watched')">MARK WATCHED</button>`;
     } else {
       actionBtns += `<button class="btn-add-plan" onclick="openAdd(window._detailMovie,'plan')">+ WATCHLIST</button>`;
-      actionBtns += `<button class="btn-add-watched" onclick="openAdd(window._detailMovie,'watched')">✓ WATCHED</button>`;
+      actionBtns += `<button class="btn-add-watched" onclick="openAdd(window._detailMovie,'watched')">WATCHED</button>`;
     }
 
     document.getElementById("detail-content").innerHTML = `
@@ -1413,6 +1420,12 @@ async function deleteItem(id) {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 function initUI() {
+  // Show username in header
+  const nameEl = document.getElementById("header-username");
+  if (nameEl && currentUser) {
+    const name = currentUser.displayName || currentUser.email?.split("@")[0] || "";
+    nameEl.textContent = name ? `Hi, ${name}` : "";
+  }
   document.getElementById("search-results").innerHTML = `
     <div class="empty"><div class="icon">🎬</div>
     <div class="title">FIND YOUR NEXT FILM</div>
