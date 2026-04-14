@@ -222,7 +222,10 @@
 <div class="app" id="main-app" style="display:none">
   <div class="header">
     <h1><span class="gold">MOVIE</span> NIGHT</h1>
-    <p>TMDB · AI Picks · Watch History</p>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px">
+      <p style="margin:0">TMDB · AI Picks · Watch History</p>
+      <button onclick="signOut()" style="background:none;border:none;color:#444;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0">Sign out</button>
+    </div>
   </div>
 
   <div class="tabs">
@@ -247,8 +250,8 @@
         <div class="search-row">
           <input id="rec-input" type="text" placeholder="Mood, genre, or anything...">
           <button class="btn-gold" id="rec-btn" onclick="loadRecs()">FIND</button>
-          <button onclick="surpriseMe()" style="padding:11px 14px;border-radius:10px;background:#7c3aed;border:none;color:#fff;font-family:'Bebas Neue',cursive;font-size:15px;letter-spacing:1px;cursor:pointer;flex-shrink:0;transition:opacity .15s;white-space:nowrap" onmouseover="this.style.opacity=.85" onmouseout="this.style.opacity=1">✨ SURPRISE ME</button>
         </div>
+        <button onclick="surpriseMe()" style="width:100%;margin-top:8px;padding:9px;border-radius:10px;background:#7c3aed;border:none;color:#fff;font-family:'Bebas Neue',cursive;font-size:14px;letter-spacing:1px;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity=.85" onmouseout="this.style.opacity=1">✨ SURPRISE ME</button>
         <div id="rec-history-hint" style="color:#444;font-size:11px;margin-top:5px"></div>
       </div>
       <div id="rec-results"></div>
