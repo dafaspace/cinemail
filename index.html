@@ -273,7 +273,8 @@
 const TMDB_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkMzZlNzE1NWJmMGM3YTEwZWU3ZDZhMzQ3NTRjZGIwZiIsIm5iZiI6MTc3NTU0MzgzNi45MDIwMDAyLCJzdWIiOiI2OWQ0YTYxY2UzMmYxZGQ5NjVmOGE0NTYiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.LQNp1b9CpMzuO2J5XknQ4osUtiqoG9VRsZpGg0oAY4U";
 const TMDB_BASE = "https://api.themoviedb.org/3";
 const TMDB_IMG  = "https://image.tmdb.org/t/p/w300";
-const ANTHROPIC_KEY = "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";
+const ANTHROPIC_KEY = "enabled"; // Key stored securely in Cloudflare Worker
+const PROXY_URL = "https://movie-night-proxy.dafa4me.workers.dev";
 
 const SB_URL = "https://ubjafkxdybiwgcupassu.supabase.co";
 const SB_KEY = "sb_publishable_Ep9kQs8XcfgUoK2ACiIo8w_CLDGkZJf";
@@ -374,9 +375,9 @@ function hasCyrillic(str) { return /[а-яёА-ЯЁ]/.test(str); }
 async function translateQuery(q) {
   if (!ANTHROPIC_KEY) return q;
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
+    const res = await fetch(PROXY_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-api-key": ANTHROPIC_KEY, "anthropic-version": "2023-06-01" },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001", max_tokens: 100,
         messages: [{ role: "user", content: `Translate this movie/show title to English for searching. Reply with ONLY the English title, nothing else: "${q}"` }]
@@ -763,9 +764,9 @@ Write 2-3 sentences explaining exactly why THIS film is perfect for them tonight
 Reply ONLY with JSON (no other text):
 {"title":"...","year":"...","type":"movie or tv","why":"2-3 sentence explanation"}`;
 
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
+    const res = await fetch(PROXY_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-api-key": ANTHROPIC_KEY, "anthropic-version": "2023-06-01" },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 400, messages: [{ role: "user", content: prompt }] })
     });
     const data = await res.json();
@@ -820,9 +821,9 @@ Based on their taste and request, suggest exactly 5 films or TV shows.
 Reply ONLY with a JSON array, no other text:
 [{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
 
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch(PROXY_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-api-key": ANTHROPIC_KEY, "anthropic-version": "2023-06-01" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "claude-haiku-4-5-20251001",
           max_tokens: 1000,
