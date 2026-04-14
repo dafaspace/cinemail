@@ -1128,7 +1128,7 @@ async function confirmAdd() {
 }
 
 // ── Picks ─────────────────────────────────────────────────────────────────────
-const _shownSurprises = [];
+const _shownSurprises = JSON.parse(sessionStorage.getItem("shownSurprises") || "[]");
 
 const _surpriseModes = ["taste","taste","random","seasonal","taste","random"];
 let _surpriseModeIdx = Math.floor(Math.random() * _surpriseModes.length);
@@ -1188,19 +1188,19 @@ async function surpriseMe() {
     if (!Array.isArray(suggestions)) suggestions = [suggestions];
 
     const details = await Promise.all(suggestions.map(async s => {
-      const found = await tmdbSearch(s.title + " " + s.year);
-      const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
-      if (!pick) return { Title: s.title, Year: s.year, Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
-      // Fetch full details to get proper poster
       try {
-        const d = await tmdbDetail(pick.tmdbID || pick.id, pick.type || "movie");
+        const found = await tmdbSearch(s.title + (s.year ? " " + s.year : ""));
+        const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
+        if (!pick) return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
+        const d = await tmdbDetail(pick.tmdbID || String(pick.id), pick.type || "movie");
         return { ...d, why: s.why };
       } catch(e) {
-        return { ...pick, why: s.why };
+        return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
       }
     }));
 
     details.forEach(m => { if (m.Title) _shownSurprises.push(m.Title); });
+    sessionStorage.setItem("shownSurprises", JSON.stringify(_shownSurprises.slice(-18)));
 
     const modeLabel = mode === "random" ? "✨ RANDOM PICKS" : mode === "seasonal" ? "✨ PICKS FOR TONIGHT" : "✨ PICKS FOR YOU";
     el.innerHTML = `
@@ -1265,14 +1265,14 @@ Reply ONLY with a JSON array, no other text:
 
     // Fetch TMDB details for each suggestion
     const details = await Promise.all(suggestions.map(async s => {
-      const found = await tmdbSearch(s.title + " " + s.year);
-      const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
-      if (!pick) return { Title: s.title, Year: s.year, Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
       try {
-        const d = await tmdbDetail(pick.tmdbID || pick.id, pick.type || "movie");
+        const found = await tmdbSearch(s.title + (s.year ? " " + s.year : ""));
+        const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
+        if (!pick) return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
+        const d = await tmdbDetail(pick.tmdbID || String(pick.id), pick.type || "movie");
         return { ...d, why: s.why };
       } catch(e) {
-        return { ...pick, why: s.why };
+        return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
       }
     }));
 
