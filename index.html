@@ -1203,25 +1203,16 @@ async function surpriseMe() {
     let suggestions = JSON.parse(cleaned);
     if (!Array.isArray(suggestions)) suggestions = [suggestions];
 
-    // Sequential to avoid TMDB rate limiting
+    // Use simple search like doSearch — details load on click
     const details = [];
     for (const s of suggestions) {
-      try {
-        let found = await tmdbSearch(s.title + (s.year ? " " + s.year : ""));
-        if (!found.length) found = await tmdbSearch(s.title);
-        const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
-        if (!pick) { details.push({ Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why }); continue; }
-        const pickId = pick.id ? String(pick.id) : (pick.tmdbID && pick.tmdbID !== "null" ? pick.tmdbID : null);
-        if (!pickId) { details.push({ ...pick, why: s.why }); continue; }
-        try {
-          const d = await tmdbDetail(pickId, pick.type || "movie");
-          if (!d.Poster && pick.Poster) d.Poster = pick.Poster;
-          details.push({ ...d, why: s.why });
-        } catch(e) {
-          details.push({ ...pick, tmdbID: pickId, why: s.why });
-        }
-      } catch(e) {
-        details.push({ Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why });
+      let found = await tmdbSearch(s.title + (s.year ? " " + s.year : ""));
+      if (!found.length) found = await tmdbSearch(s.title);
+      const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
+      if (pick) {
+        details.push({ ...pick, why: s.why });
+      } else {
+        details.push({ Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, type: s.type||"movie", why: s.why });
       }
     }
 
@@ -1289,25 +1280,16 @@ Reply ONLY with a JSON array, no other text:
       return;
     }
 
-    // Fetch TMDB details sequentially to avoid rate limiting
+    // Use simple search like doSearch — details load on click
     const details = [];
     for (const s of suggestions) {
-      try {
-        let found = await tmdbSearch(s.title + (s.year ? " " + s.year : ""));
-        if (!found.length) found = await tmdbSearch(s.title);
-        const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
-        if (!pick) { details.push({ Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why }); continue; }
-        const pickId = pick.id ? String(pick.id) : (pick.tmdbID && pick.tmdbID !== "null" ? pick.tmdbID : null);
-        if (!pickId) { details.push({ ...pick, why: s.why }); continue; }
-        try {
-          const d = await tmdbDetail(pickId, pick.type || "movie");
-          if (!d.Poster && pick.Poster) d.Poster = pick.Poster;
-          details.push({ ...d, why: s.why });
-        } catch(e) {
-          details.push({ ...pick, tmdbID: pickId, why: s.why });
-        }
-      } catch(e) {
-        details.push({ Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why });
+      let found = await tmdbSearch(s.title + (s.year ? " " + s.year : ""));
+      if (!found.length) found = await tmdbSearch(s.title);
+      const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
+      if (pick) {
+        details.push({ ...pick, why: s.why });
+      } else {
+        details.push({ Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, type: s.type||"movie", why: s.why });
       }
     }
 
