@@ -478,8 +478,8 @@ async function onSignedIn(user) {
   try { watchHistory = await loadHistoryFromDB(); } catch(e) { console.warn(e); }
   // Load display name
   try {
-    const { data } = await sbClient.from("profiles").select("display_name").eq("id", user.id).single();
-    if (data?.display_name) currentUser.displayName = data.display_name;
+    const { data } = await sbClient.from("profiles").select("display_name").eq("id", user.id).limit(1);
+    if (data?.[0]?.display_name) currentUser.displayName = data[0].display_name;
   } catch(e) {}
   // Check inbox for pending invites
   try {
