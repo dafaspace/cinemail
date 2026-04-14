@@ -213,10 +213,10 @@
     <!-- PICKS -->
     <div id="tab-recs" style="display:none">
       <div style="margin-bottom:12px">
-        <div style="color:#555;font-size:11px;margin-bottom:5px;font-weight:600;letter-spacing:.5px">OPTIONAL PROMPT</div>
         <div class="search-row">
-          <input id="rec-input" type="text" placeholder="Genre, mood, a film you love...">
+          <input id="rec-input" type="text" placeholder="Mood, genre, or anything...">
           <button class="btn-gold" id="rec-btn" onclick="loadRecs()">FIND</button>
+          <button onclick="surpriseMe()" style="padding:11px 14px;border-radius:10px;background:#7c3aed;border:none;color:#fff;font-family:'Bebas Neue',cursive;font-size:15px;letter-spacing:1px;cursor:pointer;flex-shrink:0;transition:opacity .15s;white-space:nowrap" onmouseover="this.style.opacity=.85" onmouseout="this.style.opacity=1">✨ SURPRISE ME</button>
         </div>
         <div id="rec-history-hint" style="color:#444;font-size:11px;margin-top:5px"></div>
       </div>
@@ -273,7 +273,7 @@
 const TMDB_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkMzZlNzE1NWJmMGM3YTEwZWU3ZDZhMzQ3NTRjZGIwZiIsIm5iZiI6MTc3NTU0MzgzNi45MDIwMDAyLCJzdWIiOiI2OWQ0YTYxY2UzMmYxZGQ5NjVmOGE0NTYiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.LQNp1b9CpMzuO2J5XknQ4osUtiqoG9VRsZpGg0oAY4U";
 const TMDB_BASE = "https://api.themoviedb.org/3";
 const TMDB_IMG  = "https://image.tmdb.org/t/p/w300";
-const ANTHROPIC_KEY = ""; // Optional: paste your Anthropic key for AI picks
+const ANTHROPIC_KEY = "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";
 
 const SB_URL = "https://ubjafkxdybiwgcupassu.supabase.co";
 const SB_KEY = "sb_publishable_Ep9kQs8XcfgUoK2ACiIo8w_CLDGkZJf";
@@ -740,45 +740,117 @@ async function confirmAdd() {
 }
 
 // ── Picks ─────────────────────────────────────────────────────────────────────
+async function surpriseMe() {
+  const el = document.getElementById("rec-results");
+  el.innerHTML = loadingHTML(randQuote(), false);
+
+  try {
+    const watched = watchHistory.filter(h=>h.status==="watched").slice(-12)
+      .map(m => `${m.title} (${m.year})${m.stars ? " "+m.stars+"★" : ""}${m.comment ? ` — "${m.comment}"` : ""}`)
+      .join("\n");
+    const planned = watchHistory.filter(h=>h.status==="plan").slice(-6)
+      .map(m => m.title).join(", ");
+
+    const prompt = `You are a film expert. Pick ONE perfect film or show for this person to watch tonight.
+
+${watched ? `Their watch history:\n${watched}` : "No watch history yet."}
+${planned ? `\nOn their watchlist: ${planned}` : ""}
+
+Choose something they haven't seen. Be bold — don't just pick the obvious choice.
+Occasionally suggest something outside their comfort zone that they might love.
+Write 2-3 sentences explaining exactly why THIS film is perfect for them tonight.
+
+Reply ONLY with JSON (no other text):
+{"title":"...","year":"...","type":"movie or tv","why":"2-3 sentence explanation"}`;
+
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-api-key": ANTHROPIC_KEY, "anthropic-version": "2023-06-01" },
+      body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 400, messages: [{ role: "user", content: prompt }] })
+    });
+    const data = await res.json();
+    const text = (data.content||[]).map(b=>b.text||"").join("");
+    const s = JSON.parse(text.replace(/```json|```/g,"").trim());
+
+    const found = await tmdbSearch(s.title + " " + s.year);
+    const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
+    const m = pick ? { ...pick, why: s.why } : { Title: s.title, Year: s.year, Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
+
+    el.innerHTML = `
+      <div style="margin-bottom:12px;padding:12px 14px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:12px">
+        <div style="color:#a78bfa;font-size:11px;font-weight:600;letter-spacing:1px;margin-bottom:4px">✨ TONIGHT'S PICK</div>
+        <div style="color:#ddd;font-size:13px;line-height:1.6">${s.why}</div>
+      </div>
+      <div class="card-list">${movieCardHTML(m)}</div>`;
+  } catch(e) {
+    el.innerHTML = `<div class="empty"><div class="title">ERROR</div><div class="sub">${e.message}</div></div>`;
+  }
+}
+
 async function loadRecs() {
   const q = document.getElementById("rec-input").value.trim();
   const btn = document.getElementById("rec-btn");
   const el = document.getElementById("rec-results");
-  btn.disabled = true; btn.textContent = "SEARCHING...";
+  btn.disabled = true; btn.textContent = "THINKING...";
   el.innerHTML = loadingHTML(randQuote(), true);
 
   try {
     let suggestions = [];
+
     if (ANTHROPIC_KEY) {
-      const watched = watchHistory.filter(h=>h.status==="watched").slice(-8)
-        .map(m => `${m.title} (${m.year}) ${m.stars}★`).join(", ");
-      const prompt = q
-        ? `Suggest 5 movies or TV shows similar to: "${q}". User watched: ${watched||"nothing yet"}. Reply ONLY with JSON array: [{"title":"...","year":"...","why":"one sentence"}]`
-        : `Based on watch history: ${watched||"no history"}. Suggest 5 films or shows. Reply ONLY with JSON array: [{"title":"...","year":"...","why":"one sentence"}]`;
+      const watched = watchHistory.filter(h=>h.status==="watched").slice(-12)
+        .map(m => `${m.title} (${m.year})${m.stars ? " "+m.stars+"★" : ""}${m.comment ? ` — "${m.comment}"` : ""}`)
+        .join("\n");
+      const planned = watchHistory.filter(h=>h.status==="plan").slice(-6)
+        .map(m => m.title).join(", ");
+
+      const prompt = `You are a film expert helping pick what to watch tonight.
+
+${watched ? `Watch history:\n${watched}` : "No watch history yet."}
+${planned ? `\nOn their watchlist: ${planned}` : ""}
+
+User request: "${q || "Surprise me with something great"}"
+
+Based on their taste and request, suggest exactly 5 films or TV shows.
+- Interpret the request broadly: if they say "something funny", find comedy films; "cozy evening" means light feel-good content; "mind-bending" means psychological thrillers etc.
+- Don't suggest anything already in their history or watchlist.
+- Vary genres/eras unless the request is specific.
+- For each, write one sentence explaining WHY it fits their taste or request specifically.
+
+Reply ONLY with a JSON array, no other text:
+[{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
+
       const res = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-api-key": ANTHROPIC_KEY, "anthropic-version": "2023-06-01" },
-        body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 800, messages: [{ role: "user", content: prompt }] })
+        body: JSON.stringify({
+          model: "claude-haiku-4-5-20251001",
+          max_tokens: 1000,
+          messages: [{ role: "user", content: prompt }]
+        })
       });
       const data = await res.json();
       const text = (data.content||[]).map(b=>b.text||"").join("");
       suggestions = JSON.parse(text.replace(/```json|```/g,"").trim());
     } else {
-      const term = q || (watchHistory.filter(h=>h.status==="watched")[0]?.title) || "best films";
-      const found = await tmdbSearch(term);
-      suggestions = found.slice(0,5).map(m => ({ title: m.Title, year: m.Year, why: null }));
+      el.innerHTML = `<div class="empty"><div class="icon">🔑</div><div class="title">API KEY NEEDED</div><div class="sub">Add your Anthropic key to enable smart picks</div></div>`;
+      btn.disabled = false; btn.textContent = "FIND";
+      return;
     }
 
+    // Fetch TMDB details for each suggestion
     const details = await Promise.all(suggestions.map(async s => {
       const found = await tmdbSearch(s.title + " " + s.year);
-      const pick = found[0];
-      if (!pick) return { Title: s.title, Year: s.year, Poster: "", tmdbID: null, Rating: null, why: s.why };
+      // Try to match type if Claude specified it
+      const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
+      if (!pick) return { Title: s.title, Year: s.year, Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
       return { ...pick, why: s.why };
     }));
 
     el.innerHTML = details.length
       ? `<div class="card-list">${details.map(m => movieCardHTML(m, m.why)).join("")}</div>`
       : `<div class="empty"><div class="icon">🤷</div><div class="title">NO PICKS FOUND</div><div class="sub">Try a different prompt</div></div>`;
+
   } catch(e) {
     el.innerHTML = `<div class="empty"><div class="title">ERROR</div><div class="sub">${e.message}</div></div>`;
   }
@@ -851,7 +923,7 @@ async function deleteItem(id) {
 document.getElementById("search-results").innerHTML = `
   <div class="empty"><div class="icon">🎬</div>
   <div class="title">FIND YOUR NEXT FILM</div>
-  <div class="sub">Search in English or Russian</div></div>`;
+  <div class="sub">Type a title and press Search</div></div>`;
 document.getElementById("rec-results").innerHTML = `
   <div class="empty"><div class="icon">✨</div>
   <div class="title">GET PERSONALISED PICKS</div>
