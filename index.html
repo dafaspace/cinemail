@@ -1166,14 +1166,30 @@ async function surpriseMe() {
     const planned = watchHistory.filter(h=>h.status==="plan").slice(-6)
       .map(m => m.title).join(", ");
 
-    let prompt = "";
-    if (mode === "random") {
-      prompt = `Pick 3 great films or shows completely at random — pure instinct, no context. Make them wildly different in genre, era, country.${recentlyShown ? "\nDO NOT repeat: "+recentlyShown : ""}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why it's a must-watch"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
+  let prompt = "";
+
+  // Random angles to force variety each call
+  const angles = [
+    "Focus on films from non-English speaking countries.",
+    "Focus on films from the 1970s or 1980s.",
+    "Focus on documentary or animated films.",
+    "Focus on recent films from the last 3 years.",
+    "Focus on cult classics or underrated gems.",
+    "Focus on films from Asia or Latin America.",
+    "Focus on short films or miniseries under 4 episodes.",
+    "Include at least one silent era or black-and-white film.",
+    "Focus on films with female directors.",
+    "Mix decades: one classic, one from 90s-2000s, one recent.",
+  ];
+  const angle = angles[Math.floor(Math.random() * angles.length)];
+
+  if (mode === "random") {
+      prompt = `Pick 3 great films or shows completely at random — pure instinct, no context. ${angle} Make them wildly different in genre, era, country.${recentlyShown ? "\nDO NOT repeat: "+recentlyShown : ""}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why it's a must-watch"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
     } else if (mode === "seasonal") {
       const ctx = getSeasonalContext();
-      prompt = `Suggest 3 films perfectly suited for right now: ${ctx}. Match the mood of the moment.${recentlyShown ? "\nDO NOT repeat: "+recentlyShown : ""}${watched ? "\nAlready watched — skip: "+watched : ""}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why it fits tonight"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
+      prompt = `Suggest 3 films perfectly suited for right now: ${ctx}. Match the mood of the moment. ${angle}${recentlyShown ? "\nDO NOT repeat: "+recentlyShown : ""}${watched ? "\nAlready watched — skip: "+watched : ""}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why it fits tonight"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
     } else {
-      prompt = `Suggest 3 films based on taste. Vary genre, era, country.${watched ? "\nWatch history: "+watched : "No history — use acclaimed films."}${planned ? "\nDO NOT suggest from watchlist: "+planned : ""}${recentlyShown ? "\nDO NOT repeat recently shown: "+recentlyShown : ""}${watched ? "\nDO NOT suggest already watched: "+watched : ""}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why they'd love it"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
+      prompt = `Suggest 3 films based on taste. ${angle} Vary genre, era, country.${watched ? "\nWatch history: "+watched : "No history — use acclaimed films."}${planned ? "\nDO NOT suggest from watchlist: "+planned : ""}${recentlyShown ? "\nDO NOT repeat recently shown: "+recentlyShown : ""}${watched ? "\nDO NOT suggest already watched: "+watched : ""}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why they'd love it"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
     }
 
     const res = await fetch(PROXY_URL, {
@@ -1195,7 +1211,11 @@ async function surpriseMe() {
         const d = await tmdbDetail(pick.tmdbID || String(pick.id), pick.type || "movie");
         return { ...d, why: s.why };
       } catch(e) {
-        return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
+        console.warn("tmdbDetail failed for", s.title, e.message);
+        // Return pick data if we have it, so card is still clickable
+        const found2 = await tmdbSearch(s.title).catch(() => []);
+        const p = found2[0];
+        return p ? { ...p, why: s.why } : { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
       }
     }));
 
@@ -1272,7 +1292,10 @@ Reply ONLY with a JSON array, no other text:
         const d = await tmdbDetail(pick.tmdbID || String(pick.id), pick.type || "movie");
         return { ...d, why: s.why };
       } catch(e) {
-        return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
+        console.warn("tmdbDetail failed for", s.title, e.message);
+        const found2 = await tmdbSearch(s.title).catch(() => []);
+        const p = found2[0];
+        return p ? { ...p, why: s.why } : { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
       }
     }));
 
