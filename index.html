@@ -451,11 +451,14 @@ async function doSignUp() {
   if (password.length < 6) { showSignUpError("Password must be at least 6 characters."); return; }
   btn.textContent = "..."; btn.disabled = true;
   try {
-    const { data, error } = await sbClient.auth.signUp({ email, password });
+    const { data, error } = await sbClient.auth.signUp({
+      email, password,
+      options: { data: { display_name: name } }  // stored in user_metadata, no RLS
+    });
     if (error) throw error;
-    // Save display name to profiles
+    // Also try to save to profiles (may fail before email confirmation — that's OK)
     if (data.user) {
-      await sbClient.from("profiles").upsert({ id: data.user.id, display_name: name });
+      try { await sbClient.from("profiles").upsert({ id: data.user.id, display_name: name }); } catch(e2) {}
     }
     // Show check email screen
     document.getElementById("check-email-msg").innerHTML =
@@ -483,12 +486,21 @@ async function onSignedIn(user) {
   });
   document.getElementById("main-app").style.display = "block";
   try { watchHistory = await loadHistoryFromDB(); } catch(e) { console.warn(e); }
-  // Load display name
+  // Load display name: user_metadata is always available, profiles may be empty
   try {
-    const { data, error } = await sbClient.rpc("get_my_profile");
-    console.log("[profile load] data:", data, "error:", error);
-    if (data?.[0]?.display_name) currentUser.displayName = data[0].display_name;
-  } catch(e) { console.warn("[profile load]", e.message); }
+    // 1. Get name from user_metadata (set at signup, never blocked by RLS)
+    const metaName = user.user_metadata?.display_name || "";
+    // 2. Try to read from profiles table
+    const { data: profileData } = await sbClient.from("profiles").select("display_name").eq("id", user.id).limit(1);
+    const profileName = profileData?.[0]?.display_name || "";
+    // 3. Use whichever is available (profile takes priority if set)
+    currentUser.displayName = profileName || metaName;
+    // 4. If profile row missing but we have a name, create/update it now (user is authenticated)
+    if (!profileName && metaName) {
+      try { await sbClient.from("profiles").upsert({ id: user.id, display_name: metaName }); } catch(e2) {}
+    }
+    console.log("[profile] meta:", metaName, "profile:", profileName, "→ using:", currentUser.displayName);
+  } catch(e) { console.warn("[profile]", e.message); }
   // Check inbox for pending invites
   try {
     const { data } = await sbClient.from("invites").select("id").eq("to_user_id", user.id).eq("status", "pending");
@@ -734,10 +746,9 @@ async function searchUsers(q) {
   el.style.display = "block";
   try {
     const { data, error } = await sbClient.rpc("search_profiles", {
-      search_query: q,
-      exclude_id: currentUser.id
+      search_query: q, exclude_id: currentUser.id
     });
-    console.log("[searchUsers] data:", data, "error:", error);
+    console.log("[searchUsers]", data, error);
     if (error) throw new Error(error.message);
     if (!data || !data.length) {
       el.innerHTML = `<div style="padding:10px 12px;color:#555;font-size:13px">No users found</div>`;
@@ -752,7 +763,7 @@ async function searchUsers(q) {
     }).join("");
   } catch(e) {
     console.error("[searchUsers]", e.message);
-    el.innerHTML = `<div style="padding:10px 12px;color:#f87171;font-size:12px">⚠ Нужно выполнить SQL в Supabase (см. README)</div>`;
+    el.innerHTML = `<div style="padding:10px 12px;color:#f87171;font-size:12px">⚠ ${e.message}</div>`;
   }
 }
 
