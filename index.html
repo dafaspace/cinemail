@@ -11,6 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Movie Night">
 <meta name="theme-color" content="#0d0d1a">
 <link rel="apple-touch-icon" href="icon.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -189,7 +190,37 @@
 </style>
 </head>
 <body>
-<div class="app">
+<!-- Auth Screen -->
+<div id="auth-screen" style="display:none;position:fixed;inset:0;background:#0d0d1a;z-index:500;
+  display:flex;align-items:center;justify-content:center;padding:20px">
+  <div style="width:100%;max-width:360px">
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="font-family:'Bebas Neue',cursive;font-size:36px;letter-spacing:2px;line-height:1">
+        <span style="color:#F5C518">MOVIE</span><span style="color:#fff"> NIGHT</span>
+      </div>
+      <div style="color:#555;font-size:12px;margin-top:4px">Sign in to sync your list</div>
+    </div>
+    <div id="auth-error" style="display:none;color:#f87171;font-size:12px;margin-bottom:12px;
+      padding:10px 12px;background:rgba(248,113,113,0.1);border-radius:8px;border:1px solid rgba(248,113,113,0.2)"></div>
+    <input id="auth-email" type="email" placeholder="Email" style="width:100%;background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#f0f0f0;font-size:15px;
+      padding:12px 14px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:10px">
+    <input id="auth-password" type="password" placeholder="Password" style="width:100%;background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#f0f0f0;font-size:15px;
+      padding:12px 14px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:16px"
+      onkeydown="if(event.key==='Enter')authSubmit()">
+    <button onclick="authSubmit()" id="auth-btn" style="width:100%;padding:13px;border-radius:10px;
+      background:#F5C518;border:none;color:#111;font-family:'Bebas Neue',cursive;font-size:17px;
+      letter-spacing:1px;cursor:pointer;margin-bottom:12px">SIGN IN</button>
+    <div style="text-align:center">
+      <span style="color:#555;font-size:13px" id="auth-toggle-text">Don't have an account?</span>
+      <button onclick="toggleAuthMode()" style="background:none;border:none;color:#F5C518;
+        font-size:13px;cursor:pointer;margin-left:6px" id="auth-toggle-btn">Sign up</button>
+    </div>
+  </div>
+</div>
+
+<div class="app" id="main-app" style="display:none">
   <div class="header">
     <h1><span class="gold">MOVIE</span> NIGHT</h1>
     <p>TMDB · AI Picks · Watch History</p>
@@ -304,6 +335,72 @@ const PROXY_URL = "https://movie-night-proxy.dafa4me.workers.dev";
 const SB_URL = "https://ubjafkxdybiwgcupassu.supabase.co";
 const SB_KEY = "sb_publishable_Ep9kQs8XcfgUoK2ACiIo8w_CLDGkZJf";
 
+// ── Supabase Auth client ──────────────────────────────────────────────────────
+const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+let currentUser = null;
+let authMode = "signin"; // or "signup"
+
+function toggleAuthMode() {
+  authMode = authMode === "signin" ? "signup" : "signin";
+  document.getElementById("auth-btn").textContent = authMode === "signin" ? "SIGN IN" : "SIGN UP";
+  document.getElementById("auth-toggle-text").textContent = authMode === "signin" ? "Don't have an account?" : "Already have an account?";
+  document.getElementById("auth-toggle-btn").textContent = authMode === "signin" ? "Sign up" : "Sign in";
+  document.getElementById("auth-error").style.display = "none";
+}
+
+async function authSubmit() {
+  const email = document.getElementById("auth-email").value.trim();
+  const password = document.getElementById("auth-password").value;
+  const btn = document.getElementById("auth-btn");
+  const errEl = document.getElementById("auth-error");
+  if (!email || !password) { showAuthError("Please enter email and password"); return; }
+  btn.textContent = "..."; btn.disabled = true;
+  errEl.style.display = "none";
+  try {
+    let result;
+    if (authMode === "signup") {
+      result = await supabase.auth.signUp({ email, password });
+      if (result.error) throw result.error;
+      if (result.data.user && !result.data.session) {
+        showAuthError("Check your email to confirm your account, then sign in.");
+        btn.textContent = "SIGN UP"; btn.disabled = false; return;
+      }
+    } else {
+      result = await supabase.auth.signInWithPassword({ email, password });
+      if (result.error) throw result.error;
+    }
+    await onSignedIn(result.data.user);
+  } catch(e) {
+    showAuthError(e.message);
+  }
+  btn.textContent = authMode === "signin" ? "SIGN IN" : "SIGN UP";
+  btn.disabled = false;
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById("auth-error");
+  el.textContent = msg;
+  el.style.display = "block";
+}
+
+async function onSignedIn(user) {
+  currentUser = user;
+  document.getElementById("auth-screen").style.display = "none";
+  document.getElementById("main-app").style.display = "block";
+  try { watchHistory = await loadHistoryFromDB(); } catch(e) { console.warn(e); }
+  initUI();
+}
+
+async function signOut() {
+  await supabase.auth.signOut();
+  currentUser = null;
+  watchHistory = [];
+  document.getElementById("main-app").style.display = "none";
+  document.getElementById("auth-screen").style.display = "flex";
+  document.getElementById("auth-email").value = "";
+  document.getElementById("auth-password").value = "";
+}
+
 // ── Quotes ────────────────────────────────────────────────────────────────────
 const QUOTES = [
   { text: "I'll be back.", source: "The Terminator (1984)" },
@@ -326,11 +423,13 @@ const randQuote = () => QUOTES[Math.floor(Math.random() * QUOTES.length)];
 
 // ── Supabase ──────────────────────────────────────────────────────────────────
 async function sbFetch(path, opts = {}) {
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session ? session.access_token : SB_KEY;
   const res = await fetch(SB_URL + "/rest/v1/" + path, {
     ...opts,
     headers: {
       "apikey": SB_KEY,
-      "Authorization": "Bearer " + SB_KEY,
+      "Authorization": "Bearer " + token,
       "Content-Type": "application/json",
       "Prefer": opts.prefer || "",
       ...(opts.headers || {})
@@ -369,7 +468,8 @@ async function saveEntryToDB(entry) {
       stars: entry.stars,
       comment: entry.comment,
       status: entry.status,
-      media_type: entry.mediaType || "movie"
+      media_type: entry.mediaType || "movie",
+      user_id: currentUser ? currentUser.id : null
     })
   });
 }
@@ -1022,17 +1122,34 @@ async function deleteItem(id) {
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
-document.getElementById("search-results").innerHTML = `
-  <div class="empty"><div class="icon">🎬</div>
-  <div class="title">FIND YOUR NEXT FILM</div>
-  <div class="sub">Type a title and press Search</div></div>`;
-document.getElementById("rec-results").innerHTML = `
-  <div class="empty"><div class="icon">✨</div>
-  <div class="title">GET PERSONALISED PICKS</div>
-  <div class="sub">Enter a prompt or leave blank and hit Find</div></div>`;
+function initUI() {
+  document.getElementById("search-results").innerHTML = `
+    <div class="empty"><div class="icon">🎬</div>
+    <div class="title">FIND YOUR NEXT FILM</div>
+    <div class="sub">Type a title and press Search</div></div>`;
+  document.getElementById("rec-results").innerHTML = `
+    <div class="empty"><div class="icon">✨</div>
+    <div class="title">GET PERSONALISED PICKS</div>
+    <div class="sub">Enter a prompt or leave blank and hit Find</div></div>`;
+}
 
 (async () => {
-  try { watchHistory = await loadHistoryFromDB(); } catch(e) { console.warn("History load failed:", e); }
+  // Check if user already has a session
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) {
+    await onSignedIn(session.user);
+  } else {
+    document.getElementById("auth-screen").style.display = "flex";
+  }
+  // Listen for auth changes
+  supabase.auth.onAuthStateChange(async (event, session) => {
+    if (event === "SIGNED_IN" && session) {
+      await onSignedIn(session.user);
+    } else if (event === "SIGNED_OUT") {
+      document.getElementById("auth-screen").style.display = "flex";
+      document.getElementById("main-app").style.display = "none";
+    }
+  });
 })();
 
 if ("serviceWorker" in navigator) {
