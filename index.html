@@ -483,12 +483,21 @@ async function onSignedIn(user) {
   });
   document.getElementById("main-app").style.display = "block";
   try { watchHistory = await loadHistoryFromDB(); } catch(e) { console.warn(e); }
-  // Load display name
+  // Load display name via RPC (bypasses RLS)
   try {
-    const { data, error } = await sbClient.from("profiles").select("display_name").eq("id", user.id).limit(1);
+    const { data, error } = await sbClient.rpc("get_my_profile");
     console.log("[profile load] data:", data, "error:", error);
-    if (data?.[0]?.display_name) currentUser.displayName = data[0].display_name;
-  } catch(e) { console.warn("[profile load] exception:", e); }
+    if (data?.[0]?.display_name) {
+      currentUser.displayName = data[0].display_name;
+    } else {
+      // Profile row missing — derive name from email as fallback
+      currentUser.displayName = user.email?.split("@")[0] || "";
+    }
+  } catch(e) {
+    // RPC not created yet — fall back to email prefix
+    currentUser.displayName = user.email?.split("@")[0] || "";
+    console.warn("[profile load] RPC not available:", e.message);
+  }
   // Check inbox for pending invites
   try {
     const { data } = await sbClient.from("invites").select("id").eq("to_user_id", user.id).eq("status", "pending");
@@ -733,17 +742,13 @@ async function searchUsers(q) {
   el.innerHTML = `<div style="padding:10px 12px;color:#555;font-size:13px">Searching...</div>`;
   el.style.display = "block";
   try {
-    // Use sbClient which automatically attaches the current session token
-    const { data, error } = await sbClient
-      .from("profiles")
-      .select("id, display_name")
-      .ilike("display_name", `%${q}%`)
-      .neq("id", currentUser.id)
-      .limit(8);
-
-    console.log("[searchUsers] query:", q, "data:", data, "error:", error);
-
-    if (error) throw new Error(error.message || JSON.stringify(error));
+    // Call RPC function that runs with SECURITY DEFINER (bypasses RLS)
+    const { data, error } = await sbClient.rpc("search_profiles", {
+      search_query: q,
+      exclude_id: currentUser.id
+    });
+    console.log("[searchUsers] data:", data, "error:", error);
+    if (error) throw new Error(error.message);
     if (!data || !data.length) {
       el.innerHTML = `<div style="padding:10px 12px;color:#555;font-size:13px">No users found</div>`;
       return;
@@ -756,8 +761,18 @@ async function searchUsers(q) {
       </div>`;
     }).join("");
   } catch(e) {
-    console.error("[searchUsers] error:", e);
-    el.innerHTML = `<div style="padding:10px 12px;color:#f87171;font-size:12px">⚠ ${e.message}</div>`;
+    console.error("[searchUsers]", e);
+    // Fallback: try direct fetch with service key hint
+    el.innerHTML = `<div style="padding:10px 12px;color:#f87171;font-size:12px">⚠ ${e.message}<br><span style="color:#555;font-size:10px">Run SQL fix in Supabase (see console)</span></div>`;
+    console.warn("Fix: run this SQL in Supabase SQL Editor:\n\n" +
+      "CREATE OR REPLACE FUNCTION search_profiles(search_query TEXT, exclude_id UUID)\n" +
+      "RETURNS TABLE(id UUID, display_name TEXT)\n" +
+      "LANGUAGE sql SECURITY DEFINER AS $$\n" +
+      "  SELECT id, display_name FROM profiles\n" +
+      "  WHERE display_name ILIKE '%' || search_query || '%'\n" +
+      "  AND id != exclude_id\n" +
+      "  LIMIT 8;\n" +
+      "$$;");
   }
 }
 
@@ -1363,10 +1378,7 @@ function renderHistory() {
     </div>
     <div class="card-list">
       ${filtered.map(item => {
-        const key = regMovie({
-          tmdbID: item.tmdbID, Title: item.title, Year: item.year,
-          Poster: item.poster, type: item.mediaType || "movie"
-        });
+        const key = regMovie({ tmdbID: item.tmdbID, Title: item.title, Year: item.year, Poster: item.poster, type: item.mediaType || "movie" });
         return `
         <div class="hist-card ${item.status === 'plan' ? 'plan' : ''}" onclick="${item.tmdbID ? `openDetail('${item.tmdbID}','${item.mediaType||"movie"}')` : ''}">
           <div class="hist-poster">${item.poster&&item.poster!=="N/A" ? `<img src="${item.poster}" alt="" onerror="this.parentNode.innerHTML='🎬'">` : "🎬"}</div>
@@ -1376,8 +1388,8 @@ function renderHistory() {
                 <div class="hist-title">${item.title}</div>
                 <div class="hist-meta">${item.year} · ${item.date}</div>
               </div>
-              <div style="display:flex;gap:6px;align-items:center">
-                <button onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" style="background:none;border:none;color:#6d4aad;font-size:14px;cursor:pointer;padding:0 2px" title="Share">↗</button>
+              <div style="display:flex;gap:4px;align-items:center">
+                <button onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" style="background:none;border:1px solid rgba(124,58,237,0.35);border-radius:5px;color:#9d6ef5;font-size:11px;cursor:pointer;padding:2px 7px;font-family:'Bebas Neue',cursive;letter-spacing:.5px" title="Share">↗ SHARE</button>
                 ${item.status === "watched" ? `<button class="hist-del" style="font-size:13px;color:#555" onclick="event.stopPropagation();openEdit(${item.id})">✏️</button>` : ""}
                 <button class="hist-del" onclick="event.stopPropagation();deleteItem(${item.id})">×</button>
               </div>
@@ -1445,7 +1457,6 @@ async function deleteItem(id) {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 function initUI() {
-  // Show username in header (display_name only, not email)
   const nameEl = document.getElementById("header-username");
   if (nameEl && currentUser) {
     const name = currentUser.displayName || "";
