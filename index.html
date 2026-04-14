@@ -191,33 +191,63 @@
 </head>
 <body>
 <!-- Auth Screen -->
-<div id="auth-screen" style="display:none;position:fixed;inset:0;background:#0d0d1a;z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="width:100%;max-width:360px">
+<!-- ── SIGN IN SCREEN ─────────────────────────────────────────────── -->
+<div id="screen-signin" style="display:none;position:fixed;inset:0;background:#0d0d1a;z-index:500;align-items:center;justify-content:center;padding:20px;overflow-y:auto">
+  <div style="width:100%;max-width:360px;padding:20px 0">
     <div style="text-align:center;margin-bottom:32px">
       <div style="font-family:'Bebas Neue',cursive;font-size:36px;letter-spacing:2px;line-height:1">
         <span style="color:#F5C518">MOVIE</span><span style="color:#fff"> NIGHT</span>
       </div>
-      <div style="color:#555;font-size:12px;margin-top:4px">Sign in to sync your list</div>
+      <div style="color:#555;font-size:13px;margin-top:6px">Welcome back</div>
     </div>
-    <div id="auth-error" style="display:none;color:#f87171;font-size:12px;margin-bottom:12px;
-      padding:10px 12px;background:rgba(248,113,113,0.1);border-radius:8px;border:1px solid rgba(248,113,113,0.2)"></div>
-    <input id="auth-email" type="email" placeholder="Email" style="width:100%;background:rgba(255,255,255,0.05);
-      border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#f0f0f0;font-size:15px;
-      padding:12px 14px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:10px">
-    <input id="auth-password" type="password" placeholder="Password" style="width:100%;background:rgba(255,255,255,0.05);
-      border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#f0f0f0;font-size:15px;
-      padding:12px 14px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:16px"
-      onkeydown="if(event.key==='Enter')authSubmit()">
-    <button onclick="authSubmit()" id="auth-btn" style="width:100%;padding:13px;border-radius:10px;
-      background:#F5C518;border:none;color:#111;font-family:'Bebas Neue',cursive;font-size:17px;
-      letter-spacing:1px;cursor:pointer;margin-bottom:12px">SIGN IN</button>
-    <div style="text-align:center">
-      <span style="color:#555;font-size:13px" id="auth-toggle-text">Don't have an account?</span>
-      <button onclick="toggleAuthMode()" style="background:none;border:none;color:#F5C518;
-        font-size:13px;cursor:pointer;margin-left:6px" id="auth-toggle-btn">Sign up</button>
+    <div id="signin-error" style="display:none;color:#f87171;font-size:13px;margin-bottom:12px;
+      padding:10px 12px;background:rgba(248,113,113,0.08);border-radius:8px;border:1px solid rgba(248,113,113,0.2)"></div>
+    <input id="signin-email" type="email" placeholder="Email" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#f0f0f0;font-size:15px;padding:12px 14px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:10px;display:block">
+    <input id="signin-password" type="password" placeholder="Password" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#f0f0f0;font-size:15px;padding:12px 14px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:16px;display:block"
+      onkeydown="if(event.key==='Enter')doSignIn()">
+    <button onclick="doSignIn()" id="signin-btn" style="width:100%;padding:13px;border-radius:10px;background:#F5C518;border:none;color:#111;font-family:'Bebas Neue',cursive;font-size:17px;letter-spacing:1px;cursor:pointer;margin-bottom:20px;display:block">SIGN IN</button>
+    <div style="text-align:center;border-top:1px solid rgba(255,255,255,0.06);padding-top:20px">
+      <div style="color:#555;font-size:13px;margin-bottom:12px">New to Movie Night?</div>
+      <button onclick="showScreen('signup')" style="width:100%;padding:12px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#f0f0f0;font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:1px;cursor:pointer">CREATE ACCOUNT</button>
     </div>
   </div>
 </div>
+
+<!-- ── SIGN UP SCREEN ─────────────────────────────────────────────── -->
+<div id="screen-signup" style="display:none;position:fixed;inset:0;background:#0d0d1a;z-index:500;align-items:center;justify-content:center;padding:20px;overflow-y:auto">
+  <div style="width:100%;max-width:360px;padding:20px 0">
+    <button onclick="showScreen('signin')" style="background:none;border:none;color:#555;font-size:13px;cursor:pointer;margin-bottom:24px;padding:0;display:flex;align-items:center;gap:6px;font-family:'DM Sans',sans-serif">← Back to Sign In</button>
+    <div style="margin-bottom:28px">
+      <div style="font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:1px;color:#fff">Create Account</div>
+      <div style="color:#555;font-size:13px;margin-top:4px">Track films. Get picks. Share with friends.</div>
+    </div>
+    <div id="signup-error" style="display:none;color:#f87171;font-size:13px;margin-bottom:12px;
+      padding:10px 12px;background:rgba(248,113,113,0.08);border-radius:8px;border:1px solid rgba(248,113,113,0.2)"></div>
+    <input id="signup-name" type="text" placeholder="Your name" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#f0f0f0;font-size:15px;padding:12px 14px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:10px;display:block">
+    <input id="signup-email" type="email" placeholder="Email" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#f0f0f0;font-size:15px;padding:12px 14px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:10px;display:block">
+    <input id="signup-password" type="password" placeholder="Password (min 6 characters)" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#f0f0f0;font-size:15px;padding:12px 14px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:16px;display:block"
+      onkeydown="if(event.key==='Enter')doSignUp()">
+    <button onclick="doSignUp()" id="signup-btn" style="width:100%;padding:13px;border-radius:10px;background:#F5C518;border:none;color:#111;font-family:'Bebas Neue',cursive;font-size:17px;letter-spacing:1px;cursor:pointer;display:block">CREATE ACCOUNT</button>
+  </div>
+</div>
+
+<!-- ── CHECK EMAIL SCREEN ─────────────────────────────────────────── -->
+<div id="screen-check-email" style="display:none;position:fixed;inset:0;background:#0d0d1a;z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="width:100%;max-width:360px;text-align:center">
+    <div style="font-size:56px;margin-bottom:20px">📬</div>
+    <div style="font-family:'Bebas Neue',cursive;font-size:26px;letter-spacing:1px;color:#fff;margin-bottom:10px">Check your inbox</div>
+    <div style="color:#aaa;font-size:14px;line-height:1.7;margin-bottom:28px" id="check-email-msg">
+      We sent a confirmation link to your email.<br>Click it to activate your account.
+    </div>
+    <div style="color:#555;font-size:12px;padding:12px;background:rgba(255,255,255,0.04);border-radius:8px;margin-bottom:24px">
+      Didn't get it? Check your spam folder.
+    </div>
+    <button onclick="showScreen('signin')" style="background:none;border:none;color:#F5C518;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">← Back to Sign In</button>
+  </div>
+</div>
+
+<!-- legacy placeholder kept for JS compat -->
+<div id="auth-screen" style="display:none"></div>
 
 <div class="app" id="main-app" style="display:none">
   <div class="header">
@@ -271,7 +301,7 @@
 
 <!-- Edit Modal -->
 <div id="edit-overlay" class="overlay" style="display:none" onclick="closeEdit()">
-  <div style="padding:20px;width:100%;display:flex;justify-content:center" onclick="event.stopPropagation()">
+  <div style="padding:20px;width:100%;display:flex;justify-content:center;cursor:default" onclick="event.stopPropagation();event.preventDefault()">
     <div class="add-modal">
       <div style="font-family:'Bebas Neue',cursive;color:#F5C518;font-size:12px;letter-spacing:2px;margin-bottom:3px">EDIT REVIEW</div>
       <div id="edit-movie-title" style="font-family:'Bebas Neue',cursive;font-size:19px;margin-bottom:14px;line-height:1.2"></div>
@@ -295,15 +325,15 @@
 
 <!-- Detail Modal -->
 <div id="detail-overlay" class="overlay" style="display:none" onclick="closeDetail()">
-  <div class="modal" onclick="event.stopPropagation()">
+  <div class="modal" onclick="event.stopPropagation();event.preventDefault()">
     <div id="detail-content"></div>
   </div>
 </div>
 
 <!-- Add Modal -->
 <div id="add-overlay" class="overlay" style="display:none" onclick="closeAdd()">
-  <div style="padding:20px;width:100%;display:flex;justify-content:center" onclick="event.stopPropagation()">
-    <div class="add-modal">
+  <div style="padding:20px;width:100%;display:flex;justify-content:center;cursor:default" onclick="event.stopPropagation();event.preventDefault()">
+    <div class="add-modal" onclick="event.stopPropagation()">
       <div style="font-family:'Bebas Neue',cursive;color:#F5C518;font-size:12px;letter-spacing:2px;margin-bottom:3px" id="add-modal-label">ADD TO HISTORY</div>
       <div id="add-movie-title" style="font-family:'Bebas Neue',cursive;font-size:19px;margin-bottom:14px;line-height:1.2"></div>
       <div id="add-stars-section">
@@ -340,56 +370,87 @@ const SB_KEY = "sb_publishable_Ep9kQs8XcfgUoK2ACiIo8w_CLDGkZJf";
 // ── Supabase Auth client ──────────────────────────────────────────────────────
 let sbClient = null;
 let currentUser = null;
-let authMode = "signin";
 
-function toggleAuthMode() {
-  authMode = authMode === "signin" ? "signup" : "signin";
-  document.getElementById("auth-btn").textContent = authMode === "signin" ? "SIGN IN" : "SIGN UP";
-  document.getElementById("auth-toggle-text").textContent = authMode === "signin" ? "Don't have an account?" : "Already have an account?";
-  document.getElementById("auth-toggle-btn").textContent = authMode === "signin" ? "Sign up" : "Sign in";
-  document.getElementById("auth-error").style.display = "none";
+function showScreen(name) {
+  ["signin","signup","check-email"].forEach(s => {
+    const el = document.getElementById("screen-"+s);
+    if (el) el.style.display = s === name ? "flex" : "none";
+  });
+  document.getElementById("main-app").style.display = "none";
 }
 
-async function authSubmit() {
-  const email = document.getElementById("auth-email").value.trim();
-  const password = document.getElementById("auth-password").value;
-  const btn = document.getElementById("auth-btn");
-  const errEl = document.getElementById("auth-error");
-  if (!email || !password) { showAuthError("Please enter email and password"); return; }
-  btn.textContent = "..."; btn.disabled = true;
+async function doSignIn() {
+  const email = document.getElementById("signin-email").value.trim();
+  const password = document.getElementById("signin-password").value;
+  const btn = document.getElementById("signin-btn");
+  const errEl = document.getElementById("signin-error");
   errEl.style.display = "none";
+  if (!email || !password) { showSignInError("Please enter your email and password."); return; }
+  btn.textContent = "..."; btn.disabled = true;
   try {
-    let result;
-    if (authMode === "signup") {
-      result = await sbClient.auth.signUp({ email, password });
-      if (result.error) throw result.error;
-      if (result.data.user && !result.data.session) {
-        showAuthError("Check your email to confirm your account, then sign in.");
-        btn.textContent = "SIGN UP"; btn.disabled = false; return;
-      }
-    } else {
-      result = await sbClient.auth.signInWithPassword({ email, password });
-      if (result.error) throw result.error;
-    }
-    await onSignedIn(result.data.user);
+    const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    await onSignedIn(data.user);
   } catch(e) {
-    showAuthError(e.message);
+    showSignInError(e.message);
+    btn.textContent = "SIGN IN"; btn.disabled = false;
   }
-  btn.textContent = authMode === "signin" ? "SIGN IN" : "SIGN UP";
-  btn.disabled = false;
 }
 
-function showAuthError(msg) {
-  const el = document.getElementById("auth-error");
-  el.textContent = msg;
-  el.style.display = "block";
+function showSignInError(msg) {
+  const el = document.getElementById("signin-error");
+  el.textContent = msg; el.style.display = "block";
 }
+
+async function doSignUp() {
+  const name = document.getElementById("signup-name").value.trim();
+  const email = document.getElementById("signup-email").value.trim();
+  const password = document.getElementById("signup-password").value;
+  const btn = document.getElementById("signup-btn");
+  const errEl = document.getElementById("signup-error");
+  errEl.style.display = "none";
+  if (!name) { showSignUpError("Please enter your name."); return; }
+  if (!email) { showSignUpError("Please enter your email."); return; }
+  if (password.length < 6) { showSignUpError("Password must be at least 6 characters."); return; }
+  btn.textContent = "..."; btn.disabled = true;
+  try {
+    const { data, error } = await sbClient.auth.signUp({ email, password });
+    if (error) throw error;
+    // Save display name to profiles
+    if (data.user) {
+      await sbClient.from("profiles").upsert({ id: data.user.id, display_name: name });
+    }
+    // Show check email screen
+    document.getElementById("check-email-msg").innerHTML =
+      `We sent a confirmation link to<br><strong style="color:#f0f0f0">${email}</strong><br><br>Click it to activate your account.`;
+    showScreen("check-email");
+  } catch(e) {
+    showSignUpError(e.message);
+    btn.textContent = "CREATE ACCOUNT"; btn.disabled = false;
+  }
+}
+
+function showSignUpError(msg) {
+  const el = document.getElementById("signup-error");
+  el.textContent = msg; el.style.display = "block";
+}
+
+// keep for legacy compat
+function showAuthError(msg) { showSignInError(msg); }
 
 async function onSignedIn(user) {
   currentUser = user;
-  document.getElementById("auth-screen").style.display = "none";
+  ["signin","signup","check-email"].forEach(s => {
+    const el = document.getElementById("screen-"+s);
+    if (el) el.style.display = "none";
+  });
   document.getElementById("main-app").style.display = "block";
   try { watchHistory = await loadHistoryFromDB(); } catch(e) { console.warn(e); }
+  // Load display name
+  try {
+    const { data } = await sbClient.from("profiles").select("display_name").eq("id", user.id).single();
+    if (data?.display_name) currentUser.displayName = data.display_name;
+  } catch(e) {}
   initUI();
 }
 
@@ -398,9 +459,9 @@ async function signOut() {
   currentUser = null;
   watchHistory = [];
   document.getElementById("main-app").style.display = "none";
-  document.getElementById("auth-screen").style.display = "flex";
-  document.getElementById("auth-email").value = "";
-  document.getElementById("auth-password").value = "";
+  showScreen("signin");
+  document.getElementById("signin-email").value = "";
+  document.getElementById("signin-password").value = "";
 }
 
 // ── Quotes ────────────────────────────────────────────────────────────────────
@@ -1144,14 +1205,14 @@ function initUI() {
   if (session) {
     await onSignedIn(session.user);
   } else {
-    document.getElementById("auth-screen").style.display = "flex";
+    showScreen("signin");
   }
   // Listen for auth changes
   sbClient.auth.onAuthStateChange(async (event, session) => {
     if (event === "SIGNED_IN" && session) {
       await onSignedIn(session.user);
     } else if (event === "SIGNED_OUT") {
-      document.getElementById("auth-screen").style.display = "flex";
+      showScreen("signin");
       document.getElementById("main-app").style.display = "none";
     }
   });
