@@ -486,7 +486,15 @@ async function onSignedIn(user) {
   // Load display name
   try {
     const { data } = await sbClient.from("profiles").select("display_name").eq("id", user.id).limit(1);
-    if (data?.[0]?.display_name) currentUser.displayName = data[0].display_name;
+    if (data?.[0]?.display_name) {
+      currentUser.displayName = data[0].display_name;
+    } else {
+      // Try via sbFetch as fallback (in case RLS blocks anonymous read)
+      try {
+        const rows = await sbFetch(`profiles?id=eq.${user.id}&select=display_name&limit=1`);
+        if (rows?.[0]?.display_name) currentUser.displayName = rows[0].display_name;
+      } catch(e2) {}
+    }
   } catch(e) {}
   // Check inbox for pending invites
   try {
@@ -729,18 +737,28 @@ function closeShare() {
 async function searchUsers(q) {
   const el = document.getElementById("share-user-results");
   if (!q.trim() || q.length < 2) { el.style.display = "none"; return; }
-  const { data } = await sbClient.from("profiles")
-    .select("id, display_name")
-    .ilike("display_name", `%${q}%`)
-    .neq("id", currentUser.id)
-    .limit(5);
-  if (!data || !data.length) { el.innerHTML = `<div style="padding:10px 12px;color:#555;font-size:13px">No users found</div>`; el.style.display = "block"; return; }
-  el.innerHTML = data.map(u => `
-    <div onclick="selectUser('${u.id}','${u.display_name.replace(/'/g,"\\'")}') " style="padding:10px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.05)"
-      onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">
-      ${u.display_name}
-    </div>`).join("");
-  el.style.display = "block";
+  try {
+    const encoded = encodeURIComponent('%' + q + '%');
+    const data = await sbFetch(
+      `profiles?select=id,display_name&display_name=ilike.${encoded}&id=neq.${currentUser.id}&limit=5`
+    );
+    if (!data || !data.length) {
+      el.innerHTML = `<div style="padding:10px 12px;color:#555;font-size:13px">No users found</div>`;
+      el.style.display = "block";
+      return;
+    }
+    el.innerHTML = data.map(u => {
+      const safeName = u.display_name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      return `<div onclick="selectUser('${u.id}','${safeName}')" style="padding:10px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.05)"
+        onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">
+        ${u.display_name}
+      </div>`;
+    }).join("");
+    el.style.display = "block";
+  } catch(e) {
+    el.innerHTML = `<div style="padding:10px 12px;color:#f87171;font-size:12px">Error: ${e.message}</div>`;
+    el.style.display = "block";
+  }
 }
 
 function selectUser(id, name) {
@@ -1423,7 +1441,7 @@ function initUI() {
   // Show username in header
   const nameEl = document.getElementById("header-username");
   if (nameEl && currentUser) {
-    const name = currentUser.displayName || currentUser.email?.split("@")[0] || "";
+    const name = currentUser.displayName || "";
     nameEl.textContent = name ? `Hi, ${name}` : "";
   }
   document.getElementById("search-results").innerHTML = `
