@@ -63,9 +63,10 @@
   .card-title { font-family: 'Bebas Neue', cursive; font-size: 16px; letter-spacing: .5px; line-height: 1.2; }
   .card-meta { color: #666; font-size: 11px; margin-top: 2px; }
   .card-actions { display: flex; align-items: center; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
-  .btn-watched { padding: 3px 10px; border-radius: 6px; background: #F5C518; border: none;
-    color: #111; font-size: 11px; font-weight: 700; cursor: pointer;
-    font-family: 'Bebas Neue', cursive; letter-spacing: 1px; }
+  .btn-watched { padding: 3px 10px; border-radius: 6px; background: transparent;
+    border: 1px solid rgba(245,197,24,0.5); color: #F5C518; font-size: 11px; font-weight: 700; cursor: pointer;
+    font-family: 'Bebas Neue', cursive; letter-spacing: 1px; transition: all .15s; }
+  .btn-watched:hover { background: rgba(245,197,24,0.1); border-color: #F5C518; }
   .btn-watchlist { padding: 3px 10px; border-radius: 6px; background: transparent;
     border: 1px solid rgba(255,255,255,0.2); color: #aaa; font-size: 11px; font-weight: 700; cursor: pointer;
     font-family: 'Bebas Neue', cursive; letter-spacing: 1px; transition: all .15s; }
@@ -231,6 +232,30 @@
         <button class="filter-pill" id="pill-watched" onclick="setFilter('watched')">✓ Watched</button>
       </div>
       <div id="history-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="edit-overlay" class="overlay" style="display:none" onclick="closeEdit()">
+  <div style="padding:20px;width:100%;display:flex;justify-content:center" onclick="event.stopPropagation()">
+    <div class="add-modal">
+      <div style="font-family:'Bebas Neue',cursive;color:#F5C518;font-size:12px;letter-spacing:2px;margin-bottom:3px">EDIT REVIEW</div>
+      <div id="edit-movie-title" style="font-family:'Bebas Neue',cursive;font-size:19px;margin-bottom:14px;line-height:1.2"></div>
+      <div class="add-label">Rating</div>
+      <div class="stars-row" id="edit-stars-row">
+        <span class="star" id="edit-star-1" onclick="setEditStar(1)">★</span>
+        <span class="star" id="edit-star-2" onclick="setEditStar(2)">★</span>
+        <span class="star" id="edit-star-3" onclick="setEditStar(3)">★</span>
+        <span class="star" id="edit-star-4" onclick="setEditStar(4)">★</span>
+        <span class="star" id="edit-star-5" onclick="setEditStar(5)">★</span>
+      </div>
+      <div class="add-label">Notes</div>
+      <textarea id="edit-note" placeholder="What did you think?"></textarea>
+      <div style="display:flex;gap:9px">
+        <button class="btn-close" onclick="closeEdit()">Cancel</button>
+        <button class="btn-add-watched" id="edit-confirm-btn" onclick="confirmEdit()">SAVE</button>
+      </div>
     </div>
   </div>
 </div>
@@ -754,12 +779,14 @@ async function surpriseMe() {
 
     const prompt = `You are a film expert. Pick ONE perfect film or show for this person to watch tonight.
 
-${watched ? `Their watch history:\n${watched}` : "No watch history yet."}
-${planned ? `\nOn their watchlist: ${planned}` : ""}
+${watched ? `Already watched — DO NOT suggest any of these:\n${watched}` : "No watch history yet."}
+${planned ? `\nAlready on watchlist — DO NOT suggest any of these: ${planned}` : ""}
 
-Choose something they haven't seen. Be bold — don't just pick the obvious choice.
-Occasionally suggest something outside their comfort zone that they might love.
-Write 2-3 sentences explaining exactly why THIS film is perfect for them tonight.
+CRITICAL RULE: Your suggestion must be a film or show that does NOT appear in either list above. Suggesting anything already watched or on the watchlist is a complete failure.
+
+Pick something new and unexpected. Be bold — avoid obvious blockbusters unless they truly fit.
+Occasionally go outside their comfort zone with something they might not have considered.
+Write 2-3 sentences explaining exactly why THIS specific film is the right choice for them tonight.
 
 Reply ONLY with JSON (no other text):
 {"title":"...","year":"...","type":"movie or tv","why":"2-3 sentence explanation"}`;
@@ -807,14 +834,14 @@ async function loadRecs() {
 
       const prompt = `You are a film expert helping pick what to watch tonight.
 
-${watched ? `Watch history:\n${watched}` : "No watch history yet."}
-${planned ? `\nOn their watchlist: ${planned}` : ""}
+${watched ? `Already watched — DO NOT suggest any of these:\n${watched}` : "No watch history yet."}
+${planned ? `\nAlready on watchlist — DO NOT suggest any of these: ${planned}` : ""}
 
 User request: "${q || "Surprise me with something great"}"
 
 Based on their taste and request, suggest exactly 5 films or TV shows.
+CRITICAL: None of your suggestions may appear in the watched or watchlist above. Suggesting anything already seen or saved is a failure.
 - Interpret the request broadly: if they say "something funny", find comedy films; "cozy evening" means light feel-good content; "mind-bending" means psychological thrillers etc.
-- Don't suggest anything already in their history or watchlist.
 - Vary genres/eras unless the request is specific.
 - For each, write one sentence explaining WHY it fits their taste or request specifically.
 
@@ -901,15 +928,61 @@ function renderHistory() {
                 <div class="hist-title">${item.title}</div>
                 <div class="hist-meta">${item.year} · ${item.date}</div>
               </div>
-              <button class="hist-del" onclick="event.stopPropagation();deleteItem(${item.id})">×</button>
+              <div style="display:flex;gap:6px;align-items:center">
+                ${item.status === "watched" ? `<button class="hist-del" style="font-size:13px;color:#555" onclick="event.stopPropagation();openEdit(${item.id})">✏️</button>` : ""}
+                <button class="hist-del" onclick="event.stopPropagation();deleteItem(${item.id})">×</button>
+              </div>
             </div>
             ${item.status === "watched"
               ? `<div style="display:flex;gap:2px;margin-top:3px">${starsHTML(item.stars)}</div>`
               : `<span class="status-tag plan">🕐 Want to watch</span>`}
-            ${item.comment ? `<div class="hist-note">"${item.comment}"</div>` : ""}
+            ${item.comment ? `<div class="hist-note">"${item.comment}" <span style="color:#555;font-style:normal;font-size:10px">— ${item.date}</span></div>` : ""}
           </div>
         </div>`).join("")}
     </div>`;
+}
+
+// ── Edit review ───────────────────────────────────────────────────────────────
+let currentEditId = null;
+let currentEditStars = 0;
+
+function openEdit(id) {
+  const item = watchHistory.find(h => h.id === id);
+  if (!item) return;
+  currentEditId = id;
+  currentEditStars = item.stars || 0;
+  document.getElementById("edit-movie-title").textContent = `${item.title} (${item.year})`;
+  document.getElementById("edit-note").value = item.comment || "";
+  renderEditStars(currentEditStars);
+  document.getElementById("edit-overlay").style.display = "flex";
+}
+
+function closeEdit() { document.getElementById("edit-overlay").style.display = "none"; }
+
+function setEditStar(n) { currentEditStars = n; renderEditStars(n); }
+
+function renderEditStars(n) {
+  [1,2,3,4,5].forEach(i => {
+    const s = document.getElementById("edit-star-"+i);
+    if (s) s.classList.toggle("on", i <= n);
+  });
+}
+
+async function confirmEdit() {
+  const btn = document.getElementById("edit-confirm-btn");
+  btn.textContent = "SAVING..."; btn.disabled = true;
+  try {
+    await updateEntryInDB(currentEditId, {
+      stars: currentEditStars,
+      comment: document.getElementById("edit-note").value
+    });
+    watchHistory = await loadHistoryFromDB();
+    closeEdit();
+    renderHistory();
+  } catch(e) {
+    alert("Could not save: " + e.message);
+  }
+  btn.textContent = "SAVE"; btn.disabled = false;
 }
 
 async function deleteItem(id) {
