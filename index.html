@@ -1305,7 +1305,7 @@ Reply ONLY with a JSON array, no other text:
           return { ...pick, tmdbID: pickId, why: s.why };
         }
       } catch(e) {
-        console.warn("tmdbSearch failed:", s.title, e.message);
+        console.warn("OUTER catch:", s.title, e.message, e.stack?.slice(0,200));
         return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
       }
     }));
