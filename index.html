@@ -1203,25 +1203,27 @@ async function surpriseMe() {
     let suggestions = JSON.parse(cleaned);
     if (!Array.isArray(suggestions)) suggestions = [suggestions];
 
-    const details = await Promise.all(suggestions.map(async s => {
+    // Sequential to avoid TMDB rate limiting
+    const details = [];
+    for (const s of suggestions) {
       try {
-        const found = await tmdbSearch(s.title + (s.year ? " " + s.year : ""));
+        let found = await tmdbSearch(s.title + (s.year ? " " + s.year : ""));
+        if (!found.length) found = await tmdbSearch(s.title);
         const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
-        if (!pick) return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
-        const pickId = (pick.tmdbID && pick.tmdbID !== "null") ? pick.tmdbID : (pick.id ? String(pick.id) : null);
-        if (!pickId) return { ...pick, why: s.why };
+        if (!pick) { details.push({ Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why }); continue; }
+        const pickId = pick.id ? String(pick.id) : (pick.tmdbID && pick.tmdbID !== "null" ? pick.tmdbID : null);
+        if (!pickId) { details.push({ ...pick, why: s.why }); continue; }
         try {
           const d = await tmdbDetail(pickId, pick.type || "movie");
           if (!d.Poster && pick.Poster) d.Poster = pick.Poster;
-          return { ...d, why: s.why };
+          details.push({ ...d, why: s.why });
         } catch(e) {
-          console.warn("tmdbDetail failed for", s.title, "pickId:", pickId, "error:", e.message);
-          return { ...pick, tmdbID: pickId, why: s.why };
+          details.push({ ...pick, tmdbID: pickId, why: s.why });
         }
       } catch(e) {
-        return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
+        details.push({ Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why });
       }
-    }));
+    }
 
     details.forEach(m => { if (m.Title) _shownSurprises.push(m.Title); });
     localStorage.setItem("shownSurprises", JSON.stringify(_shownSurprises.slice(-30)));
@@ -1287,28 +1289,27 @@ Reply ONLY with a JSON array, no other text:
       return;
     }
 
-    // Fetch TMDB details for each suggestion
-    const details = await Promise.all(suggestions.map(async s => {
+    // Fetch TMDB details sequentially to avoid rate limiting
+    const details = [];
+    for (const s of suggestions) {
       try {
-        const found = await tmdbSearch(s.title + (s.year ? " " + s.year : ""));
+        let found = await tmdbSearch(s.title + (s.year ? " " + s.year : ""));
+        if (!found.length) found = await tmdbSearch(s.title);
         const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
-        if (!pick) return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
+        if (!pick) { details.push({ Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why }); continue; }
         const pickId = pick.id ? String(pick.id) : (pick.tmdbID && pick.tmdbID !== "null" ? pick.tmdbID : null);
-        console.log("recs debug:", s.title, "pick.id:", pick.id, "pickId:", pickId);
-        if (!pickId) return { ...pick, why: s.why };
+        if (!pickId) { details.push({ ...pick, why: s.why }); continue; }
         try {
           const d = await tmdbDetail(pickId, pick.type || "movie");
           if (!d.Poster && pick.Poster) d.Poster = pick.Poster;
-          return { ...d, why: s.why };
+          details.push({ ...d, why: s.why });
         } catch(e) {
-          console.warn("tmdbDetail failed:", s.title, pickId, e.message);
-          return { ...pick, tmdbID: pickId, why: s.why };
+          details.push({ ...pick, tmdbID: pickId, why: s.why });
         }
       } catch(e) {
-        console.warn("OUTER catch:", s.title, e.message, e.stack?.slice(0,200));
-        return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
+        details.push({ Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why });
       }
-    }));
+    }
 
     el.innerHTML = details.length
       ? `<div class="card-list">${details.map(m => { console.log("pick:", m.Title, "tmdbID:", m.tmdbID, "Poster:", m.Poster?.slice(0,40)); return movieCardHTML(m, m.why); }).join("")}</div>`
