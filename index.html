@@ -1197,7 +1197,27 @@ function initUI() {
 }
 
 (async () => {
-  // Wait for Supabase SDK then initialize
+  // Handle email confirmation token from URL
+  const params = new URLSearchParams(window.location.search);
+  const tokenHash = params.get("token_hash");
+  const type = params.get("type");
+  if (tokenHash && type) {
+    // Clean URL
+    window.history.replaceState({}, "", window.location.pathname);
+    sbClient = window.supabase.createClient(SB_URL, SB_KEY);
+    const { data, error } = await sbClient.auth.verifyOtp({ token_hash: tokenHash, type });
+    if (error) {
+      showScreen("signin");
+      showSignInError("Confirmation failed: " + error.message);
+      return;
+    }
+    if (data.user) {
+      await onSignedIn(data.user);
+      return;
+    }
+  }
+
+  // Normal init — Wait for Supabase SDK then initialize
   sbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
   // Check if user already has a session
