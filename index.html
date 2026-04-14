@@ -932,7 +932,7 @@ async function confirmAdd() {
 const _shownSurprises = [];
 
 const _surpriseModes = ["taste","taste","random","seasonal","taste","random"];
-let _surpriseModeIdx = 0;
+let _surpriseModeIdx = Math.floor(Math.random() * _surpriseModes.length);
 
 function getSurpriseMode() {
   return _surpriseModes[(_surpriseModeIdx++) % _surpriseModes.length];
