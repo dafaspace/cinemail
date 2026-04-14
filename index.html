@@ -65,9 +65,9 @@
   .card-meta { color: #666; font-size: 11px; margin-top: 2px; }
   .card-actions { display: flex; align-items: center; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
   .btn-watched { padding: 3px 10px; border-radius: 6px; background: transparent;
-    border: 1px solid rgba(245,197,24,0.5); color: #F5C518; font-size: 11px; font-weight: 700; cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.2); color: #aaa; font-size: 11px; font-weight: 700; cursor: pointer;
     font-family: 'Bebas Neue', cursive; letter-spacing: 1px; transition: all .15s; }
-  .btn-watched:hover { background: rgba(245,197,24,0.1); border-color: #F5C518; }
+  .btn-watched:hover { background: rgba(245,197,24,0.1); border-color: #F5C518; color: #F5C518; }
   .btn-watchlist { padding: 3px 10px; border-radius: 6px; background: transparent;
     border: 1px solid rgba(255,255,255,0.2); color: #aaa; font-size: 11px; font-weight: 700; cursor: pointer;
     font-family: 'Bebas Neue', cursive; letter-spacing: 1px; transition: all .15s; }
@@ -1085,6 +1085,9 @@ async function confirmAdd() {
   const btn = document.getElementById("add-confirm-btn");
   btn.textContent = "SAVING..."; btn.disabled = true;
 
+  if (!sbClient) { alert("Not connected. Please sign out and sign in again."); btn.textContent = "SAVE"; btn.disabled = false; return; }
+  if (!currentUser) { alert("Session expired. Please sign in again."); btn.textContent = "SAVE"; btn.disabled = false; return; }
+
   const tmdbID = String(m.tmdbID || m.id || "");
   const existing = watchHistory.find(h => h.tmdbID === tmdbID);
 
@@ -1185,7 +1188,14 @@ async function surpriseMe() {
     const details = await Promise.all(suggestions.map(async s => {
       const found = await tmdbSearch(s.title + " " + s.year);
       const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
-      return pick ? { ...pick, why: s.why } : { Title: s.title, Year: s.year, Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
+      if (!pick) return { Title: s.title, Year: s.year, Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
+      // Fetch full details to get proper poster
+      try {
+        const d = await tmdbDetail(pick.tmdbID || pick.id, pick.type || "movie");
+        return { ...d, why: s.why };
+      } catch(e) {
+        return { ...pick, why: s.why };
+      }
     }));
 
     details.forEach(m => { if (m.Title) _shownSurprises.push(m.Title); });
@@ -1254,10 +1264,14 @@ Reply ONLY with a JSON array, no other text:
     // Fetch TMDB details for each suggestion
     const details = await Promise.all(suggestions.map(async s => {
       const found = await tmdbSearch(s.title + " " + s.year);
-      // Try to match type if Claude specified it
       const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
       if (!pick) return { Title: s.title, Year: s.year, Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
-      return { ...pick, why: s.why };
+      try {
+        const d = await tmdbDetail(pick.tmdbID || pick.id, pick.type || "movie");
+        return { ...d, why: s.why };
+      } catch(e) {
+        return { ...pick, why: s.why };
+      }
     }));
 
     el.innerHTML = details.length
