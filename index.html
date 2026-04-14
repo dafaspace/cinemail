@@ -335,9 +335,9 @@ const SB_URL = "https://ubjafkxdybiwgcupassu.supabase.co";
 const SB_KEY = "sb_publishable_Ep9kQs8XcfgUoK2ACiIo8w_CLDGkZJf";
 
 // ── Supabase Auth client ──────────────────────────────────────────────────────
-const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+let supabase = null;
 let currentUser = null;
-let authMode = "signin"; // or "signup"
+let authMode = "signin";
 
 function toggleAuthMode() {
   authMode = authMode === "signin" ? "signup" : "signin";
@@ -1133,6 +1133,9 @@ function initUI() {
 }
 
 (async () => {
+  // Wait for Supabase SDK then initialize
+  supabase = window.supabase.createClient(SB_URL, SB_KEY);
+
   // Check if user already has a session
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
