@@ -485,17 +485,10 @@ async function onSignedIn(user) {
   try { watchHistory = await loadHistoryFromDB(); } catch(e) { console.warn(e); }
   // Load display name
   try {
-    const { data } = await sbClient.from("profiles").select("display_name").eq("id", user.id).limit(1);
-    if (data?.[0]?.display_name) {
-      currentUser.displayName = data[0].display_name;
-    } else {
-      // Try via sbFetch as fallback (in case RLS blocks anonymous read)
-      try {
-        const rows = await sbFetch(`profiles?id=eq.${user.id}&select=display_name&limit=1`);
-        if (rows?.[0]?.display_name) currentUser.displayName = rows[0].display_name;
-      } catch(e2) {}
-    }
-  } catch(e) {}
+    const { data, error } = await sbClient.from("profiles").select("display_name").eq("id", user.id).limit(1);
+    console.log("[profile load] data:", data, "error:", error);
+    if (data?.[0]?.display_name) currentUser.displayName = data[0].display_name;
+  } catch(e) { console.warn("[profile load] exception:", e); }
   // Check inbox for pending invites
   try {
     const { data } = await sbClient.from("invites").select("id").eq("to_user_id", user.id).eq("status", "pending");
@@ -737,27 +730,34 @@ function closeShare() {
 async function searchUsers(q) {
   const el = document.getElementById("share-user-results");
   if (!q.trim() || q.length < 2) { el.style.display = "none"; return; }
+  el.innerHTML = `<div style="padding:10px 12px;color:#555;font-size:13px">Searching...</div>`;
+  el.style.display = "block";
   try {
-    const encoded = encodeURIComponent('%' + q + '%');
-    const data = await sbFetch(
-      `profiles?select=id,display_name&display_name=ilike.${encoded}&id=neq.${currentUser.id}&limit=5`
-    );
+    // Use sbClient which automatically attaches the current session token
+    const { data, error } = await sbClient
+      .from("profiles")
+      .select("id, display_name")
+      .ilike("display_name", `%${q}%`)
+      .neq("id", currentUser.id)
+      .limit(8);
+
+    console.log("[searchUsers] query:", q, "data:", data, "error:", error);
+
+    if (error) throw new Error(error.message || JSON.stringify(error));
     if (!data || !data.length) {
       el.innerHTML = `<div style="padding:10px 12px;color:#555;font-size:13px">No users found</div>`;
-      el.style.display = "block";
       return;
     }
     el.innerHTML = data.map(u => {
-      const safeName = u.display_name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      const safeName = (u.display_name || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
       return `<div onclick="selectUser('${u.id}','${safeName}')" style="padding:10px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.05)"
         onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">
         ${u.display_name}
       </div>`;
     }).join("");
-    el.style.display = "block";
   } catch(e) {
-    el.innerHTML = `<div style="padding:10px 12px;color:#f87171;font-size:12px">Error: ${e.message}</div>`;
-    el.style.display = "block";
+    console.error("[searchUsers] error:", e);
+    el.innerHTML = `<div style="padding:10px 12px;color:#f87171;font-size:12px">⚠ ${e.message}</div>`;
   }
 }
 
@@ -1362,7 +1362,12 @@ function renderHistory() {
       <span>Avg: ${avg}</span>
     </div>
     <div class="card-list">
-      ${filtered.map(item => `
+      ${filtered.map(item => {
+        const key = regMovie({
+          tmdbID: item.tmdbID, Title: item.title, Year: item.year,
+          Poster: item.poster, type: item.mediaType || "movie"
+        });
+        return `
         <div class="hist-card ${item.status === 'plan' ? 'plan' : ''}" onclick="${item.tmdbID ? `openDetail('${item.tmdbID}','${item.mediaType||"movie"}')` : ''}">
           <div class="hist-poster">${item.poster&&item.poster!=="N/A" ? `<img src="${item.poster}" alt="" onerror="this.parentNode.innerHTML='🎬'">` : "🎬"}</div>
           <div style="flex:1;min-width:0">
@@ -1372,6 +1377,7 @@ function renderHistory() {
                 <div class="hist-meta">${item.year} · ${item.date}</div>
               </div>
               <div style="display:flex;gap:6px;align-items:center">
+                <button onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" style="background:none;border:none;color:#6d4aad;font-size:14px;cursor:pointer;padding:0 2px" title="Share">↗</button>
                 ${item.status === "watched" ? `<button class="hist-del" style="font-size:13px;color:#555" onclick="event.stopPropagation();openEdit(${item.id})">✏️</button>` : ""}
                 <button class="hist-del" onclick="event.stopPropagation();deleteItem(${item.id})">×</button>
               </div>
@@ -1381,7 +1387,8 @@ function renderHistory() {
               : `<span class="status-tag plan">🕐 Want to watch</span>`}
             ${item.comment ? `<div class="hist-note">"${item.comment}" <span style="color:#555;font-style:normal;font-size:10px">— ${item.date}</span></div>` : ""}
           </div>
-        </div>`).join("")}
+        </div>`;
+      }).join("")}
     </div>`;
 }
 
@@ -1438,7 +1445,7 @@ async function deleteItem(id) {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 function initUI() {
-  // Show username in header
+  // Show username in header (display_name only, not email)
   const nameEl = document.getElementById("header-username");
   if (nameEl && currentUser) {
     const name = currentUser.displayName || "";
