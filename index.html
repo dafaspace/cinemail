@@ -453,10 +453,9 @@ async function doSignUp() {
   try {
     const { data, error } = await sbClient.auth.signUp({
       email, password,
-      options: { data: { display_name: name } }  // stored in user_metadata, no RLS
+      options: { data: { display_name: name } }
     });
     if (error) throw error;
-    // Also try to save to profiles (may fail before email confirmation — that's OK)
     if (data.user) {
       try { await sbClient.from("profiles").upsert({ id: data.user.id, display_name: name }); } catch(e2) {}
     }
@@ -486,20 +485,16 @@ async function onSignedIn(user) {
   });
   document.getElementById("main-app").style.display = "block";
   try { watchHistory = await loadHistoryFromDB(); } catch(e) { console.warn(e); }
-  // Load display name: user_metadata is always available, profiles may be empty
+  // Load display name: user_metadata is always available, profiles may need RLS
   try {
-    // 1. Get name from user_metadata (set at signup, never blocked by RLS)
     const metaName = user.user_metadata?.display_name || "";
-    // 2. Try to read from profiles table
     const { data: profileData } = await sbClient.from("profiles").select("display_name").eq("id", user.id).limit(1);
     const profileName = profileData?.[0]?.display_name || "";
-    // 3. Use whichever is available (profile takes priority if set)
     currentUser.displayName = profileName || metaName;
-    // 4. If profile row missing but we have a name, create/update it now (user is authenticated)
     if (!profileName && metaName) {
       try { await sbClient.from("profiles").upsert({ id: user.id, display_name: metaName }); } catch(e2) {}
     }
-    console.log("[profile] meta:", metaName, "profile:", profileName, "→ using:", currentUser.displayName);
+    console.log("[profile] using:", currentUser.displayName);
   } catch(e) { console.warn("[profile]", e.message); }
   // Check inbox for pending invites
   try {
@@ -791,7 +786,9 @@ async function confirmShare() {
       poster: m.Poster || "",
       media_type: m.type || m.mediaType || "movie",
       message: document.getElementById("share-message").value || null,
-      status: "pending"
+      status: "pending",
+      from_name: currentUser.displayName || currentUser.email?.split("@")[0] || "someone",
+      to_name: currentShareToUser.name || ""
     });
     closeShare();
     alert(`Sent to ${currentShareToUser.name}! 🎬`);
@@ -805,17 +802,20 @@ async function renderInbox() {
   const el = document.getElementById("inbox-list");
   el.innerHTML = `<div style="color:#555;text-align:center;padding:30px 0">Loading...</div>`;
   try {
-    const { data: received } = await sbClient.from("invites")
-      .select("*, profiles!invites_from_user_id_fkey(display_name)")
+    // No JOIN with profiles — use from_name/to_name stored in the invite row
+    const { data: received, error: recErr } = await sbClient.from("invites")
+      .select("*")
       .eq("to_user_id", currentUser.id)
       .eq("status", "pending")
       .order("created_at", { ascending: false });
 
-    const { data: sent } = await sbClient.from("invites")
-      .select("*, profiles!invites_to_user_id_fkey(display_name)")
+    const { data: sent, error: sentErr } = await sbClient.from("invites")
+      .select("*")
       .eq("from_user_id", currentUser.id)
       .order("created_at", { ascending: false })
       .limit(10);
+
+    console.log("[inbox] received:", received, recErr, "sent:", sent, sentErr);
 
     let html = "";
 
@@ -826,10 +826,10 @@ async function renderInbox() {
           ${posterHTML(inv.poster, inv.title, 46, 66)}
           <div style="flex:1;min-width:0">
             <div style="font-family:'Bebas Neue',cursive;font-size:15px">${inv.title} (${inv.year||""})</div>
-            <div style="color:#7c3aed;font-size:11px;margin-top:2px">from ${inv.profiles?.display_name || "someone"}</div>
+            <div style="color:#7c3aed;font-size:11px;margin-top:2px">from ${inv.from_name || "someone"}</div>
             ${inv.message ? `<div style="color:#aaa;font-size:12px;font-style:italic;margin-top:4px">"${inv.message}"</div>` : ""}
             <div style="display:flex;gap:8px;margin-top:8px">
-              <button onclick="respondInvite('${inv.id}','accepted',${JSON.stringify(inv).replace(/"/g,'&quot;')})" 
+              <button onclick="respondInvite('${inv.id}','accepted',${JSON.stringify(inv).replace(/"/g,'&quot;')})"
                 style="padding:4px 12px;border-radius:6px;background:#F5C518;border:none;color:#111;font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">✓ ADD TO WATCHLIST</button>
               <button onclick="respondInvite('${inv.id}','declined',null)"
                 style="padding:4px 12px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">✕ DECLINE</button>
@@ -845,7 +845,7 @@ async function renderInbox() {
           ${posterHTML(inv.poster, inv.title, 36, 52)}
           <div style="flex:1;min-width:0">
             <div style="font-family:'Bebas Neue',cursive;font-size:14px">${inv.title}</div>
-            <div style="color:#555;font-size:11px">→ ${inv.profiles?.display_name || "?"} · <span style="color:${inv.status==='accepted'?'#4ade80':inv.status==='declined'?'#f87171':'#888'}">${inv.status}</span></div>
+            <div style="color:#555;font-size:11px">→ ${inv.to_name || "?"} · <span style="color:${inv.status==='accepted'?'#4ade80':inv.status==='declined'?'#f87171':'#888'}">${inv.status}</span></div>
           </div>
         </div>`).join("")}</div>`;
     }
@@ -863,6 +863,7 @@ async function renderInbox() {
     else { badge.style.display = "none"; }
 
   } catch(e) {
+    console.error("[inbox]", e);
     el.innerHTML = `<div class="empty"><div class="title">ERROR</div><div class="sub">${e.message}</div></div>`;
   }
 }
