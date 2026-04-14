@@ -1208,14 +1208,17 @@ async function surpriseMe() {
         const found = await tmdbSearch(s.title + (s.year ? " " + s.year : ""));
         const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
         if (!pick) return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
-        const d = await tmdbDetail(pick.tmdbID || String(pick.id), pick.type || "movie");
-        return { ...d, why: s.why };
+        try {
+          const d = await tmdbDetail(pick.tmdbID || String(pick.id), pick.type || "movie");
+          // Use poster from search result if detail didn't return one
+          if (!d.Poster && pick.Poster) d.Poster = pick.Poster;
+          return { ...d, why: s.why };
+        } catch(e) {
+          console.warn("tmdbDetail failed for", s.title, e.message);
+          return { ...pick, why: s.why };
+        }
       } catch(e) {
-        console.warn("tmdbDetail failed for", s.title, e.message);
-        // Return pick data if we have it, so card is still clickable
-        const found2 = await tmdbSearch(s.title).catch(() => []);
-        const p = found2[0];
-        return p ? { ...p, why: s.why } : { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
+        return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
       }
     }));
 
@@ -1289,13 +1292,16 @@ Reply ONLY with a JSON array, no other text:
         const found = await tmdbSearch(s.title + (s.year ? " " + s.year : ""));
         const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
         if (!pick) return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
-        const d = await tmdbDetail(pick.tmdbID || String(pick.id), pick.type || "movie");
-        return { ...d, why: s.why };
+        try {
+          const d = await tmdbDetail(pick.tmdbID || String(pick.id), pick.type || "movie");
+          if (!d.Poster && pick.Poster) d.Poster = pick.Poster;
+          return { ...d, why: s.why };
+        } catch(e) {
+          console.warn("tmdbDetail failed for", s.title, e.message);
+          return { ...pick, why: s.why };
+        }
       } catch(e) {
-        console.warn("tmdbDetail failed for", s.title, e.message);
-        const found2 = await tmdbSearch(s.title).catch(() => []);
-        const p = found2[0];
-        return p ? { ...p, why: s.why } : { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
+        return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
       }
     }));
 
