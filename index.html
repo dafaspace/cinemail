@@ -262,6 +262,7 @@
     <button class="tab-btn active" onclick="switchTab('search')">🔍 Search</button>
     <button class="tab-btn" onclick="switchTab('recs')">✨ Picks</button>
     <button class="tab-btn" onclick="switchTab('history')">📋 My List</button>
+    <button class="tab-btn" id="tab-btn-inbox" onclick="switchTab('inbox')">📬 <span id="inbox-badge" style="display:none;background:#F5C518;color:#111;border-radius:10px;padding:0 5px;font-size:10px;font-weight:700;margin-left:2px">0</span>Inbox</button>
   </div>
 
   <div class="content">
@@ -295,6 +296,35 @@
         <button class="filter-pill" id="pill-watched" onclick="setFilter('watched')">✓ Watched</button>
       </div>
       <div id="history-list"></div>
+    </div>
+
+    <!-- INBOX -->
+    <div id="tab-inbox" style="display:none">
+      <div id="inbox-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Share Modal -->
+<div id="share-overlay" class="overlay" style="display:none" onclick="closeShare()">
+  <div style="padding:20px;width:100%;display:flex;justify-content:center;cursor:default" onclick="event.stopPropagation();event.preventDefault()">
+    <div class="add-modal" onclick="event.stopPropagation()">
+      <div style="font-family:'Bebas Neue',cursive;color:#7c3aed;font-size:12px;letter-spacing:2px;margin-bottom:3px">RECOMMEND A FILM</div>
+      <div id="share-movie-title" style="font-family:'Bebas Neue',cursive;font-size:19px;margin-bottom:14px;line-height:1.2"></div>
+      <div class="add-label">Send to (search by name)</div>
+      <div style="position:relative;margin-bottom:10px">
+        <input id="share-search" type="text" placeholder="Type a name..." 
+          style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#f0f0f0;font-size:14px;padding:10px 14px;font-family:'DM Sans',sans-serif;outline:none"
+          oninput="searchUsers(this.value)">
+        <div id="share-user-results" style="display:none;position:absolute;top:100%;left:0;right:0;background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:8px;margin-top:4px;z-index:10;max-height:150px;overflow-y:auto"></div>
+      </div>
+      <div id="share-to-display" style="display:none;padding:8px 12px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:8px;margin-bottom:10px;font-size:13px;color:#a78bfa"></div>
+      <div class="add-label">Message (optional)</div>
+      <textarea id="share-message" placeholder="Why you'd love this..." style="min-height:55px;margin-bottom:18px"></textarea>
+      <div style="display:flex;gap:9px">
+        <button class="btn-close" onclick="closeShare()">Cancel</button>
+        <button id="share-confirm-btn" onclick="confirmShare()" style="flex:2;padding:9px;border-radius:8px;background:#7c3aed;border:none;color:#fff;font-family:'Bebas Neue',cursive;font-size:15px;letter-spacing:1px;cursor:pointer">SEND</button>
+      </div>
     </div>
   </div>
 </div>
@@ -450,6 +480,13 @@ async function onSignedIn(user) {
   try {
     const { data } = await sbClient.from("profiles").select("display_name").eq("id", user.id).single();
     if (data?.display_name) currentUser.displayName = data.display_name;
+  } catch(e) {}
+  // Check inbox for pending invites
+  try {
+    const { data } = await sbClient.from("invites").select("id").eq("to_user_id", user.id).eq("status", "pending");
+    const count = data?.length || 0;
+    const badge = document.getElementById("inbox-badge");
+    if (badge) { badge.textContent = count; badge.style.display = count > 0 ? "inline" : "none"; }
   } catch(e) {}
   initUI();
 }
@@ -647,19 +684,175 @@ let historyFilter = "all";
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
 function switchTab(name) {
-  ["search","recs","history"].forEach(t => {
+  ["search","recs","history","inbox"].forEach(t => {
     document.getElementById("tab-"+t).style.display = t === name ? "block" : "none";
   });
   document.querySelectorAll(".tab-btn").forEach((btn, i) => {
-    btn.classList.toggle("active", ["search","recs","history"][i] === name);
+    btn.classList.toggle("active", ["search","recs","history","inbox"][i] === name);
   });
   if (name === "history") renderHistory();
+  if (name === "inbox") renderInbox();
   if (name === "recs") {
     const watched = watchHistory.filter(h => h.status === "watched");
     document.getElementById("rec-history-hint").textContent = watched.length > 0
       ? `Based on ${watched.length} watched film${watched.length > 1 ? "s" : ""}`
       : "Add watched films for personalised picks";
   }
+}
+
+// ── Sharing ───────────────────────────────────────────────────────────────────
+let currentShareMovie = null;
+let currentShareToUser = null;
+
+function openShare(movie) {
+  currentShareMovie = movie;
+  currentShareToUser = null;
+  document.getElementById("share-movie-title").textContent = `${movie.Title} (${movie.Year})`;
+  document.getElementById("share-message").value = "";
+  document.getElementById("share-search").value = "";
+  document.getElementById("share-user-results").style.display = "none";
+  document.getElementById("share-to-display").style.display = "none";
+  document.getElementById("share-overlay").style.display = "flex";
+}
+
+function closeShare() {
+  document.getElementById("share-overlay").style.display = "none";
+}
+
+async function searchUsers(q) {
+  const el = document.getElementById("share-user-results");
+  if (!q.trim() || q.length < 2) { el.style.display = "none"; return; }
+  const { data } = await sbClient.from("profiles")
+    .select("id, display_name")
+    .ilike("display_name", `%${q}%`)
+    .neq("id", currentUser.id)
+    .limit(5);
+  if (!data || !data.length) { el.innerHTML = `<div style="padding:10px 12px;color:#555;font-size:13px">No users found</div>`; el.style.display = "block"; return; }
+  el.innerHTML = data.map(u => `
+    <div onclick="selectUser('${u.id}','${u.display_name.replace(/'/g,"\\'")}') " style="padding:10px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.05)"
+      onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">
+      ${u.display_name}
+    </div>`).join("");
+  el.style.display = "block";
+}
+
+function selectUser(id, name) {
+  currentShareToUser = { id, name };
+  document.getElementById("share-search").value = name;
+  document.getElementById("share-user-results").style.display = "none";
+  const disp = document.getElementById("share-to-display");
+  disp.textContent = `→ Sending to ${name}`;
+  disp.style.display = "block";
+}
+
+async function confirmShare() {
+  if (!currentShareToUser) { alert("Please select a user to send to."); return; }
+  const m = currentShareMovie;
+  const btn = document.getElementById("share-confirm-btn");
+  btn.textContent = "SENDING..."; btn.disabled = true;
+  try {
+    await sbClient.from("invites").insert({
+      from_user_id: currentUser.id,
+      to_user_id: currentShareToUser.id,
+      tmdb_id: String(m.tmdbID || m.id || ""),
+      title: m.Title || "",
+      year: m.Year || "",
+      poster: m.Poster || "",
+      media_type: m.type || m.mediaType || "movie",
+      message: document.getElementById("share-message").value || null,
+      status: "pending"
+    });
+    closeShare();
+    alert(`Sent to ${currentShareToUser.name}! 🎬`);
+  } catch(e) {
+    alert("Could not send: " + e.message);
+  }
+  btn.textContent = "SEND"; btn.disabled = false;
+}
+
+async function renderInbox() {
+  const el = document.getElementById("inbox-list");
+  el.innerHTML = `<div style="color:#555;text-align:center;padding:30px 0">Loading...</div>`;
+  try {
+    const { data: received } = await sbClient.from("invites")
+      .select("*, profiles!invites_from_user_id_fkey(display_name)")
+      .eq("to_user_id", currentUser.id)
+      .eq("status", "pending")
+      .order("created_at", { ascending: false });
+
+    const { data: sent } = await sbClient.from("invites")
+      .select("*, profiles!invites_to_user_id_fkey(display_name)")
+      .eq("from_user_id", currentUser.id)
+      .order("created_at", { ascending: false })
+      .limit(10);
+
+    let html = "";
+
+    if (received && received.length) {
+      html += `<div style="color:#a78bfa;font-size:11px;font-weight:600;letter-spacing:1px;margin-bottom:10px">INCOMING RECOMMENDATIONS</div>`;
+      html += `<div class="card-list" style="margin-bottom:24px">${received.map(inv => `
+        <div style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.2);border-radius:12px;padding:11px;display:flex;gap:11px;align-items:flex-start">
+          ${posterHTML(inv.poster, inv.title, 46, 66)}
+          <div style="flex:1;min-width:0">
+            <div style="font-family:'Bebas Neue',cursive;font-size:15px">${inv.title} (${inv.year||""})</div>
+            <div style="color:#7c3aed;font-size:11px;margin-top:2px">from ${inv.profiles?.display_name || "someone"}</div>
+            ${inv.message ? `<div style="color:#aaa;font-size:12px;font-style:italic;margin-top:4px">"${inv.message}"</div>` : ""}
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button onclick="respondInvite('${inv.id}','accepted',${JSON.stringify(inv).replace(/"/g,'&quot;')})" 
+                style="padding:4px 12px;border-radius:6px;background:#F5C518;border:none;color:#111;font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">✓ ADD TO WATCHLIST</button>
+              <button onclick="respondInvite('${inv.id}','declined',null)"
+                style="padding:4px 12px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">✕ DECLINE</button>
+            </div>
+          </div>
+        </div>`).join("")}</div>`;
+    }
+
+    if (sent && sent.length) {
+      html += `<div style="color:#555;font-size:11px;font-weight:600;letter-spacing:1px;margin-bottom:10px">SENT</div>`;
+      html += `<div class="card-list">${sent.map(inv => `
+        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:11px;display:flex;gap:11px;align-items:center">
+          ${posterHTML(inv.poster, inv.title, 36, 52)}
+          <div style="flex:1;min-width:0">
+            <div style="font-family:'Bebas Neue',cursive;font-size:14px">${inv.title}</div>
+            <div style="color:#555;font-size:11px">→ ${inv.profiles?.display_name || "?"} · <span style="color:${inv.status==='accepted'?'#4ade80':inv.status==='declined'?'#f87171':'#888'}">${inv.status}</span></div>
+          </div>
+        </div>`).join("")}</div>`;
+    }
+
+    if (!received?.length && !sent?.length) {
+      html = `<div class="empty"><div class="icon">📬</div><div class="title">YOUR INBOX IS EMPTY</div><div class="sub">Share a film from search results or your list</div></div>`;
+    }
+
+    el.innerHTML = html;
+
+    // Update badge
+    const count = received?.length || 0;
+    const badge = document.getElementById("inbox-badge");
+    if (count > 0) { badge.textContent = count; badge.style.display = "inline"; }
+    else { badge.style.display = "none"; }
+
+  } catch(e) {
+    el.innerHTML = `<div class="empty"><div class="title">ERROR</div><div class="sub">${e.message}</div></div>`;
+  }
+}
+
+async function respondInvite(id, status, inv) {
+  await sbClient.from("invites").update({ status }).eq("id", id);
+  if (status === "accepted" && inv) {
+    const entry = {
+      tmdbID: inv.tmdb_id,
+      title: inv.title,
+      year: inv.year,
+      poster: inv.poster,
+      stars: 0,
+      comment: "",
+      status: "plan",
+      mediaType: inv.media_type || "movie"
+    };
+    await saveEntryToDB(entry);
+    watchHistory = await loadHistoryFromDB();
+  }
+  renderInbox();
 }
 
 // ── UI helpers ────────────────────────────────────────────────────────────────
@@ -740,6 +933,7 @@ function movieCardHTML(m, why) {
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;margin-left:6px">
           ${actionBtns}
+          ${shareBtn}
         </div>
       </div>
       ${why ? `<div class="why-strip">💡 ${why}</div>` : ""}
