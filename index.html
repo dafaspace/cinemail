@@ -920,6 +920,8 @@ function movieCardHTML(m, why) {
   const topRadius = why ? "12px 12px 0 0" : "12px";
   const idVal = m.tmdbID || m.id;
   const typeVal = m.type || "movie";
+  // Share button
+  const shareBtn = idVal ? `<button onclick="openShare(_movieRegistry['${key}'])" style="padding:3px 8px;border-radius:6px;background:transparent;border:1px solid rgba(124,58,237,0.4);color:#a78bfa;font-size:11px;cursor:pointer;font-family:'Bebas Neue',cursive;letter-spacing:1px;transition:all .15s" onmouseover="this.style.borderColor='#7c3aed'" onmouseout="this.style.borderColor='rgba(124,58,237,0.4)'">↗ SHARE</button>` : "";
   return `
     <div>
       <div class="card" style="border-radius:${topRadius};cursor:default;align-items:center">
