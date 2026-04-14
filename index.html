@@ -1293,17 +1293,19 @@ Reply ONLY with a JSON array, no other text:
         const found = await tmdbSearch(s.title + (s.year ? " " + s.year : ""));
         const pick = found.find(r => s.type === "tv" ? r.type === "tv" : r.type === "movie") || found[0];
         if (!pick) return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
-        const pickId = (pick.tmdbID && pick.tmdbID !== "null") ? pick.tmdbID : (pick.id ? String(pick.id) : null);
+        const pickId = pick.id ? String(pick.id) : (pick.tmdbID && pick.tmdbID !== "null" ? pick.tmdbID : null);
+        console.log("recs debug:", s.title, "pick.id:", pick.id, "pickId:", pickId);
         if (!pickId) return { ...pick, why: s.why };
         try {
           const d = await tmdbDetail(pickId, pick.type || "movie");
           if (!d.Poster && pick.Poster) d.Poster = pick.Poster;
           return { ...d, why: s.why };
         } catch(e) {
-          console.warn("tmdbDetail failed for", s.title, e.message);
+          console.warn("tmdbDetail failed:", s.title, pickId, e.message);
           return { ...pick, tmdbID: pickId, why: s.why };
         }
       } catch(e) {
+        console.warn("tmdbSearch failed:", s.title, e.message);
         return { Title: s.title, Year: s.year||"", Poster: "", tmdbID: null, Rating: null, type: s.type||"movie", why: s.why };
       }
     }));
