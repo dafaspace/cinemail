@@ -834,6 +834,8 @@ async function renderInbox() {
         ${items.map(inv => {
           const isIn = inv._dir === "in";
           const isPending = isIn && inv.status === "pending";
+          // Store invite in registry to avoid JSON-in-onclick issues
+          const invKey = regMovie({ tmdbID: inv.tmdb_id, Title: inv.title, Year: inv.year, Poster: inv.poster, type: inv.media_type || "movie", _invId: inv.id, _invFull: inv });
           return `
           <div style="background:${isPending ? "rgba(124,58,237,0.06)" : "rgba(255,255,255,0.02)"};border:1px solid ${isPending ? "rgba(124,58,237,0.3)" : "rgba(255,255,255,0.06)"};border-radius:12px;padding:11px;display:flex;gap:11px;align-items:flex-start">
             ${posterHTML(inv.poster, inv.title, 46, 66)}
@@ -850,9 +852,9 @@ async function renderInbox() {
               ${inv.message ? `<div style="color:#aaa;font-size:12px;font-style:italic;margin-top:5px">"${inv.message}"</div>` : ""}
               ${isPending ? `
               <div style="display:flex;gap:8px;margin-top:9px">
-                <button onclick="respondInvite('${inv.id}','accepted',${JSON.stringify(inv).replace(/"/g,'&quot;')})"
+                <button onclick="respondInviteByKey('${invKey}','accepted')"
                   style="padding:4px 12px;border-radius:6px;background:#F5C518;border:none;color:#111;font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">✓ ADD TO WATCHLIST</button>
-                <button onclick="respondInvite('${inv.id}','declined',null)"
+                <button onclick="respondInviteByKey('${invKey}','declined')"
                   style="padding:4px 12px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">✕ DECLINE</button>
               </div>` : ""}
             </div>
@@ -868,6 +870,12 @@ async function renderInbox() {
     console.error("[inbox]", e);
     el.innerHTML = `<div class="empty"><div class="title">ERROR</div><div class="sub">${e.message}</div></div>`;
   }
+}
+
+async function respondInviteByKey(key, status) {
+  const inv = _movieRegistry[key]?._invFull;
+  if (!inv) { showToast("Error: invite not found", true); return; }
+  await respondInvite(inv.id, status, status === "accepted" ? inv : null);
 }
 
 async function respondInvite(id, status, inv) {
@@ -892,7 +900,7 @@ async function respondInvite(id, status, inv) {
 
 // ── Notifications ─────────────────────────────────────────────────────────────
 let _lastKnownPendingCount = 0;
-let _inboxPollInterval = null;
+let _realtimeChannel = null;
 
 function playNotificationSound() {
   try {
@@ -949,12 +957,34 @@ async function checkPendingInvites(notify = false) {
 
 function startInboxPolling() {
   stopInboxPolling();
-  // Check every 30 seconds for new invites
-  _inboxPollInterval = setInterval(() => checkPendingInvites(true), 30000);
+  // Use Supabase Realtime for instant notifications (much better than polling)
+  _realtimeChannel = sbClient
+    .channel("inbox-" + currentUser.id)
+    .on("postgres_changes", {
+      event: "INSERT",
+      schema: "public",
+      table: "invites",
+      filter: `to_user_id=eq.${currentUser.id}`
+    }, (payload) => {
+      console.log("[realtime] new invite:", payload);
+      _lastKnownPendingCount++;
+      notifyNewInvite(1);
+      // Update badge
+      const badge = document.getElementById("inbox-badge");
+      if (badge) { badge.textContent = _lastKnownPendingCount; badge.style.display = "inline"; }
+      // If inbox tab is open, refresh it
+      if (document.getElementById("tab-inbox")?.style.display !== "none") renderInbox();
+    })
+    .subscribe((status) => {
+      console.log("[realtime] status:", status);
+    });
 }
 
 function stopInboxPolling() {
-  if (_inboxPollInterval) { clearInterval(_inboxPollInterval); _inboxPollInterval = null; }
+  if (_realtimeChannel) {
+    sbClient.removeChannel(_realtimeChannel);
+    _realtimeChannel = null;
+  }
 }
 
 
