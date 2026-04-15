@@ -191,6 +191,7 @@
   @keyframes bounce { 0%,80%,100%{transform:scale(0.6);opacity:.3} 40%{transform:scale(1);opacity:1} }
   @keyframes shimmer { 0%,100%{opacity:.5} 50%{opacity:1} }
   @keyframes progressSlide { 0%{transform:translateX(-200%)} 100%{transform:translateX(350%)} }
+  @keyframes fadeInUp { from{opacity:0;transform:translateX(-50%) translateY(8px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
 </style>
 </head>
 <body>
@@ -485,12 +486,13 @@ async function onSignedIn(user) {
   });
   document.getElementById("main-app").style.display = "block";
   try { watchHistory = await loadHistoryFromDB(); } catch(e) { console.warn(e); }
-  // Load display name: user_metadata is always available, profiles may need RLS
+  // Load display name: try profiles table first, fall back to user_metadata
   try {
     const metaName = user.user_metadata?.display_name || "";
     const { data: profileData } = await sbClient.from("profiles").select("display_name").eq("id", user.id).limit(1);
     const profileName = profileData?.[0]?.display_name || "";
     currentUser.displayName = profileName || metaName;
+    // If profile row is missing but we have a name, create it now (user is authenticated)
     if (!profileName && metaName) {
       try { await sbClient.from("profiles").upsert({ id: user.id, display_name: metaName }); } catch(e2) {}
     }
@@ -557,6 +559,11 @@ async function sbFetch(path, opts = {}) {
 
 async function loadHistoryFromDB() {
   const rows = await sbFetch("watchlist?order=created_at.desc");
+  // Safety: if rows is not an array or empty due to auth issue, return current watchHistory
+  if (!Array.isArray(rows)) {
+    console.warn("[loadHistory] unexpected response:", rows);
+    return watchHistory; // keep existing data
+  }
   return rows.map(r => ({
     id: r.id,
     tmdbID: r.imdb_id,
@@ -743,7 +750,6 @@ async function searchUsers(q) {
     const { data, error } = await sbClient.rpc("search_profiles", {
       search_query: q, exclude_id: currentUser.id
     });
-    console.log("[searchUsers]", data, error);
     if (error) throw new Error(error.message);
     if (!data || !data.length) {
       el.innerHTML = `<div style="padding:10px 12px;color:#555;font-size:13px">No users found</div>`;
@@ -757,7 +763,6 @@ async function searchUsers(q) {
       </div>`;
     }).join("");
   } catch(e) {
-    console.error("[searchUsers]", e.message);
     el.innerHTML = `<div style="padding:10px 12px;color:#f87171;font-size:12px">⚠ ${e.message}</div>`;
   }
 }
@@ -772,12 +777,12 @@ function selectUser(id, name) {
 }
 
 async function confirmShare() {
-  if (!currentShareToUser) { alert("Please select a user to send to."); return; }
+  if (!currentShareToUser) { showToast("Select a user first"); return; }
   const m = currentShareMovie;
   const btn = document.getElementById("share-confirm-btn");
   btn.textContent = "SENDING..."; btn.disabled = true;
   try {
-    await sbClient.from("invites").insert({
+    const { error } = await sbClient.from("invites").insert({
       from_user_id: currentUser.id,
       to_user_id: currentShareToUser.id,
       tmdb_id: String(m.tmdbID || m.id || ""),
@@ -790,10 +795,11 @@ async function confirmShare() {
       from_name: currentUser.displayName || currentUser.email?.split("@")[0] || "someone",
       to_name: currentShareToUser.name || ""
     });
+    if (error) throw new Error(error.message);
     closeShare();
-    alert(`Sent to ${currentShareToUser.name}! 🎬`);
+    showToast(`Sent to ${currentShareToUser.name} 🎬`);
   } catch(e) {
-    alert("Could not send: " + e.message);
+    showToast("Could not send: " + e.message, true);
   }
   btn.textContent = "SEND"; btn.disabled = false;
 }
@@ -802,64 +808,81 @@ async function renderInbox() {
   const el = document.getElementById("inbox-list");
   el.innerHTML = `<div style="color:#555;text-align:center;padding:30px 0">Loading...</div>`;
   try {
-    // No JOIN with profiles — use from_name/to_name stored in the invite row
+    // Two separate queries — no JOIN with profiles (RLS would block it)
     const { data: received, error: recErr } = await sbClient.from("invites")
       .select("*")
       .eq("to_user_id", currentUser.id)
-      .eq("status", "pending")
       .order("created_at", { ascending: false });
 
     const { data: sent, error: sentErr } = await sbClient.from("invites")
       .select("*")
       .eq("from_user_id", currentUser.id)
       .order("created_at", { ascending: false })
-      .limit(10);
+      .limit(20);
 
-    console.log("[inbox] received:", received, recErr, "sent:", sent, sentErr);
+    console.log("[inbox] received:", received, recErr, "| sent:", sent, sentErr);
 
-    let html = "";
+    // Merge into a single chronological list, tag each item
+    const allItems = [
+      ...(received || []).map(inv => ({ ...inv, _dir: "in" })),
+      ...(sent || []).map(inv => ({ ...inv, _dir: "out" }))
+    ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-    if (received && received.length) {
-      html += `<div style="color:#a78bfa;font-size:11px;font-weight:600;letter-spacing:1px;margin-bottom:10px">INCOMING RECOMMENDATIONS</div>`;
-      html += `<div class="card-list" style="margin-bottom:24px">${received.map(inv => `
-        <div style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.2);border-radius:12px;padding:11px;display:flex;gap:11px;align-items:flex-start">
-          ${posterHTML(inv.poster, inv.title, 46, 66)}
-          <div style="flex:1;min-width:0">
-            <div style="font-family:'Bebas Neue',cursive;font-size:15px">${inv.title} (${inv.year||""})</div>
-            <div style="color:#7c3aed;font-size:11px;margin-top:2px">from ${inv.from_name || "someone"}</div>
-            ${inv.message ? `<div style="color:#aaa;font-size:12px;font-style:italic;margin-top:4px">"${inv.message}"</div>` : ""}
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <button onclick="respondInvite('${inv.id}','accepted',${JSON.stringify(inv).replace(/"/g,'&quot;')})"
-                style="padding:4px 12px;border-radius:6px;background:#F5C518;border:none;color:#111;font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">✓ ADD TO WATCHLIST</button>
-              <button onclick="respondInvite('${inv.id}','declined',null)"
-                style="padding:4px 12px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">✕ DECLINE</button>
+    // Deduplicate (same invite appears in both queries for sender=receiver edge case)
+    const seen = new Set();
+    const items = allItems.filter(inv => {
+      if (seen.has(inv.id)) return false;
+      seen.add(inv.id);
+      return true;
+    });
+
+    const pending = items.filter(i => i._dir === "in" && i.status === "pending");
+
+    if (!items.length) {
+      el.innerHTML = `<div class="empty"><div class="icon">📬</div><div class="title">YOUR INBOX IS EMPTY</div><div class="sub">Share a film from search results or your list</div></div>`;
+      document.getElementById("inbox-badge").style.display = "none";
+      return;
+    }
+
+    const statusColor = s => s === "accepted" ? "#4ade80" : s === "declined" ? "#f87171" : "#888";
+    const statusLabel = s => s === "accepted" ? "✓ accepted" : s === "declined" ? "✕ declined" : "pending";
+
+    el.innerHTML = `
+      <div style="color:#555;font-size:11px;margin-bottom:14px">${items.length} message${items.length!==1?"s":""} · ${pending.length} pending</div>
+      <div class="card-list">
+        ${items.map(inv => {
+          const isIn = inv._dir === "in";
+          const isPending = isIn && inv.status === "pending";
+          const borderCol = isPending ? "rgba(124,58,237,0.3)" : "rgba(255,255,255,0.06)";
+          const bgCol = isPending ? "rgba(124,58,237,0.06)" : "rgba(255,255,255,0.02)";
+          const fromTo = isIn
+            ? `<span style="color:#a78bfa">↓ from ${inv.from_name || "someone"}</span>`
+            : `<span style="color:#555">↑ to ${inv.to_name || "?"}</span>`;
+          return `
+          <div style="background:${bgCol};border:1px solid ${borderCol};border-radius:12px;padding:11px;display:flex;gap:11px;align-items:flex-start">
+            ${posterHTML(inv.poster, inv.title, 46, 66)}
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+                <div style="font-family:'Bebas Neue',cursive;font-size:15px;line-height:1.2">${inv.title} ${inv.year ? `(${inv.year})` : ""}</div>
+                <span style="font-size:10px;color:${statusColor(inv.status)};white-space:nowrap;margin-top:2px">${statusLabel(inv.status)}</span>
+              </div>
+              <div style="font-size:11px;margin-top:3px">${fromTo}</div>
+              ${inv.message ? `<div style="color:#aaa;font-size:12px;font-style:italic;margin-top:5px">"${inv.message}"</div>` : ""}
+              ${isPending ? `
+              <div style="display:flex;gap:8px;margin-top:9px">
+                <button onclick="respondInvite('${inv.id}','accepted',${JSON.stringify(inv).replace(/"/g,'&quot;')})"
+                  style="padding:4px 12px;border-radius:6px;background:#F5C518;border:none;color:#111;font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">✓ ADD TO WATCHLIST</button>
+                <button onclick="respondInvite('${inv.id}','declined',null)"
+                  style="padding:4px 12px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">✕ DECLINE</button>
+              </div>` : ""}
             </div>
-          </div>
-        </div>`).join("")}</div>`;
-    }
+          </div>`;
+        }).join("")}
+      </div>`;
 
-    if (sent && sent.length) {
-      html += `<div style="color:#555;font-size:11px;font-weight:600;letter-spacing:1px;margin-bottom:10px">SENT</div>`;
-      html += `<div class="card-list">${sent.map(inv => `
-        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:11px;display:flex;gap:11px;align-items:center">
-          ${posterHTML(inv.poster, inv.title, 36, 52)}
-          <div style="flex:1;min-width:0">
-            <div style="font-family:'Bebas Neue',cursive;font-size:14px">${inv.title}</div>
-            <div style="color:#555;font-size:11px">→ ${inv.to_name || "?"} · <span style="color:${inv.status==='accepted'?'#4ade80':inv.status==='declined'?'#f87171':'#888'}">${inv.status}</span></div>
-          </div>
-        </div>`).join("")}</div>`;
-    }
-
-    if (!received?.length && !sent?.length) {
-      html = `<div class="empty"><div class="icon">📬</div><div class="title">YOUR INBOX IS EMPTY</div><div class="sub">Share a film from search results or your list</div></div>`;
-    }
-
-    el.innerHTML = html;
-
-    // Update badge
-    const count = received?.length || 0;
+    // Update badge — only pending incoming
     const badge = document.getElementById("inbox-badge");
-    if (count > 0) { badge.textContent = count; badge.style.display = "inline"; }
+    if (pending.length > 0) { badge.textContent = pending.length; badge.style.display = "inline"; }
     else { badge.style.display = "none"; }
 
   } catch(e) {
@@ -869,22 +892,49 @@ async function renderInbox() {
 }
 
 async function respondInvite(id, status, inv) {
-  await sbClient.from("invites").update({ status }).eq("id", id);
-  if (status === "accepted" && inv) {
-    const entry = {
-      tmdbID: inv.tmdb_id,
-      title: inv.title,
-      year: inv.year,
-      poster: inv.poster,
-      stars: 0,
-      comment: "",
-      status: "plan",
-      mediaType: inv.media_type || "movie"
-    };
-    await saveEntryToDB(entry);
-    watchHistory = await loadHistoryFromDB();
+  try {
+    const { error } = await sbClient.from("invites").update({ status }).eq("id", id);
+    if (error) throw new Error(error.message);
+    if (status === "accepted" && inv) {
+      await saveEntryToDB({
+        tmdbID: inv.tmdb_id,
+        title: inv.title,
+        year: inv.year,
+        poster: inv.poster,
+        stars: 0,
+        comment: "",
+        status: "plan",
+        mediaType: inv.media_type || "movie"
+      });
+      const newHistory = await loadHistoryFromDB();
+      if (newHistory.length > 0 || watchHistory.length === 0) watchHistory = newHistory;
+      showToast(`"${inv.title}" added to your watchlist`);
+    } else {
+      showToast("Recommendation declined");
+    }
+  } catch(e) {
+    showToast("Error: " + e.message, true);
   }
   renderInbox();
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function showToast(msg, isError = false) {
+  const existing = document.getElementById("toast");
+  if (existing) existing.remove();
+  const t = document.createElement("div");
+  t.id = "toast";
+  t.textContent = msg;
+  t.style.cssText = `position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+    background:${isError ? "#7f1d1d" : "#1a2a1a"};
+    border:1px solid ${isError ? "rgba(248,113,113,0.4)" : "rgba(74,222,128,0.3)"};
+    color:${isError ? "#fca5a5" : "#86efac"};
+    padding:10px 18px;border-radius:10px;font-size:13px;z-index:9999;
+    white-space:nowrap;pointer-events:none;
+    animation:fadeInUp .2s ease`;
+  document.body.appendChild(t);
+  setTimeout(() => t.style.opacity = "0", 2200);
+  setTimeout(() => t.remove(), 2500);
 }
 
 // ── UI helpers ────────────────────────────────────────────────────────────────
@@ -1146,7 +1196,10 @@ async function confirmAdd() {
         mediaType: m.type || m.mediaType || "movie"
       });
     }
-    watchHistory = await loadHistoryFromDB();
+    const newHistory = await loadHistoryFromDB();
+    if (newHistory.length > 0 || watchHistory.length === 0) {
+      watchHistory = newHistory; // only update if we got real data back
+    }
   } catch(e) {
     alert("Could not save: " + e.message);
     btn.textContent = "SAVE"; btn.disabled = false;
@@ -1155,7 +1208,7 @@ async function confirmAdd() {
 
   closeAdd();
   closeDetail();
-  if (document.querySelector(".tab-btn:nth-child(3)").classList.contains("active")) renderHistory();
+  renderHistory(); // always re-render regardless of active tab
   btn.textContent = "SAVE"; btn.disabled = false;
 }
 
