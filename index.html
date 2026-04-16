@@ -905,10 +905,12 @@ async function respondInviteByKey(key, status) {
 
 async function deleteInvite(id) {
   try {
-    const { error } = await sbClient.from("invites").delete().eq("id", id);
-    if (error) throw new Error(error.message);
+    await sbFetch(`invites?id=eq.${id}`, { method: "DELETE" });
     renderInbox();
-  } catch(e) { showToast("Could not delete: " + e.message, true); }
+  } catch(e) {
+    console.error("[deleteInvite]", e.message);
+    showToast("Could not delete: " + e.message, true);
+  }
 }
 
 async function respondInvite(id, status, inv) {
@@ -1683,15 +1685,22 @@ function initUI() {
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./sw.js").then(reg => {
-    reg.update(); // check for new version every load
+    reg.update();
     reg.addEventListener("updatefound", () => {
       const sw = reg.installing;
       sw.addEventListener("statechange", () => {
         if (sw.state === "installed" && navigator.serviceWorker.controller) {
+          // Real new version — reload once
           sw.postMessage("skipWaiting");
-          navigator.serviceWorker.addEventListener("controllerchange", () => window.location.reload());
         }
       });
+    });
+    // Listen for controller change exactly once
+    let reloading = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (reloading) return;
+      reloading = true;
+      window.location.reload();
     });
   }).catch(err => console.warn("SW:", err));
 }
