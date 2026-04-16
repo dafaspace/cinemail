@@ -1685,17 +1685,8 @@ function initUI() {
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./sw.js").then(reg => {
-    reg.update();
-    reg.addEventListener("updatefound", () => {
-      const sw = reg.installing;
-      sw.addEventListener("statechange", () => {
-        if (sw.state === "installed" && navigator.serviceWorker.controller) {
-          // Real new version — reload once
-          sw.postMessage("skipWaiting");
-        }
-      });
-    });
-    // Listen for controller change exactly once
+    // Don't call reg.update() manually — browser checks automatically
+    // Only reload when a genuinely new SW activates
     let reloading = false;
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (reloading) return;
