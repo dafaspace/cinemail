@@ -323,7 +323,7 @@
       <div style="position:relative;margin-bottom:10px">
         <input id="share-search" type="text" placeholder="Type a name..." 
           style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#f0f0f0;font-size:14px;padding:10px 14px;font-family:'DM Sans',sans-serif;outline:none"
-          oninput="searchUsers(this.value)">
+          oninput="searchUsers(this.value)" placeholder="Enter exact name...">
         <div id="share-user-results" style="display:none;position:absolute;top:100%;left:0;right:0;background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:8px;margin-top:4px;z-index:10;max-height:150px;overflow-y:auto"></div>
       </div>
       <div id="share-to-display" style="display:none;padding:8px 12px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:8px;margin-bottom:10px;font-size:13px;color:#a78bfa"></div>
@@ -440,6 +440,18 @@ function showSignInError(msg) {
   el.textContent = msg; el.style.display = "block";
 }
 
+async function findUniqueName(baseName) {
+  // Check if name is taken, if so try baseName 1, baseName 2, etc.
+  const { data } = await sbClient.from("profiles")
+    .select("display_name")
+    .ilike("display_name", `${baseName}%`);
+  const taken = new Set((data || []).map(r => r.display_name?.toLowerCase()));
+  if (!taken.has(baseName.toLowerCase())) return baseName;
+  let i = 1;
+  while (taken.has(`${baseName.toLowerCase()} ${i}`)) i++;
+  return `${baseName} ${i}`;
+}
+
 async function doSignUp() {
   const name = document.getElementById("signup-name").value.trim();
   const email = document.getElementById("signup-email").value.trim();
@@ -452,15 +464,23 @@ async function doSignUp() {
   if (password.length < 6) { showSignUpError("Password must be at least 6 characters."); return; }
   btn.textContent = "..."; btn.disabled = true;
   try {
+    // Find a unique display name
+    const uniqueName = await findUniqueName(name);
+    if (uniqueName !== name) {
+      // Let user know their name was adjusted
+      document.getElementById("signup-name").value = uniqueName;
+      showSignUpError(`"${name}" is taken — your name will be "${uniqueName}". Press Create Account again to confirm.`);
+      btn.textContent = "CREATE ACCOUNT"; btn.disabled = false;
+      return;
+    }
     const { data, error } = await sbClient.auth.signUp({
       email, password,
-      options: { data: { display_name: name } }
+      options: { data: { display_name: uniqueName } }
     });
     if (error) throw error;
     if (data.user) {
-      try { await sbClient.from("profiles").upsert({ id: data.user.id, display_name: name }); } catch(e2) {}
+      try { await sbClient.from("profiles").upsert({ id: data.user.id, display_name: uniqueName }); } catch(e2) {}
     }
-    // Show check email screen
     document.getElementById("check-email-msg").innerHTML =
       `We sent a confirmation link to<br><strong style="color:#f0f0f0">${email}</strong><br><br>Click it to activate your account.`;
     showScreen("check-email");
@@ -737,7 +757,7 @@ async function searchUsers(q) {
     });
     if (error) throw new Error(error.message);
     if (!data || !data.length) {
-      el.innerHTML = `<div style="padding:10px 12px;color:#555;font-size:13px">No users found</div>`;
+      el.innerHTML = `<div style="padding:10px 12px;color:#555;font-size:13px">Not found — enter exact name</div>`;
       return;
     }
     el.innerHTML = data.map(u => {
