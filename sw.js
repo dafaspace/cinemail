@@ -1,57 +1,73 @@
-const CACHE = "movie-night-v2";
-const ASSETS = [
+// ── Cache version — bump this string on every deploy to force refresh ──────────
+const CACHE_VERSION = "v8";
+const CACHE_NAME = "movie-night-" + CACHE_VERSION;
+
+// Files to cache for offline use
+const PRECACHE = [
+  "./",
   "./index.html",
   "./manifest.json",
-  "./icon.png",
 ];
 
-self.addEventListener("install", e => {
-  e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(ASSETS))
-  );
+// ── Install: cache core files ─────────────────────────────────────────────────
+self.addEventListener("install", event => {
+  // Skip waiting — activate immediately without waiting for old SW to die
   self.skipWaiting();
-});
-
-self.addEventListener("activate", e => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    )
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(PRECACHE).catch(() => {}))
   );
-  self.clients.claim();
 });
 
-self.addEventListener("fetch", e => {
-  const url = e.request.url;
-
-  // API calls — always network first, no caching
-  if (
-    url.includes("themoviedb.org") ||
-    url.includes("anthropic.com") ||
-    url.includes("supabase.co")
-  ) {
-    e.respondWith(fetch(e.request).catch(() => new Response("offline", { status: 503 })));
-    return;
-  }
-
-  // Google Fonts — cache first, then network (so fonts work offline)
-  if (url.includes("fonts.googleapis.com") || url.includes("fonts.gstatic.com")) {
-    e.respondWith(
-      caches.open(CACHE).then(cache =>
-        cache.match(e.request).then(cached => {
-          if (cached) return cached;
-          return fetch(e.request).then(response => {
-            cache.put(e.request, response.clone());
-            return response;
-          });
-        })
+// ── Activate: delete ALL old caches ──────────────────────────────────────────
+self.addEventListener("activate", event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys
+          .filter(key => key !== CACHE_NAME)
+          .map(key => {
+            console.log("[SW] Deleting old cache:", key);
+            return caches.delete(key);
+          })
       )
+    ).then(() => self.clients.claim()) // take control of all open pages immediately
+  );
+});
+
+// ── Fetch: network-first strategy for HTML, cache-first for assets ────────────
+self.addEventListener("fetch", event => {
+  const url = new URL(event.request.url);
+
+  // Always fetch HTML fresh from network (never serve stale app shell)
+  if (event.request.mode === "navigate" || url.pathname.endsWith(".html")) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          // Update cache with fresh version
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          return response;
+        })
+        .catch(() => caches.match(event.request)) // fallback to cache if offline
     );
     return;
   }
 
-  // App shell — cache first
-  e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
+  // For everything else: network-first with cache fallback
+  event.respondWith(
+    fetch(event.request)
+      .then(response => {
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        }
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
+});
+
+// ── Message: force update from page ──────────────────────────────────────────
+self.addEventListener("message", event => {
+  if (event.data === "skipWaiting") self.skipWaiting();
 });
