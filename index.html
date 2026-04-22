@@ -716,6 +716,7 @@ async function loadHistoryFromDB() {
     poster: r.poster, stars: r.stars || 0, comment: r.comment || "",
     status: r.status || "watched", mediaType: r.media_type || "movie",
     composer: r.composer || "",
+    director: r.director || "",
     date: new Date(r.created_at).toLocaleDateString("en-GB")
   }));
 }
@@ -734,6 +735,7 @@ async function saveEntryToDB(entry) {
       status: entry.status,
       media_type: entry.mediaType || "movie",
       composer: entry.composer || null,
+      director: entry.director || null,
       user_id: currentUser ? currentUser.id : null
     })
   });
@@ -1383,12 +1385,17 @@ async function openDetail(id, type) {
     ].join("");
     const tvInfo = d.Seasons ? `<div class="crew-label">SEASONS / EPISODES</div><div class="crew-val">${d.Seasons} seasons · ${d.Episodes} episodes${d.Networks ? ` · ${d.Networks}` : ""}</div>` : "";
 
-    // Auto-backfill composer for existing watchlist entries that have it empty
+    // Auto-backfill composer/director for existing watchlist entries that have them empty
     const existing = watchHistory.find(h => h.tmdbID === String(id));
-    if (existing && !existing.composer && d.Composer) {
-      updateEntryInDB(existing.id, { composer: d.Composer }).then(async () => {
-        watchHistory = await loadHistoryFromDB();
-      }).catch(() => {});
+    if (existing) {
+      const patch = {};
+      if (!existing.composer && d.Composer) patch.composer = d.Composer;
+      if (!existing.director && d.Director) patch.director = d.Director;
+      if (Object.keys(patch).length) {
+        updateEntryInDB(existing.id, patch).then(async () => {
+          watchHistory = await loadHistoryFromDB();
+        }).catch(() => {});
+      }
     }
 
     let actionBtns = `<button class="btn-close" onclick="closeDetail()">Close</button>`;
@@ -1459,10 +1466,12 @@ async function confirmAdd() {
   const tmdbID = String(m.tmdbID || m.id || "");
   const existing = watchHistory.find(h => h.tmdbID === tmdbID);
 
-  // Composer: from currentAddMovie if present (opened via detail), else from _detailMovie fallback
+  // Composer/Director: from currentAddMovie if present, else from _detailMovie fallback
   let composer = m.Composer || "";
-  if (!composer && window._detailMovie && String(window._detailMovie.tmdbID) === tmdbID) {
-    composer = window._detailMovie.Composer || "";
+  let director = m.Director || "";
+  if (window._detailMovie && String(window._detailMovie.tmdbID) === tmdbID) {
+    if (!composer) composer = window._detailMovie.Composer || "";
+    if (!director) director = window._detailMovie.Director || "";
   }
 
   try {
@@ -1473,8 +1482,9 @@ async function confirmAdd() {
         fields.stars = currentStars;
         fields.comment = document.getElementById("add-note").value;
       }
-      // Backfill composer if we now know it and row was empty
+      // Backfill composer/director if we now know them and row was empty
       if (composer && !existing.composer) fields.composer = composer;
+      if (director && !existing.director) fields.director = director;
       await updateEntryInDB(existing.id, fields);
     } else {
       await saveEntryToDB({
@@ -1486,7 +1496,8 @@ async function confirmAdd() {
         comment: currentAddStatus === "plan" ? "" : document.getElementById("add-note").value,
         status: currentAddStatus,
         mediaType: m.type || m.mediaType || "movie",
-        composer: composer || null
+        composer: composer || null,
+        director: director || null
       });
     }
     const newHistory = await loadHistoryFromDB();
@@ -1688,45 +1699,61 @@ function renderHistory() {
   const rated = watched.filter(h => h.stars > 0);
   const avg = rated.length ? (rated.reduce((a,b)=>a+b.stars,0)/rated.length).toFixed(1)+"★" : "—";
 
-  // Composer stats: count by composer name, only watched entries with composer set
-  const composerMap = {};
-  watched.forEach(h => {
-    if (!h.composer) return;
-    h.composer.split(", ").forEach(name => {
-      name = name.trim();
-      if (name) composerMap[name] = (composerMap[name] || 0) + 1;
+  // Build top-N stats from a field that may contain comma-separated names
+  function buildTopStats(entries, field, minCount, maxItems) {
+    const map = {};
+    entries.forEach(h => {
+      if (!h[field]) return;
+      h[field].split(", ").forEach(name => {
+        name = name.trim();
+        if (name) map[name] = (map[name] || 0) + 1;
+      });
     });
-  });
-  const topComposers = Object.entries(composerMap)
-    .filter(([, count]) => count >= 2)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5);
-  const maxCount = topComposers.length ? topComposers[0][1] : 1;
+    return Object.entries(map)
+      .filter(([, c]) => c >= minCount)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, maxItems);
+  }
 
-  const composerBlock = (historyFilter === "watched" && topComposers.length) ? `
-    <div style="margin-bottom:14px;padding:11px 13px;background:rgba(245,197,24,0.04);border:1px solid rgba(245,197,24,0.12);border-radius:12px">
-      <div style="font-size:11px;color:#F5C518;font-weight:600;letter-spacing:.5px;margin-bottom:9px">🎵 Your top composers</div>
-      ${topComposers.map(([name, count]) => {
-        const pct = Math.round((count / maxCount) * 100);
-        return `
-        <div style="display:flex;align-items:center;gap:9px;margin-bottom:7px;cursor:pointer" onclick="setSearchAndGo('${name.replace(/'/g,"\\'")}')">
-          <div style="flex:1;min-width:0">
-            <div style="font-size:12px;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</div>
-          </div>
-          <div style="width:80px;height:3px;background:rgba(255,255,255,0.07);border-radius:2px;flex-shrink:0">
-            <div style="width:${pct}%;height:100%;background:#F5C518;border-radius:2px;transition:width .4s"></div>
-          </div>
-          <div style="font-size:11px;color:#666;flex-shrink:0;width:38px;text-align:right">${count} film${count > 1 ? "s" : ""}</div>
-        </div>`;
-      }).join("")}
-    </div>` : "";
+  function collapsibleStatsBlock(id, icon, label, items) {
+    if (!items.length) return "";
+    const maxCount = items[0][1];
+    const rows = items.map(([name, count]) => {
+      const pct = Math.round((count / maxCount) * 100);
+      const safe = name.replace(/'/g, "\'");
+      return `
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:7px;cursor:pointer"
+           onclick="setSearchAndGo('${safe}')">
+        <div style="flex:1;min-width:0;font-size:12px;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</div>
+        <div style="width:80px;height:3px;background:rgba(255,255,255,0.07);border-radius:2px;flex-shrink:0">
+          <div style="width:${pct}%;height:100%;background:#F5C518;border-radius:2px"></div>
+        </div>
+        <div style="font-size:11px;color:#666;flex-shrink:0;width:38px;text-align:right">${count} film${count > 1 ? "s" : ""}</div>
+      </div>`;
+    }).join("");
+    return `
+    <div style="margin-bottom:10px;border:1px solid rgba(245,197,24,0.12);border-radius:12px;overflow:hidden">
+      <div onclick="toggleStatsBlock('${id}')" style="display:flex;justify-content:space-between;align-items:center;padding:10px 13px;cursor:pointer;background:rgba(245,197,24,0.04)">
+        <div style="font-size:11px;color:#F5C518;font-weight:600;letter-spacing:.5px">${icon} ${label}</div>
+        <span id="stats-arrow-${id}" style="color:#F5C518;font-size:10px">▼</span>
+      </div>
+      <div id="stats-body-${id}" style="display:none;padding:11px 13px 4px">
+        ${rows}
+      </div>
+    </div>`;
+  }
+
+  const showStats = historyFilter === "watched";
+  const topDirectors = showStats ? buildTopStats(watched, "director", 2, 5) : [];
+  const topComposers = showStats ? buildTopStats(watched, "composer", 2, 5) : [];
 
   el.innerHTML = `
     <div class="history-header">
       <span>${watched.length} watched · ${plan.length} planned</span>
       <span>Avg: ${avg}</span>
     </div>
-    ${composerBlock}
+    ${collapsibleStatsBlock("directors", "🎬", "Your top directors", topDirectors)}
+    ${collapsibleStatsBlock("composers", "🎵", "Your top composers", topComposers)}
     <div class="card-list">
       ${filtered.map(item => {
         const key = regMovie({ tmdbID: item.tmdbID, Title: item.title, Year: item.year, Poster: item.poster, type: item.mediaType || "movie" });
@@ -1757,11 +1784,20 @@ function renderHistory() {
     </div>`;
 }
 
-// ── Composer tap → search ─────────────────────────────────────────────────────
-function setSearchAndGo(composerName) {
+// ── Stats helpers ────────────────────────────────────────────────────────────
+function setSearchAndGo(name) {
   switchTab("search");
-  document.getElementById("search-input").value = composerName;
+  document.getElementById("search-input").value = name;
   doSearch();
+}
+
+function toggleStatsBlock(id) {
+  const body = document.getElementById("stats-body-" + id);
+  const arrow = document.getElementById("stats-arrow-" + id);
+  if (!body) return;
+  const open = body.style.display === "none";
+  body.style.display = open ? "block" : "none";
+  if (arrow) arrow.textContent = open ? "▲" : "▼";
 }
 
 // ── Edit review ───────────────────────────────────────────────────────────────
