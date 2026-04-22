@@ -381,6 +381,13 @@
   </div>
 </div>
 
+<!-- Person filmography modal -->
+<div id="person-overlay" class="overlay" style="display:none" onclick="closePerson()">
+  <div class="modal" onclick="event.stopPropagation();event.preventDefault()">
+    <div id="person-content"></div>
+  </div>
+</div>
+
 <!-- Add Modal -->
 <div id="add-overlay" class="overlay" style="display:none" onclick="closeAdd()">
   <div style="padding:20px;width:100%;display:flex;justify-content:center;cursor:default" onclick="event.stopPropagation();event.preventDefault()">
@@ -1366,7 +1373,7 @@ function clickableNames(str, closeModal) {
   return str.split(", ").map(name => {
     const safe = name.trim().replace(/'/g, "\\'");
     const close = closeModal ? "closeDetail();" : "";
-    return `<span onclick="${close}setSearchAndGo('${safe}')" style="cursor:pointer;color:#ddd;border-bottom:1px dotted rgba(255,255,255,0.2);transition:color .15s;white-space:nowrap" onmouseover="this.style.color='#F5C518';this.style.borderBottomColor='#F5C518'" onmouseout="this.style.color='#ddd';this.style.borderBottomColor='rgba(255,255,255,0.2)'">${name.trim()}</span>`;
+    return `<span onclick="${close}openPerson('${safe}')" style="cursor:pointer;color:#ddd;border-bottom:1px dotted rgba(255,255,255,0.2);transition:color .15s;white-space:nowrap" onmouseover="this.style.color='#F5C518';this.style.borderBottomColor='#F5C518'" onmouseout="this.style.color='#ddd';this.style.borderBottomColor='rgba(255,255,255,0.2)'">${name.trim()}</span>`;
   }).join('<span style="color:#555">, </span>');
 }
 
@@ -1432,6 +1439,101 @@ async function openDetail(id, type) {
 }
 
 function closeDetail() { document.getElementById("detail-overlay").style.display = "none"; }
+
+// ── Person filmography ────────────────────────────────────────────────────────
+function closePerson() { document.getElementById("person-overlay").style.display = "none"; }
+
+async function openPerson(name) {
+  const el = document.getElementById("person-content");
+  document.getElementById("person-overlay").style.display = "flex";
+  el.innerHTML = loadingHTML(randQuote(), false);
+  try {
+    // Search for person by name
+    const searchRes = await tmdbFetch(`/search/person?query=${encodeURIComponent(name)}&language=en-US`);
+    const person = searchRes.results?.[0];
+    if (!person) {
+      el.innerHTML = `<div class="empty"><div class="icon">🤷</div><div class="title">NOT FOUND</div><div class="sub">No results for "${name}"</div></div>
+        <div style="margin-top:16px"><button class="btn-close" onclick="closePerson()">Close</button></div>`;
+      return;
+    }
+    // Get combined credits (movies + tv)
+    const credits = await tmdbFetch(`/person/${person.id}/combined_credits?language=en-US`);
+    const photo = person.profile_path ? `https://image.tmdb.org/t/p/w185${person.profile_path}` : "";
+
+    // Combine cast + crew, deduplicate by id, sort by popularity
+    const allWorks = [...(credits.cast || []), ...(credits.crew || [])];
+    const seen = new Set();
+    const works = allWorks
+      .filter(r => {
+        if ((r.media_type !== "movie" && r.media_type !== "tv") || seen.has(r.id)) return false;
+        seen.add(r.id); return true;
+      })
+      .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+      .slice(0, 20);
+
+    // Known for: top 3 by vote_count
+    const knownFor = [...works].sort((a,b) => (b.vote_count||0) - (a.vote_count||0)).slice(0,3)
+      .map(r => r.title || r.name).join(", ");
+
+    const dept = person.known_for_department || "";
+    const bio = person.biography ? person.biography.slice(0, 220) + (person.biography.length > 220 ? "…" : "") : "";
+
+    el.innerHTML = `
+      <div style="display:flex;gap:14px;margin-bottom:16px;align-items:flex-start">
+        ${photo
+          ? `<div style="width:64px;height:90px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#1a1a2e"><img src="${photo}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='👤'"></div>`
+          : `<div style="width:64px;height:90px;flex-shrink:0;border-radius:8px;background:#1a1a2e;display:flex;align-items:center;justify-content:center;font-size:28px">👤</div>`}
+        <div style="flex:1;min-width:0">
+          <div class="modal-title">${name}</div>
+          ${dept ? `<div style="color:#666;font-size:12px;margin-top:2px">${dept}</div>` : ""}
+          ${knownFor ? `<div style="color:#888;font-size:11px;margin-top:4px">Known for: ${knownFor}</div>` : ""}
+          ${bio ? `<div style="color:#777;font-size:11px;margin-top:6px;line-height:1.5">${bio}</div>` : ""}
+        </div>
+      </div>
+      <div style="color:#555;font-size:11px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Filmography · top ${works.length}</div>
+      <div class="card-list">
+        ${works.map(r => {
+          const m = {
+            id: r.id, tmdbID: String(r.id), type: r.media_type,
+            Title: r.title || r.name,
+            Year: (r.release_date || r.first_air_date || "").slice(0,4),
+            Poster: r.poster_path ? `https://image.tmdb.org/t/p/w300${r.poster_path}` : "",
+            Rating: r.vote_average ? r.vote_average.toFixed(1) : null,
+            Genre: ""
+          };
+          const key = regMovie(m);
+          const status = getEntryStatus(m.tmdbID);
+          const role = r.character || r.job || "";
+          let actionBtns = "";
+          if (status === "watched") {
+            actionBtns = `<span class="badge-watched" style="font-size:10px">✓</span>`;
+          } else if (status === "plan") {
+            actionBtns = `<span style="color:#666;font-size:10px">🕐</span>`;
+          } else {
+            actionBtns = `
+              <button class="btn-watchlist" style="font-size:10px;padding:2px 7px" onclick="openAdd(_movieRegistry['${key}'],'plan')">+ LIST</button>
+              <button class="btn-watched" style="font-size:10px;padding:2px 7px" onclick="openAdd(_movieRegistry['${key}'],'watched')">✓</button>`;
+          }
+          return `
+          <div class="card" style="cursor:default;align-items:center">
+            <div onclick="closePerson();openDetail('${m.tmdbID}','${m.type}')" style="display:flex;gap:11px;flex:1;min-width:0;cursor:pointer">
+              ${posterHTML(m.Poster, m.Title)}
+              <div class="card-body">
+                <div class="card-title">${m.Title}</div>
+                <div class="card-meta">${m.Year}${m.Rating ? ` · ★ ${m.Rating}` : ""}${m.type === "tv" ? " · TV" : ""}</div>
+                ${role ? `<div style="color:#555;font-size:11px;margin-top:2px;font-style:italic">${role}</div>` : ""}
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;margin-left:6px">${actionBtns}</div>
+          </div>`;
+        }).join("")}
+      </div>
+      <div style="margin-top:16px"><button class="btn-close" style="width:100%" onclick="closePerson()">Close</button></div>`;
+  } catch(e) {
+    el.innerHTML = `<div class="empty"><div class="title">ERROR</div><div class="sub">${e.message}</div></div>
+      <div style="margin-top:16px"><button class="btn-close" onclick="closePerson()">Close</button></div>`;
+  }
+}
 
 // ── Add modal ─────────────────────────────────────────────────────────────────
 function openAdd(movie, status) {
@@ -1723,7 +1825,7 @@ function renderHistory() {
       const safe = name.replace(/'/g, "\'");
       return `
       <div style="display:flex;align-items:center;gap:9px;margin-bottom:7px;cursor:pointer"
-           onclick="setSearchAndGo('${safe}')">
+           onclick="openPerson('${safe}')">
         <div style="flex:1;min-width:0;font-size:12px;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</div>
         <div style="width:80px;height:3px;background:rgba(255,255,255,0.07);border-radius:2px;flex-shrink:0">
           <div style="width:${pct}%;height:100%;background:#F5C518;border-radius:2px"></div>
