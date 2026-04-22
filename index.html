@@ -270,7 +270,7 @@
       <p style="grid-column:1;grid-row:2;margin:0">TMDB · AI Picks · Watch History</p>
       <span id="header-username" style="grid-column:3;grid-row:1;color:#aaa;font-size:12px;font-weight:600;text-align:right;min-height:12px">.</span>
       <button onclick="openFeedback()" style="grid-column:2;grid-row:2;justify-self:end;background:none;border:none;cursor:pointer;padding:0;display:inline-flex;align-items:baseline;gap:3px;color:#555;font-family:'DM Sans',sans-serif;font-size:11px">
-        <span id="feedback-icon" style="font-size:13px;color:#666;transition:color .2s">✉</span><span id="feedback-label" style="transition:color .2s">Feedback</span>
+        <span id="feedback-icon" style="font-size:13px;transition:all .2s">✉</span><span id="feedback-label" style="color:#555">Feedback</span>
       </button>
       <button onclick="signOut()" style="grid-column:3;grid-row:2;justify-self:end;background:none;border:none;color:#444;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0">Sign out</button>
     </div>
@@ -715,6 +715,7 @@ async function loadHistoryFromDB() {
     id: r.id, tmdbID: r.imdb_id, title: r.title, year: r.year,
     poster: r.poster, stars: r.stars || 0, comment: r.comment || "",
     status: r.status || "watched", mediaType: r.media_type || "movie",
+    composer: r.composer || "",
     date: new Date(r.created_at).toLocaleDateString("en-GB")
   }));
 }
@@ -732,6 +733,7 @@ async function saveEntryToDB(entry) {
       comment: entry.comment,
       status: entry.status,
       media_type: entry.mediaType || "movie",
+      composer: entry.composer || null,
       user_id: currentUser ? currentUser.id : null
     })
   });
@@ -810,6 +812,12 @@ async function tmdbDetail(id, type) {
   const director = credits.crew?.filter(c => c.job === "Director").map(c => c.name).join(", ") || "";
   const cast = credits.cast?.slice(0,6).map(c => c.name).join(", ") || "";
   const writers = credits.crew?.filter(c => ["Screenplay","Writer","Story"].includes(c.job)).slice(0,3).map(c => c.name).join(", ") || "";
+  const composerJobs = ["Original Music Composer", "Music", "Composer"];
+  const composer = credits.crew
+    ?.filter(c => composerJobs.includes(c.job))
+    .map(c => c.name)
+    .filter((v, i, a) => a.indexOf(v) === i)
+    .join(", ") || "";
   return {
     tmdbID: String(id),
     type,
@@ -824,6 +832,7 @@ async function tmdbDetail(id, type) {
     Director: director,
     Cast: cast,
     Writers: writers,
+    Composer: composer,
     Country: (detail.production_countries||[]).map(c=>c.name).join(", "),
     Language: (detail.spoken_languages||[]).map(l=>l.english_name).join(", "),
     Tagline: detail.tagline || "",
@@ -1358,6 +1367,7 @@ async function openDetail(id, type) {
     const chips = d.Genre.split(", ").filter(Boolean).map(g => `<span class="chip">${g}</span>`).join("");
     const crew = [
       d.Director ? `<div class="crew-label">🎬 Director</div><div class="crew-val">${d.Director}</div>` : "",
+      d.Composer ? `<div class="crew-label">🎵 Composer</div><div class="crew-val">${d.Composer}</div>` : "",
       d.Writers  ? `<div class="crew-label">✍️ Screenplay</div><div class="crew-val">${d.Writers}</div>` : "",
       d.Cast     ? `<div class="crew-label">🌟 Cast</div><div class="crew-val">${d.Cast}</div>` : "",
     ].join("");
@@ -1431,6 +1441,12 @@ async function confirmAdd() {
   const tmdbID = String(m.tmdbID || m.id || "");
   const existing = watchHistory.find(h => h.tmdbID === tmdbID);
 
+  // Composer: from currentAddMovie if present (opened via detail), else from _detailMovie fallback
+  let composer = m.Composer || "";
+  if (!composer && window._detailMovie && String(window._detailMovie.tmdbID) === tmdbID) {
+    composer = window._detailMovie.Composer || "";
+  }
+
   try {
     if (existing) {
       // Update existing entry instead of creating a duplicate
@@ -1439,6 +1455,8 @@ async function confirmAdd() {
         fields.stars = currentStars;
         fields.comment = document.getElementById("add-note").value;
       }
+      // Backfill composer if we now know it and row was empty
+      if (composer && !existing.composer) fields.composer = composer;
       await updateEntryInDB(existing.id, fields);
     } else {
       await saveEntryToDB({
@@ -1449,7 +1467,8 @@ async function confirmAdd() {
         stars: currentAddStatus === "plan" ? 0 : currentStars,
         comment: currentAddStatus === "plan" ? "" : document.getElementById("add-note").value,
         status: currentAddStatus,
-        mediaType: m.type || m.mediaType || "movie"
+        mediaType: m.type || m.mediaType || "movie",
+        composer: composer || null
       });
     }
     const newHistory = await loadHistoryFromDB();
@@ -1752,9 +1771,7 @@ function openFeedback() {
 
 function setFeedbackUnread(has) {
   const icon = document.getElementById("feedback-icon");
-  const label = document.getElementById("feedback-label");
-  if (icon) icon.style.color = has ? "#F5C518" : "#666";
-  if (label) label.style.color = has ? "#F5C518" : "#555";
+  if (icon) icon.textContent = has ? "📩" : "✉";
 }
 
 async function deleteFeedback(id) {
