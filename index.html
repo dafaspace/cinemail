@@ -553,6 +553,32 @@ const QUOTES = [
 ];
 const randQuote = () => QUOTES[Math.floor(Math.random() * QUOTES.length)];
 
+// ── AI JSON parser (robust) ──────────────────────────────────────────────────
+function extractJSON(text) {
+  const cleaned = text.replace(/```json|```/g, "").trim();
+  const match = cleaned.match(/\[[\s\S]*\]/);
+  if (!match) throw new Error("No JSON array in response");
+  return JSON.parse(match[0]);
+}
+
+async function proxyFetchWithRetry(body) {
+  let data = await proxyFetch(body);
+  let text = (data.content||[]).map(b=>b.text||"").join("");
+  try {
+    return extractJSON(text);
+  } catch(e) {
+    // One retry with explicit JSON instruction
+    const retryMessages = [
+      ...body.messages,
+      { role: "assistant", content: text },
+      { role: "user", content: "Your response was not valid JSON. Reply ONLY with a valid JSON array, no prose, no markdown." }
+    ];
+    data = await proxyFetch({ ...body, messages: retryMessages });
+    text = (data.content||[]).map(b=>b.text||"").join("");
+    return extractJSON(text);
+  }
+}
+
 // ── Proxy wrapper (JWT + 429 handling) ────────────────────────────────────────
 async function proxyFetch(body) {
   const { data: { session } } = await sbClient.auth.getSession();
@@ -1476,16 +1502,13 @@ async function surpriseMe() {
       prompt = `Suggest 3 films based on taste. ${angle} Vary genre, era, country.${watched ? "\nWatch history: "+watched : "No history — use acclaimed films."}${planned ? "\nDO NOT suggest from watchlist: "+planned : ""}${recentlyShown ? "\nDO NOT repeat recently shown: "+recentlyShown : ""}${watched ? "\nDO NOT suggest already watched: "+watched : ""}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why they'd love it"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
     }
 
-    let data;
+    let suggestions;
     try {
-      data = await proxyFetch({ model: "claude-haiku-4-5-20251001", max_tokens: 700, messages: [{ role: "user", content: prompt }] });
+      suggestions = await proxyFetchWithRetry({ model: "claude-haiku-4-5-20251001", max_tokens: 700, messages: [{ role: "user", content: prompt }] });
     } catch(e) {
       if (e.message === "rate_limited") { el.innerHTML = ""; return; }
       throw e;
     }
-    const text = (data.content||[]).map(b=>b.text||"").join("");
-    const cleaned = text.replace(/```json|```/g,"").trim();
-    let suggestions = JSON.parse(cleaned);
     if (!Array.isArray(suggestions)) suggestions = [suggestions];
 
     // Parallel TMDB search
@@ -1542,15 +1565,12 @@ CRITICAL: None of your suggestions may appear in the watched or watchlist above.
 Reply ONLY with a JSON array, no other text:
 [{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
 
-      let data;
       try {
-        data = await proxyFetch({ model: "claude-haiku-4-5-20251001", max_tokens: 1000, messages: [{ role: "user", content: prompt }] });
+        suggestions = await proxyFetchWithRetry({ model: "claude-haiku-4-5-20251001", max_tokens: 1000, messages: [{ role: "user", content: prompt }] });
       } catch(e) {
         if (e.message === "rate_limited") { el.innerHTML = ""; btn.disabled = false; btn.textContent = "FIND"; return; }
         throw e;
       }
-      const text = (data.content||[]).map(b=>b.text||"").join("");
-      suggestions = JSON.parse(text.replace(/```json|```/g,"").trim());
     } else {
       el.innerHTML = `<div class="empty"><div class="icon">🔑</div><div class="title">API KEY NEEDED</div><div class="sub">Add your Anthropic key to enable smart picks</div></div>`;
       btn.disabled = false; btn.textContent = "FIND";
