@@ -292,6 +292,7 @@
         </div>
         <button onclick="surpriseMe()" style="width:100%;margin-top:8px;padding:9px;border-radius:10px;background:#7c3aed;border:none;color:#fff;font-family:'Bebas Neue',cursive;font-size:14px;letter-spacing:1px;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity=.85" onmouseout="this.style.opacity=1">✨ SURPRISE ME</button>
         <div id="rec-history-hint" style="color:#444;font-size:11px;margin-top:5px"></div>
+        <div id="ai-counter" style="color:#555;font-size:11px;margin-top:2px"></div>
       </div>
       <div id="rec-results"></div>
     </div>
@@ -553,6 +554,88 @@ const QUOTES = [
 ];
 const randQuote = () => QUOTES[Math.floor(Math.random() * QUOTES.length)];
 
+// ── Proxy wrapper (JWT + 429 handling) ────────────────────────────────────────
+async function proxyFetch(body) {
+  const { data: { session } } = await sbClient.auth.getSession();
+  if (!session) throw new Error("Not signed in");
+  const res = await fetch(PROXY_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + session.access_token,
+    },
+    body: JSON.stringify(body),
+  });
+  const remaining = res.headers.get("X-RateLimit-Remaining");
+  const limit = res.headers.get("X-RateLimit-Limit");
+  if (remaining !== null && limit !== null) updateAICounter(+remaining, +limit);
+  if (res.status === 429) {
+    const data = await res.json().catch(() => ({}));
+    handleRateLimitHit(data);
+    throw new Error("rate_limited");
+  }
+  if (res.status === 401) {
+    showToast("Session expired — please sign in again", true);
+    throw new Error("unauthorized");
+  }
+  if (!res.ok) throw new Error("Proxy error " + res.status);
+  return res.json();
+}
+
+function formatReset(iso) {
+  if (!iso) return "midnight UTC";
+  const reset = new Date(iso);
+  const diffMs = reset - Date.now();
+  if (diffMs <= 0) return "soon";
+  const hours = Math.floor(diffMs / 3600000);
+  const minutes = Math.floor((diffMs % 3600000) / 60000);
+  return hours > 0 ? `in ${hours}h ${minutes}m` : `in ${minutes}m`;
+}
+
+function handleRateLimitHit(data) {
+  const resetStr = formatReset(data.reset_at);
+  const seen = localStorage.getItem("seenLimitExplainer") === "1";
+  if (!seen) {
+    showLimitExplainer(data, resetStr);
+    localStorage.setItem("seenLimitExplainer", "1");
+  } else {
+    showToast(`AI limit reached (${data.limit||20}/day) — resets ${resetStr} 🌙`, true);
+  }
+}
+
+function showLimitExplainer(data, resetStr) {
+  const ov = document.createElement("div");
+  ov.className = "overlay";
+  ov.style.display = "flex";
+  ov.onclick = () => ov.remove();
+  ov.innerHTML = `
+    <div style="padding:20px;width:100%;display:flex;justify-content:center" onclick="event.stopPropagation()">
+      <div class="add-modal" style="max-width:340px">
+        <div style="font-family:'Bebas Neue',cursive;color:#F5C518;font-size:13px;letter-spacing:2px;margin-bottom:4px">DAILY AI LIMIT REACHED</div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:20px;margin-bottom:14px;line-height:1.2">You've used all ${data.limit||20} AI picks for today</div>
+        <div style="color:#bbb;font-size:13px;line-height:1.6;margin-bottom:14px">
+          Resets ${resetStr}. Search and watchlist still work — only AI picks are paused.
+        </div>
+        <div style="color:#666;font-size:12px;line-height:1.6;margin-bottom:18px;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06)">
+          I'm building this solo and each AI pick costs real money. The daily cap keeps the app free and sustainable — thanks for understanding.
+        </div>
+        <button class="btn-save" style="width:100%" onclick="this.closest('.overlay').remove()">GOT IT</button>
+      </div>
+    </div>`;
+  document.body.appendChild(ov);
+}
+
+let _aiQuota = { remaining: null, limit: null };
+function updateAICounter(remaining, limit) {
+  _aiQuota = { remaining, limit };
+  const el = document.getElementById("ai-counter");
+  if (!el) return;
+  if (remaining === null || limit === null) { el.textContent = ""; return; }
+  const low = remaining <= 3;
+  el.textContent = `${remaining}/${limit} AI picks left today`;
+  el.style.color = low ? "#f87171" : "#555";
+}
+
 // ── Supabase ──────────────────────────────────────────────────────────────────
 async function sbFetch(path, opts = {}) {
   const { data: { session } } = await sbClient.auth.getSession();
@@ -627,15 +710,10 @@ function hasCyrillic(str) { return /[а-яёА-ЯЁ]/.test(str); }
 async function translateQuery(q) {
   if (!ANTHROPIC_KEY) return q;
   try {
-    const res = await fetch(PROXY_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-haiku-4-5-20251001", max_tokens: 100,
-        messages: [{ role: "user", content: `Translate this movie/show title to English for searching. Reply with ONLY the English title, nothing else: "${q}"` }]
-      })
+    const d = await proxyFetch({
+      model: "claude-haiku-4-5-20251001", max_tokens: 100,
+      messages: [{ role: "user", content: `Translate this movie/show title to English for searching. Reply with ONLY the English title, nothing else: "${q}"` }]
     });
-    const d = await res.json();
     return d.content?.[0]?.text?.trim() || q;
   } catch { return q; }
 }
@@ -1398,12 +1476,13 @@ async function surpriseMe() {
       prompt = `Suggest 3 films based on taste. ${angle} Vary genre, era, country.${watched ? "\nWatch history: "+watched : "No history — use acclaimed films."}${planned ? "\nDO NOT suggest from watchlist: "+planned : ""}${recentlyShown ? "\nDO NOT repeat recently shown: "+recentlyShown : ""}${watched ? "\nDO NOT suggest already watched: "+watched : ""}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why they'd love it"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
     }
 
-    const res = await fetch(PROXY_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens: 700, messages: [{ role: "user", content: prompt }] })
-    });
-    const data = await res.json();
+    let data;
+    try {
+      data = await proxyFetch({ model: "claude-haiku-4-5-20251001", max_tokens: 700, messages: [{ role: "user", content: prompt }] });
+    } catch(e) {
+      if (e.message === "rate_limited") { el.innerHTML = ""; return; }
+      throw e;
+    }
     const text = (data.content||[]).map(b=>b.text||"").join("");
     const cleaned = text.replace(/```json|```/g,"").trim();
     let suggestions = JSON.parse(cleaned);
@@ -1468,16 +1547,17 @@ CRITICAL: None of your suggestions may appear in the watched or watchlist above.
 Reply ONLY with a JSON array, no other text:
 [{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
 
-      const res = await fetch(PROXY_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      let data;
+      try {
+        data = await proxyFetch({
           model: "claude-haiku-4-5-20251001",
           max_tokens: 1000,
           messages: [{ role: "user", content: prompt }]
-        })
-      });
-      const data = await res.json();
+        });
+      } catch(e) {
+        if (e.message === "rate_limited") { el.innerHTML = ""; btn.disabled = false; btn.textContent = "FIND"; return; }
+        throw e;
+      }
       const text = (data.content||[]).map(b=>b.text||"").join("");
       suggestions = JSON.parse(text.replace(/```json|```/g,"").trim());
     } else {
