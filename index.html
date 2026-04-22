@@ -1358,6 +1358,16 @@ async function doSearch() {
 }
 
 // ── Detail ────────────────────────────────────────────────────────────────────
+// Helper: render comma-separated names as clickable search tags
+function clickableNames(str, closeModal) {
+  if (!str) return "";
+  return str.split(", ").map(name => {
+    const safe = name.trim().replace(/'/g, "\\'");
+    const close = closeModal ? "closeDetail();" : "";
+    return `<span onclick="${close}setSearchAndGo('${safe}')" style="cursor:pointer;color:#ddd;border-bottom:1px dotted rgba(255,255,255,0.2);transition:color .15s;white-space:nowrap" onmouseover="this.style.color='#F5C518';this.style.borderBottomColor='#F5C518'" onmouseout="this.style.color='#ddd';this.style.borderBottomColor='rgba(255,255,255,0.2)'">${name.trim()}</span>`;
+  }).join('<span style="color:#555">, </span>');
+}
+
 async function openDetail(id, type) {
   document.getElementById("detail-overlay").style.display = "flex";
   document.getElementById("detail-content").innerHTML = loadingHTML(randQuote(), false);
@@ -1366,12 +1376,20 @@ async function openDetail(id, type) {
     const status = getEntryStatus(id);
     const chips = d.Genre.split(", ").filter(Boolean).map(g => `<span class="chip">${g}</span>`).join("");
     const crew = [
-      d.Director ? `<div class="crew-label">🎬 Director</div><div class="crew-val">${d.Director}</div>` : "",
-      d.Composer ? `<div class="crew-label">🎵 Composer</div><div class="crew-val">${d.Composer}</div>` : "",
-      d.Writers  ? `<div class="crew-label">✍️ Screenplay</div><div class="crew-val">${d.Writers}</div>` : "",
-      d.Cast     ? `<div class="crew-label">🌟 Cast</div><div class="crew-val">${d.Cast}</div>` : "",
+      d.Director ? `<div class="crew-label">🎬 Director</div><div class="crew-val">${clickableNames(d.Director, true)}</div>` : "",
+      d.Composer ? `<div class="crew-label">🎵 Composer</div><div class="crew-val">${clickableNames(d.Composer, true)}</div>` : "",
+      d.Writers  ? `<div class="crew-label">✍️ Screenplay</div><div class="crew-val">${clickableNames(d.Writers, true)}</div>` : "",
+      d.Cast     ? `<div class="crew-label">🌟 Cast</div><div class="crew-val">${clickableNames(d.Cast, true)}</div>` : "",
     ].join("");
     const tvInfo = d.Seasons ? `<div class="crew-label">SEASONS / EPISODES</div><div class="crew-val">${d.Seasons} seasons · ${d.Episodes} episodes${d.Networks ? ` · ${d.Networks}` : ""}</div>` : "";
+
+    // Auto-backfill composer for existing watchlist entries that have it empty
+    const existing = watchHistory.find(h => h.tmdbID === String(id));
+    if (existing && !existing.composer && d.Composer) {
+      updateEntryInDB(existing.id, { composer: d.Composer }).then(async () => {
+        watchHistory = await loadHistoryFromDB();
+      }).catch(() => {});
+    }
 
     let actionBtns = `<button class="btn-close" onclick="closeDetail()">Close</button>`;
     if (status === "watched") {
