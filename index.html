@@ -261,6 +261,7 @@
       <p style="margin:0">TMDB · AI Picks · Watch History</p>
       <div style="display:flex;align-items:center;gap:8px">
         <span id="header-username" style="color:#555;font-size:11px"></span>
+        <button onclick="openFeedback()" style="background:none;border:none;color:#444;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;margin-right:8px">✉</button>
         <button onclick="signOut()" style="background:none;border:none;color:#444;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0">Sign out</button>
       </div>
     </div>
@@ -1713,6 +1714,90 @@ async function deleteItem(id) {
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
+
+// ── Feedback ──────────────────────────────────────────────────────────────────
+let _fbType = "other";
+
+function openFeedback() {
+  _fbType = "other";
+  document.getElementById("fb-message").value = "";
+  setFbType("other");
+  loadFeedbackReplies();
+  document.getElementById("feedback-overlay").style.display = "flex";
+}
+
+function closeFeedback() {
+  document.getElementById("feedback-overlay").style.display = "none";
+}
+
+function setFbType(type) {
+  _fbType = type;
+  ["bug","idea","other"].forEach(t => {
+    const btn = document.getElementById("fb-type-" + t);
+    if (!btn) return;
+    btn.style.background = t === type ? "rgba(245,197,24,0.15)" : "transparent";
+    btn.style.borderColor = t === type ? "#F5C518" : "rgba(255,255,255,0.15)";
+    btn.style.color = t === type ? "#F5C518" : "#aaa";
+  });
+}
+
+async function submitFeedback() {
+  const message = document.getElementById("fb-message").value.trim();
+  if (!message) { showToast("Please write something first", true); return; }
+  const btn = document.getElementById("fb-submit-btn");
+  btn.textContent = "SENDING..."; btn.disabled = true;
+  try {
+    const { error } = await sbClient.from("feedback").insert({
+      user_id: currentUser.id,
+      user_email: currentUser.email || "",
+      user_name: currentUser.displayName || "",
+      type: _fbType,
+      message,
+      app_version: "0.1.0",
+      user_agent: navigator.userAgent
+    });
+    if (error) throw new Error(error.message);
+    document.getElementById("fb-message").value = "";
+    showToast("Got it! I read everything personally 🙏");
+    closeFeedback();
+  } catch(e) {
+    showToast("Could not send: " + e.message, true);
+  }
+  btn.textContent = "SEND"; btn.disabled = false;
+}
+
+async function loadFeedbackReplies() {
+  const el = document.getElementById("fb-replies");
+  if (!el) return;
+  try {
+    const { data, error } = await sbClient.from("feedback")
+      .select("id, type, message, reply, replied_at, read_by_user, created_at")
+      .eq("user_id", currentUser.id)
+      .order("created_at", { ascending: false })
+      .limit(10);
+    if (error || !data?.length) { el.style.display = "none"; return; }
+    // Mark unread replies as read
+    const unreadIds = data.filter(f => f.reply && !f.read_by_user).map(f => f.id);
+    if (unreadIds.length) {
+      await sbClient.from("feedback").update({ read_by_user: true }).in("id", unreadIds);
+    }
+    const typeEmoji = { bug: "🐛", idea: "💡", other: "💬" };
+    el.style.display = "block";
+    el.innerHTML = `
+      <div style="color:#555;font-size:11px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Your previous messages</div>
+      ${data.map(f => `
+        <div style="margin-bottom:10px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06)">
+          <div style="font-size:11px;color:#555;margin-bottom:4px">${typeEmoji[f.type]||"💬"} ${new Date(f.created_at).toLocaleDateString("en-GB")}</div>
+          <div style="font-size:13px;color:#ccc">${f.message}</div>
+          ${f.reply ? `
+            <div style="margin-top:8px;padding:8px;background:rgba(245,197,24,0.05);border-radius:6px;border-left:2px solid #F5C518">
+              <div style="font-size:10px;color:#F5C518;margin-bottom:3px">Reply</div>
+              <div style="font-size:12px;color:#ddd">${f.reply}</div>
+            </div>` : ""}
+        </div>`).join("")}`;
+  } catch(e) { el.style.display = "none"; }
+}
+
 function initUI() {
   // Show username in header
   const nameEl = document.getElementById("header-username");
@@ -1785,5 +1870,28 @@ if ("serviceWorker" in navigator) {
   }).catch(err => console.warn("SW:", err));
 }
 </script>
+
+<!-- Feedback Modal -->
+<div id="feedback-overlay" class="overlay" style="display:none" onclick="closeFeedback()">
+  <div style="padding:20px;width:100%;display:flex;justify-content:center;cursor:default" onclick="event.stopPropagation()">
+    <div class="add-modal" style="max-width:360px">
+      <div style="font-family:'Bebas Neue',cursive;color:#F5C518;font-size:12px;letter-spacing:2px;margin-bottom:3px">FEEDBACK</div>
+      <div style="font-family:'Bebas Neue',cursive;font-size:19px;margin-bottom:14px;line-height:1.2">Share a thought or report a bug</div>
+      <div class="add-label">Type</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <button id="fb-type-bug" onclick="setFbType('bug')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s">🐛 Bug</button>
+        <button id="fb-type-idea" onclick="setFbType('idea')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s">💡 Idea</button>
+        <button id="fb-type-other" onclick="setFbType('other')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s">💬 Other</button>
+      </div>
+      <div class="add-label">Message</div>
+      <textarea id="fb-message" placeholder="Tell me what's on your mind..." style="min-height:90px;margin-bottom:18px"></textarea>
+      <div id="fb-replies" style="display:none;margin-bottom:14px"></div>
+      <div style="display:flex;gap:9px">
+        <button class="btn-close" onclick="closeFeedback()">Cancel</button>
+        <button class="btn-save" id="fb-submit-btn" onclick="submitFeedback()">SEND</button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
