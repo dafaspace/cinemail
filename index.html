@@ -261,11 +261,10 @@
       <p style="margin:0">TMDB · AI Picks · Watch History</p>
       <div style="display:flex;align-items:center;gap:8px">
         <div style="display:flex;align-items:flex-end;gap:12px">
-          <button onclick="openFeedback()" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:flex-end;gap:4px;position:relative">
-            <span style="font-size:18px;line-height:1;color:#666">✉</span>
-            <span style="font-size:11px;font-family:'DM Sans',sans-serif;color:#555;line-height:1">feedback</span>
-            <span id="feedback-badge" style="display:none;position:absolute;top:-2px;right:-4px;width:7px;height:7px;background:#F5C518;border-radius:50%"></span>
-          </button>
+          <div style="position:relative;display:inline-block">
+            <button onclick="openFeedback()" style="background:none;border:none;cursor:pointer;padding:0;font-family:'DM Sans',sans-serif;font-size:11px;color:#555;display:flex;align-items:center;gap:4px">✉ feedback</button>
+            <span id="feedback-badge" style="display:none;position:absolute;top:-3px;right:-5px;width:7px;height:7px;background:#F5C518;border-radius:50%;pointer-events:none"></span>
+          </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px">
             <span id="header-username" style="color:#aaa;font-size:13px;font-weight:600;line-height:1"></span>
             <button onclick="signOut()" style="background:none;border:none;color:#444;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;line-height:1">Sign out</button>
