@@ -313,7 +313,7 @@
     <div id="tab-history" style="display:none">
       <div class="filter-row">
         <button class="filter-pill active" id="pill-all" onclick="setFilter('all')">All</button>
-        <button class="filter-pill" id="pill-plan" onclick="setFilter('plan')">🕐 Want to Watch</button>
+        <button class="filter-pill" id="pill-plan" onclick="setFilter('plan')">🕐 Watchlist</button>
         <button class="filter-pill" id="pill-watched" onclick="setFilter('watched')">✓ Watched</button>
       </div>
       <div id="history-list"></div>
@@ -1440,7 +1440,7 @@ function openAdd(movie, status) {
   currentAddStatus = status || "watched";
   currentStars = 0;
   document.getElementById("add-movie-title").textContent = `${movie.Title} (${movie.Year})`;
-  document.getElementById("add-modal-label").textContent = status === "plan" ? "SAVE TO WATCHLIST" : "ADD TO HISTORY";
+  document.getElementById("add-modal-label").textContent = status === "plan" ? "ADD TO WATCHLIST" : "ADD TO HISTORY";
   document.getElementById("add-confirm-btn").textContent = status === "plan" ? "SAVE" : "SAVE";
   // Hide stars/notes for plan entries
   document.getElementById("add-stars-section").style.display = status === "plan" ? "none" : "block";
@@ -1690,7 +1690,7 @@ function renderHistory() {
     return;
   }
   if (!filtered.length) {
-    el.innerHTML = `<div class="empty"><div class="icon">🔍</div><div class="title">NOTHING HERE YET</div><div class="sub">${historyFilter === "watched" ? "Mark films as watched" : "Save films to watch later"}</div></div>`;
+    el.innerHTML = `<div class="empty"><div class="icon">🔍</div><div class="title">NOTHING HERE YET</div><div class="sub">${historyFilter === "watched" ? "Mark films as watched" : "Add films to your watchlist"}</div></div>`;
     return;
   }
 
@@ -1749,7 +1749,7 @@ function renderHistory() {
 
   el.innerHTML = `
     <div class="history-header">
-      <span>${watched.length} watched · ${plan.length} planned</span>
+      <span>${watched.length} watched · ${plan.length} watchlist</span>
       <span>Avg: ${avg}</span>
     </div>
     ${collapsibleStatsBlock("directors", "🎬", "Your top directors", topDirectors)}
@@ -1776,7 +1776,7 @@ function renderHistory() {
             </div>
             ${item.status === "watched"
               ? `<div style="display:flex;gap:2px;margin-top:3px">${starsHTML(item.stars)}</div>`
-              : `<span class="status-tag plan">🕐 Want to watch</span>`}
+              : `<span class="status-tag plan">🕐 Watchlist</span>`}
             ${item.comment ? `<div class="hist-note">"${item.comment}" <span style="color:#555;font-style:normal;font-size:10px">— ${item.date}</span></div>` : ""}
           </div>
         </div>`;
