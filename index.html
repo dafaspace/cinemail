@@ -261,9 +261,13 @@
       <p style="margin:0">TMDB · AI Picks · Watch History</p>
       <div style="display:flex;align-items:center;gap:8px">
         <div style="display:flex;align-items:flex-end;gap:12px">
-          <button onclick="openFeedback()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer;padding:0;line-height:1;display:flex;align-items:baseline;gap:5px">✉<span style="font-size:11px;font-family:'DM Sans',sans-serif;color:#555">feedback</span></button>
+          <button onclick="openFeedback()" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:flex-end;gap:4px;position:relative">
+            <span style="font-size:18px;line-height:1;color:#666">✉</span>
+            <span style="font-size:11px;font-family:'DM Sans',sans-serif;color:#555;line-height:1">feedback</span>
+            <span id="feedback-badge" style="display:none;position:absolute;top:-2px;right:-4px;width:7px;height:7px;background:#F5C518;border-radius:50%"></span>
+          </button>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px">
-            <span id="header-username" style="color:#aaa;font-size:13px;font-weight:600"></span>
+            <span id="header-username" style="color:#aaa;font-size:13px;font-weight:600;line-height:1"></span>
             <button onclick="signOut()" style="background:none;border:none;color:#444;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;line-height:1">Sign out</button>
           </div>
         </div>
@@ -526,6 +530,7 @@ async function onSignedIn(user) {
   } catch(e) { console.warn("[profile]", e.message); }
   // Check inbox for pending invites (sets badge, no notification on first load)
   await checkPendingInvites(false);
+  await checkFeedbackBadge();
   startInboxPolling();
   initUI();
 }
@@ -1744,6 +1749,24 @@ function openFeedback() {
   document.getElementById("feedback-overlay").style.display = "flex";
 }
 
+async function deleteFeedback(id) {
+  try {
+    await sbClient.from("feedback").delete().eq("id", id);
+    loadFeedbackReplies();
+  } catch(e) { showToast("Could not delete: " + e.message, true); }
+}
+
+async function checkFeedbackBadge() {
+  if (!currentUser) return;
+  try {
+    const { data } = await sbClient.from("feedback")
+      .select("id").eq("user_id", currentUser.id)
+      .eq("read_by_user", false).not("reply", "is", null).limit(1);
+    const badge = document.getElementById("feedback-badge");
+    if (badge) badge.style.display = data?.length ? "block" : "none";
+  } catch(e) {}
+}
+
 function closeFeedback() {
   document.getElementById("feedback-overlay").style.display = "none";
 }
@@ -1805,17 +1828,24 @@ async function loadFeedbackReplies() {
       .limit(10);
     if (error || !data?.length) { el.style.display = "none"; return; }
     // Mark unread replies as read
-    const unreadIds = data.filter(f => f.reply && !f.read_by_user).map(f => f.id);
-    if (unreadIds.length) {
-      await sbClient.from("feedback").update({ read_by_user: true }).in("id", unreadIds);
+    const unreadReplies = data.filter(f => f.reply && !f.read_by_user);
+    if (unreadReplies.length) {
+      await sbClient.from("feedback").update({ read_by_user: true }).in("id", unreadReplies.map(f => f.id));
     }
+    // Update badge
+    const badge = document.getElementById("feedback-badge");
+    if (badge) badge.style.display = "none";
+
     const typeEmoji = { bug: "🐛", idea: "💡", other: "💬" };
     el.style.display = "block";
     el.innerHTML = `
       <div style="color:#555;font-size:11px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Your previous messages</div>
       ${data.map(f => `
-        <div style="margin-bottom:10px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06)">
-          <div style="font-size:11px;color:#555;margin-bottom:4px">${typeEmoji[f.type]||"💬"} ${new Date(f.created_at).toLocaleDateString("en-GB")}</div>
+        <div style="margin-bottom:10px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);position:relative">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <div style="font-size:11px;color:#555">${typeEmoji[f.type]||"💬"} ${new Date(f.created_at).toLocaleDateString("en-GB")}</div>
+            <button onclick="deleteFeedback('${f.id}')" style="background:none;border:none;color:#444;cursor:pointer;font-size:16px;line-height:1;padding:0">×</button>
+          </div>
           <div style="font-size:13px;color:#ccc">${f.message}</div>
           ${f.reply ? `
             <div style="margin-top:8px;padding:8px;background:rgba(245,197,24,0.05);border-radius:6px;border-left:2px solid #F5C518">
