@@ -1028,7 +1028,7 @@ async function renderInbox() {
               ${isPending ? `
               <div style="display:flex;gap:8px;margin-top:9px">
                 <button onclick="respondInviteByKey('${invKey}','accepted')"
-                  style="padding:4px 12px;border-radius:6px;background:#F5C518;border:none;color:#111;font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">✓ ADD TO WATCHLIST</button>
+                  style="padding:4px 12px;border-radius:6px;background:#F5C518;border:none;color:#111;font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">+ Watchlist</button>
                 <button onclick="respondInviteByKey('${invKey}','declined')"
                   style="padding:4px 12px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">✕ DECLINE</button>
               </div>` : ""}
@@ -1214,7 +1214,7 @@ function showToast(msg, isError = false) {
 // ── UI helpers ────────────────────────────────────────────────────────────────
 function posterHTML(src, title, w=56, h=80) {
   const s = `width:${w}px;height:${h}px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#1a1a2e;display:flex;align-items:center;justify-content:center;font-size:22px`;
-  if (src && src !== "N/A") return `<div style="${s}"><img src="${src}" alt="${title||''}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='🎬'"></div>`;
+  if (src && src !== "N/A") return `<div style="${s}"><img src="${src}" alt="${title||''}" style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.parentNode.innerHTML='🎬'"></div>`;
   return `<div style="${s}">🎬</div>`;
 }
 
@@ -1267,11 +1267,11 @@ function movieCardHTML(m, why) {
   } else if (status === "plan") {
     actionBtns = `
       <span class="badge-plan" style="margin-bottom:2px">🕐 Watchlist</span>
-      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">WATCHED</button>`;
+      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">✓ Watched</button>`;
   } else {
     actionBtns = `
-      <button class="btn-watchlist" onclick="openAdd(_movieRegistry['${key}'],'plan')">+ WATCHLIST</button>
-      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">WATCHED</button>`;
+      <button class="btn-watchlist" onclick="openAdd(_movieRegistry['${key}'],'plan')">+ Watchlist</button>
+      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">✓ Watched</button>`;
   }
   const topRadius = why ? "12px 12px 0 0" : "12px";
   const idVal = m.tmdbID || m.id;
@@ -1410,10 +1410,10 @@ async function openDetail(id, type) {
       actionBtns += `<div class="already-badge">✓ Already watched</div>`;
     } else if (status === "plan") {
       actionBtns += `<div class="already-badge" style="color:#888">🕐 In your watchlist</div>`;
-      actionBtns += `<button class="btn-add-watched" onclick="openAdd(window._detailMovie,'watched')">MARK WATCHED</button>`;
+      actionBtns += `<button class="btn-add-watched" onclick="openAdd(window._detailMovie,'watched')">✓ Watched</button>`;
     } else {
-      actionBtns += `<button class="btn-add-plan" onclick="openAdd(window._detailMovie,'plan')">+ WATCHLIST</button>`;
-      actionBtns += `<button class="btn-add-watched" onclick="openAdd(window._detailMovie,'watched')">WATCHED</button>`;
+      actionBtns += `<button class="btn-add-plan" onclick="openAdd(window._detailMovie,'plan')">+ Watchlist</button>`;
+      actionBtns += `<button class="btn-add-watched" onclick="openAdd(window._detailMovie,'watched')">✓ Watched</button>`;
     }
 
     document.getElementById("detail-content").innerHTML = `
@@ -1466,10 +1466,10 @@ async function openPerson(name) {
     const works = allWorks
       .filter(r => {
         if ((r.media_type !== "movie" && r.media_type !== "tv") || seen.has(r.id)) return false;
+        if (!r.poster_path || (r.vote_count || 0) < 10) return false; // skip entries without poster or data
         seen.add(r.id); return true;
       })
-      .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
-      .slice(0, 20);
+      .sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
 
     // Known for: top 3 by vote_count
     const knownFor = [...works].sort((a,b) => (b.vote_count||0) - (a.vote_count||0)).slice(0,3)
@@ -1481,7 +1481,7 @@ async function openPerson(name) {
     el.innerHTML = `
       <div style="display:flex;gap:14px;margin-bottom:16px;align-items:flex-start">
         ${photo
-          ? `<div style="width:64px;height:90px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#1a1a2e"><img src="${photo}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='👤'"></div>`
+          ? `<div style="width:64px;height:90px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#1a1a2e"><img src="${photo}" style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.parentNode.innerHTML='👤'"></div>`
           : `<div style="width:64px;height:90px;flex-shrink:0;border-radius:8px;background:#1a1a2e;display:flex;align-items:center;justify-content:center;font-size:28px">👤</div>`}
         <div style="flex:1;min-width:0">
           <div class="modal-title">${name}</div>
@@ -1490,7 +1490,7 @@ async function openPerson(name) {
           ${bio ? `<div style="color:#777;font-size:11px;margin-top:6px;line-height:1.5">${bio}</div>` : ""}
         </div>
       </div>
-      <div style="color:#555;font-size:11px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Filmography · top ${works.length}</div>
+      <div style="color:#555;font-size:11px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Filmography · ${works.length} titles</div>
       <div class="card-list">
         ${works.map(r => {
           const m = {
@@ -1511,7 +1511,7 @@ async function openPerson(name) {
             actionBtns = `<span style="color:#666;font-size:10px">🕐</span>`;
           } else {
             actionBtns = `
-              <button class="btn-watchlist" style="font-size:10px;padding:2px 7px" onclick="openAdd(_movieRegistry['${key}'],'plan')">+ LIST</button>
+              <button class="btn-watchlist" style="font-size:10px;padding:2px 7px" onclick="openAdd(_movieRegistry['${key}'],'plan')">+</button>
               <button class="btn-watched" style="font-size:10px;padding:2px 7px" onclick="openAdd(_movieRegistry['${key}'],'watched')">✓</button>`;
           }
           return `
