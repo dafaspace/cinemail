@@ -1285,7 +1285,7 @@ function openAdd(movie, status) {
 function closeAdd() { document.getElementById("add-overlay").style.display = "none"; }
 function setStar(n) { currentStars = n; renderStars(n); }
 function renderStars(n) {
-  document.querySelectorAll(".star").forEach((s, i) => s.classList.toggle("on", i < n));
+  document.querySelectorAll("#stars-row .star").forEach((s, i) => s.classList.toggle("on", i < n));
 }
 
 async function confirmAdd() {
