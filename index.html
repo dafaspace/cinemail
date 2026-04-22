@@ -260,11 +260,11 @@
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px">
       <p style="margin:0">TMDB · AI Picks · Watch History</p>
       <div style="display:flex;align-items:center;gap:8px">
-        <div style="display:flex;align-items:center;gap:12px">
-          <button onclick="openFeedback()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer;padding:0;line-height:1;display:flex;align-items:center;gap:5px">✉ <span style="font-size:11px;font-family:'DM Sans',sans-serif;color:#555">feedback</span></button>
+        <div style="display:flex;align-items:flex-end;gap:12px">
+          <button onclick="openFeedback()" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer;padding:0;line-height:1;display:flex;align-items:baseline;gap:5px">✉<span style="font-size:11px;font-family:'DM Sans',sans-serif;color:#555">feedback</span></button>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px">
             <span id="header-username" style="color:#aaa;font-size:13px;font-weight:600"></span>
-            <button onclick="signOut()" style="background:none;border:none;color:#444;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0">Sign out</button>
+            <button onclick="signOut()" style="background:none;border:none;color:#444;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;line-height:1">Sign out</button>
           </div>
         </div>
       </div>
@@ -560,6 +560,20 @@ const QUOTES = [
   { text: "Get busy living, or get busy dying.", source: "The Shawshank Redemption (1994)" },
 ];
 const randQuote = () => QUOTES[Math.floor(Math.random() * QUOTES.length)];
+
+// ── Worker fetch (any path) ───────────────────────────────────────────────────
+async function workerFetch(path, body) {
+  const { data: { session } } = await sbClient.auth.getSession();
+  if (!session) return;
+  await fetch(PROXY_URL.replace(/\/$/, "") + path, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + session.access_token,
+    },
+    body: JSON.stringify(body),
+  });
+}
 
 // ── AI JSON parser (robust) ──────────────────────────────────────────────────
 function extractJSON(text) {
@@ -1751,7 +1765,7 @@ async function submitFeedback() {
   const btn = document.getElementById("fb-submit-btn");
   btn.textContent = "SENDING..."; btn.disabled = true;
   try {
-    const { error } = await sbClient.from("feedback").insert({
+    const { data, error } = await sbClient.from("feedback").insert({
       user_id: currentUser.id,
       user_email: currentUser.email || "",
       user_name: currentUser.displayName || "",
@@ -1759,8 +1773,18 @@ async function submitFeedback() {
       message,
       app_version: "0.1.0",
       user_agent: navigator.userAgent
-    });
+    }).select();
     if (error) throw new Error(error.message);
+    // Notify via Telegram
+    const inserted = data?.[0];
+    if (inserted?.id) {
+      workerFetch("/feedback-notify", {
+        feedback_id: inserted.id,
+        type: _fbType,
+        message,
+        user_name: currentUser.displayName || currentUser.email?.split("@")[0] || "someone"
+      }).catch(() => {});
+    }
     document.getElementById("fb-message").value = "";
     showToast("Got it! I read everything personally 🙏");
     closeFeedback();
