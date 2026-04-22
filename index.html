@@ -1386,7 +1386,7 @@ async function openDetail(id, type) {
     const chips = d.Genre.split(", ").filter(Boolean).map(g => `<span class="chip">${g}</span>`).join("");
     const crew = [
       d.Director ? `<div class="crew-label">🎬 Director</div><div class="crew-val">${clickableNames(d.Director, true)}</div>` : "",
-      d.Composer ? `<div class="crew-label">🎵 Composer</div><div class="crew-val">${clickableNames(d.Composer, true)}</div>` : "",
+      d.Composer ? `<div class="crew-label">🎵 Composer</div><div class="crew-val">${clickableNames(d.Composer, true)}${streamingLinks(`${d.Title} soundtrack`)}</div>` : "",
       d.Writers  ? `<div class="crew-label">✍️ Screenplay</div><div class="crew-val">${clickableNames(d.Writers, true)}</div>` : "",
       d.Cast     ? `<div class="crew-label">🌟 Cast</div><div class="crew-val">${clickableNames(d.Cast, true)}</div>` : "",
     ].join("");
@@ -1443,6 +1443,52 @@ function closeDetail() { document.getElementById("detail-overlay").style.display
 // ── Person filmography ────────────────────────────────────────────────────────
 function closePerson() { document.getElementById("person-overlay").style.display = "none"; }
 
+// ── Streaming links ───────────────────────────────────────────────────────────
+function streamingLinks(query) {
+  const q = encodeURIComponent(query);
+  const links = [
+    {
+      label: "Spotify",
+      bg: "#1DB954", fg: "#fff",
+      deep: `spotify:search:${query}`,
+      web: `https://open.spotify.com/search/${q}`
+    },
+    {
+      label: "Apple Music",
+      bg: "#fc3c44", fg: "#fff",
+      deep: `music://music.apple.com/search?term=${q}`,
+      web: `https://music.apple.com/search?term=${q}`
+    },
+    {
+      label: "YT Music",
+      bg: "#FF0000", fg: "#fff",
+      deep: null,
+      web: `https://music.youtube.com/search?q=${q}`
+    }
+  ];
+  return `<div style="display:flex;gap:7px;margin-top:8px;flex-wrap:wrap">
+    ${links.map(s => {
+      const onclick = s.deep
+        ? `openStreaming('${s.deep.replace(/'/g,"\'")}','${s.web.replace(/'/g,"\'")}')"`
+        : `window.open('${s.web.replace(/'/g,"\'")}','_blank')"`;
+      return `<button onclick="${onclick}
+        style="display:flex;align-items:center;gap:5px;padding:4px 10px 4px 6px;border-radius:20px;background:${s.bg};border:none;cursor:pointer;transition:opacity .15s"
+        onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+        <div style="width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <div style="width:8px;height:8px;border-radius:50%;background:${s.fg}"></div>
+        </div>
+        <span style="color:${s.fg};font-size:10px;font-weight:700;letter-spacing:.3px;white-space:nowrap">${s.label}</span>
+      </button>`;
+    }).join("")}
+  </div>`;
+}
+
+function openStreaming(deepLink, webUrl) {
+  // Try deep link first, fall back to web after 600ms
+  window.location.href = deepLink;
+  setTimeout(() => { window.open(webUrl, "_blank"); }, 600);
+}
+
 async function openPerson(name) {
   const el = document.getElementById("person-content");
   document.getElementById("person-overlay").style.display = "flex";
@@ -1487,6 +1533,7 @@ async function openPerson(name) {
           <div class="modal-title">${name}</div>
           ${dept ? `<div style="color:#666;font-size:12px;margin-top:2px">${dept}</div>` : ""}
           ${knownFor ? `<div style="color:#888;font-size:11px;margin-top:4px">Known for: ${knownFor}</div>` : ""}
+          ${dept === "Sound" || dept === "Music" ? streamingLinks(name) : ""}
           ${bio ? `<div style="color:#777;font-size:11px;margin-top:6px;line-height:1.5">${bio}</div>` : ""}
         </div>
       </div>
