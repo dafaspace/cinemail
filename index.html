@@ -269,12 +269,9 @@
     <div class="header-grid">
       <p style="grid-column:1;grid-row:2;margin:0">TMDB · AI Picks · Watch History</p>
       <span id="header-username" style="grid-column:3;grid-row:1;color:#aaa;font-size:12px;font-weight:600;text-align:right;min-height:12px">.</span>
-      <div style="grid-column:2;grid-row:2;position:relative;justify-self:end">
-        <button onclick="openFeedback()" style="background:none;border:none;cursor:pointer;padding:0;display:inline-flex;align-items:baseline;gap:3px;color:#555;font-family:'DM Sans',sans-serif;font-size:11px">
-          <span style="font-size:13px;color:#666">✉</span><span>Feedback</span>
-        </button>
-        <span id="feedback-badge" style="display:none;position:absolute;top:-4px;left:2px;width:6px;height:6px;background:#F5C518;border-radius:50%;border:1px solid #0d0d1a"></span>
-      </div>
+      <button onclick="openFeedback()" style="grid-column:2;grid-row:2;justify-self:end;background:none;border:none;cursor:pointer;padding:0;display:inline-flex;align-items:baseline;gap:3px;color:#555;font-family:'DM Sans',sans-serif;font-size:11px">
+        <span id="feedback-icon" style="font-size:13px;color:#666;transition:color .2s">✉</span><span id="feedback-label" style="transition:color .2s">Feedback</span>
+      </button>
       <button onclick="signOut()" style="grid-column:3;grid-row:2;justify-self:end;background:none;border:none;color:#444;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0">Sign out</button>
     </div>
   </div>
@@ -1753,6 +1750,13 @@ function openFeedback() {
   document.getElementById("feedback-overlay").style.display = "flex";
 }
 
+function setFeedbackUnread(has) {
+  const icon = document.getElementById("feedback-icon");
+  const label = document.getElementById("feedback-label");
+  if (icon) icon.style.color = has ? "#F5C518" : "#666";
+  if (label) label.style.color = has ? "#F5C518" : "#555";
+}
+
 async function deleteFeedback(id) {
   try {
     await sbClient.from("feedback").delete().eq("id", id);
@@ -1766,8 +1770,7 @@ async function checkFeedbackBadge() {
     const { data } = await sbClient.from("feedback")
       .select("id").eq("user_id", currentUser.id)
       .eq("read_by_user", false).not("reply", "is", null).limit(1);
-    const badge = document.getElementById("feedback-badge");
-    if (badge) badge.style.display = data?.length ? "block" : "none";
+    setFeedbackUnread(data?.length > 0);
   } catch(e) {}
 }
 
@@ -1836,9 +1839,7 @@ async function loadFeedbackReplies() {
     if (unreadReplies.length) {
       await sbClient.from("feedback").update({ read_by_user: true }).in("id", unreadReplies.map(f => f.id));
     }
-    // Update badge
-    const badge = document.getElementById("feedback-badge");
-    if (badge) badge.style.display = "none";
+    setFeedbackUnread(false);
 
     const typeEmoji = { bug: "🐛", idea: "💡", other: "💬" };
     el.style.display = "block";
