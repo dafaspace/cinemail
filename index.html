@@ -1670,11 +1670,45 @@ function renderHistory() {
   const rated = watched.filter(h => h.stars > 0);
   const avg = rated.length ? (rated.reduce((a,b)=>a+b.stars,0)/rated.length).toFixed(1)+"★" : "—";
 
+  // Composer stats: count by composer name, only watched entries with composer set
+  const composerMap = {};
+  watched.forEach(h => {
+    if (!h.composer) return;
+    h.composer.split(", ").forEach(name => {
+      name = name.trim();
+      if (name) composerMap[name] = (composerMap[name] || 0) + 1;
+    });
+  });
+  const topComposers = Object.entries(composerMap)
+    .filter(([, count]) => count >= 2)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+  const maxCount = topComposers.length ? topComposers[0][1] : 1;
+
+  const composerBlock = (historyFilter === "watched" && topComposers.length) ? `
+    <div style="margin-bottom:14px;padding:11px 13px;background:rgba(245,197,24,0.04);border:1px solid rgba(245,197,24,0.12);border-radius:12px">
+      <div style="font-size:11px;color:#F5C518;font-weight:600;letter-spacing:.5px;margin-bottom:9px">🎵 Your top composers</div>
+      ${topComposers.map(([name, count]) => {
+        const pct = Math.round((count / maxCount) * 100);
+        return `
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:7px;cursor:pointer" onclick="setSearchAndGo('${name.replace(/'/g,"\\'")}')">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</div>
+          </div>
+          <div style="width:80px;height:3px;background:rgba(255,255,255,0.07);border-radius:2px;flex-shrink:0">
+            <div style="width:${pct}%;height:100%;background:#F5C518;border-radius:2px;transition:width .4s"></div>
+          </div>
+          <div style="font-size:11px;color:#666;flex-shrink:0;width:38px;text-align:right">${count} film${count > 1 ? "s" : ""}</div>
+        </div>`;
+      }).join("")}
+    </div>` : "";
+
   el.innerHTML = `
     <div class="history-header">
       <span>${watched.length} watched · ${plan.length} planned</span>
       <span>Avg: ${avg}</span>
     </div>
+    ${composerBlock}
     <div class="card-list">
       ${filtered.map(item => {
         const key = regMovie({ tmdbID: item.tmdbID, Title: item.title, Year: item.year, Poster: item.poster, type: item.mediaType || "movie" });
@@ -1703,6 +1737,13 @@ function renderHistory() {
         </div>`;
       }).join("")}
     </div>`;
+}
+
+// ── Composer tap → search ─────────────────────────────────────────────────────
+function setSearchAndGo(composerName) {
+  switchTab("search");
+  document.getElementById("search-input").value = composerName;
+  doSearch();
 }
 
 // ── Edit review ───────────────────────────────────────────────────────────────
