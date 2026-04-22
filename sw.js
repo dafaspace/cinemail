@@ -1,5 +1,5 @@
 // ── Cache version — bump this string on every deploy to force refresh ──────────
-const CACHE_VERSION = "v8";
+const CACHE_VERSION = "v9";
 const CACHE_NAME = "movie-night-" + CACHE_VERSION;
 
 // Files to cache for offline use
@@ -37,6 +37,9 @@ self.addEventListener("activate", event => {
 // ── Fetch: network-first strategy for HTML, cache-first for assets ────────────
 self.addEventListener("fetch", event => {
   const url = new URL(event.request.url);
+
+  // Never cache non-GET requests (PATCH, POST, DELETE etc.)
+  if (event.request.method !== "GET") return;
 
   // Always fetch HTML fresh from network (never serve stale app shell)
   if (event.request.mode === "navigate" || url.pathname.endsWith(".html")) {
