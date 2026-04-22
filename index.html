@@ -255,22 +255,22 @@
 <div id="auth-screen" style="display:none"></div>
 
 <div class="app" id="main-app" style="display:none">
-  <div class="header" style="display:flex;justify-content:space-between;align-items:flex-end">
-    <div>
-      <h1><span class="gold">MOVIE</span> NIGHT</h1>
-      <p style="margin-top:3px">TMDB · AI Picks · Watch History</p>
-    </div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;gap:3px;padding-bottom:2px;margin-right:6px">
-      <span id="header-username" style="color:#aaa;font-size:13px;font-weight:600;line-height:1"></span>
+  <div class="header">
+    <h1><span class="gold">MOVIE</span> NIGHT</h1>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px">
+      <p style="margin:0">TMDB · AI Picks · Watch History</p>
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="position:relative;margin-right:14px">
-          <button onclick="openFeedback()" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;gap:3px;line-height:1">
-            <span style="font-size:16px;color:#666;line-height:1">✉</span>
-            <span style="font-size:11px;font-family:'DM Sans',sans-serif;color:#555;line-height:1">feedback</span>
+        <div style="position:relative">
+          <button onclick="openFeedback()" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;gap:3px">
+            <span style="font-size:14px;color:#666;line-height:1">✉</span>
+            <span style="font-size:11px;font-family:'DM Sans',sans-serif;color:#555">feedback</span>
           </button>
-          <span id="feedback-badge" style="display:none;position:absolute;top:0px;left:3px;width:7px;height:7px;background:#F5C518;border-radius:50%;border:1px solid #0d0d1a"></span>
+          <span id="feedback-badge" style="display:none;position:absolute;top:-2px;left:2px;width:6px;height:6px;background:#F5C518;border-radius:50%;border:1px solid #0d0d1a"></span>
         </div>
-        <button onclick="signOut()" style="background:none;border:none;color:#444;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;line-height:1">Sign out</button>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px">
+          <span id="header-username" style="color:#aaa;font-size:11px;font-weight:600;line-height:1"></span>
+          <button onclick="signOut()" style="background:none;border:none;color:#444;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;line-height:1">Sign out</button>
+        </div>
       </div>
     </div>
   </div>
