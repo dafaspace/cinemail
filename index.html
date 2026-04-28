@@ -1444,41 +1444,47 @@ function closeDetail() { document.getElementById("detail-overlay").style.display
 function closePerson() { document.getElementById("person-overlay").style.display = "none"; }
 
 // ── Streaming links ───────────────────────────────────────────────────────────
-function streamingLinks(query) {
+function streamingLinks(query, compact) {
   const q = encodeURIComponent(query);
   const links = [
     {
       label: "Spotify",
-      bg: "#1DB954", fg: "#fff",
+      icon: `<svg width="16" height="16" viewBox="0 0 168 168"><circle cx="84" cy="84" r="84" fill="#1DB954"/><path d="M120.7 116.4c-1.6 2.7-5.1 3.5-7.7 1.9-21.2-13-47.9-15.9-79.3-8.7-3 .7-6.1-1.2-6.8-4.2-.7-3 1.2-6.1 4.2-6.8 34.4-7.9 64-4.5 87.8 10.1 2.7 1.6 3.5 5.1 1.9 7.7zm10.2-22.8c-2 3.4-6.4 4.5-9.8 2.5-24.3-14.9-61.3-19.3-90-10.5-3.7 1.1-7.6-1-8.7-4.7-1.1-3.7 1-7.6 4.7-8.7 32.8-10 73.5-5.1 101.3 12 3.4 2 4.5 6.4 2.5 9.8zm.9-23.8c-29.1-17.3-77.2-18.9-105-10.5-4.5 1.4-9.2-1.2-10.5-5.6-1.4-4.5 1.2-9.2 5.6-10.5 31.9-9.7 84.9-7.8 118.4 12.1 4 2.4 5.4 7.6 3 11.6-2.4 4.1-7.6 5.4-11.6 3z" fill="white"/></svg>`,
+      iconLg: `<svg width="20" height="20" viewBox="0 0 168 168"><circle cx="84" cy="84" r="84" fill="#1DB954"/><path d="M120.7 116.4c-1.6 2.7-5.1 3.5-7.7 1.9-21.2-13-47.9-15.9-79.3-8.7-3 .7-6.1-1.2-6.8-4.2-.7-3 1.2-6.1 4.2-6.8 34.4-7.9 64-4.5 87.8 10.1 2.7 1.6 3.5 5.1 1.9 7.7zm10.2-22.8c-2 3.4-6.4 4.5-9.8 2.5-24.3-14.9-61.3-19.3-90-10.5-3.7 1.1-7.6-1-8.7-4.7-1.1-3.7 1-7.6 4.7-8.7 32.8-10 73.5-5.1 101.3 12 3.4 2 4.5 6.4 2.5 9.8zm.9-23.8c-29.1-17.3-77.2-18.9-105-10.5-4.5 1.4-9.2-1.2-10.5-5.6-1.4-4.5 1.2-9.2 5.6-10.5 31.9-9.7 84.9-7.8 118.4 12.1 4 2.4 5.4 7.6 3 11.6-2.4 4.1-7.6 5.4-11.6 3z" fill="white"/></svg>`,
       deep: `spotify:search:${query}`,
       web: `https://open.spotify.com/search/${q}`
     },
     {
       label: "Apple Music",
-      bg: "#fc3c44", fg: "#fff",
+      icon: `<svg width="16" height="16" viewBox="0 0 16 16"><defs><linearGradient id="apmG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f984a0"/><stop offset="100%" stop-color="#d3001a"/></linearGradient></defs><rect width="16" height="16" rx="3.5" fill="url(#apmG)"/><path fill-rule="evenodd" d="M10.9 2.5 6.13 3.46a.5.5 0 0 0-.46.49v5.95c0 .14-.01.27-.1.39-.1.11-.22.15-.35.18l-.31.06c-.5.1-.91.56-.91 1.1 0 .6.5 1.1 1.1 1.1.17 0 .34-.04.5-.12.43-.2.72-.64.72-1.13V5.2l3.83-.77v3.96c0 .14-.01.28-.1.39-.1.12-.22.15-.35.18l-.31.06c-.5.1-.91.56-.91 1.1 0 .6.5 1.1 1.1 1.1.17 0 .34-.04.5-.12.43-.2.72-.64.72-1.13V3.0a.5.5 0 0 0-.6-.49z" fill="white"/></svg>`,
+      iconLg: `<svg width="20" height="20" viewBox="0 0 16 16"><defs><linearGradient id="apmG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f984a0"/><stop offset="100%" stop-color="#d3001a"/></linearGradient></defs><rect width="20" height="20" rx="3.5" fill="url(#apmG)"/><path fill-rule="evenodd" d="M10.9 2.5 6.13 3.46a.5.5 0 0 0-.46.49v5.95c0 .14-.01.27-.1.39-.1.11-.22.15-.35.18l-.31.06c-.5.1-.91.56-.91 1.1 0 .6.5 1.1 1.1 1.1.17 0 .34-.04.5-.12.43-.2.72-.64.72-1.13V5.2l3.83-.77v3.96c0 .14-.01.28-.1.39-.1.12-.22.15-.35.18l-.31.06c-.5.1-.91.56-.91 1.1 0 .6.5 1.1 1.1 1.1.17 0 .34-.04.5-.12.43-.2.72-.64.72-1.13V3.0a.5.5 0 0 0-.6-.49z" fill="white"/></svg>`,
       deep: `music://music.apple.com/search?term=${q}`,
       web: `https://music.apple.com/search?term=${q}`
     },
     {
       label: "YT Music",
-      bg: "#FF0000", fg: "#fff",
+      icon: `<svg width="16" height="16" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#FF0000"/><path d="M21.6 7.2s-.2-1.4-.8-2c-.8-.8-1.7-.8-2.1-.9C16.2 4 12 4 12 4s-4.2 0-6.7.3c-.4.1-1.3.1-2.1.9-.6.6-.8 2-.8 2S2 8.8 2 10.4v1.5c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.3.8C7 18 12 18 12 18s4.2 0 6.7-.3c.4-.1 1.3-.1 2.1-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5c0-1.6-.2-3.2-.2-3.2zm-12.4 6.5V8.3l5.7 2.7-5.7 2.7z" fill="white"/></svg>`,
+      iconLg: `<svg width="20" height="20" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#FF0000"/><path d="M21.6 7.2s-.2-1.4-.8-2c-.8-.8-1.7-.8-2.1-.9C16.2 4 12 4 12 4s-4.2 0-6.7.3c-.4.1-1.3.1-2.1.9-.6.6-.8 2-.8 2S2 8.8 2 10.4v1.5c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.3.8C7 18 12 18 12 18s4.2 0 6.7-.3c.4-.1 1.3-.1 2.1-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5c0-1.6-.2-3.2-.2-3.2zm-12.4 6.5V8.3l5.7 2.7-5.7 2.7z" fill="white"/></svg>`,
       deep: null,
       web: `https://music.youtube.com/search?q=${q}`
     }
   ];
+  if (compact) {
+    return `<div style="display:flex;gap:7px;margin-top:8px">
+      ${links.map(s => {
+        const onclick = s.deep
+          ? `openStreaming('${s.deep.replace(/'/g, "\\'")}','${s.web.replace(/'/g, "\\'")}')`
+          : `window.open('${s.web.replace(/'/g, "\\'")}','_blank')`;
+        return `<button title="${s.label}" onclick="${onclick}" style="width:30px;height:30px;border-radius:${s.label==='Spotify'?'50%':'8px'};background:transparent;border:1px solid rgba(255,255,255,0.12);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:border-color .15s" onmouseover="this.style.borderColor='rgba(255,255,255,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">${s.iconLg}</button>`;
+      }).join("")}
+    </div>`;
+  }
   return `<div style="display:flex;gap:7px;margin-top:8px;flex-wrap:wrap">
     ${links.map(s => {
       const onclick = s.deep
-        ? `openStreaming('${s.deep.replace(/'/g,"\'")}','${s.web.replace(/'/g,"\'")}')"`
-        : `window.open('${s.web.replace(/'/g,"\'")}','_blank')"`;
-      return `<button onclick="${onclick}
-        style="display:flex;align-items:center;gap:5px;padding:4px 10px 4px 6px;border-radius:20px;background:${s.bg};border:none;cursor:pointer;transition:opacity .15s"
-        onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-        <div style="width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <div style="width:8px;height:8px;border-radius:50%;background:${s.fg}"></div>
-        </div>
-        <span style="color:${s.fg};font-size:10px;font-weight:700;letter-spacing:.3px;white-space:nowrap">${s.label}</span>
-      </button>`;
+        ? `openStreaming('${s.deep.replace(/'/g, "\\'")}','${s.web.replace(/'/g, "\\'")}')`
+        : `window.open('${s.web.replace(/'/g, "\\'")}','_blank')`;
+      return `<button onclick="${onclick}" style="display:flex;align-items:center;gap:7px;padding:6px 13px;border-radius:20px;background:transparent;border:1px solid rgba(255,255,255,0.12);cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='rgba(255,255,255,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">${s.icon}<span style="color:#ddd;font-size:11px;font-weight:500;white-space:nowrap">${s.label}</span></button>`;
     }).join("")}
   </div>`;
 }
@@ -1533,7 +1539,7 @@ async function openPerson(name) {
           <div class="modal-title">${name}</div>
           ${dept ? `<div style="color:#666;font-size:12px;margin-top:2px">${dept}</div>` : ""}
           ${knownFor ? `<div style="color:#888;font-size:11px;margin-top:4px">Known for: ${knownFor}</div>` : ""}
-          ${dept === "Sound" || dept === "Music" ? streamingLinks(name) : ""}
+          ${dept === "Sound" || dept === "Music" ? streamingLinks(name, true) : ""}
           ${bio ? `<div style="color:#777;font-size:11px;margin-top:6px;line-height:1.5">${bio}</div>` : ""}
         </div>
       </div>
@@ -2009,8 +2015,11 @@ function openFeedback() {
   _fbType = "other";
   document.getElementById("fb-message").value = "";
   setFbType("other");
-  loadFeedbackReplies();
+  // Show loading placeholder immediately, then load replies async
+  const el = document.getElementById("fb-replies");
+  if (el) { el.style.display = "block"; el.innerHTML = `<div style="color:#555;font-size:12px;padding:8px 0">Loading history...</div>`; }
   document.getElementById("feedback-overlay").style.display = "flex";
+  loadFeedbackReplies();
 }
 
 function setFeedbackUnread(has) {
@@ -2066,7 +2075,6 @@ async function submitFeedback() {
       user_agent: navigator.userAgent
     }).select();
     if (error) throw new Error(error.message);
-    // Notify via Telegram
     const inserted = data?.[0];
     if (inserted?.id) {
       workerFetch("/feedback-notify", {
@@ -2077,12 +2085,13 @@ async function submitFeedback() {
       }).catch(() => {});
     }
     document.getElementById("fb-message").value = "";
-    showToast("Got it! I read everything personally 🙏");
     closeFeedback();
+    showToast("Got it! I read everything personally 🙏");
   } catch(e) {
     showToast("Could not send: " + e.message, true);
+  } finally {
+    btn.textContent = "SEND"; btn.disabled = false;
   }
-  btn.textContent = "SEND"; btn.disabled = false;
 }
 
 async function loadFeedbackReplies() {
