@@ -615,17 +615,40 @@ async function proxyFetchWithRetry(body) {
 }
 
 // ── Proxy wrapper (JWT + 429 handling) ────────────────────────────────────────
+// Global controller — allows user to cancel in-flight AI requests
+let _aiAbortController = null;
+
+function cancelAIRequest() {
+  if (_aiAbortController) {
+    _aiAbortController.abort();
+    _aiAbortController = null;
+  }
+}
+
 async function proxyFetch(body) {
   const { data: { session } } = await sbClient.auth.getSession();
   if (!session) throw new Error("Not signed in");
-  const res = await fetch(PROXY_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + session.access_token,
-    },
-    body: JSON.stringify(body),
-  });
+  // Hard 15s timeout + manual cancel via shared controller
+  _aiAbortController = new AbortController();
+  const timeoutId = setTimeout(() => _aiAbortController?.abort(), 15000);
+  let res;
+  try {
+    res = await fetch(PROXY_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + session.access_token,
+      },
+      body: JSON.stringify(body),
+      signal: _aiAbortController.signal,
+    });
+  } catch(e) {
+    clearTimeout(timeoutId);
+    if (e.name === "AbortError") throw new Error("timeout_or_cancelled");
+    throw e;
+  } finally {
+    clearTimeout(timeoutId);
+  }
   const remaining = res.headers.get("X-RateLimit-Remaining");
   const limit = res.headers.get("X-RateLimit-Limit");
   if (remaining !== null && limit !== null) updateAICounter(+remaining, +limit);
@@ -1222,7 +1245,7 @@ function starsHTML(n, size=13) {
   return [1,2,3,4,5].map(s => `<span style="font-size:${size}px;color:${s<=n?'#F5C518':'#333'}">★</span>`).join("");
 }
 
-function loadingHTML(quote, withSkeletons) {
+function loadingHTML(quote, withSkeletons, cancellable) {
   const skels = withSkeletons ? Array(5).fill(0).map((_,i) => `
     <div class="skeleton-card" style="margin-top:9px">
       <div class="skel-poster"></div>
@@ -1231,14 +1254,25 @@ function loadingHTML(quote, withSkeletons) {
         <div class="skel-line" style="height:11px;width:35%;animation-delay:${i*.1+.1}s"></div>
       </div>
     </div>`).join("") : "";
+  const cancelBtn = cancellable ? `
+    <button id="ai-cancel-btn" onclick="cancelAIRequest()" style="margin-top:14px;padding:7px 18px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#888;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#f87171';this.style.color='#f87171'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='#888'">Cancel</button>` : "";
   return `
     <div class="loading-box">
       <div class="dots">${[0,1,2,3,4].map(()=>`<div class="dot"></div>`).join("")}</div>
       <div class="progress-track"><div class="progress-bar"></div></div>
       <div class="loading-quote">"${quote.text}"</div>
       <div class="loading-source">— ${quote.source}</div>
-      <div class="loading-sub">Searching...</div>
+      <div class="loading-sub" id="ai-loading-sub">Searching...</div>
+      ${cancelBtn}
     </div>${skels}`;
+}
+
+// Show "Still thinking..." after 7s of waiting
+function startSlowLoadingIndicator() {
+  return setTimeout(() => {
+    const sub = document.getElementById("ai-loading-sub");
+    if (sub) sub.textContent = "Still thinking, hang tight...";
+  }, 7000);
 }
 
 function getEntryStatus(tmdbID) {
@@ -1698,7 +1732,8 @@ function getSeasonalContext() {
 
 async function surpriseMe() {
   const el = document.getElementById("rec-results");
-  el.innerHTML = loadingHTML(randQuote(), true);
+  el.innerHTML = loadingHTML(randQuote(), true, true);
+  const slowTimer = startSlowLoadingIndicator();
   try {
     const mode = getSurpriseMode();
     const recentlyShown = _shownSurprises.slice(-9).join(", ");
@@ -1760,7 +1795,14 @@ async function surpriseMe() {
       </div>
       <div class="card-list">${details.map(m => movieCardHTML(m, m.why)).join("")}</div>`;
   } catch(e) {
-    el.innerHTML = `<div class="empty"><div class="title">ERROR</div><div class="sub">${e.message}</div></div>`;
+    if (e.message === "timeout_or_cancelled") {
+      el.innerHTML = `<div class="empty"><div class="icon">⏱</div><div class="title">TOOK TOO LONG</div><div class="sub">Try again in a moment</div></div>`;
+    } else {
+      el.innerHTML = `<div class="empty"><div class="title">ERROR</div><div class="sub">${e.message}</div></div>`;
+    }
+  } finally {
+    clearTimeout(slowTimer);
+    _aiAbortController = null;
   }
 }
 async function loadRecs() {
@@ -1768,7 +1810,8 @@ async function loadRecs() {
   const btn = document.getElementById("rec-btn");
   const el = document.getElementById("rec-results");
   btn.disabled = true; btn.textContent = "THINKING...";
-  el.innerHTML = loadingHTML(randQuote(), true);
+  el.innerHTML = loadingHTML(randQuote(), true, true);
+  const slowTimer = startSlowLoadingIndicator();
 
   try {
     let suggestions = [];
@@ -1821,7 +1864,14 @@ Reply ONLY with a JSON array, no other text:
       : `<div class="empty"><div class="icon">🤷</div><div class="title">NO PICKS FOUND</div><div class="sub">Try a different prompt</div></div>`;
 
   } catch(e) {
-    el.innerHTML = `<div class="empty"><div class="title">ERROR</div><div class="sub">${e.message}</div></div>`;
+    if (e.message === "timeout_or_cancelled") {
+      el.innerHTML = `<div class="empty"><div class="icon">⏱</div><div class="title">TOOK TOO LONG</div><div class="sub">Try again in a moment</div></div>`;
+    } else {
+      el.innerHTML = `<div class="empty"><div class="title">ERROR</div><div class="sub">${e.message}</div></div>`;
+    }
+  } finally {
+    clearTimeout(slowTimer);
+    _aiAbortController = null;
   }
   btn.disabled = false; btn.textContent = "FIND";
 }
