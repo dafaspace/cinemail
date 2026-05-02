@@ -35,6 +35,18 @@
     margin-top: 3px;
   }
 
+  /* Аватар-кнопка */
+  .avatar-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.4);
+    color: #a78bfa; font-family: 'Bebas Neue', cursive; font-size: 18px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .avatar-btn:hover {
+    background: rgba(124,58,237,0.25); border-color: #a78bfa;
+  }
+
   .tabs { display: flex; border-bottom: 1px solid rgba(255,255,255,0.08); }
   .tab-btn { flex: 1; padding: 11px 0; background: none; border: none; border-bottom: 2px solid transparent;
     color: #555; cursor: pointer; font-size: 12px; font-family: 'DM Sans', sans-serif;
@@ -268,11 +280,10 @@
     <h1><span class="gold">MOVIE</span> NIGHT</h1>
     <div class="header-grid">
       <p style="grid-column:1;grid-row:2;margin:0">TMDB · AI Picks · Watch History</p>
-      <span id="header-username" style="grid-column:3;grid-row:1;color:#aaa;font-size:12px;font-weight:600;text-align:right;min-height:12px">.</span>
-      <button onclick="openFeedback()" style="grid-column:2;grid-row:2;justify-self:end;background:none;border:none;cursor:pointer;padding:0;display:inline-flex;align-items:baseline;gap:3px;color:#555;font-family:'DM Sans',sans-serif;font-size:11px">
+      <button onclick="openFeedback()" style="grid-column:2;grid-row:2;justify-self:end;background:none;border:none;cursor:pointer;padding:0;display:inline-flex;align-items:baseline;gap:3px;color:#555;font-family:'DM Sans',sans-serif;font-size:11px;margin-right:8px;">
         <span id="feedback-icon" style="font-size:13px;transition:all .2s">✉</span><span id="feedback-label" style="color:#555">Feedback</span>
       </button>
-      <button onclick="signOut()" style="grid-column:3;grid-row:2;justify-self:end;background:none;border:none;color:#444;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0">Sign out</button>
+      <button class="avatar-btn" id="btn-avatar" onclick="openAccount()" style="grid-column:3; grid-row:1 / span 2; justify-self:end; align-self:center;" title="Account">U</button>
     </div>
   </div>
 
@@ -409,6 +420,49 @@
       <div style="display:flex;gap:9px">
         <button class="btn-close" onclick="closeAdd()">Cancel</button>
         <button class="btn-save" id="add-confirm-btn" onclick="confirmAdd()">SAVE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Account Modal -->
+<div id="account-overlay" class="overlay" style="display:none" onclick="closeAccount()">
+  <div style="padding:20px;width:100%;display:flex;justify-content:center;cursor:default" onclick="event.stopPropagation();event.preventDefault()">
+    <div class="add-modal" style="max-width:360px" onclick="event.stopPropagation()">
+      
+      <!-- Аватар и Инфо -->
+      <div style="text-align:center;padding:8px 0 20px">
+        <div style="width:68px;height:68px;border-radius:50%;background:rgba(124,58,237,0.1);border:2px solid rgba(124,58,237,0.4);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:32px;color:#a78bfa;margin:0 auto 12px" id="acc-modal-avatar">U</div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:24px;letter-spacing:0.5px;color:#fff" id="acc-name-display">User</div>
+        <div style="font-size:13px;color:#aaa;margin-top:2px" id="acc-email-display"></div>
+      </div>
+
+      <!-- Статистика -->
+      <div style="display:flex;justify-content:space-around;margin-bottom:24px;padding:16px 0;border-top:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06)">
+        <div style="text-align:center">
+          <div style="font-family:'Bebas Neue',cursive;font-size:24px;color:#F5C518" id="acc-stat-watched">0</div>
+          <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px">Watched</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-family:'Bebas Neue',cursive;font-size:24px;color:#aaa" id="acc-stat-plan">0</div>
+          <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px">Watchlist</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-family:'Bebas Neue',cursive;font-size:24px;color:#F5C518" id="acc-stat-avg">0.0</div>
+          <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px">Avg ★</div>
+        </div>
+      </div>
+
+      <!-- Смена имени -->
+      <div class="add-label">Display Name</div>
+      <div style="display:flex;gap:8px;margin-bottom:24px">
+        <input type="text" id="acc-name-input" placeholder="Your name" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:9px;color:#f0f0f0;font-size:14px;padding:10px 12px;font-family:'DM Sans',sans-serif;outline:none" />
+        <button class="btn-save" id="btn-save-name" onclick="saveDisplayName()" style="flex:none;padding:10px 18px;font-size:14px">SAVE</button>
+      </div>
+
+      <div style="display:flex;gap:9px">
+        <button class="btn-close" onclick="closeAccount()">Cancel</button>
+        <button class="btn-close" onclick="closeAccount(); signOut();" style="color:#f87171;border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.05)">Sign Out</button>
       </div>
     </div>
   </div>
@@ -2089,7 +2143,58 @@ async function deleteItem(id) {
   } catch(e) { alert("Could not delete: " + e.message); }
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
+// ── Управление аккаунтом ──────────────────────────────────────────────────────
+function openAccount() {
+  if (!currentUser) return;
+  const name = currentUser.displayName || currentUser.email?.split("@")[0] || "User";
+  const initial = name.charAt(0).toUpperCase();
+
+  // Заполняем профиль
+  document.getElementById('acc-modal-avatar').textContent = initial;
+  document.getElementById('acc-name-display').textContent = name;
+  document.getElementById('acc-email-display').textContent = currentUser.email || "";
+  document.getElementById('acc-name-input').value = name;
+
+  // Считаем статистику
+  const watched = watchHistory.filter(h => h.status === "watched");
+  const plan = watchHistory.filter(h => h.status === "plan");
+  const rated = watched.filter(h => h.stars > 0);
+  const avg = rated.length ? (rated.reduce((sum, h) => sum + h.stars, 0) / rated.length).toFixed(1) : "0.0";
+
+  document.getElementById('acc-stat-watched').textContent = watched.length;
+  document.getElementById('acc-stat-plan').textContent = plan.length;
+  document.getElementById('acc-stat-avg').textContent = avg;
+
+  document.getElementById("account-overlay").style.display = "flex";
+}
+
+function closeAccount() {
+  document.getElementById("account-overlay").style.display = "none";
+}
+
+async function saveDisplayName() {
+  const newName = document.getElementById('acc-name-input').value.trim();
+  if (!newName) { showToast("Name cannot be empty", true); return; }
+  
+  const btn = document.getElementById('btn-save-name');
+  btn.textContent = "SAVING..."; btn.disabled = true;
+
+  try {
+    await sbClient.from("profiles").upsert({ id: currentUser.id, display_name: newName });
+    currentUser.displayName = newName;
+
+    const initial = newName.charAt(0).toUpperCase();
+    document.getElementById('btn-avatar').textContent = initial;
+    document.getElementById('acc-modal-avatar').textContent = initial;
+    document.getElementById('acc-name-display').textContent = newName;
+
+    showToast("✅ Name updated");
+  } catch (e) {
+    showToast("Error updating name: " + e.message, true);
+  }
+  
+  btn.textContent = "SAVE"; btn.disabled = false;
+}
 
 // ── Feedback ──────────────────────────────────────────────────────────────────
 let _fbType = "other";
@@ -2215,12 +2320,13 @@ async function loadFeedbackReplies() {
 }
 
 function initUI() {
-  // Show username in header
-  const nameEl = document.getElementById("header-username");
-  if (nameEl && currentUser) {
-    const name = currentUser.displayName || "";
-    nameEl.textContent = name ? `Hi, ${name}` : "";
+  // Обновляем аватарку в шапке
+  const btnAvatar = document.getElementById("btn-avatar");
+  if (btnAvatar && currentUser) {
+    const name = currentUser.displayName || currentUser.email?.split("@")[0] || "User";
+    btnAvatar.textContent = name.charAt(0).toUpperCase();
   }
+  
   document.getElementById("search-results").innerHTML = `
     <div class="empty"><div class="icon">🎬</div>
     <div class="title">FIND YOUR NEXT FILM</div>
