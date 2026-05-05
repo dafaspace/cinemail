@@ -60,14 +60,12 @@ body {
 
 /* ── Auth Screens ───────────────────────────────────────────────────── */
 .auth-wrap {
-  width: 100%;
-  min-height: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 24px 20px;
-  box-sizing: border-box;
 }
 
 .auth-logo {
@@ -756,7 +754,43 @@ body {
   transition: color 0.15s, background 0.15s;
 }
 .feedback-btn:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-#feedback-icon { font-size: 16px; transition: all 0.2s; }
+#feedback-icon-wrap {
+  position: relative;
+  display: inline-block;
+  line-height: 1;
+  vertical-align: text-bottom;
+  top: -1px;
+}
+#feedback-icon {
+  font-size: 26px;
+  display: block;
+  line-height: 1;
+  transition: color 0.2s, text-shadow 0.2s;
+}
+#feedback-icon.unread {
+  color: var(--primary);
+  text-shadow: 0 0 10px rgba(245,197,24,0.7), 0 0 20px rgba(245,197,24,0.3);
+  animation: icon-glow 1.8s ease-in-out infinite;
+}
+@keyframes icon-glow {
+  0%, 100% { text-shadow: 0 0 8px rgba(245,197,24,0.6); }
+  50% { text-shadow: 0 0 16px rgba(245,197,24,0.9), 0 0 28px rgba(245,197,24,0.4); }
+}
+.feedback-badge {
+  display: none;
+  position: absolute;
+  top: 9px; right: 0px;
+  width: 3px; height: 3px;
+  background: var(--primary);
+  border-radius: 50%;
+  box-shadow: 0 0 3px var(--primary);
+  animation: badge-pulse 1.8s ease-in-out infinite;
+}
+@keyframes badge-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+.feedback-badge.visible { display: block; }
 
 /* ── Inbox badge ────────────────────────────────────────────────────── */
 .inbox-badge {
@@ -993,8 +1027,11 @@ body {
     <div class="topbar-logo"><span>MOVIE</span> NIGHT</div>
     <div class="topbar-actions">
       <button class="feedback-btn" id="btn-open-feedback" onclick="openFeedback()" title="Feedback">
-        <span id="feedback-icon">✉</span>
-        <span style="font-size:12px;color:var(--muted)">Feedback</span>
+        <span id="feedback-icon-wrap">
+          <span id="feedback-icon">✉</span>
+          <span id="feedback-badge" class="feedback-badge"></span>
+        </span>
+        <span style="font-size:12px;color:var(--muted);line-height:1;position:relative;top:3px">Feedback</span>
       </button>
       <button class="avatar-btn" id="btn-avatar" onclick="openAccount()" title="Account">U</button>
     </div>
@@ -1246,7 +1283,7 @@ let currentUser = null;
 function showScreen(name) {
   ["signin","signup","check-email"].forEach(s => {
     const el = document.getElementById("screen-"+s);
-    if (el) el.style.display = s === name ? "flex" : "none";
+    if (el) el.style.display = s === name ? "block" : "none";
   });
   document.getElementById("main-app").style.display = "none";
 }
@@ -2439,7 +2476,9 @@ function openFeedback() {
 }
 function setFeedbackUnread(has) {
   const icon=document.getElementById("feedback-icon");
-  if(icon)icon.textContent=has?"📩":"✉";
+  const badge=document.getElementById("feedback-badge");
+  if(icon)icon.classList.toggle("unread",!!has);
+  if(badge)badge.classList.toggle("visible",!!has);
 }
 async function checkFeedbackBadge() {
   if(!currentUser)return;
