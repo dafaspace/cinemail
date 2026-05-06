@@ -756,25 +756,27 @@ body {
 .feedback-btn:hover { color: var(--text); background: rgba(255,255,255,0.05); }
 #feedback-icon-wrap {
   position: relative;
-  display: inline-block;
-  line-height: 1;
-  vertical-align: text-bottom;
-  top: -1px;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
 }
 #feedback-icon {
-  font-size: 26px;
+  width: 22px;
+  height: 22px;
   display: block;
-  line-height: 1;
-  transition: color 0.2s, text-shadow 0.2s;
+  stroke: var(--muted);
+  fill: none;
+  flex-shrink: 0;
+  transition: stroke 0.2s, filter 0.2s;
 }
 #feedback-icon.unread {
-  color: var(--primary);
-  text-shadow: 0 0 10px rgba(245,197,24,0.7), 0 0 20px rgba(245,197,24,0.3);
+  stroke: var(--primary);
+  filter: drop-shadow(0 0 5px rgba(245,197,24,0.8));
   animation: icon-glow 1.8s ease-in-out infinite;
 }
 @keyframes icon-glow {
-  0%, 100% { text-shadow: 0 0 8px rgba(245,197,24,0.6); }
-  50% { text-shadow: 0 0 16px rgba(245,197,24,0.9), 0 0 28px rgba(245,197,24,0.4); }
+  0%, 100% { filter: drop-shadow(0 0 3px rgba(245,197,24,0.6)); }
+  50% { filter: drop-shadow(0 0 8px rgba(245,197,24,1)); }
 }
 .feedback-badge {
   display: none;
@@ -1028,7 +1030,10 @@ body {
     <div class="topbar-actions">
       <button class="feedback-btn" id="btn-open-feedback" onclick="openFeedback()" title="Feedback">
         <span id="feedback-icon-wrap">
-          <span id="feedback-icon">✉</span>
+          <svg id="feedback-icon" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <polyline points="2,4 12,13 22,4"/>
+          </svg>
           <span id="feedback-badge" class="feedback-badge"></span>
         </span>
         <span style="font-size:12px;color:var(--muted);line-height:1;position:relative;top:3px">Feedback</span>
@@ -2296,8 +2301,11 @@ async function renderInbox() {
   const el = document.getElementById("inbox-list");
   el.innerHTML=`<div style="color:var(--muted);text-align:center;padding:30px 0">Loading…</div>`;
   try {
-    const {data:received}=await sbClient.from("invites").select("*").eq("to_user_id",currentUser.id).order("created_at",{ascending:false});
-    const {data:sent}=await sbClient.from("invites").select("*").eq("from_user_id",currentUser.id).order("created_at",{ascending:false}).limit(20);
+    const [recRes, sentRes] = await withTimeout(Promise.all([
+      sbClient.from("invites").select("id,tmdb_id,title,year,poster,media_type,message,status,created_at,from_user_id,to_user_id,from_name,to_name").eq("to_user_id",currentUser.id).order("created_at",{ascending:false}),
+      sbClient.from("invites").select("id,tmdb_id,title,year,poster,media_type,message,status,created_at,from_user_id,to_user_id,from_name,to_name").eq("from_user_id",currentUser.id).order("created_at",{ascending:false}).limit(20)
+    ]));
+    const received = recRes.data, sent = sentRes.data;
     const allItems=[...(received||[]).map(inv=>({...inv,_dir:"in"})),...(sent||[]).map(inv=>({...inv,_dir:"out"}))].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
     const seen=new Set(); const items=allItems.filter(inv=>{if(seen.has(inv.id))return false;seen.add(inv.id);return true;});
     const pending=items.filter(i=>i._dir==="in"&&i.status==="pending");
@@ -2342,7 +2350,14 @@ async function renderInbox() {
     const badge=document.getElementById("inbox-badge");
     if (pending.length>0){badge.textContent=pending.length;badge.style.display="inline";}
     else badge.style.display="none";
-  } catch(e) { el.innerHTML=`<div class="empty-state"><div class="empty-state-title">Error</div><p>${e.message}</p></div>`; }
+  } catch(e) {
+    el.innerHTML=`<div class="empty-state">
+      <div class="empty-state-icon">⚠️</div>
+      <div class="empty-state-title">Could not load</div>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:16px">${e.message}</p>
+      <button class="btn btn-ghost" onclick="renderInbox()" style="font-size:13px;padding:8px 18px">Try again</button>
+    </div>`;
+  }
 }
 async function respondInviteByKey(key, status) {
   const inv=_movieRegistry[key]?._invFull;
@@ -2368,7 +2383,15 @@ async function respondInvite(id, status, inv) {
 }
 
 // ── Notifications ─────────────────────────────────────────────────────────────
-let _lastKnownPendingCount = 0, _realtimeChannel = null, _audioCtx = null;
+let _lastKnownPendingCount = 0, _realtimeChannel = null, _feedbackChannel = null, _audioCtx = null, _feedbackPollTimer = null;
+let _lastFeedbackPollTime = new Date(0).toISOString();
+
+function withTimeout(promise, ms = 10000) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error("Request timed out")), ms))
+  ]);
+}
 function getAudioCtx() {
   if (!_audioCtx) _audioCtx = new (window.AudioContext||window.webkitAudioContext)();
   if (_audioCtx.state==="suspended") _audioCtx.resume();
@@ -2405,15 +2428,53 @@ async function checkPendingInvites(notify=false) {
 }
 function startInboxPolling() {
   stopInboxPolling();
-  _realtimeChannel=sbClient.channel("inbox-"+currentUser.id)
+  _realtimeChannel = sbClient.channel("inbox-"+currentUser.id)
     .on("postgres_changes",{event:"INSERT",schema:"public",table:"invites",filter:`to_user_id=eq.${currentUser.id}`},(payload)=>{
       _lastKnownPendingCount++;notifyNewInvite(1);
       const badge=document.getElementById("inbox-badge");
       if(badge){badge.textContent=_lastKnownPendingCount;badge.style.display="inline";}
       if(document.getElementById("tab-inbox")?.style.display!=="none")renderInbox();
     }).subscribe();
+
+  _feedbackChannel = sbClient.channel("feedback-replies-"+currentUser.id)
+    .on("postgres_changes",{event:"UPDATE",schema:"public",table:"feedback",filter:`user_id=eq.${currentUser.id}`},(payload)=>{
+      if(payload.new?.reply) notifyFeedbackReply();
+    }).subscribe();
+
+  startFeedbackPolling();
 }
-function stopInboxPolling(){if(_realtimeChannel){sbClient.removeChannel(_realtimeChannel);_realtimeChannel=null;}}
+function stopInboxPolling() {
+  if(_realtimeChannel){sbClient.removeChannel(_realtimeChannel);_realtimeChannel=null;}
+  if(_feedbackChannel){sbClient.removeChannel(_feedbackChannel);_feedbackChannel=null;}
+  stopFeedbackPolling();
+}
+function notifyFeedbackReply() {
+  setFeedbackUnread(true);
+  playNotificationSound();
+  triggerVibration();
+  showToast("💬 You got a reply to your feedback!");
+  if(document.getElementById("feedback-overlay")?.style.display!=="none") loadFeedbackReplies();
+}
+async function pollFeedbackReplies() {
+  if(!currentUser) return;
+  try {
+    const now = new Date().toISOString();
+    const {data} = await withTimeout(
+      sbClient.from("feedback").select("id").eq("user_id",currentUser.id).not("reply","is",null).gt("replied_at",_lastFeedbackPollTime),
+      8000
+    );
+    _lastFeedbackPollTime = now;
+    if(data?.length) notifyFeedbackReply();
+  } catch(e){}
+}
+function startFeedbackPolling() {
+  stopFeedbackPolling();
+  _feedbackPollTimer = setInterval(pollFeedbackReplies, 30_000);
+  pollFeedbackReplies();
+}
+function stopFeedbackPolling() {
+  if(_feedbackPollTimer){clearInterval(_feedbackPollTimer);_feedbackPollTimer=null;}
+}
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 function showToast(msg, isError=false) {
@@ -2483,9 +2544,12 @@ function setFeedbackUnread(has) {
 async function checkFeedbackBadge() {
   if(!currentUser)return;
   try {
-    const {data}=await sbClient.from("feedback").select("id").eq("user_id",currentUser.id).eq("read_by_user",false).not("reply","is",null).limit(1);
+    const {data}=await sbClient.from("feedback").select("id").eq("user_id",currentUser.id).eq("read_by_user",false).not("reply","is",null);
     setFeedbackUnread(data?.length>0);
-  } catch(e){}
+  } catch(e){} finally {
+    // Set poll baseline to now — polls will only notify for replies arriving after login
+    _lastFeedbackPollTime = new Date().toISOString();
+  }
 }
 function closeFeedback(){document.getElementById("feedback-overlay").style.display="none";}
 function setFbType(type) {
@@ -2556,7 +2620,10 @@ async function deleteFeedback(id) {
 async function loadFeedbackReplies() {
   const el=document.getElementById("fb-replies");if(!el)return;
   try {
-    const {data,error}=await sbClient.from("feedback").select("id,type,message,reply,replied_at,read_by_user,created_at").eq("user_id",currentUser.id).order("created_at",{ascending:false}).limit(10);
+    const {data,error}=await withTimeout(
+      sbClient.from("feedback").select("id,type,message,reply,replied_at,read_by_user,created_at").eq("user_id",currentUser.id).order("created_at",{ascending:false}).limit(10),
+      8000
+    );
     if(error||!data?.length){el.style.display="none";return;}
     const unreadReplies=data.filter(f=>f.reply&&!f.read_by_user);
     if(unreadReplies.length)await sbClient.from("feedback").update({read_by_user:true}).in("id",unreadReplies.map(f=>f.id));
@@ -2603,6 +2670,16 @@ function initUI() {
     else if(event==="SIGNED_OUT"){showScreen("signin");document.getElementById("main-app").style.display="none";}
   });
 })();
+
+// Refresh data when tab becomes visible again (browser pauses intervals in background)
+document.addEventListener("visibilitychange", async () => {
+  if(document.visibilityState !== "visible" || !currentUser) return;
+  try { await sbClient.auth.refreshSession(); } catch(e) {}
+  checkPendingInvites(false);
+  pollFeedbackReplies();
+  const inboxTab = document.getElementById("tab-inbox");
+  if(inboxTab && inboxTab.style.display !== "none") renderInbox();
+});
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./sw.js").then(reg => {
