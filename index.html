@@ -768,34 +768,9 @@ body {
   fill: none;
   flex-shrink: 0;
   transform: translateY(-1px);
+  transition: stroke 0.2s, filter 0.2s, transform 0.2s;
 }
-#feedback-text {
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1;
-  transition: color 0.2s, text-shadow 0.2s;
-}
-#feedback-text.unread {
-  color: var(--primary);
-  animation: text-glow 1.8s ease-in-out infinite;
-}
-@keyframes text-glow {
-  0%, 100% { text-shadow: 0 0 3px rgba(245,197,24,0.4); }
-  50% { text-shadow: 0 0 9px rgba(245,197,24,0.95); }
-}
-
-/* Inbox tab envelope icon */
-#inbox-icon {
-  width: 13px;
-  height: 13px;
-  display: inline-block;
-  stroke: currentColor;
-  fill: none;
-  vertical-align: middle;
-  transform: translateY(-1px);
-  transition: stroke 0.2s;
-}
-#inbox-icon.unread {
+#feedback-icon.unread {
   stroke: var(--primary);
   animation: icon-pulse 1.6s ease-in-out infinite;
 }
@@ -887,6 +862,45 @@ body {
 }
 .acc-stat-val { font-family: 'Bebas Neue', cursive; font-size: 24px; color: var(--primary); }
 .acc-stat-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+/* ── Backup section ─────────────────────────────────────────────────── */
+.backup-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.btn-backup {
+  flex: 1;
+  padding: 9px 10px;
+  border-radius: 9px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.btn-backup:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); }
+.btn-backup-drive {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 9px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: not-allowed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
 
 /* ── Feedback reply card ────────────────────────────────────────────── */
 .fb-reply-card {
@@ -1051,7 +1065,7 @@ body {
             <polyline points="2,4 12,13 22,4"/>
           </svg>
         </span>
-        <span id="feedback-text">Feedback</span>
+        <span style="font-size:12px;color:var(--muted);line-height:1">Feedback</span>
       </button>
       <button class="avatar-btn" id="btn-avatar" onclick="openAccount()" title="Account">U</button>
     </div>
@@ -1062,13 +1076,7 @@ body {
     <button class="tab-btn active" id="tab-btn-search" onclick="switchTab('search')">🔍 Search</button>
     <button class="tab-btn" id="tab-btn-recs" onclick="switchTab('recs')">✨ Picks</button>
     <button class="tab-btn" id="tab-btn-history" onclick="switchTab('history')">📋 My List</button>
-    <button class="tab-btn" id="tab-btn-inbox" onclick="switchTab('inbox')">
-      <svg id="inbox-icon" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="4" width="20" height="16" rx="2"/>
-        <polyline points="2,4 12,13 22,4"/>
-      </svg>
-      <span id="inbox-badge" class="inbox-badge">0</span>Inbox
-    </button>
+    <button class="tab-btn" id="tab-btn-inbox" onclick="switchTab('inbox')">📬 <span id="inbox-badge" class="inbox-badge">0</span>Inbox</button>
   </div>
 
   <!-- ── TAB: Search ──────────────────────────────────────────────────── -->
@@ -1251,6 +1259,16 @@ body {
           onblur="this.style.borderColor='var(--border)'">
         <button class="btn-modal-save" id="btn-save-name" onclick="saveDisplayName()" style="flex:none;padding:10px 18px;font-size:14px">Save</button>
       </div>
+      <div class="add-label" style="margin-top:4px">Backup</div>
+      <div class="backup-row">
+        <button class="btn-backup" onclick="backupExportCSV()">↓ Export CSV</button>
+        <button class="btn-backup" onclick="backupImportCSV()">↑ Import CSV</button>
+        <input type="file" id="backup-import-input" accept=".csv" style="display:none">
+      </div>
+      <button class="btn-backup-drive" disabled title="Coming soon">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        Google Drive — Coming Soon
+      </button>
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" onclick="closeAccount()">Close</button>
         <button class="btn-modal-close" onclick="closeAccount();signOut();" style="color:#f87171;border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.05)">Sign Out</button>
@@ -2466,7 +2484,6 @@ async function checkPendingInvites(notify=false) {
     const count=data?.length||0;
     const badge=document.getElementById("inbox-badge");
     if (badge){badge.textContent=count;badge.style.display=count>0?"inline":"none";}
-    setInboxUnread(count>0);
     if (notify&&count>_lastKnownPendingCount) notifyNewInvite(count-_lastKnownPendingCount);
     _lastKnownPendingCount=count;
   } catch(e){}
@@ -2478,7 +2495,6 @@ function startInboxPolling() {
       _lastKnownPendingCount++;notifyNewInvite(1);
       const badge=document.getElementById("inbox-badge");
       if(badge){badge.textContent=_lastKnownPendingCount;badge.style.display="inline";}
-      setInboxUnread(true);
       if(document.getElementById("tab-inbox")?.style.display!=="none")renderInbox();
     }).subscribe();
 
@@ -2570,6 +2586,153 @@ async function saveDisplayName() {
   btn.textContent="Save";btn.disabled=false;
 }
 
+// ── Backup ────────────────────────────────────────────────────────────────────
+
+// Core: fetch all watchlist rows from Supabase (storage-agnostic)
+async function getBackupData() {
+  const rows = await sbFetch("watchlist?order=created_at.asc");
+  return Array.isArray(rows) ? rows : [];
+}
+
+// Core: merge-import rows into Supabase (skip existing by tmdb_id+status)
+async function applyBackupData(rows) {
+  if (!currentUser || !rows.length) return { added: 0, skipped: 0 };
+  const existing = await sbFetch("watchlist?select=imdb_id,status");
+  const existingKeys = new Set((existing || []).map(r => `${r.imdb_id}|${r.status}`));
+  let added = 0, skipped = 0;
+  for (const r of rows) {
+    if (!r.imdb_id || !r.title) { skipped++; continue; }
+    if (existingKeys.has(`${r.imdb_id}|${r.status}`)) { skipped++; continue; }
+    await saveEntryToDB({
+      tmdbID: r.imdb_id, title: r.title, year: r.year, poster: r.poster || "",
+      stars: parseInt(r.stars) || 0, comment: r.comment || "",
+      status: r.status || "watched", mediaType: r.media_type || "movie",
+      director: r.director || "", composer: r.composer || ""
+    });
+    added++;
+  }
+  return { added, skipped };
+}
+
+// CSV helpers
+function _csvEscape(v) { return `"${String(v||"").replace(/"/g,'""')}"`; }
+
+function _parseCSVLine(line) {
+  const result = []; let cur = "", inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    if (line[i] === '"') { if (inQ && line[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
+    else if (line[i] === ',' && !inQ) { result.push(cur); cur = ""; }
+    else cur += line[i];
+  }
+  result.push(cur);
+  return result;
+}
+
+function _parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/);
+  if (lines.length < 2) return [];
+  const headers = _parseCSVLine(lines[0]).map(h => h.replace(/^"|"$/g,"").trim());
+  return lines.slice(1).map(line => {
+    const vals = _parseCSVLine(line);
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = (vals[i]||"").replace(/^"|"$/g,"").trim());
+    return {
+      imdb_id: obj.tmdb_id || "",   title: obj.title || "",
+      year: obj.year || "",          media_type: obj.type || "movie",
+      status: obj.status || "watched", stars: parseInt(obj.rating) || 0,
+      comment: obj.comment || "",   director: obj.director || "",
+      composer: obj.composer || "", poster: ""
+    };
+  }).filter(r => r.imdb_id && r.title);
+}
+
+function _todayStr() { return new Date().toISOString().slice(0,10); }
+
+// ── Local file provider ────────────────────────────────────────────────────────
+const BackupLocal = {
+  export(rows) {
+    const cols = ["tmdb_id","title","year","type","status","rating","comment","director","composer","added_at"];
+    const lines = [cols.join(",")];
+    for (const r of rows) {
+      lines.push([
+        _csvEscape(r.imdb_id), _csvEscape(r.title), _csvEscape(r.year),
+        _csvEscape(r.media_type||"movie"), _csvEscape(r.status||"watched"),
+        _csvEscape(r.stars||0), _csvEscape(r.comment||""),
+        _csvEscape(r.director||""), _csvEscape(r.composer||""),
+        _csvEscape(r.created_at||"")
+      ].join(","));
+    }
+    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `movie-night-backup-${_todayStr()}.csv`;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+  },
+
+  import() {
+    return new Promise((resolve, reject) => {
+      const input = document.getElementById("backup-import-input");
+      const handler = (e) => {
+        input.removeEventListener("change", handler);
+        const file = e.target.files[0];
+        if (!file) return reject(new Error("No file selected"));
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try { resolve(_parseCSV(ev.target.result)); }
+          catch(err) { reject(err); }
+        };
+        reader.readAsText(file, "utf-8");
+        input.value = "";
+      };
+      input.addEventListener("change", handler);
+      input.click();
+    });
+  }
+};
+
+// ── Google Drive provider (Phase 2 — placeholder) ─────────────────────────────
+const BackupDrive = {
+  async export(_rows) { showToast("Google Drive — coming soon"); },
+  async import() { showToast("Google Drive — coming soon"); }
+};
+
+// ── Public backup actions ──────────────────────────────────────────────────────
+async function backupExportCSV() {
+  const btn = event?.currentTarget;
+  if (btn) { btn.textContent = "Exporting…"; btn.disabled = true; }
+  try {
+    const rows = await getBackupData();
+    if (!rows.length) { showToast("Nothing to export yet"); return; }
+    BackupLocal.export(rows);
+    showToast(`✓ Exported ${rows.length} items`);
+  } catch(e) { showToast("Export failed: " + e.message, true); }
+  finally { if (btn) { btn.textContent = "↓ Export CSV"; btn.disabled = false; } }
+}
+
+async function backupImportCSV() {
+  try {
+    const rows = await BackupLocal.import();
+    if (!rows.length) { showToast("No valid entries found in file", true); return; }
+    const btn = document.querySelector('.btn-backup[onclick="backupImportCSV()"]');
+    if (btn) { btn.textContent = "Importing…"; btn.disabled = true; }
+    try {
+      const { added, skipped } = await applyBackupData(rows);
+      watchHistory = await loadHistoryFromDB();
+      renderHistory();
+      closeAccount();
+      const msg = added > 0
+        ? `✓ Added ${added} item${added!==1?"s":""}${skipped?`, ${skipped} already existed`:""}`
+        : `Nothing new — ${skipped} item${skipped!==1?"s":""} already in your list`;
+      showToast(msg);
+    } finally {
+      if (btn) { btn.textContent = "↑ Import CSV"; btn.disabled = false; }
+    }
+  } catch(e) {
+    if (e.message !== "No file selected") showToast("Import failed: " + e.message, true);
+  }
+}
+
 // ── Feedback ──────────────────────────────────────────────────────────────────
 let _fbType="other";
 function openFeedback() {
@@ -2582,11 +2745,7 @@ function openFeedback() {
   loadFeedbackReplies();
 }
 function setFeedbackUnread(has) {
-  const txt=document.getElementById("feedback-text");
-  if(txt)txt.classList.toggle("unread",!!has);
-}
-function setInboxUnread(has) {
-  const icon=document.getElementById("inbox-icon");
+  const icon=document.getElementById("feedback-icon");
   if(icon)icon.classList.toggle("unread",!!has);
 }
 async function checkFeedbackBadge() {
