@@ -768,9 +768,34 @@ body {
   fill: none;
   flex-shrink: 0;
   transform: translateY(-1px);
+}
+#feedback-text {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1;
+  transition: color 0.2s, text-shadow 0.2s;
+}
+#feedback-text.unread {
+  color: var(--primary);
+  animation: text-glow 1.8s ease-in-out infinite;
+}
+@keyframes text-glow {
+  0%, 100% { text-shadow: 0 0 3px rgba(245,197,24,0.4); }
+  50% { text-shadow: 0 0 9px rgba(245,197,24,0.95); }
+}
+
+/* Inbox tab envelope icon */
+#inbox-icon {
+  width: 13px;
+  height: 13px;
+  display: inline-block;
+  stroke: currentColor;
+  fill: none;
+  vertical-align: middle;
+  transform: translateY(-1px);
   transition: stroke 0.2s;
 }
-#feedback-icon.unread {
+#inbox-icon.unread {
   stroke: var(--primary);
   animation: icon-pulse 1.6s ease-in-out infinite;
 }
@@ -780,7 +805,7 @@ body {
     filter: drop-shadow(0 0 2px rgba(245,197,24,0.5));
   }
   50% {
-    transform: translateY(-1px) scale(1.2);
+    transform: translateY(-1px) scale(1.25);
     filter: drop-shadow(0 0 7px rgba(245,197,24,1));
   }
 }
@@ -1026,7 +1051,7 @@ body {
             <polyline points="2,4 12,13 22,4"/>
           </svg>
         </span>
-        <span style="font-size:12px;color:var(--muted);line-height:1">Feedback</span>
+        <span id="feedback-text">Feedback</span>
       </button>
       <button class="avatar-btn" id="btn-avatar" onclick="openAccount()" title="Account">U</button>
     </div>
@@ -1038,7 +1063,11 @@ body {
     <button class="tab-btn" id="tab-btn-recs" onclick="switchTab('recs')">✨ Picks</button>
     <button class="tab-btn" id="tab-btn-history" onclick="switchTab('history')">📋 My List</button>
     <button class="tab-btn" id="tab-btn-inbox" onclick="switchTab('inbox')">
-      📬 <span id="inbox-badge" class="inbox-badge">0</span>Inbox
+      <svg id="inbox-icon" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="4" width="20" height="16" rx="2"/>
+        <polyline points="2,4 12,13 22,4"/>
+      </svg>
+      <span id="inbox-badge" class="inbox-badge">0</span>Inbox
     </button>
   </div>
 
@@ -2375,6 +2404,7 @@ async function respondInvite(id, status, inv) {
     } else showToast("Recommendation declined");
   } catch(e) { showToast("Error: "+e.message); }
   renderInbox();
+  checkPendingInvites(false);
 }
 
 // ── Notifications ─────────────────────────────────────────────────────────────
@@ -2436,6 +2466,7 @@ async function checkPendingInvites(notify=false) {
     const count=data?.length||0;
     const badge=document.getElementById("inbox-badge");
     if (badge){badge.textContent=count;badge.style.display=count>0?"inline":"none";}
+    setInboxUnread(count>0);
     if (notify&&count>_lastKnownPendingCount) notifyNewInvite(count-_lastKnownPendingCount);
     _lastKnownPendingCount=count;
   } catch(e){}
@@ -2447,6 +2478,7 @@ function startInboxPolling() {
       _lastKnownPendingCount++;notifyNewInvite(1);
       const badge=document.getElementById("inbox-badge");
       if(badge){badge.textContent=_lastKnownPendingCount;badge.style.display="inline";}
+      setInboxUnread(true);
       if(document.getElementById("tab-inbox")?.style.display!=="none")renderInbox();
     }).subscribe();
 
@@ -2550,7 +2582,11 @@ function openFeedback() {
   loadFeedbackReplies();
 }
 function setFeedbackUnread(has) {
-  const icon=document.getElementById("feedback-icon");
+  const txt=document.getElementById("feedback-text");
+  if(txt)txt.classList.toggle("unread",!!has);
+}
+function setInboxUnread(has) {
+  const icon=document.getElementById("inbox-icon");
   if(icon)icon.classList.toggle("unread",!!has);
 }
 async function checkFeedbackBadge() {
