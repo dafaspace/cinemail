@@ -11,6 +11,7 @@
 <meta name="theme-color" content="#0d0d1a">
 <link rel="apple-touch-icon" href="icon.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://accounts.google.com/gsi/client" async></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -883,23 +884,11 @@ body {
   transition: background 0.15s, border-color 0.15s;
 }
 .btn-backup:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); }
-.btn-backup-drive {
-  width: 100%;
-  padding: 9px 12px;
-  border-radius: 9px;
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.08);
-  color: var(--muted);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: not-allowed;
+.btn-backup-drive-action {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  margin-bottom: 20px;
-  opacity: 0.5;
+  gap: 6px;
 }
 
 /* ── Feedback reply card ────────────────────────────────────────────── */
@@ -1265,10 +1254,17 @@ body {
         <button class="btn-backup" onclick="backupImportCSV()">↑ Import CSV</button>
         <input type="file" id="backup-import-input" accept=".csv" style="display:none">
       </div>
-      <button class="btn-backup-drive" disabled title="Coming soon">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        Google Drive — Coming Soon
-      </button>
+      <div class="backup-row">
+        <button class="btn-backup btn-backup-drive-action" id="btn-drive-save" onclick="backupSaveToDrive()">
+          <svg viewBox="0 0 87.3 78" width="13" height="13" style="flex-shrink:0" xmlns="http://www.w3.org/2000/svg"><path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/><path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/><path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/><path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/><path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/><path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 27h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/></svg>
+          Save to Drive
+        </button>
+        <button class="btn-backup btn-backup-drive-action" id="btn-drive-restore" onclick="backupRestoreFromDrive()">
+          <svg viewBox="0 0 87.3 78" width="13" height="13" style="flex-shrink:0" xmlns="http://www.w3.org/2000/svg"><path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/><path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/><path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/><path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/><path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/><path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 27h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/></svg>
+          Restore
+        </button>
+      </div>
+      <div id="drive-backup-meta" style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:14px;min-height:14px"></div>
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" onclick="closeAccount()">Close</button>
         <button class="btn-modal-close" onclick="closeAccount();signOut();" style="color:#f87171;border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.05)">Sign Out</button>
@@ -2567,6 +2563,7 @@ function openAccount() {
   document.getElementById("acc-stat-plan").textContent=plan.length;
   document.getElementById("acc-stat-avg").textContent=avg;
   document.getElementById("account-overlay").style.display="flex";
+  refreshDriveMeta();
 }
 function closeAccount(){document.getElementById("account-overlay").style.display="none";}
 async function saveDisplayName() {
@@ -2725,11 +2722,191 @@ const BackupLocal = {
   }
 };
 
-// ── Google Drive provider (Phase 2 — placeholder) ─────────────────────────────
+// ── Google Drive provider ──────────────────────────────────────────────────────
+const GOOGLE_DRIVE_CLIENT_ID = "404048705413-vrbqa41j92dhth8abenlirdnmh6062dl.apps.googleusercontent.com";
+const _DRIVE_SCOPE     = "https://www.googleapis.com/auth/drive.appdata";
+const _DRIVE_FILENAME  = "movie-night-backup.json";
+const _DRIVE_UPLOAD    = "https://www.googleapis.com/upload/drive/v3/files";
+const _DRIVE_API       = "https://www.googleapis.com/drive/v3/files";
+
 const BackupDrive = {
-  async export(_rows) { showToast("Google Drive — coming soon"); },
-  async import()      { showToast("Google Drive — coming soon"); }
+  _tokenClient: null,
+  _token: null,
+  _tokenExpiry: 0,
+
+  // Lazily init the GIS token client
+  _initClient() {
+    if (this._tokenClient) return;
+    if (typeof google === "undefined" || !google.accounts?.oauth2)
+      throw new Error("Google Identity Services not loaded");
+    this._tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_DRIVE_CLIENT_ID,
+      scope: _DRIVE_SCOPE,
+      callback: () => {}   // overridden per-request
+    });
+  },
+
+  // Get a valid access token (shows popup on first use, silent after)
+  getToken() {
+    return new Promise((resolve, reject) => {
+      // Reuse cached token if still valid (with 60s buffer)
+      if (this._token && Date.now() < this._tokenExpiry - 60_000) {
+        return resolve(this._token);
+      }
+      try { this._initClient(); } catch(e) { return reject(e); }
+      this._tokenClient.callback = (resp) => {
+        if (resp.error) return reject(new Error(resp.error_description || resp.error));
+        this._token = resp.access_token;
+        this._tokenExpiry = Date.now() + resp.expires_in * 1000;
+        resolve(this._token);
+      };
+      // prompt:"" = silent if already authorised; shows popup on first time
+      this._tokenClient.requestAccessToken({ prompt: this._token ? "" : "consent" });
+    });
+  },
+
+  // Authenticated Drive API request
+  async _req(url, opts = {}) {
+    const token = await this.getToken();
+    const res = await fetch(url, {
+      ...opts,
+      headers: { ...opts.headers, Authorization: "Bearer " + token }
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `Drive error ${res.status}`);
+    }
+    return res;
+  },
+
+  // Find backup file in appDataFolder, returns {id, modifiedTime} or null
+  async _findFile() {
+    const res = await this._req(
+      `${_DRIVE_API}?spaces=appDataFolder&q=name%3D'${_DRIVE_FILENAME}'&fields=files(id,modifiedTime)&pageSize=1`
+    );
+    const data = await res.json();
+    return data.files?.[0] || null;
+  },
+
+  // Upload (create or update) the backup JSON
+  async export(rows) {
+    const payload = JSON.stringify({
+      version: 1, app: "movie-night",
+      exported_at: new Date().toISOString(),
+      items: rows
+    });
+    const meta = { name: _DRIVE_FILENAME, parents: ["appDataFolder"] };
+    const existing = await this._findFile();
+
+    const form = new FormData();
+    form.append("metadata", new Blob([JSON.stringify(meta)], { type: "application/json" }));
+    form.append("file",     new Blob([payload],             { type: "application/json" }));
+
+    if (existing) {
+      // PATCH — update content, don't change parents
+      const patchMeta = { name: _DRIVE_FILENAME };
+      const pf = new FormData();
+      pf.append("metadata", new Blob([JSON.stringify(patchMeta)], { type: "application/json" }));
+      pf.append("file",     new Blob([payload],                   { type: "application/json" }));
+      await this._req(`${_DRIVE_UPLOAD}/${existing.id}?uploadType=multipart`, { method: "PATCH", body: pf });
+    } else {
+      await this._req(`${_DRIVE_UPLOAD}?uploadType=multipart`, { method: "POST", body: form });
+    }
+  },
+
+  // Download backup JSON, return items array
+  async import() {
+    const file = await this._findFile();
+    if (!file) throw new Error("no_backup");
+    const res = await this._req(`${_DRIVE_API}/${file.id}?alt=media`);
+    const data = await res.json();
+    const items = Array.isArray(data) ? data : (data.items || []);
+    if (!items.length) throw new Error("empty_backup");
+    return { items, exportedAt: data.exported_at || null };
+  },
+
+  // Get last backup metadata without downloading full file
+  async getLastBackupInfo() {
+    try {
+      const file = await this._findFile();
+      return file ? new Date(file.modifiedTime) : null;
+    } catch(e) { return null; }
+  }
 };
+
+// ── Drive UI helpers ──────────────────────────────────────────────────────────
+function _setDriveMeta(text) {
+  const el = document.getElementById("drive-backup-meta");
+  if (el) el.textContent = text;
+}
+function _setDriveBtns(disabled, saveLabel = "Save to Drive", restoreLabel = "Restore") {
+  const s = document.getElementById("btn-drive-save");
+  const r = document.getElementById("btn-drive-restore");
+  if (s) { s.disabled = disabled; if (saveLabel) s.childNodes[s.childNodes.length - 1].textContent = " " + saveLabel; }
+  if (r) { r.disabled = disabled; if (restoreLabel) r.childNodes[r.childNodes.length - 1].textContent = " " + restoreLabel; }
+}
+
+async function backupSaveToDrive() {
+  if (GOOGLE_DRIVE_CLIENT_ID === "PASTE_YOUR_CLIENT_ID_HERE") {
+    showToast("Add your Google Client ID first", true); return;
+  }
+  _setDriveBtns(true, "Saving…", "Restore");
+  _setDriveMeta("");
+  try {
+    const rows = await getBackupData();
+    if (!rows.length) { showToast("Nothing to export yet"); return; }
+    await BackupDrive.export(rows);
+    const now = new Date();
+    _setDriveMeta(`Last saved: ${now.toLocaleDateString()} ${now.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`);
+    showToast(`✓ Saved ${rows.length} items to Google Drive`);
+  } catch(e) {
+    const msg = e.message === "popup_closed_by_user" ? "Authorization cancelled" : e.message;
+    showToast("Drive save failed: " + msg, true);
+  } finally {
+    _setDriveBtns(false, "Save to Drive", "Restore");
+  }
+}
+
+async function backupRestoreFromDrive() {
+  if (GOOGLE_DRIVE_CLIENT_ID === "PASTE_YOUR_CLIENT_ID_HERE") {
+    showToast("Add your Google Client ID first", true); return;
+  }
+  _setDriveBtns(true, "Save to Drive", "Restoring…");
+  _setDriveMeta("");
+  try {
+    const { items, exportedAt } = await BackupDrive.import();
+    const { added, skipped } = await applyBackupData(items);
+    watchHistory = await loadHistoryFromDB();
+    renderHistory();
+    closeAccount();
+    const dateStr = exportedAt ? ` (backup from ${new Date(exportedAt).toLocaleDateString()})` : "";
+    const msg = added > 0
+      ? `✓ Restored ${added} item${added!==1?"s":""}${skipped ? `, ${skipped} already existed` : ""}${dateStr}`
+      : `Nothing new — all ${skipped} items already in your list`;
+    showToast(msg);
+  } catch(e) {
+    if (e.message === "no_backup")       showToast("No backup found in Google Drive", true);
+    else if (e.message === "empty_backup") showToast("Backup file is empty", true);
+    else if (e.message === "popup_closed_by_user") { /* user cancelled, do nothing */ }
+    else showToast("Drive restore failed: " + e.message, true);
+  } finally {
+    _setDriveBtns(false, "Save to Drive", "Restore");
+  }
+}
+
+// Show last Drive backup date when account panel opens
+async function refreshDriveMeta() {
+  if (GOOGLE_DRIVE_CLIENT_ID === "PASTE_YOUR_CLIENT_ID_HERE") {
+    _setDriveMeta("Add Client ID to enable Google Drive");
+    return;
+  }
+  // Only check if we already have a token (no silent popup)
+  if (!BackupDrive._token || Date.now() >= BackupDrive._tokenExpiry - 60_000) {
+    _setDriveMeta(""); return;
+  }
+  const d = await BackupDrive.getLastBackupInfo();
+  if (d) _setDriveMeta(`Last saved: ${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`);
+}
 
 // ── Public backup actions ──────────────────────────────────────────────────────
 async function backupExportCSV() {
