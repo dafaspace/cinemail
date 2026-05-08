@@ -2594,7 +2594,7 @@ async function getBackupData() {
   return Array.isArray(rows) ? rows : [];
 }
 
-// Core: merge-import rows into Supabase (skip existing by tmdb_id+status)
+// Core: merge-import enriched rows into Supabase (skip existing by tmdb_id+status)
 async function applyBackupData(rows) {
   if (!currentUser || !rows.length) return { added: 0, skipped: 0 };
   const existing = await sbFetch("watchlist?select=imdb_id,status");
@@ -2604,14 +2604,41 @@ async function applyBackupData(rows) {
     if (!r.imdb_id || !r.title) { skipped++; continue; }
     if (existingKeys.has(`${r.imdb_id}|${r.status}`)) { skipped++; continue; }
     await saveEntryToDB({
-      tmdbID: r.imdb_id, title: r.title, year: r.year, poster: r.poster || "",
-      stars: parseInt(r.stars) || 0, comment: r.comment || "",
-      status: r.status || "watched", mediaType: r.media_type || "movie",
-      director: r.director || "", composer: r.composer || ""
+      tmdbID: r.imdb_id, title: r.title, year: r.year,
+      poster: r.poster || "",
+      stars: parseInt(r.stars) || 0,
+      comment: r.comment || "",
+      status: r.status || "watched",
+      mediaType: r.media_type || "movie",
+      director: r.director || "",
+      composer: r.composer || ""
     });
     added++;
   }
   return { added, skipped };
+}
+
+// Enrich rows with fresh data from TMDB (poster, canonical title/year)
+// Preserves user data (stars, comment, status) — only fills in media metadata
+async function _enrichFromTMDB(rows, onProgress) {
+  const enriched = [];
+  for (let i = 0; i < rows.length; i++) {
+    onProgress?.(i + 1, rows.length);
+    const r = { ...rows[i] };
+    if (r.imdb_id) {
+      const type = r.media_type === "tv" ? "tv" : "movie";
+      try {
+        const detail = await tmdbFetch(`/${type}/${r.imdb_id}?language=en-US`);
+        if (detail && !detail.status_code) {
+          r.poster   = detail.poster_path ? TMDB_IMG + detail.poster_path : r.poster || "";
+          r.title    = (type === "tv" ? detail.name : detail.title) || r.title;
+          r.year     = ((type === "tv" ? detail.first_air_date : detail.release_date) || "").slice(0, 4) || r.year;
+        }
+      } catch(e) { /* keep original values on network error */ }
+    }
+    enriched.push(r);
+  }
+  return enriched;
 }
 
 // CSV helpers
@@ -2637,11 +2664,16 @@ function _parseCSV(text) {
     const obj = {};
     headers.forEach((h, i) => obj[h] = (vals[i]||"").replace(/^"|"$/g,"").trim());
     return {
-      imdb_id: obj.tmdb_id || "",   title: obj.title || "",
-      year: obj.year || "",          media_type: obj.type || "movie",
-      status: obj.status || "watched", stars: parseInt(obj.rating) || 0,
-      comment: obj.comment || "",   director: obj.director || "",
-      composer: obj.composer || "", poster: ""
+      imdb_id:    obj.tmdb_id    || "",
+      title:      obj.title      || "",
+      year:       obj.year       || "",
+      media_type: obj.type       || "movie",
+      status:     obj.status     || "watched",
+      stars:      parseInt(obj.rating) || 0,
+      comment:    obj.comment    || "",
+      director:   obj.director   || "",
+      composer:   obj.composer   || "",
+      poster:     obj.poster     || ""   // fallback if TMDB call fails
     };
   }).filter(r => r.imdb_id && r.title);
 }
@@ -2651,14 +2683,16 @@ function _todayStr() { return new Date().toISOString().slice(0,10); }
 // ── Local file provider ────────────────────────────────────────────────────────
 const BackupLocal = {
   export(rows) {
-    const cols = ["tmdb_id","title","year","type","status","rating","comment","director","composer","added_at"];
+    // Include poster URL so it works as a fallback if TMDB is unavailable on import
+    const cols = ["tmdb_id","title","year","type","status","rating","comment","director","composer","poster","added_at"];
     const lines = [cols.join(",")];
     for (const r of rows) {
       lines.push([
-        _csvEscape(r.imdb_id), _csvEscape(r.title), _csvEscape(r.year),
-        _csvEscape(r.media_type||"movie"), _csvEscape(r.status||"watched"),
-        _csvEscape(r.stars||0), _csvEscape(r.comment||""),
-        _csvEscape(r.director||""), _csvEscape(r.composer||""),
+        _csvEscape(r.imdb_id),          _csvEscape(r.title),
+        _csvEscape(r.year),              _csvEscape(r.media_type||"movie"),
+        _csvEscape(r.status||"watched"), _csvEscape(r.stars||0),
+        _csvEscape(r.comment||""),       _csvEscape(r.director||""),
+        _csvEscape(r.composer||""),      _csvEscape(r.poster||""),
         _csvEscape(r.created_at||"")
       ].join(","));
     }
@@ -2694,7 +2728,7 @@ const BackupLocal = {
 // ── Google Drive provider (Phase 2 — placeholder) ─────────────────────────────
 const BackupDrive = {
   async export(_rows) { showToast("Google Drive — coming soon"); },
-  async import() { showToast("Google Drive — coming soon"); }
+  async import()      { showToast("Google Drive — coming soon"); }
 };
 
 // ── Public backup actions ──────────────────────────────────────────────────────
@@ -2711,25 +2745,32 @@ async function backupExportCSV() {
 }
 
 async function backupImportCSV() {
+  const importBtn = document.querySelector('.btn-backup[onclick="backupImportCSV()"]');
   try {
     const rows = await BackupLocal.import();
     if (!rows.length) { showToast("No valid entries found in file", true); return; }
-    const btn = document.querySelector('.btn-backup[onclick="backupImportCSV()"]');
-    if (btn) { btn.textContent = "Importing…"; btn.disabled = true; }
-    try {
-      const { added, skipped } = await applyBackupData(rows);
-      watchHistory = await loadHistoryFromDB();
-      renderHistory();
-      closeAccount();
-      const msg = added > 0
-        ? `✓ Added ${added} item${added!==1?"s":""}${skipped?`, ${skipped} already existed`:""}`
-        : `Nothing new — ${skipped} item${skipped!==1?"s":""} already in your list`;
-      showToast(msg);
-    } finally {
-      if (btn) { btn.textContent = "↑ Import CSV"; btn.disabled = false; }
-    }
+
+    // Step 1: enrich with TMDB (poster + canonical data), show progress
+    const setLabel = (txt) => { if (importBtn) { importBtn.textContent = txt; importBtn.disabled = true; } };
+    setLabel(`Fetching 1/${rows.length}…`);
+    const enriched = await _enrichFromTMDB(rows, (done, total) => setLabel(`Fetching ${done}/${total}…`));
+
+    // Step 2: save to Supabase
+    setLabel("Saving…");
+    const { added, skipped } = await applyBackupData(enriched);
+
+    watchHistory = await loadHistoryFromDB();
+    renderHistory();
+    closeAccount();
+
+    const msg = added > 0
+      ? `✓ Imported ${added} item${added!==1?"s":""}${skipped ? `, ${skipped} already existed` : ""}`
+      : `Nothing new — ${skipped} item${skipped!==1?"s":""} already in your list`;
+    showToast(msg);
   } catch(e) {
     if (e.message !== "No file selected") showToast("Import failed: " + e.message, true);
+  } finally {
+    if (importBtn) { importBtn.textContent = "↑ Import CSV"; importBtn.disabled = false; }
   }
 }
 
