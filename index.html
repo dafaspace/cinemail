@@ -1196,8 +1196,8 @@ body {
   <div id="tab-history" class="tab-panel" style="display:none">
     <div class="filter-row">
       <button class="filter-pill active" id="pill-all" onclick="setFilter('all')">All</button>
-      <button class="filter-pill" id="pill-plan" onclick="setFilter('plan')">🕐 Watchlist</button>
-      <button class="filter-pill" id="pill-watched" onclick="setFilter('watched')">✓ Watched</button>
+      <button class="filter-pill" id="pill-plan" onclick="setFilter('plan')">🕐 To Watch</button>
+      <button class="filter-pill" id="pill-watched" onclick="setFilter('watched')">✅ Seen</button>
     </div>
     <div id="history-list"></div>
   </div>
@@ -1321,11 +1321,11 @@ body {
       <div class="acc-stats">
         <div style="text-align:center">
           <div class="acc-stat-val" id="acc-stat-watched">0</div>
-          <div class="acc-stat-lbl">Watched</div>
+          <div class="acc-stat-lbl">Seen</div>
         </div>
         <div style="text-align:center">
           <div class="acc-stat-val" style="color:#aaa" id="acc-stat-plan">0</div>
-          <div class="acc-stat-lbl">Watchlist</div>
+          <div class="acc-stat-lbl">To Watch</div>
         </div>
         <div style="text-align:center">
           <div class="acc-stat-val" id="acc-stat-avg">0.0</div>
@@ -1856,15 +1856,15 @@ function movieCardHTML(m, why) {
   const key = regMovie(m);
   let actionBtns = "";
   if (status === "watched") {
-    actionBtns = `<span class="badge-watched">✓ Watched</span>`;
+    actionBtns = `<span class="badge-watched">✅ Seen</span>`;
   } else if (status === "plan") {
     actionBtns = `
-      <span class="badge-plan" style="margin-bottom:2px">🕐 Watchlist</span>
-      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">✓ Watched</button>`;
+      <span class="badge-plan" style="margin-bottom:2px">🕐 To Watch</span>
+      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">✅ Seen</button>`;
   } else {
     actionBtns = `
-      <button class="btn-watchlist" onclick="openAdd(_movieRegistry['${key}'],'plan')">+ Watchlist</button>
-      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">✓ Watched</button>`;
+      <button class="btn-watchlist" onclick="openAdd(_movieRegistry['${key}'],'plan')">→ List</button>
+      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">✅ Seen</button>`;
   }
   const topRadius = why ? "12px 12px 0 0" : "12px";
   const idVal = m.tmdbID || m.id;
@@ -1951,13 +1951,13 @@ async function openDetail(id, type) {
 
     let actionBtns = `<button class="btn-modal-close" onclick="closeDetail()">Close</button>`;
     if (status === "watched") {
-      actionBtns += `<div class="already-badge">✓ Already watched</div>`;
+      actionBtns += `<div class="already-badge">✅ Seen</div>`;
     } else if (status === "plan") {
-      actionBtns += `<div class="already-badge" style="color:#888">🕐 In your watchlist</div>`;
-      actionBtns += `<button class="btn-modal-add-watched" onclick="openAdd(window._detailMovie,'watched')">✓ Watched</button>`;
+      actionBtns += `<div class="already-badge" style="color:#888">🕐 To Watch</div>`;
+      actionBtns += `<button class="btn-modal-add-watched" onclick="openAdd(window._detailMovie,'watched')">✅ Mark Seen</button>`;
     } else {
-      actionBtns += `<button class="btn-modal-plan" onclick="openAdd(window._detailMovie,'plan')">+ Watchlist</button>`;
-      actionBtns += `<button class="btn-modal-add-watched" onclick="openAdd(window._detailMovie,'watched')">✓ Watched</button>`;
+      actionBtns += `<button class="btn-modal-plan" onclick="openAdd(window._detailMovie,'plan')">→ List</button>`;
+      actionBtns += `<button class="btn-modal-add-watched" onclick="openAdd(window._detailMovie,'watched')">✅ Mark Seen</button>`;
     }
 
     document.getElementById("detail-content").innerHTML = `
@@ -2096,7 +2096,7 @@ function openAdd(movie, status) {
   if (typeof movie === "string") movie = JSON.parse(decodeURIComponent(movie));
   currentAddMovie = movie; currentAddStatus = status || "watched"; currentStars = 0;
   document.getElementById("add-movie-title").textContent = `${movie.Title} (${movie.Year})`;
-  document.getElementById("add-modal-label").textContent = status === "plan" ? "ADD TO WATCHLIST" : "ADD TO HISTORY";
+  document.getElementById("add-modal-label").textContent = status === "plan" ? "ADD TO LIST" : "MARK AS SEEN";
   document.getElementById("add-stars-section").style.display = status === "plan" ? "none" : "block";
   document.getElementById("add-note").value = "";
   renderStars(0);
@@ -2188,7 +2188,7 @@ function renderHistory() {
     return;
   }
   if (!filtered.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔍</div><div class="empty-state-title">Nothing Here Yet</div><p>${historyFilter === "watched" ? "Mark films as watched" : "Add films to your watchlist"}</p></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔍</div><div class="empty-state-title">Nothing Here Yet</div><p>${historyFilter === "watched" ? "Mark films as seen" : "Save films to your list"}</p></div>`;
     return;
   }
   const watched = watchHistory.filter(h => h.status === "watched");
@@ -2227,7 +2227,7 @@ function renderHistory() {
 
   el.innerHTML = `
     <div class="history-header">
-      <span>${watched.length} watched · ${plan.length} watchlist</span>
+      <span>${watched.length} seen · ${plan.length} to watch</span>
       <span>Avg: ${avg}</span>
     </div>
     ${collapsibleStatsBlock("directors", "🎬", "Your top directors", topDirectors)}
@@ -2254,7 +2254,7 @@ function renderHistory() {
             </div>
             ${item.status==="watched"
               ?`<div style="display:flex;gap:2px;margin-top:3px">${starsHTML(item.stars)}</div>`
-              :`<span class="status-tag plan">🕐 Watchlist</span>`}
+              :`<span class="status-tag plan">🕐 To Watch</span>`}
             ${item.comment?`<div class="hist-note">"${item.comment}" <span style="color:var(--muted);font-style:normal;font-size:10px">— ${item.date}</span></div>`:""}
           </div>
         </div>`;
@@ -2542,7 +2542,7 @@ function _renderInvCard(inv) {
         </div>
         ${inv.message ? `<div style="color:#aaa;font-size:12px;font-style:italic;margin-top:4px">"${inv.message}"</div>` : ""}
         ${isPending ? `<div style="display:flex;gap:8px;margin-top:8px" onclick="event.stopPropagation()">
-          <button onclick="respondInviteById('${inv.id}','accepted')" style="padding:4px 12px;border-radius:6px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">+ Watchlist</button>
+          <button onclick="respondInviteById('${inv.id}','accepted')" style="padding:4px 12px;border-radius:6px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">→ List</button>
           <button onclick="respondInviteById('${inv.id}','declined')" style="padding:4px 12px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">✕ Decline</button>
         </div>` : ""}
       </div>
@@ -2564,15 +2564,13 @@ function _renderInvThread(inv) {
   return `<div class="inv-thread" onclick="event.stopPropagation()">
     ${msgsHTML}
     <div class="inv-reactions">
-      ${["🔥","👍","😂","🤔"].map(e =>
+      ${["👀","❤️","🔥","🤔"].map(e =>
         `<button class="inv-react-btn" onclick="sendInviteMsg('${inv.id}','${e}','reaction')">${e}</button>`
       ).join("")}
-      <button class="inv-react-btn inv-reply-toggle" onclick="toggleInviteReply('${inv.id}')" title="Reply">✏️</button>
     </div>
-    <div class="inv-reply-row" id="inv-reply-${inv.id}" style="display:none">
+    <div class="inv-reply-row" style="display:flex;margin-top:8px">
       <input type="text" class="inv-reply-input" id="inv-reply-input-${inv.id}"
         placeholder="Reply…" maxlength="200"
-        onfocus="this.parentNode.style.display='flex'"
         onkeydown="if(event.key==='Enter')sendInviteTextReply('${inv.id}')">
       <button class="inv-reply-send" onclick="sendInviteTextReply('${inv.id}')">↑</button>
     </div>
@@ -2651,7 +2649,7 @@ async function respondInvite(id, status, inv) {
       await saveEntryToDB({tmdbID:inv.tmdb_id,title:inv.title,year:inv.year,poster:inv.poster,stars:0,comment:"",status:"plan",mediaType:inv.media_type||"movie"});
       const newHistory = await loadHistoryFromDB();
       if (newHistory.length > 0 || watchHistory.length === 0) watchHistory = newHistory;
-      showToast(`"${inv.title}" added to your watchlist`);
+      showToast(`"${inv.title}" added to your list`);
     } else { showToast("Recommendation declined"); }
   } catch(e) { showToast("Error: " + e.message); }
   renderInboxFromCache();
@@ -2753,7 +2751,7 @@ function startInboxPolling() {
       if(idx>=0){
         const old=_inboxCache.sent[idx], upd=payload.new;
         if(old.status!==upd.status){
-          if(upd.status==="accepted"){playNotificationSound();showToast(`✅ ${upd.to_name||"Someone"} added "${upd.title}" to their watchlist!`);}
+          if(upd.status==="accepted"){playNotificationSound();showToast(`✅ ${upd.to_name||"Someone"} added "${upd.title}" to their list!`);}
           else if(upd.status==="declined") showToast(`❌ "${upd.title}" was declined`);
         }
         const oldLen=(old.messages||[]).length, newLen=(upd.messages||[]).length;
