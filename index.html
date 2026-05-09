@@ -381,6 +381,10 @@ body {
   cursor: pointer;
   transition: all 0.15s;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 .btn-watchlist:hover { border-color: var(--primary); color: var(--primary); }
 .btn-watched:hover { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
@@ -400,7 +404,17 @@ body {
 }
 .btn-share-card:hover { border-color: var(--accent); background: var(--accent-soft); }
 
-.badge-watched { color: var(--primary); font-size: 11px; }
+.badge-watched {
+  display: inline-flex; align-items: center; gap: 3px;
+  background: rgba(245,197,24,0.08);
+  border: 1px solid rgba(245,197,24,0.18);
+  border-radius: 4px;
+  padding: 2px 7px;
+  color: var(--primary);
+  font-size: 10px;
+  font-family: 'Bebas Neue', cursive;
+  letter-spacing: 0.5px;
+}
 .badge-plan { color: #888; font-size: 11px; }
 
 /* ── Why strip ──────────────────────────────────────────────────────── */
@@ -1256,8 +1270,9 @@ body {
 
 <!-- Detail Modal -->
 <div id="detail-overlay" class="overlay" style="display:none" onclick="closeDetail()">
-  <div class="modal" onclick="event.stopPropagation()">
+  <div class="modal" onclick="event.stopPropagation()" style="position:relative">
     <div class="modal-handle"></div>
+    <button onclick="closeDetail()" style="position:absolute;top:10px;right:14px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:4px;z-index:1">×</button>
     <div id="detail-content" class="modal-body"></div>
   </div>
 </div>
@@ -2628,10 +2643,10 @@ function _renderChatDetail(partnerId) {
 }
 
 function _sentStatusHTML(inv) {
-  const to = inv.to_name ? `<span style="color:#888">→ ${inv.to_name}</span>  ` : "";
+  const to = inv.to_name ? `<span style="color:var(--accent-text)">→ ${inv.to_name}</span>  ` : "";
   if (!inv.read_at) return `${to}<span style="color:#555">📤 Sent</span>`;
-  if (inv.status === "accepted") return `${to}<span style="color:#4ade80">✅ Added to list</span>`;
-  if (inv.status === "declined") return `${to}<span style="color:#f87171">❌ Declined</span>`;
+  if (inv.status === "accepted") return `${to}<span style="color:#4ade80">Added to list</span>`;
+  if (inv.status === "declined") return `${to}<span style="color:#f87171">Declined</span>`;
   return `${to}<span style="color:#777">👁 Seen</span>`;
 }
 
