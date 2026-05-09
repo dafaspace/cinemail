@@ -2307,23 +2307,21 @@ function renderHistory() {
         <div class="hist-card ${item.status==='plan'?'plan':''}" onclick="${item.tmdbID?`openDetail('${item.tmdbID}','${item.mediaType||"movie"}')`:''}">
           <div class="hist-poster">${item.poster&&item.poster!=="N/A"?`<img src="${item.poster}" alt="" onerror="this.parentNode.innerHTML='🎬'">`:"🎬"}</div>
           <div style="flex:1;min-width:0">
-            <div class="hist-top">
-              <div style="flex:1;min-width:0">
-                <div class="hist-title">${item.title}</div>
-                <div class="hist-meta">${item.year} · ${item.date}</div>
-              </div>
-              <div style="display:flex;gap:6px;align-items:center;margin-left:8px;flex-shrink:0">
-                ${item.status==="watched"?`<button class="hist-del" onclick="event.stopPropagation();openEdit(${item.id})">✎</button>`:""}
-                <button class="hist-del" onclick="event.stopPropagation();deleteItem(${item.id})">×</button>
-              </div>
-            </div>
+            <div class="hist-title">${item.title}</div>
+            <div class="hist-meta">${item.year} · ${item.date}</div>
             ${item.status==="watched"
               ?`<div style="display:flex;gap:2px;margin-top:3px">${starsHTML(item.stars)}</div>`
               :`<span class="status-tag plan">≡ My List</span>`}
             ${item.comment?`<div class="hist-note">"${item.comment}" <span style="color:var(--muted);font-style:normal;font-size:10px">— ${item.date}</span></div>`:""}
           </div>
-          <div style="display:flex;align-items:center;flex-shrink:0;margin-left:6px">
-            <button onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" class="btn-share-card">↗ Share</button>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;margin-left:8px">
+            <div style="display:flex;gap:6px;align-items:center">
+              ${item.status==="watched"?`<button class="hist-del" onclick="event.stopPropagation();openEdit(${item.id})">✎</button>`:""}
+              <button class="hist-del" onclick="event.stopPropagation();deleteItem(${item.id})">×</button>
+            </div>
+            <div style="flex:1;display:flex;align-items:center;padding-top:4px">
+              <button onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" class="btn-share-card">↗ Share</button>
+            </div>
           </div>
         </div>`;
       }).join("")}
