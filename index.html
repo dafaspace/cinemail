@@ -952,6 +952,47 @@ body {
   cursor: pointer;
 }
 
+/* ── Chat list (per-person view) ────────────────────────────────────── */
+.inv-chat-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 6px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.inv-chat-row:hover { background: rgba(255,255,255,0.05); }
+.inv-chat-row.inv-chat-unread { background: rgba(245,197,24,0.04); border-color: var(--primary-border); }
+.inv-chat-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  color: var(--accent-text);
+  font-family: 'Bebas Neue', cursive;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.inv-chat-back {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 22px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
 /* ── Backup section ─────────────────────────────────────────────────── */
 .backup-row {
   display: flex;
@@ -1196,18 +1237,14 @@ body {
   <div id="tab-history" class="tab-panel" style="display:none">
     <div class="filter-row">
       <button class="filter-pill active" id="pill-all" onclick="setFilter('all')">All</button>
-      <button class="filter-pill" id="pill-plan" onclick="setFilter('plan')">🕐 To Watch</button>
-      <button class="filter-pill" id="pill-watched" onclick="setFilter('watched')">✅ Seen</button>
+      <button class="filter-pill" id="pill-plan" onclick="setFilter('plan')">≡ My List</button>
+      <button class="filter-pill" id="pill-watched" onclick="setFilter('watched')">Watched</button>
     </div>
     <div id="history-list"></div>
   </div>
 
   <!-- ── TAB: Inbox ───────────────────────────────────────────────────── -->
   <div id="tab-inbox" class="tab-panel" style="display:none">
-    <div class="filter-row">
-      <button class="filter-pill active" id="inbox-pill-received" onclick="setInboxSubtab('received')">📥 Received</button>
-      <button class="filter-pill" id="inbox-pill-sent" onclick="setInboxSubtab('sent')">📤 Sent</button>
-    </div>
     <div id="inbox-list"></div>
   </div>
 
@@ -1321,11 +1358,11 @@ body {
       <div class="acc-stats">
         <div style="text-align:center">
           <div class="acc-stat-val" id="acc-stat-watched">0</div>
-          <div class="acc-stat-lbl">Seen</div>
+          <div class="acc-stat-lbl">Watched</div>
         </div>
         <div style="text-align:center">
           <div class="acc-stat-val" style="color:#aaa" id="acc-stat-plan">0</div>
-          <div class="acc-stat-lbl">To Watch</div>
+          <div class="acc-stat-lbl">My List</div>
         </div>
         <div style="text-align:center">
           <div class="acc-stat-val" id="acc-stat-avg">0.0</div>
@@ -1856,15 +1893,15 @@ function movieCardHTML(m, why) {
   const key = regMovie(m);
   let actionBtns = "";
   if (status === "watched") {
-    actionBtns = `<span class="badge-watched">✅ Seen</span>`;
+    actionBtns = `<span class="badge-watched">✓ Watched</span>`;
   } else if (status === "plan") {
     actionBtns = `
-      <span class="badge-plan" style="margin-bottom:2px">🕐 To Watch</span>
-      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">✅ Seen</button>`;
+      <span class="badge-plan" style="margin-bottom:2px">≡ My List</span>
+      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">Watched</button>`;
   } else {
     actionBtns = `
-      <button class="btn-watchlist" onclick="openAdd(_movieRegistry['${key}'],'plan')">→ List</button>
-      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">✅ Seen</button>`;
+      <button class="btn-watchlist" onclick="openAdd(_movieRegistry['${key}'],'plan')">≡ My List</button>
+      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">Watched</button>`;
   }
   const topRadius = why ? "12px 12px 0 0" : "12px";
   const idVal = m.tmdbID || m.id;
@@ -1951,13 +1988,13 @@ async function openDetail(id, type) {
 
     let actionBtns = `<button class="btn-modal-close" onclick="closeDetail()">Close</button>`;
     if (status === "watched") {
-      actionBtns += `<div class="already-badge">✅ Seen</div>`;
+      actionBtns += `<div class="already-badge">✓ Watched</div>`;
     } else if (status === "plan") {
-      actionBtns += `<div class="already-badge" style="color:#888">🕐 To Watch</div>`;
-      actionBtns += `<button class="btn-modal-add-watched" onclick="openAdd(window._detailMovie,'watched')">✅ Mark Seen</button>`;
+      actionBtns += `<div class="already-badge" style="color:#888">≡ My List</div>`;
+      actionBtns += `<button class="btn-modal-add-watched" onclick="openAdd(window._detailMovie,'watched')">Watched</button>`;
     } else {
-      actionBtns += `<button class="btn-modal-plan" onclick="openAdd(window._detailMovie,'plan')">→ List</button>`;
-      actionBtns += `<button class="btn-modal-add-watched" onclick="openAdd(window._detailMovie,'watched')">✅ Mark Seen</button>`;
+      actionBtns += `<button class="btn-modal-plan" onclick="openAdd(window._detailMovie,'plan')">≡ My List</button>`;
+      actionBtns += `<button class="btn-modal-add-watched" onclick="openAdd(window._detailMovie,'watched')">Watched</button>`;
     }
 
     document.getElementById("detail-content").innerHTML = `
@@ -2066,7 +2103,7 @@ async function openPerson(name) {
           const role = r.character || r.job || "";
           let actionBtns = "";
           if (status === "watched") actionBtns = `<span class="badge-watched" style="font-size:10px">✓</span>`;
-          else if (status === "plan") actionBtns = `<span style="color:#666;font-size:10px">🕐</span>`;
+          else if (status === "plan") actionBtns = `<span style="color:#aaa;font-size:12px">≡</span>`;
           else actionBtns = `
             <button class="btn-watchlist" style="font-size:10px;padding:2px 7px" onclick="openAdd(_movieRegistry['${key}'],'plan')">+</button>
             <button class="btn-watched" style="font-size:10px;padding:2px 7px" onclick="openAdd(_movieRegistry['${key}'],'watched')">✓</button>`;
@@ -2254,7 +2291,7 @@ function renderHistory() {
             </div>
             ${item.status==="watched"
               ?`<div style="display:flex;gap:2px;margin-top:3px">${starsHTML(item.stars)}</div>`
-              :`<span class="status-tag plan">🕐 To Watch</span>`}
+              :`<span class="status-tag plan">≡ My List</span>`}
             ${item.comment?`<div class="hist-note">"${item.comment}" <span style="color:var(--muted);font-style:normal;font-size:10px">— ${item.date}</span></div>`:""}
           </div>
         </div>`;
@@ -2471,40 +2508,131 @@ async function markInvitesSeen() {
   } catch(e) { console.warn("[markSeen]", e); }
 }
 
-function setInboxSubtab(subtab) {
-  _inboxSubtab = subtab;
-  document.getElementById("inbox-pill-received")?.classList.toggle("active", subtab === "received");
-  document.getElementById("inbox-pill-sent")?.classList.toggle("active", subtab === "sent");
-  renderInboxFromCache();
-}
-
 function renderInbox() {
   if (_inboxCacheLoaded) { renderInboxFromCache(); return; }
   const el = document.getElementById("inbox-list");
-  el.innerHTML = `<div style="color:var(--muted);text-align:center;padding:30px 0">Loading…</div>`;
+  if (el) el.innerHTML = `<div style="color:var(--muted);text-align:center;padding:30px 0">Loading…</div>`;
   loadInboxCache();
 }
 
 function renderInboxFromCache() {
   const el = document.getElementById("inbox-list");
   if (!el) return;
-  const items = _inboxSubtab === "received" ? _inboxCache.received : _inboxCache.sent;
-  if (!items.length) {
+  if (_chatViewPartnerId) _renderChatDetail(_chatViewPartnerId);
+  else _renderChatList();
+}
+
+// Return the "other person" for an invite (partner = whoever isn't me)
+function _invPartner(inv) {
+  const isSender = inv.from_user_id === currentUser.id;
+  return {
+    id:       isSender ? inv.to_user_id   : inv.from_user_id,
+    name:     isSender ? (inv.to_name   || "?") : (inv.from_name || "?"),
+    isSender
+  };
+}
+
+function openChat(partnerId) {
+  _chatViewPartnerId = partnerId;
+  _expandedInviteId = null;
+  renderInboxFromCache();
+}
+
+function closeChat() {
+  _chatViewPartnerId = null;
+  _expandedInviteId = null;
+  renderInboxFromCache();
+}
+
+function _renderChatList() {
+  const el = document.getElementById("inbox-list");
+  const all = [..._inboxCache.received, ..._inboxCache.sent];
+  if (!all.length) {
     el.innerHTML = `<div class="empty-state">
-      <div class="empty-state-icon">${_inboxSubtab === "received" ? "📬" : "📤"}</div>
-      <div class="empty-state-title">${_inboxSubtab === "received" ? "Your Inbox Is Empty" : "Nothing Sent Yet"}</div>
-      <p>${_inboxSubtab === "received" ? "Share a film from search results or your list" : "Find a film and tap the share icon"}</p>
+      <div class="empty-state-icon">📬</div>
+      <div class="empty-state-title">No Chats Yet</div>
+      <p>Share a film from search results or your list to start a conversation</p>
     </div>`;
     return;
   }
-  el.innerHTML = `<div class="card-list">${items.map(inv => _renderInvCard(inv)).join("")}</div>`;
+
+  // Group by partner
+  const byPartner = {};
+  for (const inv of all) {
+    const p = _invPartner(inv);
+    if (!byPartner[p.id]) byPartner[p.id] = { id: p.id, name: p.name, invites: [] };
+    byPartner[p.id].invites.push(inv);
+  }
+
+  // Sort partners by latest activity
+  const partners = Object.values(byPartner).sort((a, b) => {
+    const latest = arr => Math.max(...arr.map(i => new Date(i.last_msg_at || i.created_at).getTime()));
+    return latest(b.invites) - latest(a.invites);
+  });
+
+  el.innerHTML = partners.map(p => {
+    const pending = p.invites.filter(i => i.to_user_id === currentUser.id && i.status === "pending").length;
+    const unreadMsg = p.invites.some(inv => {
+      const msgs = inv.messages || [];
+      if (!msgs.length) return false;
+      const last = msgs[msgs.length - 1];
+      return last.from !== currentUser.id && (!inv.read_at || new Date(last.at) > new Date(inv.read_at));
+    });
+    const hasUnread = pending > 0 || unreadMsg;
+
+    // Latest activity preview
+    const sorted = [...p.invites].sort((a, b) => new Date(b.last_msg_at || b.created_at) - new Date(a.last_msg_at || a.created_at));
+    const latest = sorted[0];
+    const msgs = latest.messages || [];
+    let preview = "";
+    if (msgs.length) {
+      const lm = msgs[msgs.length - 1];
+      preview = lm.type === "reaction" ? `${lm.text} reaction` : lm.text.slice(0, 50) + (lm.text.length > 50 ? "…" : "");
+    } else {
+      preview = latest.title || "";
+    }
+
+    const count = p.invites.length;
+    const initial = (p.name || "?")[0].toUpperCase();
+
+    return `<div class="inv-chat-row${hasUnread ? " inv-chat-unread" : ""}" onclick="openChat('${p.id}')">
+      <div class="inv-chat-avatar">${initial}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <div style="font-weight:600;font-size:15px">${p.name}</div>
+          <div style="font-size:11px;color:var(--muted);white-space:nowrap">${count} film${count !== 1 ? "s" : ""}${pending ? ` · <span style="color:var(--primary)">${pending} pending</span>` : ""}</div>
+        </div>
+        <div style="font-size:12px;color:${hasUnread ? "var(--text)" : "var(--muted)"};margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(preview)}</div>
+      </div>
+      ${hasUnread ? `<div style="width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-left:4px"></div>` : ""}
+    </div>`;
+  }).join("");
+}
+
+function _renderChatDetail(partnerId) {
+  const el = document.getElementById("inbox-list");
+  const all = [..._inboxCache.received, ..._inboxCache.sent];
+  const invites = all.filter(inv => _invPartner(inv).id === partnerId);
+  if (!invites.length) { closeChat(); return; }
+
+  const partnerName = _invPartner(invites[0]).name;
+  const sorted = [...invites].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;padding:4px 0 14px">
+      <button class="inv-chat-back" onclick="closeChat()">←</button>
+      <div class="inv-chat-avatar" style="width:32px;height:32px;font-size:16px">${partnerName[0].toUpperCase()}</div>
+      <div style="font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:1px">${partnerName}</div>
+    </div>
+    <div class="card-list">${sorted.map(inv => _renderInvCard(inv)).join("")}</div>`;
 }
 
 function _sentStatusHTML(inv) {
-  if (!inv.read_at) return `<span style="color:#555">📤 Sent</span>`;
-  if (inv.status === "accepted") return `<span style="color:#4ade80">✅ Accepted</span>`;
-  if (inv.status === "declined") return `<span style="color:#f87171">❌ Declined</span>`;
-  return `<span style="color:#777">👁 Seen</span>`;
+  const to = inv.to_name ? `<span style="color:#888">→ ${inv.to_name}</span>  ` : "";
+  if (!inv.read_at) return `${to}<span style="color:#555">📤 Sent</span>`;
+  if (inv.status === "accepted") return `${to}<span style="color:#4ade80">✅ Added to list</span>`;
+  if (inv.status === "declined") return `${to}<span style="color:#f87171">❌ Declined</span>`;
+  return `${to}<span style="color:#777">👁 Seen</span>`;
 }
 
 function _renderInvCard(inv) {
@@ -2542,7 +2670,7 @@ function _renderInvCard(inv) {
         </div>
         ${inv.message ? `<div style="color:#aaa;font-size:12px;font-style:italic;margin-top:4px">"${inv.message}"</div>` : ""}
         ${isPending ? `<div style="display:flex;gap:8px;margin-top:8px" onclick="event.stopPropagation()">
-          <button onclick="respondInviteById('${inv.id}','accepted')" style="padding:4px 12px;border-radius:6px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">→ List</button>
+          <button onclick="respondInviteById('${inv.id}','accepted')" style="padding:4px 12px;border-radius:6px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">≡ My List</button>
           <button onclick="respondInviteById('${inv.id}','declined')" style="padding:4px 12px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">✕ Decline</button>
         </div>` : ""}
       </div>
@@ -2659,7 +2787,7 @@ async function respondInvite(id, status, inv) {
 let _lastKnownPendingCount = 0, _realtimeChannel = null, _sentRealtimeChannel = null, _feedbackChannel = null, _audioCtx = null, _feedbackPollTimer = null;
 let _inboxCache = { received: [], sent: [] };
 let _inboxCacheLoaded = false;
-let _inboxSubtab = "received";
+let _chatViewPartnerId = null;
 let _expandedInviteId = null;
 let _lastFeedbackPollTime = new Date(0).toISOString();
 
@@ -2734,13 +2862,13 @@ function startInboxPolling() {
       _inboxCache.received.unshift(payload.new);
       _updateInboxBadge();
       notifyNewInvite(1);
-      if(document.getElementById("tab-inbox")?.style.display!=="none"&&_inboxSubtab==="received") renderInboxFromCache();
+      if(document.getElementById("tab-inbox")?.style.display!=="none") renderInboxFromCache();
     })
     .on("postgres_changes",{event:"UPDATE",schema:"public",table:"invites",filter:`to_user_id=eq.${uid}`},(payload)=>{
       const idx=_inboxCache.received.findIndex(i=>i.id===payload.new.id);
       if(idx>=0) _inboxCache.received[idx]={..._inboxCache.received[idx],...payload.new};
       _updateInboxBadge();
-      if(document.getElementById("tab-inbox")?.style.display!=="none"&&_inboxSubtab==="received") renderInboxFromCache();
+      if(document.getElementById("tab-inbox")?.style.display!=="none") renderInboxFromCache();
     })
     .subscribe();
 
@@ -2751,7 +2879,7 @@ function startInboxPolling() {
       if(idx>=0){
         const old=_inboxCache.sent[idx], upd=payload.new;
         if(old.status!==upd.status){
-          if(upd.status==="accepted"){playNotificationSound();showToast(`✅ ${upd.to_name||"Someone"} added "${upd.title}" to their list!`);}
+          if(upd.status==="accepted"){playNotificationSound();showToast(`${upd.to_name||"Someone"} added "${upd.title}" to their list!`);}
           else if(upd.status==="declined") showToast(`❌ "${upd.title}" was declined`);
         }
         const oldLen=(old.messages||[]).length, newLen=(upd.messages||[]).length;
@@ -2762,7 +2890,7 @@ function startInboxPolling() {
         _inboxCache.sent[idx]={...old,...upd};
       }
       _updateInboxBadge();
-      if(document.getElementById("tab-inbox")?.style.display!=="none"&&_inboxSubtab==="sent") renderInboxFromCache();
+      if(document.getElementById("tab-inbox")?.style.display!=="none") renderInboxFromCache();
     })
     .subscribe();
 
