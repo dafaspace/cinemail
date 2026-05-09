@@ -1023,6 +1023,40 @@ body {
   align-items: center;
 }
 
+/* ── Friends ────────────────────────────────────────────────────────── */
+.friend-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.friend-row:last-child { border-bottom: none; }
+.friend-avatar-sm {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  color: var(--accent-text);
+  font-family: 'Bebas Neue', cursive;
+  font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.friend-pick-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-bottom: 3px;
+}
+.friend-pick-row:hover { background: rgba(255,255,255,0.04); }
+.friend-pick-row.selected { background: var(--accent-soft); border-color: var(--accent-border); }
+
 /* ── Backup section ─────────────────────────────────────────────────── */
 .backup-row {
   display: flex;
@@ -1357,16 +1391,8 @@ body {
     <div class="modal-sheet" style="border-color:var(--accent-border)" onclick="event.stopPropagation()">
       <div class="sheet-label" style="color:var(--accent-text)">RECOMMEND A FILM</div>
       <div class="sheet-title" id="share-movie-title"></div>
-      <div class="add-label">Send to (search by name)</div>
-      <div style="position:relative;margin-bottom:10px">
-        <input id="share-search" type="text" placeholder="Enter exact name…"
-          style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;padding:10px 14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s"
-          oninput="searchUsers(this.value)"
-          onfocus="this.style.borderColor='var(--accent-border)'"
-          onblur="this.style.borderColor='var(--border)'">
-        <div id="share-user-results" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-top:4px;z-index:10;max-height:150px;overflow-y:auto"></div>
-      </div>
-      <div id="share-to-display" style="display:none;padding:8px 12px;background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:8px;margin-bottom:10px;font-size:13px;color:var(--accent-text)"></div>
+      <div class="add-label">Send to</div>
+      <div id="share-friends-list" style="margin-bottom:12px;max-height:170px;overflow-y:auto"></div>
       <div class="add-label">Message (optional)</div>
       <textarea id="share-message" placeholder="Why you'd love this…" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:55px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--accent-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       <div style="display:flex;gap:9px">
@@ -1425,6 +1451,19 @@ body {
         </button>
       </div>
       <div id="drive-backup-meta" style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:14px;min-height:14px"></div>
+
+      <div class="add-label" style="margin-top:4px">Friends</div>
+      <div id="friends-section" style="margin-bottom:10px;min-height:20px"></div>
+      <div style="position:relative;display:flex;gap:8px;margin-bottom:16px">
+        <input type="text" id="friend-add-input" placeholder="Search by name to add…"
+          style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:13px;padding:8px 12px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s"
+          oninput="searchFriendUsers(this.value)"
+          onfocus="this.style.borderColor='var(--accent-border)'"
+          onblur="this.style.borderColor='var(--border)'">
+        <button onclick="sendFriendRequest()" class="btn-modal-save" style="flex:none;padding:8px 16px;font-size:13px">Add</button>
+        <div id="friend-search-results" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:70px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;z-index:10;max-height:130px;overflow-y:auto"></div>
+      </div>
+
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" onclick="closeAccount()">Close</button>
         <button class="btn-modal-close" onclick="closeAccount();signOut();" style="color:#f87171;border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.05)">Sign Out</button>
@@ -1571,6 +1610,7 @@ async function onSignedIn(user) {
   } catch(e) { console.warn("[profile]", e.message); }
   initUI(); // Update again if DB name differs from metadata
   loadInboxCache(); // non-blocking — cache ready before user opens Inbox
+  loadFriendsCache(); // non-blocking
   await checkFeedbackBadge();
   startInboxPolling();
 }
@@ -2443,53 +2483,234 @@ async function loadRecs() {
 
 // ── Share ─────────────────────────────────────────────────────────────────────
 let currentShareMovie = null;
+// ── Friends ───────────────────────────────────────────────────────────────────
+let _friendsCache = [];         // accepted friendships
+let _friendRequestsCache = [];  // pending incoming requests
+let _friendAddTarget = null;    // { id, name } — selected user to add as friend
+
+function _friendInfo(f) {
+  const isSender = f.user_id === currentUser.id;
+  return {
+    id:   isSender ? f.friend_id : f.user_id,
+    name: isSender ? (f.friend_name || "?") : (f.user_name || "?"),
+    fid:  f.id
+  };
+}
+
+async function loadFriendsCache() {
+  if (!currentUser) return;
+  try {
+    const { data } = await sbClient.from("friendships")
+      .select("*")
+      .or(`user_id.eq.${currentUser.id},friend_id.eq.${currentUser.id}`)
+      .order("created_at", { ascending: false });
+    const all = data || [];
+    _friendsCache = all.filter(f => f.status === "accepted");
+    _friendRequestsCache = all.filter(f => f.status === "pending" && f.friend_id === currentUser.id);
+    _updateFriendsBadge();
+  } catch(e) { console.warn("[friends]", e.message); }
+}
+
+function _updateFriendsBadge() {
+  // Show count of pending requests on Account avatar
+  const count = _friendRequestsCache.length;
+  const btn = document.getElementById("btn-avatar");
+  if (btn) {
+    const existing = btn.querySelector(".friend-req-badge");
+    if (count > 0) {
+      if (!existing) {
+        const b = document.createElement("span");
+        b.className = "friend-req-badge";
+        b.style.cssText = "position:absolute;top:-4px;right:-4px;background:var(--accent);color:#fff;border-radius:8px;min-width:14px;height:14px;font-size:9px;font-weight:700;line-height:14px;text-align:center;padding:0 3px;pointer-events:none";
+        b.textContent = count;
+        btn.style.position = "relative";
+        btn.appendChild(b);
+      } else { existing.textContent = count; }
+    } else if (existing) { existing.remove(); }
+  }
+}
+
+function renderFriendsSection() {
+  const el = document.getElementById("friends-section");
+  if (!el) return;
+  let html = "";
+
+  // Pending incoming requests
+  if (_friendRequestsCache.length) {
+    html += `<div style="margin-bottom:8px">`;
+    for (const f of _friendRequestsCache) {
+      const name = f.user_name || "?";
+      const init = name[0].toUpperCase();
+      html += `<div class="friend-row">
+        <div class="friend-avatar-sm">${init}</div>
+        <div style="flex:1;font-size:13px">${name} <span style="color:var(--muted);font-size:11px">wants to be friends</span></div>
+        <button onclick="respondFriendRequest('${f.id}','accepted')" style="background:var(--accent);border:none;color:#fff;border-radius:6px;padding:4px 10px;font-size:11px;font-family:'Bebas Neue',cursive;letter-spacing:1px;cursor:pointer">Accept</button>
+        <button onclick="respondFriendRequest('${f.id}','declined')" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#666;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;margin-left:4px">✕</button>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  // Accepted friends
+  if (_friendsCache.length) {
+    for (const f of _friendsCache) {
+      const { id, name, fid } = _friendInfo(f);
+      const init = name[0].toUpperCase();
+      html += `<div class="friend-row">
+        <div class="friend-avatar-sm">${init}</div>
+        <div style="flex:1;font-size:13px">${name}</div>
+        <button onclick="deleteFriend('${fid}')" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;padding:0 4px" title="Remove">×</button>
+      </div>`;
+    }
+  }
+
+  if (!html) {
+    html = `<div style="color:var(--muted);font-size:12px;padding:4px 0">No friends yet — search by name to add someone</div>`;
+  }
+  el.innerHTML = html;
+}
+
+async function searchFriendUsers(q) {
+  const el = document.getElementById("friend-search-results");
+  _friendAddTarget = null;
+  if (!q.trim() || q.length < 2) { el.style.display = "none"; return; }
+  el.innerHTML = `<div style="padding:8px 12px;color:var(--muted);font-size:12px">Searching…</div>`;
+  el.style.display = "block";
+  try {
+    const { data, error } = await sbClient.rpc("search_profiles", { search_query: q, exclude_id: currentUser.id });
+    if (error) throw new Error(error.message);
+    if (!data || !data.length) {
+      el.innerHTML = `<div style="padding:8px 12px;color:var(--muted);font-size:12px">Not found</div>`; return;
+    }
+    el.innerHTML = data.map(u => {
+      const safe = (u.display_name || "").replace(/'/g, "\\'");
+      return `<div onclick="selectFriendToAdd('${u.id}','${safe}')"
+        style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border)"
+        onmouseover="this.style.background='rgba(255,255,255,0.05)'"
+        onmouseout="this.style.background='none'">${u.display_name}</div>`;
+    }).join("");
+  } catch(e) { el.innerHTML = `<div style="padding:8px 12px;color:#f87171;font-size:12px">⚠ ${e.message}</div>`; }
+}
+
+function selectFriendToAdd(id, name) {
+  _friendAddTarget = { id, name };
+  const inp = document.getElementById("friend-add-input");
+  if (inp) inp.value = name;
+  const el = document.getElementById("friend-search-results");
+  if (el) el.style.display = "none";
+}
+
+async function sendFriendRequest() {
+  if (!_friendAddTarget) { showToast("Search and select someone first"); return; }
+  const { id, name } = _friendAddTarget;
+  // Check if already friends or pending
+  const all = [..._friendsCache, ..._friendRequestsCache];
+  const exists = all.some(f => f.user_id === id || f.friend_id === id);
+  if (exists) { showToast("Already friends or request pending"); return; }
+  try {
+    const { error } = await sbClient.from("friendships").insert({
+      user_id:     currentUser.id,
+      friend_id:   id,
+      user_name:   currentUser.displayName || currentUser.email?.split("@")[0] || "someone",
+      friend_name: name,
+      status:      "pending"
+    });
+    if (error) throw new Error(error.message);
+    showToast(`Friend request sent to ${name}`);
+    _friendAddTarget = null;
+    const inp = document.getElementById("friend-add-input");
+    if (inp) inp.value = "";
+  } catch(e) { showToast("Error: " + e.message); }
+}
+
+async function respondFriendRequest(fid, status) {
+  try {
+    const { error } = await sbClient.from("friendships").update({ status }).eq("id", fid);
+    if (error) throw new Error(error.message);
+    if (status === "accepted") {
+      const f = _friendRequestsCache.find(r => r.id === fid);
+      if (f) { _friendsCache.unshift({ ...f, status: "accepted" }); }
+      showToast("Friend added!");
+    } else {
+      showToast("Request declined");
+    }
+    _friendRequestsCache = _friendRequestsCache.filter(r => r.id !== fid);
+    _updateFriendsBadge();
+    renderFriendsSection();
+  } catch(e) { showToast("Error: " + e.message); }
+}
+
+async function deleteFriend(fid) {
+  try {
+    await sbClient.from("friendships").delete().eq("id", fid);
+    _friendsCache = _friendsCache.filter(f => f.id !== fid);
+    renderFriendsSection();
+  } catch(e) { showToast("Error: " + e.message); }
+}
+
+// ── Share ─────────────────────────────────────────────────────────────────────
 let currentShareToUser = null;
+
 function openShare(movie) {
   currentShareMovie = movie; currentShareToUser = null;
   document.getElementById("share-movie-title").textContent = `${movie.Title} (${movie.Year})`;
   document.getElementById("share-message").value = "";
-  document.getElementById("share-search").value = "";
-  document.getElementById("share-user-results").style.display = "none";
-  document.getElementById("share-to-display").style.display = "none";
+  _renderShareFriendsList();
   document.getElementById("share-overlay").style.display = "flex";
 }
 function closeShare() { document.getElementById("share-overlay").style.display = "none"; }
-async function searchUsers(q) {
-  const el = document.getElementById("share-user-results");
-  if (!q.trim()||q.length<2) { el.style.display="none"; return; }
-  el.innerHTML=`<div style="padding:10px 12px;color:var(--muted);font-size:13px">Searching…</div>`; el.style.display="block";
-  try {
-    const { data, error } = await sbClient.rpc("search_profiles",{search_query:q,exclude_id:currentUser.id});
-    if (error) throw new Error(error.message);
-    if (!data||!data.length) { el.innerHTML=`<div style="padding:10px 12px;color:var(--muted);font-size:13px">Not found — enter exact name</div>`; return; }
-    el.innerHTML=data.map(u=>{const safeName=(u.display_name||"").replace(/\\/g,"\\\\").replace(/'/g,"\\'");return`<div onclick="selectUser('${u.id}','${safeName}')" style="padding:10px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border)" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">${u.display_name}</div>`;}).join("");
-  } catch(e) { el.innerHTML=`<div style="padding:10px 12px;color:#f87171;font-size:12px">⚠ ${e.message}</div>`; }
+
+function _renderShareFriendsList() {
+  const el = document.getElementById("share-friends-list");
+  if (!el) return;
+  if (!_friendsCache.length) {
+    el.innerHTML = `<div style="color:var(--muted);font-size:12px;padding:4px 0">Add friends in Account to share films with them</div>`;
+    return;
+  }
+  el.innerHTML = _friendsCache.map(f => {
+    const { id, name } = _friendInfo(f);
+    const init = name[0].toUpperCase();
+    const sel = currentShareToUser?.id === id;
+    return `<div class="friend-pick-row${sel ? " selected" : ""}" onclick="selectFriendForShare('${id}','${name.replace(/'/g,"\\'")}')">
+      <div class="friend-avatar-sm" style="${sel ? "background:var(--accent-soft);border-color:var(--accent)" : ""}">${init}</div>
+      <div style="flex:1;font-size:14px">${name}</div>
+      ${sel ? `<span style="color:var(--accent-text);font-size:13px">✓</span>` : ""}
+    </div>`;
+  }).join("");
 }
-function selectUser(id, name) {
-  currentShareToUser={id,name};
-  document.getElementById("share-search").value=name;
-  document.getElementById("share-user-results").style.display="none";
-  const disp=document.getElementById("share-to-display");
-  disp.textContent=`→ Sending to ${name}`; disp.style.display="block";
+
+function selectFriendForShare(id, name) {
+  currentShareToUser = { id, name };
+  _renderShareFriendsList();
 }
+
 async function confirmShare() {
-  if (!currentShareToUser) { showToast("Select a user first"); return; }
+  if (!currentShareToUser) { showToast("Select a friend first"); return; }
   const m = currentShareMovie;
   const btn = document.getElementById("share-confirm-btn");
-  btn.textContent="Sending…"; btn.disabled=true;
+  btn.textContent = "Sending…"; btn.disabled = true;
   try {
-    const {error}=await sbClient.from("invites").insert({
-      from_user_id:currentUser.id, to_user_id:currentShareToUser.id,
-      tmdb_id:String(m.tmdbID||m.id||""), title:m.Title||"", year:m.Year||"",
-      poster:m.Poster||"", media_type:m.type||m.mediaType||"movie",
-      message:document.getElementById("share-message").value||null, status:"pending",
-      from_name:currentUser.displayName||currentUser.email?.split("@")[0]||"someone",
-      to_name:currentShareToUser.name||""
+    const { error } = await sbClient.from("invites").insert({
+      from_user_id: currentUser.id,
+      to_user_id:   currentShareToUser.id,
+      tmdb_id:      String(m.tmdbID || m.id || ""),
+      title:        m.Title || "", year: m.Year || "",
+      poster:       m.Poster || "", media_type: m.type || m.mediaType || "movie",
+      message:      document.getElementById("share-message").value || null,
+      status:       "pending",
+      from_name:    currentUser.displayName || currentUser.email?.split("@")[0] || "someone",
+      to_name:      currentShareToUser.name || ""
     });
     if (error) throw new Error(error.message);
+    // Update inbox cache optimistically
+    const newInv = { id: crypto.randomUUID(), from_user_id: currentUser.id, to_user_id: currentShareToUser.id,
+      title: m.Title, year: m.Year, poster: m.Poster, media_type: m.type || m.mediaType || "movie",
+      status: "pending", from_name: currentUser.displayName, to_name: currentShareToUser.name,
+      messages: [], created_at: new Date().toISOString() };
+    _inboxCache.sent.unshift(newInv);
     closeShare(); showToast(`Sent to ${currentShareToUser.name} 🎬`);
-  } catch(e) { showToast("Could not send: "+e.message); }
-  btn.textContent="Send"; btn.disabled=false;
+  } catch(e) { showToast("Could not send: " + e.message); }
+  btn.textContent = "Send"; btn.disabled = false;
 }
 
 // ── Inbox ─────────────────────────────────────────────────────────────────────
@@ -2848,7 +3069,7 @@ async function respondInvite(id, status, inv) {
 }
 
 // ── Notifications ─────────────────────────────────────────────────────────────
-let _lastKnownPendingCount = 0, _realtimeChannel = null, _sentRealtimeChannel = null, _feedbackChannel = null, _audioCtx = null, _feedbackPollTimer = null;
+let _lastKnownPendingCount = 0, _realtimeChannel = null, _sentRealtimeChannel = null, _feedbackChannel = null, _friendsChannel = null, _audioCtx = null, _feedbackPollTimer = null;
 let _inboxCache = { received: [], sent: [] };
 let _inboxCacheLoaded = false;
 let _chatViewPartnerId = null;
@@ -2964,6 +3185,24 @@ function startInboxPolling() {
       if(payload.new?.reply&&payload.new?.read_by_user===false) notifyFeedbackReply();
     }).subscribe();
 
+  // Friendships: incoming requests (INSERT where I'm the friend_id)
+  _friendsChannel = sbClient.channel("friends-"+uid)
+    .on("postgres_changes",{event:"INSERT",schema:"public",table:"friendships",filter:`friend_id=eq.${uid}`},(payload)=>{
+      _friendRequestsCache.unshift(payload.new);
+      _updateFriendsBadge();
+      playNotificationSound();
+      showToast(`👋 ${payload.new.user_name||"Someone"} sent you a friend request`);
+    })
+    .on("postgres_changes",{event:"UPDATE",schema:"public",table:"friendships",filter:`user_id=eq.${uid}`},(payload)=>{
+      if(payload.new?.status==="accepted"){
+        const f=payload.new;
+        if(!_friendsCache.find(x=>x.id===f.id)) _friendsCache.unshift(f);
+        _updateFriendsBadge();
+        showToast(`🎉 ${f.friend_name||"Someone"} accepted your friend request`);
+      }
+    })
+    .subscribe();
+
   startFeedbackPolling();
 }
 
@@ -2971,6 +3210,7 @@ function stopInboxPolling() {
   if(_realtimeChannel){sbClient.removeChannel(_realtimeChannel);_realtimeChannel=null;}
   if(_sentRealtimeChannel){sbClient.removeChannel(_sentRealtimeChannel);_sentRealtimeChannel=null;}
   if(_feedbackChannel){sbClient.removeChannel(_feedbackChannel);_feedbackChannel=null;}
+  if(_friendsChannel){sbClient.removeChannel(_friendsChannel);_friendsChannel=null;}
   stopFeedbackPolling();
 }
 function notifyFeedbackReply() {
@@ -3031,6 +3271,7 @@ function openAccount() {
   document.getElementById("acc-stat-avg").textContent=avg;
   document.getElementById("account-overlay").style.display="flex";
   refreshDriveMeta();
+  renderFriendsSection();
 }
 function closeAccount(){document.getElementById("account-overlay").style.display="none";}
 async function saveDisplayName() {
