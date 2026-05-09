@@ -370,10 +370,10 @@ body {
 .card-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; margin-left: 6px; }
 
 .btn-watchlist, .btn-watched {
-  padding: 3px 10px;
+  height: 24px;
+  padding: 0 10px;
   border-radius: 6px;
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.2);
   color: #aaa;
   font-size: 11px;
   font-family: 'Bebas Neue', cursive;
@@ -384,9 +384,14 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  line-height: 1;
 }
-.btn-watchlist:hover { border-color: var(--primary); color: var(--primary); }
+.btn-watchlist {
+  border: 1px solid var(--accent-border);
+}
+.btn-watchlist:hover { border-color: var(--accent); color: var(--accent-text); background: var(--accent-soft); }
+.btn-watched {
+  border: 1px solid var(--primary-border);
+}
 .btn-watched:hover { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
 
 .btn-share-card {
@@ -1919,11 +1924,11 @@ function movieCardHTML(m, why) {
   } else if (status === "plan") {
     actionBtns = `
       <span class="badge-plan" style="margin-bottom:2px">≡ My List</span>
-      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">Watched</button>`;
+      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">✓ Watched</button>`;
   } else {
     actionBtns = `
       <button class="btn-watchlist" onclick="openAdd(_movieRegistry['${key}'],'plan')">≡ My List</button>
-      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">Watched</button>`;
+      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">✓ Watched</button>`;
   }
   const topRadius = why ? "12px 12px 0 0" : "12px";
   const idVal = m.tmdbID || m.id;
@@ -2013,10 +2018,10 @@ async function openDetail(id, type) {
       actionBtns += `<div class="already-badge">✓ Watched</div>`;
     } else if (status === "plan") {
       actionBtns += `<div class="already-badge" style="color:#888">≡ My List</div>`;
-      actionBtns += `<button class="btn-modal-add-watched" onclick="openAdd(window._detailMovie,'watched')">Watched</button>`;
+      actionBtns += `<button class="btn-modal-add-watched" onclick="openAdd(window._detailMovie,'watched')">✓ Watched</button>`;
     } else {
       actionBtns += `<button class="btn-modal-plan" onclick="openAdd(window._detailMovie,'plan')">≡ My List</button>`;
-      actionBtns += `<button class="btn-modal-add-watched" onclick="openAdd(window._detailMovie,'watched')">Watched</button>`;
+      actionBtns += `<button class="btn-modal-add-watched" onclick="openAdd(window._detailMovie,'watched')">✓ Watched</button>`;
     }
 
     document.getElementById("detail-content").innerHTML = `
@@ -2504,13 +2509,15 @@ async function loadInboxCache() {
 }
 
 function _updateInboxBadge() {
-  const pendingNew = _inboxCache.received.filter(i => i.status === "pending" && !i.read_at).length;
+  // Use local read timestamps (_invReadAt) where available, fall back to DB read_at
+  const pendingNew = _inboxCache.received.filter(i => {
+    if (i.status !== "pending") return false;
+    return !(_invReadAt[i.id] || i.read_at);
+  }).length;
   const newMsgs = [..._inboxCache.received, ..._inboxCache.sent].filter(inv => {
     const msgs = inv.messages || [];
     if (!msgs.length) return false;
-    const last = msgs[msgs.length - 1];
-    if (last.from === currentUser?.id) return false;
-    return !inv.read_at || (inv.last_msg_at && new Date(inv.last_msg_at) > new Date(inv.read_at));
+    return msgs.some(msg => _isMsgUnread(inv, msg));
   }).length;
   const total = pendingNew + newMsgs;
   const badge = document.getElementById("inbox-badge");
@@ -2557,6 +2564,10 @@ function _invPartner(inv) {
 function openChat(partnerId) {
   _chatViewPartnerId = partnerId;
   _expandedInviteId = null;
+  // Mark all invites in this chat as locally read
+  const all = [..._inboxCache.received, ..._inboxCache.sent];
+  all.filter(inv => _invPartner(inv).id === partnerId).forEach(inv => _markInvRead(inv.id));
+  _updateInboxBadge();
   renderInboxFromCache();
 }
 
@@ -2593,17 +2604,17 @@ function _renderChatList() {
   });
 
   el.innerHTML = partners.map(p => {
-    const pending = p.invites.filter(i => i.to_user_id === currentUser.id && i.status === "pending").length;
-    // Count unread messages across all invites with this partner
-    let unreadCount = pending; // pending invites count as unread
+    // Pending = received invites not locally acknowledged
+    const pending = p.invites.filter(i =>
+      i.to_user_id === currentUser.id && i.status === "pending" && !(_invReadAt[i.id] || i.read_at)
+    ).length;
+    // New messages = msgs from other person newer than local read timestamp
+    let newMsgCount = 0;
     for (const inv of p.invites) {
       const msgs = inv.messages || [];
-      if (!msgs.length) continue;
-      const last = msgs[msgs.length - 1];
-      if (last.from !== currentUser.id && (!inv.read_at || new Date(last.at) > new Date(inv.read_at))) {
-        unreadCount++;
-      }
+      newMsgCount += msgs.filter(msg => _isMsgUnread(inv, msg)).length;
     }
+    const unreadCount = pending + newMsgCount;
     const hasUnread = unreadCount > 0;
 
     // Latest activity preview
@@ -2667,19 +2678,29 @@ function _sentStatusHTML(inv) {
   return `${to}<span style="color:#555">📤 Sent</span>`;
 }
 
+// Returns true if msg from other person is newer than last local read
+function _isMsgUnread(inv, msg) {
+  if (msg.from === currentUser.id) return false;
+  const readAt = _invReadAt[inv.id] || inv.read_at;
+  return !readAt || new Date(msg.at) > new Date(readAt);
+}
+
+function _markInvRead(invId) {
+  _invReadAt[invId] = new Date().toISOString();
+}
+
 function _renderInvCard(inv) {
   const isReceived = inv.to_user_id === currentUser.id;
   const isPending = isReceived && inv.status === "pending";
   const msgs = inv.messages || [];
   const isExpanded = _expandedInviteId === inv.id;
 
-  // Count unread messages from the other person
-  const newMsgs = msgs.filter(msg => {
-    if (msg.from === currentUser.id) return false;
-    return !inv.read_at || new Date(msg.at) > new Date(inv.read_at);
-  });
+  // Count unread messages using local read timestamp
+  const newMsgs = msgs.filter(msg => _isMsgUnread(inv, msg));
   const hasNewMsgs = newMsgs.length > 0;
-  const isCardUnread = (isReceived && !inv.read_at) || hasNewMsgs;
+  // Card is unread if: received+not-opened OR has new messages from other person
+  const readAt = _invReadAt[inv.id] || inv.read_at;
+  const isCardUnread = (isReceived && !readAt) || hasNewMsgs;
 
   const msgBadge = hasNewMsgs
     ? `<span style="background:var(--primary);color:#111;border-radius:8px;min-width:18px;height:18px;padding:0 4px;font-size:10px;font-weight:700;line-height:18px;text-align:center;display:inline-block;margin-left:5px;vertical-align:middle">${newMsgs.length}</span>`
@@ -2702,7 +2723,7 @@ function _renderInvCard(inv) {
               ${msgBadge}
             </div>
           </div>
-          <button onclick="event.stopPropagation();deleteInvite('${inv.id}')" class="hist-del" style="flex-shrink:0">×</button>
+          <button onclick="event.stopPropagation();deleteInvite('${inv.id}')" class="hist-del" style="flex-shrink:0;padding:6px 8px;margin-top:2px">×</button>
         </div>
         ${inv.message ? `<div style="color:#aaa;font-size:12px;font-style:italic;margin-top:4px">"${inv.message}"</div>` : ""}
         ${isPending ? `<div style="display:flex;gap:8px;margin-top:8px" onclick="event.stopPropagation()">
@@ -2747,6 +2768,10 @@ function escapeHtml(s) {
 
 function toggleInviteThread(id) {
   _expandedInviteId = _expandedInviteId === id ? null : id;
+  if (_expandedInviteId === id) {
+    _markInvRead(id); // mark as read when expanding the thread
+    _updateInboxBadge();
+  }
   renderInboxFromCache();
 }
 
@@ -2825,6 +2850,7 @@ let _inboxCache = { received: [], sent: [] };
 let _inboxCacheLoaded = false;
 let _chatViewPartnerId = null;
 let _expandedInviteId = null;
+let _invReadAt = {}; // local: inviteId → ISO timestamp of last read (session only)
 let _lastFeedbackPollTime = new Date(0).toISOString();
 
 // Helper: run a Supabase query with a real fetch abort on timeout.
