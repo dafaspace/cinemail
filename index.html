@@ -386,13 +386,17 @@ body {
   justify-content: center;
 }
 .btn-watchlist {
-  border: 1px solid var(--accent-border);
+  border: 1px solid rgba(124,58,237,0.45);
+  color: #aaa;
 }
-.btn-watchlist:hover { border-color: var(--accent); color: var(--accent-text); background: var(--accent-soft); }
 .btn-watched {
-  border: 1px solid var(--primary-border);
+  border: 1px solid rgba(245,197,24,0.35);
+  color: #aaa;
 }
-.btn-watched:hover { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
+@media (hover: hover) {
+  .btn-watchlist:hover { border-color: var(--accent); color: var(--accent-text); background: var(--accent-soft); }
+  .btn-watched:hover { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
+}
 
 .btn-share-card {
   padding: 3px 8px;
@@ -1284,7 +1288,7 @@ body {
 <div id="detail-overlay" class="overlay" style="display:none" onclick="closeDetail()">
   <div class="modal" onclick="event.stopPropagation()" style="position:relative">
     <div class="modal-handle"></div>
-    <button onclick="closeDetail()" style="position:absolute;top:10px;right:14px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:4px;z-index:1">×</button>
+    <button onclick="closeDetail()" style="position:absolute;top:18px;right:14px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:6px;z-index:1">×</button>
     <div id="detail-content" class="modal-body"></div>
   </div>
 </div>
@@ -2308,9 +2312,9 @@ function renderHistory() {
                 <div class="hist-title">${item.title}</div>
                 <div class="hist-meta">${item.year} · ${item.date}</div>
               </div>
-              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;margin-left:8px;flex-shrink:0">
-                <div style="display:flex;gap:4px;align-items:center">
-                  ${item.status==="watched"?`<button class="hist-del" style="font-size:12px;color:var(--muted)" onclick="event.stopPropagation();openEdit(${item.id})">✏️</button>`:""}
+              <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;align-self:stretch;margin-left:8px;flex-shrink:0">
+                <div style="display:flex;gap:2px;align-items:center">
+                  ${item.status==="watched"?`<button class="hist-del" onclick="event.stopPropagation();openEdit(${item.id})">✎</button>`:""}
                   <button class="hist-del" onclick="event.stopPropagation();deleteItem(${item.id})">×</button>
                 </div>
                 <button onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" class="btn-share-card">↗ Share</button>
@@ -2687,6 +2691,7 @@ function _isMsgUnread(inv, msg) {
 
 function _markInvRead(invId) {
   _invReadAt[invId] = new Date().toISOString();
+  try { localStorage.setItem("invReadAt", JSON.stringify(_invReadAt)); } catch(e) {}
 }
 
 function _renderInvCard(inv) {
@@ -2850,7 +2855,7 @@ let _inboxCache = { received: [], sent: [] };
 let _inboxCacheLoaded = false;
 let _chatViewPartnerId = null;
 let _expandedInviteId = null;
-let _invReadAt = {}; // local: inviteId → ISO timestamp of last read (session only)
+let _invReadAt = JSON.parse(localStorage.getItem("invReadAt") || "{}"); // persisted across reloads
 let _lastFeedbackPollTime = new Date(0).toISOString();
 
 // Helper: run a Supabase query with a real fetch abort on timeout.
