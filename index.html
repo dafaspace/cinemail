@@ -803,13 +803,20 @@ body {
 /* ── Inbox badge ────────────────────────────────────────────────────── */
 .inbox-badge {
   display: none;
+  position: absolute;
+  top: -5px;
+  right: -7px;
   background: var(--primary);
   color: #111;
-  border-radius: 10px;
-  padding: 0 5px;
-  font-size: 10px;
+  border-radius: 8px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
+  font-size: 9px;
   font-weight: 700;
-  margin-left: 2px;
+  line-height: 15px;
+  text-align: center;
+  pointer-events: none;
 }
 
 /* ── Toast ──────────────────────────────────────────────────────────── */
@@ -1208,7 +1215,7 @@ body {
     <button class="tab-btn active" id="tab-btn-search" onclick="switchTab('search')">🔍 Search</button>
     <button class="tab-btn" id="tab-btn-recs" onclick="switchTab('recs')">✨ Picks</button>
     <button class="tab-btn" id="tab-btn-history" onclick="switchTab('history')">📋 My List</button>
-    <button class="tab-btn" id="tab-btn-inbox" onclick="switchTab('inbox')">📬 <span id="inbox-badge" class="inbox-badge">0</span>Inbox</button>
+    <button class="tab-btn" id="tab-btn-inbox" onclick="switchTab('inbox')"><span style="position:relative;display:inline-block">📬<span id="inbox-badge" class="inbox-badge">0</span></span> Inbox</button>
   </div>
 
   <!-- ── TAB: Search ──────────────────────────────────────────────────── -->
@@ -2587,13 +2594,17 @@ function _renderChatList() {
 
   el.innerHTML = partners.map(p => {
     const pending = p.invites.filter(i => i.to_user_id === currentUser.id && i.status === "pending").length;
-    const unreadMsg = p.invites.some(inv => {
+    // Count unread messages across all invites with this partner
+    let unreadCount = pending; // pending invites count as unread
+    for (const inv of p.invites) {
       const msgs = inv.messages || [];
-      if (!msgs.length) return false;
+      if (!msgs.length) continue;
       const last = msgs[msgs.length - 1];
-      return last.from !== currentUser.id && (!inv.read_at || new Date(last.at) > new Date(inv.read_at));
-    });
-    const hasUnread = pending > 0 || unreadMsg;
+      if (last.from !== currentUser.id && (!inv.read_at || new Date(last.at) > new Date(inv.read_at))) {
+        unreadCount++;
+      }
+    }
+    const hasUnread = unreadCount > 0;
 
     // Latest activity preview
     const sorted = [...p.invites].sort((a, b) => new Date(b.last_msg_at || b.created_at) - new Date(a.last_msg_at || a.created_at));
@@ -2609,17 +2620,20 @@ function _renderChatList() {
 
     const count = p.invites.length;
     const initial = (p.name || "?")[0].toUpperCase();
+    const badgeHTML = hasUnread
+      ? `<span style="background:var(--primary);color:#111;border-radius:8px;min-width:18px;height:18px;padding:0 4px;font-size:10px;font-weight:700;line-height:18px;text-align:center;display:inline-block;flex-shrink:0;margin-left:6px">${unreadCount}</span>`
+      : "";
 
     return `<div class="inv-chat-row${hasUnread ? " inv-chat-unread" : ""}" onclick="openChat('${p.id}')">
       <div class="inv-chat-avatar">${initial}</div>
       <div style="flex:1;min-width:0">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
           <div style="font-weight:600;font-size:15px">${p.name}</div>
-          <div style="font-size:11px;color:var(--muted);white-space:nowrap">${count} film${count !== 1 ? "s" : ""}${pending ? ` · <span style="color:var(--primary)">${pending} pending</span>` : ""}</div>
+          <div style="font-size:11px;color:var(--muted);white-space:nowrap">${count} film${count !== 1 ? "s" : ""}</div>
         </div>
         <div style="font-size:12px;color:${hasUnread ? "var(--text)" : "var(--muted)"};margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(preview)}</div>
       </div>
-      ${hasUnread ? `<div style="width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-left:4px"></div>` : ""}
+      ${badgeHTML}
     </div>`;
   }).join("");
 }
@@ -2631,7 +2645,10 @@ function _renderChatDetail(partnerId) {
   if (!invites.length) { closeChat(); return; }
 
   const partnerName = _invPartner(invites[0]).name;
-  const sorted = [...invites].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+  // Newest activity first
+  const sorted = [...invites].sort((a, b) =>
+    new Date(b.last_msg_at || b.created_at) - new Date(a.last_msg_at || a.created_at)
+  );
 
   el.innerHTML = `
     <div style="display:flex;align-items:center;gap:10px;padding:4px 0 14px">
@@ -2643,28 +2660,32 @@ function _renderChatDetail(partnerId) {
 }
 
 function _sentStatusHTML(inv) {
-  const to = inv.to_name ? `<span style="color:var(--accent-text)">→ ${inv.to_name}</span>  ` : "";
-  if (!inv.read_at) return `${to}<span style="color:#555">📤 Sent</span>`;
-  if (inv.status === "accepted") return `${to}<span style="color:#4ade80">Added to list</span>`;
+  const to = inv.to_name ? `<span style="color:var(--accent-text)">↑ to ${inv.to_name}</span>  ` : "";
+  if (inv.status === "accepted") return `${to}<span style="color:#4ade80">Accepted</span>`;
   if (inv.status === "declined") return `${to}<span style="color:#f87171">Declined</span>`;
-  return `${to}<span style="color:#777">👁 Seen</span>`;
+  if (inv.read_at) return `${to}<span style="color:#777">Pending</span>`;
+  return `${to}<span style="color:#555">📤 Sent</span>`;
 }
 
 function _renderInvCard(inv) {
   const isReceived = inv.to_user_id === currentUser.id;
   const isPending = isReceived && inv.status === "pending";
-  const isUnread = isReceived && !inv.read_at;
   const msgs = inv.messages || [];
   const isExpanded = _expandedInviteId === inv.id;
-  const newMsgDot = (() => {
-    if (!msgs.length) return "";
-    const last = msgs[msgs.length - 1];
-    if (last.from === currentUser.id) return "";
-    if (!inv.read_at || new Date(last.at) > new Date(inv.read_at))
-      return `<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--primary);margin-left:4px;vertical-align:middle"></span>`;
-    return "";
-  })();
-  return `<div class="inv-card${isUnread ? " inv-unread" : ""}" id="inv-card-${inv.id}">
+
+  // Count unread messages from the other person
+  const newMsgs = msgs.filter(msg => {
+    if (msg.from === currentUser.id) return false;
+    return !inv.read_at || new Date(msg.at) > new Date(inv.read_at);
+  });
+  const hasNewMsgs = newMsgs.length > 0;
+  const isCardUnread = (isReceived && !inv.read_at) || hasNewMsgs;
+
+  const msgBadge = hasNewMsgs
+    ? `<span style="background:var(--primary);color:#111;border-radius:8px;min-width:18px;height:18px;padding:0 4px;font-size:10px;font-weight:700;line-height:18px;text-align:center;display:inline-block;margin-left:5px;vertical-align:middle">${newMsgs.length}</span>`
+    : msgs.length ? `<span style="color:var(--muted);margin-left:6px;font-size:11px">💬 ${msgs.length}</span>` : "";
+
+  return `<div class="inv-card${isCardUnread ? " inv-unread" : ""}" id="inv-card-${inv.id}">
     <div style="display:flex;gap:11px;align-items:flex-start" onclick="toggleInviteThread('${inv.id}')">
       <div onclick="event.stopPropagation();${inv.tmdb_id ? `openDetail('${inv.tmdb_id}','${inv.media_type||"movie"}')` : ""}">
         ${posterHTML(inv.poster, inv.title, 46, 66)}
@@ -2673,12 +2694,12 @@ function _renderInvCard(inv) {
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
           <div>
             <div style="font-family:'Bebas Neue',cursive;font-size:15px;line-height:1.2">${inv.title}${inv.year ? ` (${inv.year})` : ""}</div>
-            <div style="font-size:11px;margin-top:2px">
+            <div style="font-size:11px;margin-top:2px;display:flex;align-items:center;flex-wrap:wrap;gap:2px">
               ${isReceived
                 ? `<span style="color:var(--accent-text)">↓ from ${inv.from_name || "someone"}</span>`
                 : _sentStatusHTML(inv)
               }
-              ${msgs.length ? `<span style="color:var(--muted);margin-left:6px">💬 ${msgs.length}</span>${newMsgDot}` : ""}
+              ${msgBadge}
             </div>
           </div>
           <button onclick="event.stopPropagation();deleteInvite('${inv.id}')" class="hist-del" style="flex-shrink:0">×</button>
