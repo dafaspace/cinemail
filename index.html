@@ -1059,6 +1059,27 @@ body {
 .friend-pick-row:hover { background: rgba(255,255,255,0.04); }
 .friend-pick-row.selected { background: var(--accent-soft); border-color: var(--accent-border); }
 
+/* ── Lists checklist (in detail card) ──────────────────────────────── */
+.list-check-section { margin-bottom: 12px; }
+.list-check-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; border-radius: 9px; cursor: pointer;
+  transition: background 0.15s; border: 1px solid transparent;
+  margin-bottom: 4px;
+}
+@media (hover: hover) { .list-check-row:hover { background: rgba(255,255,255,0.05); } }
+.list-check-row.checked {
+  border-color: rgba(124,58,237,0.25);
+  background: rgba(124,58,237,0.07);
+}
+.list-check-row.checked-personal {
+  border-color: rgba(245,197,24,0.2);
+  background: rgba(245,197,24,0.05);
+}
+.list-check-icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; color: var(--muted); }
+.list-check-row.checked .list-check-icon { color: var(--accent-text); }
+.list-check-row.checked-personal .list-check-icon { color: var(--primary); }
+
 /* ── List tabs (My List tab selector) ──────────────────────────────── */
 .list-tabs-row {
   display: flex;
@@ -2064,6 +2085,68 @@ function getEntryStatus(tmdbID) {
   return e ? e.status : null;
 }
 
+function _filmListStatus(tmdbID) {
+  const all = watchHistory.filter(h => h.tmdbID === String(tmdbID));
+  const result = { watchedEntry: null, personalPlanEntry: null, listEntries: {} };
+  all.forEach(h => {
+    if (h.status === 'watched') result.watchedEntry = h;
+    else if (!h.listId) result.personalPlanEntry = h;
+    else result.listEntries[h.listId] = h;
+  });
+  return result;
+}
+
+function _buildListChecklistHTML(tmdbID) {
+  const fls = _filmListStatus(tmdbID);
+  let html = '';
+  // Personal My List row
+  const inPersonal = !!fls.personalPlanEntry;
+  html += `<div class="list-check-row ${inPersonal ? 'checked-personal' : ''}" onclick="toggleFilmInList(null,'${tmdbID}')">
+    <span class="list-check-icon">${inPersonal ? '✓' : '○'}</span>
+    <span style="font-size:13px">≡ My List</span>
+    ${inPersonal ? '<span style="font-size:10px;color:var(--muted);margin-left:auto">personal</span>' : ''}
+  </div>`;
+  // Shared lists
+  _listsCache.forEach(l => {
+    const inList = !!fls.listEntries[l.id];
+    html += `<div class="list-check-row ${inList ? 'checked' : ''}" onclick="toggleFilmInList('${l.id}','${tmdbID}')">
+      <span class="list-check-icon">${inList ? '✓' : '○'}</span>
+      <span style="font-size:13px">${l.name}</span>
+      ${inList ? '<span style="font-size:10px;color:var(--muted);margin-left:auto">added</span>' : ''}
+    </div>`;
+  });
+  return html;
+}
+
+function _refreshDetailChecklist(tmdbID) {
+  const el = document.getElementById('detail-list-checklist');
+  if (el) el.innerHTML = _buildListChecklistHTML(String(tmdbID));
+}
+
+async function toggleFilmInList(listId, tmdbID) {
+  const fls = _filmListStatus(tmdbID);
+  const existing = listId === null ? fls.personalPlanEntry : fls.listEntries[listId];
+  try {
+    if (existing) {
+      await deleteEntryFromDB(existing.id);
+      watchHistory = watchHistory.filter(h => h.id !== existing.id);
+    } else {
+      const movie = window._detailMovie;
+      if (!movie) return;
+      await saveEntryToDB({
+        tmdbID: String(tmdbID), title: movie.Title || '', year: movie.Year || '',
+        poster: movie.Poster || '', stars: 0, comment: '', status: 'plan',
+        mediaType: movie.type || movie.mediaType || 'movie',
+        composer: movie.Composer || null, director: movie.Director || null,
+        listId: listId
+      });
+      watchHistory = await loadHistoryFromDB();
+    }
+    _refreshDetailChecklist(tmdbID);
+    renderHistory();
+  } catch(e) { showToast('Error: ' + e.message, true); }
+}
+
 // Movie registry
 const _movieRegistry = {};
 let _regCounter = 0;
@@ -2170,14 +2253,23 @@ async function openDetail(id, type) {
       if (Object.keys(patch).length) { updateEntryInDB(existing.id, patch).then(async () => { watchHistory = await loadHistoryFromDB(); }).catch(() => {}); }
     }
 
+    // Lists checklist (показываем если есть листы или фильм уже в каком-то листе)
+    const _fls = _filmListStatus(String(id));
+    const _hasLists = _listsCache.length > 0;
+    const _inAnyList = _fls.personalPlanEntry || Object.keys(_fls.listEntries).length > 0;
+    const showChecklist = _hasLists || _inAnyList;
+
+    const checklistSection = showChecklist
+      ? `<div class="list-check-section"><div id="detail-list-checklist">${_buildListChecklistHTML(String(id))}</div></div>`
+      : '';
+
     let actionBtns = `<button class="btn-modal-close" onclick="closeDetail()">Close</button>`;
     if (status === "watched") {
       actionBtns += `<div class="already-badge">✓ Watched</div>`;
-    } else if (status === "plan") {
-      actionBtns += `<div class="already-badge" style="color:#888">≡ My List</div>`;
-      actionBtns += `<button class="btn-modal-add-watched" onclick="openAdd(window._detailMovie,'watched')">✓ Watched</button>`;
     } else {
-      actionBtns += `<button class="btn-modal-plan" onclick="_maybePickList(window._detailMovie,'plan')">≡ My List</button>`;
+      if (!showChecklist) {
+        actionBtns += `<button class="btn-modal-plan" onclick="_maybePickList(window._detailMovie,'plan')">≡ My List</button>`;
+      }
       actionBtns += `<button class="btn-modal-add-watched" onclick="openAdd(window._detailMovie,'watched')">✓ Watched</button>`;
     }
 
@@ -2196,6 +2288,7 @@ async function openDetail(id, type) {
       ${d.Plot ? `<div class="detail-plot">${d.Plot}</div>` : ""}
       ${crew}${tvInfo}
       ${d.Country ? `<div style="margin-bottom:14px"><div class="crew-label">Country / Language</div><div class="crew-val">${d.Country} · ${d.Language}</div></div>` : ""}
+      ${checklistSection}
       <div class="modal-actions">${actionBtns}</div>`;
     window._detailMovie = d;
   } catch(e) {
@@ -2417,7 +2510,11 @@ function renderHistory() {
     return;
   }
   if (!filtered.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔍</div><div class="empty-state-title">Nothing Here Yet</div><p>${historyFilter === "watched" ? "Mark films as seen" : "Save films to your list"}</p></div>`;
+    const activeList = _listsCache.find(l => l.id === _activeListId);
+    const emptyMsg = activeList
+      ? `<div class="empty-state"><div class="empty-state-icon">🎬</div><div class="empty-state-title">No films in "${activeList.name}"</div><p>Search for a film and tap ≡ to add it here</p></div>`
+      : `<div class="empty-state"><div class="empty-state-icon">🔍</div><div class="empty-state-title">Nothing Here Yet</div><p>${historyFilter === "watched" ? "Mark films as seen" : "Save films to your list"}</p></div>`;
+    el.innerHTML = emptyMsg;
     return;
   }
   const watched = watchHistory.filter(h => h.status === "watched");
@@ -2936,14 +3033,19 @@ function renderListManageStrip() {
           <span style="font-size:12px;color:var(--muted)">Invite to <strong style="color:var(--text)">${list.name}</strong></span>
           <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;line-height:1;padding:2px 4px">×</button>
         </div>
-        ${friends.length ? friends.map(f => {
+        <div style="position:relative;margin-bottom:8px">
+          <input id="list-invite-search" type="text" placeholder="Search by name…"
+            style="width:100%;box-sizing:border-box;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,0.05);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none"
+            oninput="_listInviteSearch(this.value,'${list.id}')">
+          <div id="list-invite-results"></div>
+        </div>
+        ${friends.length ? `<div style="font-size:11px;color:var(--muted);margin-bottom:6px">Friends:</div>` + friends.map(f => {
           const fi = _friendInfo(f);
-          const nm = fi.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-          const ln = list.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-          return `<button onclick="inviteToList('${list.id}','${fi.id}','${nm}','${ln}');_listManageMode=null"
+          return `<button data-uid="${fi.id}" data-name="${fi.name.replace(/"/g,'&quot;')}" onclick="_doInviteToList('${list.id}',this)"
             style="display:block;width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;padding:8px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:4px">${fi.name}</button>`;
-        }).join('') : '<div style="font-size:12px;color:var(--muted)">No friends to invite yet</div>'}
+        }).join('') : ''}
       </div>`;
+    setTimeout(() => document.getElementById('list-invite-search')?.focus(), 50);
     return;
   }
 
@@ -3026,14 +3128,46 @@ async function createList() {
   } catch(e) { showToast('Error: ' + e.message, true); }
 }
 
+async function _listInviteSearch(query, listId) {
+  const res = document.getElementById('list-invite-results');
+  if (!res) return;
+  if (!query || query.length < 2) { res.innerHTML = ''; return; }
+  try {
+    const { data } = await sbClient.rpc('search_profiles', { query, limit_count: 6 });
+    const hits = (data || []).filter(u => u.id !== currentUser.id);
+    if (!hits.length) { res.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:4px 0">No users found</div>'; return; }
+    res.innerHTML = hits.map(u =>
+      `<button data-uid="${u.id}" data-name="${(u.display_name||u.email||'?').replace(/"/g,'&quot;')}" onclick="_doInviteToList('${listId}',this)"
+        style="display:block;width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;padding:8px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:4px">${u.display_name||u.email||'?'}</button>`
+    ).join('');
+  } catch(e) { res.innerHTML = ''; }
+}
+
+async function _doInviteToList(listId, btn) {
+  const userId = btn.dataset.uid;
+  const userName = btn.dataset.name;
+  const list = _listsCache.find(l => l.id === listId);
+  await inviteToList(listId, userId, userName, list?.name || '');
+}
+
 async function inviteToList(listId, userId, userName, listName) {
   try {
-    const { error } = await sbClient.from('list_members').insert({ list_id: listId, user_id: userId, role: 'member' });
+    const fromName = currentUser.displayName || currentUser.email?.split('@')[0] || 'Someone';
+    const { error } = await sbClient.from('invites').insert({
+      from_user_id: currentUser.id,
+      to_user_id: userId,
+      from_name: fromName,
+      to_name: userName,
+      type: 'list_invite',
+      list_id: listId,
+      title: listName,
+      status: 'pending'
+    });
     if (error) throw new Error(error.message);
-    _listInviteTargetId = null;
-    await loadListsCache();
-    renderListsSection();
-    showToast(`${userName} added to "${listName}"`);
+    _listManageMode = null;
+    renderListManageStrip();
+    renderListTabs();
+    showToast(`Invite sent to ${userName}`);
   } catch(e) { showToast('Error: ' + e.message, true); }
 }
 
@@ -3065,17 +3199,26 @@ function openListPicker(movie, status) {
   _listPickerMovie = movie;
   _listPickerStatus = status;
   const opts = document.getElementById('list-picker-options');
+  const isPersonalActive = _activeListId === 'personal' || _activeListId === null;
+  const activeStyle = 'border-color:var(--accent);background:rgba(124,58,237,0.08);';
   if (opts) opts.innerHTML = `
-    <button class="list-picker-opt" onclick="closeListPicker();openAdd(_listPickerMovie,_listPickerStatus,null)">
-      <div style="font-size:14px;font-family:'Bebas Neue',cursive;letter-spacing:0.5px">≡ My List</div>
+    <button class="list-picker-opt" style="${isPersonalActive ? activeStyle : ''}" onclick="closeListPicker();openAdd(_listPickerMovie,_listPickerStatus,null)">
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="font-size:14px;font-family:'Bebas Neue',cursive;letter-spacing:0.5px">≡ My List</div>
+        ${isPersonalActive ? '<span style="font-size:10px;color:var(--accent-text);background:rgba(124,58,237,0.15);padding:1px 7px;border-radius:10px">active</span>' : ''}
+      </div>
       <div style="font-size:11px;color:var(--muted);margin-top:2px">Personal</div>
     </button>
-    ${_listsCache.map(l => `
-      <button class="list-picker-opt" onclick="closeListPicker();openAdd(_listPickerMovie,_listPickerStatus,'${l.id}')">
-        <div style="font-size:14px;font-family:'Bebas Neue',cursive;letter-spacing:0.5px">${l.name}</div>
+    ${_listsCache.map(l => {
+      const isActive = _activeListId === l.id;
+      return `<button class="list-picker-opt" style="${isActive ? activeStyle : ''}" onclick="closeListPicker();openAdd(_listPickerMovie,_listPickerStatus,'${l.id}')">
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="font-size:14px;font-family:'Bebas Neue',cursive;letter-spacing:0.5px">${l.name}</div>
+          ${isActive ? '<span style="font-size:10px;color:var(--accent-text);background:rgba(124,58,237,0.15);padding:1px 7px;border-radius:10px">active</span>' : ''}
+        </div>
         <div style="font-size:11px;color:var(--muted);margin-top:2px">${l.memberCount ? l.memberCount + ' member' + (l.memberCount !== 1 ? 's' : '') : l.role}</div>
-      </button>
-    `).join('')}
+      </button>`;
+    }).join('')}
   `;
   document.getElementById('list-picker-overlay').style.display = 'flex';
 }
@@ -3162,7 +3305,7 @@ async function confirmShare() {
 async function loadInboxCache() {
   if (!currentUser) return;
   try {
-    const sel = "id,tmdb_id,title,year,poster,media_type,message,status,read_at,messages,last_msg_at,created_at,from_user_id,to_user_id,from_name,to_name";
+    const sel = "id,tmdb_id,title,year,poster,media_type,message,status,read_at,messages,last_msg_at,created_at,from_user_id,to_user_id,from_name,to_name,type,list_id";
     const [recRes, sentRes] = await Promise.all([
       sbClient.from("invites").select(sel).eq("to_user_id", currentUser.id).order("created_at",{ascending:false}),
       sbClient.from("invites").select(sel).eq("from_user_id", currentUser.id).order("created_at",{ascending:false}).limit(50)
@@ -3357,7 +3500,39 @@ function _markInvRead(invId) {
   try { localStorage.setItem("invReadAt", JSON.stringify(_invReadAt)); } catch(e) {}
 }
 
+function _renderListInvCard(inv) {
+  const isReceived = inv.to_user_id === currentUser.id;
+  const isPending = isReceived && inv.status === "pending";
+  const readAt = _invReadAt[inv.id] || inv.read_at;
+  const isCardUnread = isReceived && !readAt;
+
+  let statusLine = '';
+  if (isReceived) {
+    statusLine = `<span style="color:var(--accent-text)">↓ ${inv.from_name || 'Someone'} invited you</span>`;
+  } else {
+    if (inv.status === 'accepted') statusLine = `<span style="color:var(--accent-text)">↑ to ${inv.to_name || '?'}</span>  <span style="color:#4ade80">Accepted</span>`;
+    else if (inv.status === 'declined') statusLine = `<span style="color:var(--accent-text)">↑ to ${inv.to_name || '?'}</span>  <span style="color:#f87171">Declined</span>`;
+    else statusLine = `<span style="color:var(--accent-text)">↑ to ${inv.to_name || '?'}</span>  <span style="color:#555">📤 Sent</span>`;
+  }
+
+  return `<div class="inv-card${isCardUnread ? ' inv-unread' : ''}" id="inv-card-${inv.id}">
+    <div style="display:flex;gap:11px;align-items:center">
+      <div style="width:46px;height:66px;border-radius:10px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">📋</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-family:'Bebas Neue',cursive;font-size:15px;line-height:1.2">${inv.title || 'Shared List'}</div>
+        <div style="font-size:11px;margin-top:3px">${statusLine}</div>
+        ${isPending ? `<div style="display:flex;gap:8px;margin-top:8px" onclick="event.stopPropagation()">
+          <button onclick="respondInviteById('${inv.id}','accepted')" style="padding:4px 14px;border-radius:6px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">Join List</button>
+          <button onclick="respondInviteById('${inv.id}','declined')" style="padding:4px 12px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue',cursive;font-size:12px;cursor:pointer;letter-spacing:1px">✕ Decline</button>
+        </div>` : ''}
+      </div>
+      <button onclick="event.stopPropagation();deleteInvite('${inv.id}')" class="hist-del" style="flex-shrink:0;padding:6px 8px;align-self:flex-start;margin-top:2px">×</button>
+    </div>
+  </div>`;
+}
+
 function _renderInvCard(inv) {
+  if (inv.type === 'list_invite') return _renderListInvCard(inv);
   const isReceived = inv.to_user_id === currentUser.id;
   const isPending = isReceived && inv.status === "pending";
   const msgs = inv.messages || [];
@@ -3503,11 +3678,20 @@ async function respondInvite(id, status, inv) {
     if (idx >= 0) _inboxCache.received[idx].status = status;
     _updateInboxBadge();
     if (status === "accepted" && inv) {
-      await saveEntryToDB({tmdbID:inv.tmdb_id,title:inv.title,year:inv.year,poster:inv.poster,stars:0,comment:"",status:"plan",mediaType:inv.media_type||"movie"});
-      const newHistory = await loadHistoryFromDB();
-      if (newHistory.length > 0 || watchHistory.length === 0) watchHistory = newHistory;
-      showToast(`"${inv.title}" added to your list`);
-    } else { showToast("Recommendation declined"); }
+      if (inv.type === 'list_invite') {
+        const { error: me } = await sbClient.from('list_members').insert({ list_id: inv.list_id, user_id: currentUser.id, role: 'member' });
+        if (me) throw new Error(me.message);
+        await loadListsCache();
+        watchHistory = await loadHistoryFromDB();
+        renderHistory();
+        showToast(`Joined "${inv.title}"`);
+      } else {
+        await saveEntryToDB({tmdbID:inv.tmdb_id,title:inv.title,year:inv.year,poster:inv.poster,stars:0,comment:"",status:"plan",mediaType:inv.media_type||"movie"});
+        const newHistory = await loadHistoryFromDB();
+        if (newHistory.length > 0 || watchHistory.length === 0) watchHistory = newHistory;
+        showToast(`"${inv.title}" added to your list`);
+      }
+    } else { showToast(inv?.type === 'list_invite' ? "Invite declined" : "Recommendation declined"); }
   } catch(e) { showToast("Error: " + e.message); }
   renderInboxFromCache();
 }
