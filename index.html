@@ -1737,6 +1737,7 @@ async function onSignedIn(user) {
   // Reload lists non-blocking after friends (so invite picker has fresh data)
   loadListsCache().then(() => { loadHistoryFromDB().then(h => { if(h.length) watchHistory = h; renderHistory(); }).catch(()=>{}); }).catch(()=>{});
   await checkFeedbackBadge();
+  checkPendingJoinToken(); // process ?join= token if present
   startInboxPolling();
 }
 
@@ -3033,27 +3034,36 @@ function renderListManageStrip() {
           <span style="font-size:12px;color:var(--muted)">Invite to <strong style="color:var(--text)">${list.name}</strong></span>
           <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;line-height:1;padding:2px 4px">×</button>
         </div>
-        <div style="position:relative;margin-bottom:8px">
-          <input id="list-invite-search" type="text" placeholder="Search by name…"
-            style="width:100%;box-sizing:border-box;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,0.05);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none"
-            oninput="_listInviteSearch(this.value,'${list.id}')">
-          <div id="list-invite-results"></div>
-        </div>
-        ${friends.length ? `<div style="font-size:11px;color:var(--muted);margin-bottom:6px">Friends:</div>` + friends.map(f => {
+        ${friends.length ? `<div style="font-size:11px;color:var(--muted);margin-bottom:6px">Select a friend:</div>` + friends.map(f => {
           const fi = _friendInfo(f);
           return `<button data-uid="${fi.id}" data-name="${fi.name.replace(/"/g,'&quot;')}" onclick="_doInviteToList('${list.id}',this)"
             style="display:block;width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;padding:8px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:4px">${fi.name}</button>`;
-        }).join('') : ''}
+        }).join('') : '<div style="font-size:12px;color:var(--muted);padding:4px 0">No friends yet — use 🔗 Link to invite anyone</div>'}
       </div>`;
-    setTimeout(() => document.getElementById('list-invite-search')?.focus(), 50);
+    return;
+  }
+
+  if (_listManageMode === 'link') {
+    el.innerHTML = `<div style="padding:10px;background:rgba(124,58,237,0.05);border-radius:10px;border:1px solid rgba(124,58,237,0.15)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <span style="font-size:12px;color:var(--muted)">Invite link for <strong style="color:var(--text)">${list.name}</strong></span>
+        <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;padding:2px 4px">×</button>
+      </div>
+      <div id="invite-link-content" style="text-align:center;padding:8px 0">
+        <div style="font-size:12px;color:var(--muted)">Generating…</div>
+      </div>
+    </div>`;
+    _loadInviteLink(list.id);
     return;
   }
 
   // Default: manage buttons
   el.innerHTML = `
-    <div style="display:flex;gap:6px;align-items:center">
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
       ${isOwner ? `<button onclick="_listManageMode='invite';renderListManageStrip()"
-        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(124,58,237,0.3);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'Bebas Neue',cursive;letter-spacing:0.5px">+ Invite</button>` : ''}
+        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(124,58,237,0.3);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'Bebas Neue',cursive;letter-spacing:0.5px">+ Invite Friend</button>` : ''}
+      ${isOwner ? `<button onclick="_listManageMode='link';renderListManageStrip()"
+        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(124,58,237,0.3);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">🔗 Link</button>` : ''}
       <button onclick="_listManageMode='confirm-delete';renderListManageStrip()"
         style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:none;color:#666;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">${isOwner ? 'Delete list' : 'Leave list'}</button>
       <span style="font-size:11px;color:#444;margin-left:2px">${list.memberCount ? list.memberCount + ' member' + (list.memberCount !== 1 ? 's' : '') : ''}</span>
@@ -3125,6 +3135,92 @@ async function createList() {
     await loadListsCache();
     renderListsSection();
     showToast(`"${name}" created`);
+  } catch(e) { showToast('Error: ' + e.message, true); }
+}
+
+async function _loadInviteLink(listId) {
+  const el = document.getElementById('invite-link-content');
+  if (!el) return;
+  try {
+    // Reuse existing valid token or create new one
+    const { data: existing } = await sbClient.from('invite_tokens')
+      .select('token,expires_at').eq('list_id', listId).eq('created_by', currentUser.id)
+      .gt('expires_at', new Date().toISOString()).order('created_at',{ascending:false}).limit(1);
+    let token = existing?.[0]?.token;
+    if (!token) {
+      const { data, error } = await sbClient.from('invite_tokens')
+        .insert({ list_id: listId, created_by: currentUser.id }).select('token').single();
+      if (error) throw new Error(error.message);
+      token = data.token;
+    }
+    const url = `${location.origin}${location.pathname}?join=${token}`;
+    const qr = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&bgcolor=1a1a2e&color=ffffff&data=${encodeURIComponent(url)}`;
+    el.innerHTML = `
+      <img src="${qr}" style="border-radius:10px;margin-bottom:10px;display:block;margin-left:auto;margin-right:auto" width="160" height="160">
+      <div style="font-size:10px;color:var(--muted);margin-bottom:10px">Valid for 48 hours</div>
+      <button onclick="navigator.clipboard.writeText('${url}').then(()=>showToast('Link copied!'))"
+        style="width:100%;padding:9px;border-radius:8px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue',cursive;font-size:13px;letter-spacing:1px;cursor:pointer">
+        Copy Link
+      </button>`;
+  } catch(e) { if (el) el.innerHTML = `<div style="font-size:12px;color:#f87171">${e.message}</div>`; }
+}
+
+function _checkJoinToken() {
+  const token = new URLSearchParams(location.search).get('join');
+  if (token) {
+    sessionStorage.setItem('pendingJoinToken', token);
+    history.replaceState({}, '', location.pathname);
+  }
+}
+
+async function checkPendingJoinToken() {
+  const token = sessionStorage.getItem('pendingJoinToken');
+  if (!token || !currentUser) return;
+  sessionStorage.removeItem('pendingJoinToken');
+  try {
+    const { data, error } = await sbClient.from('invite_tokens')
+      .select('id,list_id,expires_at,uses,max_uses,lists(name)').eq('token', token).single();
+    if (error || !data) { showToast('Invite link is invalid', true); return; }
+    if (new Date(data.expires_at) < new Date()) { showToast('Invite link has expired', true); return; }
+    if (data.uses >= data.max_uses) { showToast('Invite link limit reached', true); return; }
+    const { data: already } = await sbClient.from('list_members')
+      .select('id').eq('list_id', data.list_id).eq('user_id', currentUser.id).maybeSingle();
+    if (already) { showToast(`You're already in "${data.lists.name}"`); return; }
+    _showJoinConfirm(data.id, data.list_id, data.lists?.name || 'Shared List');
+  } catch(e) { console.error('join token:', e); }
+}
+
+function _showJoinConfirm(tokenId, listId, listName) {
+  const ov = document.createElement('div');
+  ov.id = 'join-confirm-overlay';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  const safeName = listName.replace(/'/g,"\\'");
+  ov.innerHTML = `<div style="background:var(--surface2);border-radius:18px;padding:26px 22px;max-width:320px;width:100%;text-align:center">
+    <div style="font-size:36px;margin-bottom:12px">📋</div>
+    <div style="font-family:'Bebas Neue',cursive;font-size:22px;margin-bottom:6px">Join "${listName}"?</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:22px">You've been invited to a shared movie list</div>
+    <div style="display:flex;gap:10px">
+      <button onclick="_confirmJoin('${tokenId}','${listId}','${safeName}')"
+        style="flex:1;padding:13px;border-radius:10px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue',cursive;font-size:16px;cursor:pointer;letter-spacing:1px">Join List</button>
+      <button onclick="document.getElementById('join-confirm-overlay').remove()"
+        style="flex:1;padding:13px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--muted);font-size:14px;cursor:pointer">Decline</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
+async function _confirmJoin(tokenId, listId, listName) {
+  document.getElementById('join-confirm-overlay')?.remove();
+  try {
+    const { error } = await sbClient.from('list_members').insert({ list_id: listId, user_id: currentUser.id, role: 'member' });
+    if (error) throw new Error(error.message);
+    await sbClient.from('invite_tokens').update({ uses: sbClient.rpc('increment','uses') }).eq('id', tokenId).catch(()=>{});
+    await loadListsCache();
+    watchHistory = await loadHistoryFromDB();
+    renderHistory();
+    switchTab('history');
+    switchListTab(listId);
+    showToast(`Joined "${listName}" 🎬`);
   } catch(e) { showToast('Error: ' + e.message, true); }
 }
 
@@ -4433,6 +4529,7 @@ function initUI() {
   const {data:{session}}=await sbClient.auth.getSession();
   if(session){await onSignedIn(session.user);}
   else{showScreen("signin");}
+  _checkJoinToken(); // capture ?join= before anything else
   sbClient.auth.onAuthStateChange(async(event,session)=>{
     if(event==="SIGNED_IN"&&session)await onSignedIn(session.user);
     else if(event==="SIGNED_OUT"){showScreen("signin");document.getElementById("main-app").style.display="none";}
