@@ -3214,7 +3214,7 @@ async function _confirmJoin(tokenId, listId, listName) {
   try {
     const { error } = await sbClient.from('list_members').insert({ list_id: listId, user_id: currentUser.id, role: 'member' });
     if (error) throw new Error(error.message);
-    await sbClient.from('invite_tokens').update({ uses: sbClient.rpc('increment','uses') }).eq('id', tokenId).catch(()=>{});
+    try { await sbClient.rpc('increment_token_uses', { token_id: tokenId }); } catch(_e) {}
     await loadListsCache();
     watchHistory = await loadHistoryFromDB();
     renderHistory();
