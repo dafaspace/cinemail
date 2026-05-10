@@ -2486,7 +2486,8 @@ let currentShareMovie = null;
 // ── Friends ───────────────────────────────────────────────────────────────────
 let _friendsCache = [];         // accepted friendships
 let _friendRequestsCache = [];  // pending incoming requests
-let _friendAddTarget = null;    // { id, name } — selected user to add as friend
+let _friendAddTarget = null;       // { id, name } — selected user to add as friend
+let _friendDeleteConfirmFid = null; // fid pending confirm before delete
 
 function _friendInfo(f) {
   const isSender = f.user_id === currentUser.id;
@@ -2556,11 +2557,21 @@ function renderFriendsSection() {
     for (const f of _friendsCache) {
       const { id, name, fid } = _friendInfo(f);
       const init = name[0].toUpperCase();
-      html += `<div class="friend-row">
-        <div class="friend-avatar-sm">${init}</div>
-        <div style="flex:1;font-size:13px">${name}</div>
-        <button onclick="deleteFriend('${fid}')" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;padding:0 4px" title="Remove">×</button>
-      </div>`;
+      if (_friendDeleteConfirmFid === fid) {
+        // Confirm row
+        html += `<div class="friend-row" style="background:rgba(248,113,113,0.06);border-radius:8px;padding:8px 10px;gap:8px">
+          <div style="flex:1;font-size:12px;color:#f87171">Remove <strong>${name}</strong> from friends?</div>
+          <button onclick="event.stopPropagation();deleteFriendConfirmed('${fid}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue',cursive;letter-spacing:1px;cursor:pointer">Remove</button>
+          <button onclick="event.stopPropagation();_friendDeleteConfirmFid=null;renderFriendsSection()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#aaa;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer">Cancel</button>
+        </div>`;
+      } else {
+        html += `<div class="friend-row">
+          <div class="friend-avatar-sm">${init}</div>
+          <div style="flex:1;font-size:13px">${name}</div>
+          <button onclick="event.stopPropagation();_friendDeleteConfirmFid='${fid}';renderFriendsSection()"
+            style="background:none;border:none;color:#555;font-size:18px;line-height:1;cursor:pointer;padding:6px 8px;margin:-6px -4px" title="Remove">×</button>
+        </div>`;
+      }
     }
   }
 
@@ -2640,11 +2651,14 @@ async function respondFriendRequest(fid, status) {
   } catch(e) { showToast("Error: " + e.message); }
 }
 
-async function deleteFriend(fid) {
+async function deleteFriendConfirmed(fid) {
   try {
-    await sbClient.from("friendships").delete().eq("id", fid);
+    const { error } = await sbClient.from("friendships").delete().eq("id", fid);
+    if (error) throw new Error(error.message);
     _friendsCache = _friendsCache.filter(f => f.id !== fid);
+    _friendDeleteConfirmFid = null;
     renderFriendsSection();
+    showToast("Friend removed");
   } catch(e) { showToast("Error: " + e.message); }
 }
 
