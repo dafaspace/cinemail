@@ -1297,6 +1297,15 @@ body {
   font-family: 'DM Sans', sans-serif; transition: opacity 0.15s;
 }
 .ob-btn-next:active { opacity: 0.8; }
+
+/* ── Language toggle ─────────────────────────────────────────────────────────── */
+.lang-toggle { display:flex; gap:6px; }
+.lang-btn {
+  padding:5px 12px; border-radius:20px; border:1px solid var(--border);
+  background:none; color:var(--muted); font-size:12px; cursor:pointer;
+  font-family:'DM Sans',sans-serif; transition:all 0.15s;
+}
+.lang-btn.active { background:var(--accent-soft); border-color:var(--accent-border); color:var(--accent-text); font-weight:600; }
 </style>
 </head>
 <body>
@@ -1315,22 +1324,22 @@ body {
     <!-- Slide 1: Welcome -->
     <div class="ob-slide">
       <div class="ob-icon">🎬</div>
-      <div class="ob-title">MOVIE <span>NIGHT</span></div>
-      <div class="ob-body">Your personal cinema companion. Track what you've seen, discover what's next.</div>
+      <div class="ob-title" data-i18n="ob1_title">MOVIE NIGHT</div>
+      <div class="ob-body" data-i18n="ob1_body">Your personal cinema companion. Track what you've seen, discover what's next.</div>
     </div>
 
     <!-- Slide 2: Track & Discover -->
     <div class="ob-slide">
       <div class="ob-icon">📋</div>
-      <div class="ob-title">Track &amp; <span>Discover</span></div>
-      <div class="ob-body">Build your watchlist, rate films you've seen, and get AI-powered recommendations based on your taste.</div>
+      <div class="ob-title" data-i18n="ob2_title">Track &amp; Discover</div>
+      <div class="ob-body" data-i18n="ob2_body">Build your watchlist, rate films you've seen, and get AI-powered recommendations based on your taste.</div>
     </div>
 
     <!-- Slide 3: Share -->
     <div class="ob-slide">
       <div class="ob-icon">👥</div>
-      <div class="ob-title">Watch <span>Together</span></div>
-      <div class="ob-body">Create shared lists with friends, send film recommendations, and plan your next movie night.</div>
+      <div class="ob-title" data-i18n="ob3_title">Watch Together</div>
+      <div class="ob-body" data-i18n="ob3_body">Create shared lists with friends, send film recommendations, and plan your next movie night.</div>
     </div>
 
   </div>
@@ -1342,8 +1351,8 @@ body {
       <div class="ob-dot" onclick="_obGoTo(2)"></div>
     </div>
     <div class="ob-btn-row">
-      <button class="ob-btn-skip" id="ob-skip-btn" onclick="_obFinish()">Skip</button>
-      <button class="ob-btn-next" id="ob-next-btn" onclick="_obNext()">Next</button>
+      <button class="ob-btn-skip" id="ob-skip-btn" onclick="_obFinish()" data-i18n="ob_skip">Skip</button>
+      <button class="ob-btn-next" id="ob-next-btn" onclick="_obNext()" data-i18n="ob_next">Next</button>
     </div>
   </div>
 </div>
@@ -1356,25 +1365,25 @@ body {
 <div id="screen-signin" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;overflow-y:auto">
   <div class="auth-wrap">
     <div class="auth-logo"><span>MOVIE</span> NIGHT</div>
-    <div class="auth-tagline">Track films · Get AI picks · Share with friends</div>
+    <div class="auth-tagline" data-i18n="auth_tagline">Track films · Get AI picks · Share with friends</div>
     <div class="auth-card">
-      <h2>Welcome Back</h2>
+      <h2 data-i18n="sign_in_title">Welcome Back</h2>
       <div id="signin-error" class="error-msg"></div>
       <div class="form-group">
-        <label>Email</label>
+        <label data-i18n="email">Email</label>
         <input type="email" id="signin-email" placeholder="you@example.com" autocomplete="email">
       </div>
       <div class="form-group">
-        <label>Password</label>
+        <label data-i18n="password">Password</label>
         <input type="password" id="signin-password" placeholder="••••••••" autocomplete="current-password"
           onkeydown="if(event.key==='Enter')doSignIn()">
       </div>
       <div style="margin-top:4px">
-        <button class="btn btn-primary" id="signin-btn" onclick="doSignIn()">Sign In</button>
+        <button class="btn btn-primary" id="signin-btn" onclick="doSignIn()" data-i18n="sign_in">Sign In</button>
       </div>
     </div>
     <div class="auth-footer">
-      New to Movie Night? <a onclick="showScreen('signup')">Create account</a>
+      <span data-i18n="new_here">New to Movie Night?</span> <a onclick="showScreen('signup')" data-i18n="create_acct_link">Create account</a>
     </div>
   </div>
 </div>
@@ -1383,30 +1392,30 @@ body {
 <div id="screen-signup" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;overflow-y:auto">
   <div class="auth-wrap">
     <div class="auth-logo"><span>MOVIE</span> NIGHT</div>
-    <div class="auth-tagline">Track films · Get AI picks · Share with friends</div>
+    <div class="auth-tagline" data-i18n="auth_tagline">Track films · Get AI picks · Share with friends</div>
     <div class="auth-card">
-      <button onclick="showScreen('signin')" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:16px;padding:0;display:flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif">← Back</button>
-      <h2>Create Account</h2>
+      <button onclick="showScreen('signin')" data-i18n="back" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:16px;padding:0;display:flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif">← Back</button>
+      <h2 data-i18n="sign_up_title">Create Account</h2>
       <div id="signup-error" class="error-msg"></div>
       <div class="form-group">
-        <label>Display Name</label>
+        <label data-i18n="display_name">Display Name</label>
         <input type="text" id="signup-name" placeholder="Your name" autocomplete="name">
       </div>
       <div class="form-group">
-        <label>Email</label>
+        <label data-i18n="email">Email</label>
         <input type="email" id="signup-email" placeholder="you@example.com" autocomplete="email">
       </div>
       <div class="form-group">
-        <label>Password</label>
+        <label data-i18n="password">Password</label>
         <input type="password" id="signup-password" placeholder="Min. 6 characters" autocomplete="new-password"
           onkeydown="if(event.key==='Enter')doSignUp()">
       </div>
       <div style="margin-top:4px">
-        <button class="btn btn-primary" id="signup-btn" onclick="doSignUp()">Create Account</button>
+        <button class="btn btn-primary" id="signup-btn" onclick="doSignUp()" data-i18n="sign_up">Create Account</button>
       </div>
     </div>
     <div class="auth-footer">
-      Already have an account? <a onclick="showScreen('signin')">Sign in</a>
+      <span data-i18n="have_acct">Already have an account?</span> <a onclick="showScreen('signin')" data-i18n="sign_in_link">Sign in</a>
     </div>
   </div>
 </div>
@@ -1416,14 +1425,14 @@ body {
   <div class="auth-wrap">
     <div class="auth-card" style="text-align:center">
       <div style="font-size:52px;margin-bottom:16px">📬</div>
-      <div style="font-family:'Bebas Neue',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:26px;letter-spacing:1px;margin-bottom:10px">Check Your Inbox</div>
-      <p id="check-email-msg" style="color:var(--muted);font-size:14px;line-height:1.7;margin-bottom:24px">
+      <div data-i18n="check_inbox_title" style="font-family:'Bebas Neue',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:26px;letter-spacing:1px;margin-bottom:10px">Check Your Inbox</div>
+      <p id="check-email-msg" data-i18n="email_sent" data-i18n-html="1" style="color:var(--muted);font-size:14px;line-height:1.7;margin-bottom:24px">
         We sent a confirmation link to your email.<br>Click it to activate your account.
       </p>
-      <div style="color:var(--muted);font-size:12px;padding:12px;background:rgba(255,255,255,0.04);border-radius:8px;margin-bottom:24px">
+      <div data-i18n="check_spam" style="color:var(--muted);font-size:12px;padding:12px;background:rgba(255,255,255,0.04);border-radius:8px;margin-bottom:24px">
         Didn't get it? Check your spam folder.
       </div>
-      <button class="btn btn-ghost w-full" onclick="showScreen('signin')">← Back to Sign In</button>
+      <button class="btn btn-ghost w-full" data-i18n="back_to_signin" onclick="showScreen('signin')">← Back to Sign In</button>
     </div>
   </div>
 </div>
@@ -1455,18 +1464,18 @@ body {
 
   <!-- Tab bar -->
   <div class="tabbar">
-    <button class="tab-btn active" id="tab-btn-search" onclick="switchTab('search')">🔍 Search</button>
-    <button class="tab-btn" id="tab-btn-recs" onclick="switchTab('recs')">✨ Picks</button>
-    <button class="tab-btn" id="tab-btn-history" onclick="switchTab('history')">📋 Lists</button>
-    <button class="tab-btn" id="tab-btn-inbox" onclick="switchTab('inbox')"><span style="position:relative;display:inline-block">📬<span id="inbox-badge" class="inbox-badge">0</span></span> Inbox</button>
+    <button class="tab-btn active" id="tab-btn-search" onclick="switchTab('search')" data-i18n="tab_search">🔍 Search</button>
+    <button class="tab-btn" id="tab-btn-recs" onclick="switchTab('recs')" data-i18n="tab_picks">✨ Picks</button>
+    <button class="tab-btn" id="tab-btn-history" onclick="switchTab('history')" data-i18n="tab_lists">📋 Lists</button>
+    <button class="tab-btn" id="tab-btn-inbox" onclick="switchTab('inbox')"><span style="position:relative;display:inline-block">📬<span id="inbox-badge" class="inbox-badge">0</span></span> <span data-i18n="tab_inbox_label">Inbox</span></button>
   </div>
 
   <!-- ── TAB: Search ──────────────────────────────────────────────────── -->
   <div id="tab-search" class="tab-panel active">
     <div class="search-row">
-      <input id="search-input" type="text" placeholder="Movie or series title…"
+      <input id="search-input" type="text" data-i18n-ph="search_ph" placeholder="Movie or series title…"
         onkeydown="if(event.key==='Enter')doSearch()">
-      <button class="btn btn-primary btn-sm" style="width:auto" onclick="doSearch()">Search</button>
+      <button class="btn btn-primary btn-sm" style="width:auto" onclick="doSearch()" data-i18n="search_btn">Search</button>
     </div>
     <div id="search-results">
       <div class="empty-state">
@@ -1481,9 +1490,9 @@ body {
   <div id="tab-recs" class="tab-panel" style="display:none">
     <div class="search-row">
       <input id="rec-input" type="text" placeholder="Mood, genre, or anything…">
-      <button class="btn btn-primary btn-sm" style="width:auto" id="rec-btn" onclick="loadRecs()">Find</button>
+      <button class="btn btn-primary btn-sm" style="width:auto" id="rec-btn" onclick="loadRecs()" data-i18n="find_btn">Find</button>
     </div>
-    <button onclick="surpriseMe()" style="width:100%;margin-top:0;margin-bottom:12px;padding:10px;border-radius:10px;background:var(--accent);border:none;color:#fff;font-family:'Bebas Neue',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity=.85" onmouseout="this.style.opacity=1">✨ Surprise Me</button>
+    <button onclick="surpriseMe()" data-i18n="surprise" style="width:100%;margin-top:0;margin-bottom:12px;padding:10px;border-radius:10px;background:var(--accent);border:none;color:#fff;font-family:'Bebas Neue',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity=.85" onmouseout="this.style.opacity=1">✨ Surprise Me</button>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
       <div id="rec-history-hint" style="color:#444;font-size:11px"></div>
       <div id="ai-counter" style="color:var(--muted);font-size:11px"></div>
@@ -1505,9 +1514,9 @@ body {
     <div id="list-manage-strip" style="margin-bottom:10px"></div>
     <!-- status pills — hidden when shared list is active -->
     <div class="filter-row" id="status-filter-row">
-      <button class="filter-pill active" id="pill-all" onclick="setFilter('all')">All</button>
-      <button class="filter-pill" id="pill-plan" onclick="setFilter('plan')">≡ My List</button>
-      <button class="filter-pill" id="pill-watched" onclick="setFilter('watched')">Watched</button>
+      <button class="filter-pill active" id="pill-all" onclick="setFilter('all')" data-i18n="filter_all">All</button>
+      <button class="filter-pill" id="pill-plan" onclick="setFilter('plan')" data-i18n="filter_plan">≡ My List</button>
+      <button class="filter-pill" id="pill-watched" onclick="setFilter('watched')" data-i18n="filter_watched">Watched</button>
     </div>
     <div id="history-list"></div>
   </div>
@@ -1631,18 +1640,18 @@ body {
           <div class="acc-stat-lbl">Avg ★</div>
         </div>
       </div>
-      <div class="add-label">Display Name</div>
+      <div class="add-label" data-i18n="display_name_lbl">Display Name</div>
       <div style="display:flex;gap:8px;margin-bottom:24px">
-        <input type="text" id="acc-name-input" placeholder="Your name"
+        <input type="text" id="acc-name-input" data-i18n-ph="display_name" placeholder="Your name"
           style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:14px;padding:10px 12px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s"
           onfocus="this.style.borderColor='var(--primary-border)'"
           onblur="this.style.borderColor='var(--border)'">
-        <button class="btn-modal-save" id="btn-save-name" onclick="saveDisplayName()" style="flex:none;padding:10px 18px;font-size:14px">Save</button>
+        <button class="btn-modal-save" id="btn-save-name" onclick="saveDisplayName()" style="flex:none;padding:10px 18px;font-size:14px" data-i18n="save">Save</button>
       </div>
-      <div class="add-label" style="margin-top:4px">Backup</div>
+      <div class="add-label" data-i18n="backup_lbl" style="margin-top:4px">Backup</div>
       <div class="backup-row">
-        <button class="btn-backup" onclick="backupExportCSV()">↓ Export CSV</button>
-        <button class="btn-backup" onclick="backupImportCSV()">↑ Import CSV</button>
+        <button class="btn-backup" onclick="backupExportCSV()" data-i18n="export_csv">↓ Export CSV</button>
+        <button class="btn-backup" onclick="backupImportCSV()" data-i18n="import_csv">↑ Import CSV</button>
         <input type="file" id="backup-import-input" accept=".csv" style="display:none">
       </div>
       <div class="backup-row">
@@ -1657,21 +1666,27 @@ body {
       </div>
       <div id="drive-backup-meta" style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:14px;min-height:14px"></div>
 
-      <div class="add-label" style="margin-top:4px">Friends</div>
+      <div class="add-label" data-i18n="friends_lbl" style="margin-top:4px">Friends</div>
       <div id="friends-section" style="margin-bottom:10px;min-height:20px"></div>
       <div style="position:relative;display:flex;gap:8px;margin-bottom:16px">
-        <input type="text" id="friend-add-input" placeholder="Search by name to add…"
+        <input type="text" id="friend-add-input" data-i18n-ph="friend_search_ph" placeholder="Search by name to add…"
           style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:13px;padding:8px 12px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s"
           oninput="searchFriendUsers(this.value)"
           onfocus="this.style.borderColor='var(--accent-border)'"
           onblur="this.style.borderColor='var(--border)'">
-        <button onclick="sendFriendRequest()" class="btn-modal-save" style="flex:none;padding:8px 16px;font-size:13px">Add</button>
+        <button onclick="sendFriendRequest()" class="btn-modal-save" data-i18n="add_friend" style="flex:none;padding:8px 16px;font-size:13px">Add</button>
         <div id="friend-search-results" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:70px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;z-index:10;max-height:130px;overflow-y:auto"></div>
       </div>
 
+      <div class="add-label" data-i18n="lang_label" style="margin-top:4px">Language</div>
+      <div class="lang-toggle" style="margin-bottom:20px">
+        <button class="lang-btn active" data-lang="en" onclick="setLang('en')">🇬🇧 English</button>
+        <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">🇷🇺 Русский</button>
+      </div>
+
       <div style="display:flex;gap:9px">
-        <button class="btn-modal-close" onclick="closeAccount()">Close</button>
-        <button class="btn-modal-close" onclick="closeAccount();signOut();" style="color:#f87171;border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.05)">Sign Out</button>
+        <button class="btn-modal-close" data-i18n="close" onclick="closeAccount()">Close</button>
+        <button class="btn-modal-close" data-i18n="sign_out" onclick="closeAccount();signOut();" style="color:#f87171;border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.05)">Sign Out</button>
       </div>
     </div>
   </div>
@@ -1732,6 +1747,97 @@ const SB_KEY      = "sb_publishable_Ep9kQs8XcfgUoK2ACiIo8w_CLDGkZJf";
 let sbClient = null;
 let currentUser = null;
 
+// ── i18n ──────────────────────────────────────────────────────────────────────
+const I18N = {
+  en: {
+    auth_tagline:"Track films · Get AI picks · Share with friends",
+    sign_in_title:"Welcome Back", sign_up_title:"Create Account",
+    email:"Email", password:"Password", display_name:"Display Name",
+    back:"← Back", back_to_signin:"← Back to Sign In",
+    new_here:"New to Movie Night?", create_acct_link:"Create account",
+    have_acct:"Already have an account?", sign_in_link:"Sign in",
+    check_inbox_title:"Check Your Inbox",
+    email_sent:"We sent a confirmation link to your email.<br>Click it to activate your account.",
+    check_spam:"Didn't get it? Check your spam folder.",
+    sign_in:"Sign In", sign_up:"Create Account", close:"Close", sign_out:"Sign Out",
+    tab_search:"🔍 Search", tab_picks:"✨ Picks", tab_lists:"📋 Lists", tab_inbox:"📬 Inbox", tab_inbox_label:"Inbox",
+    filter_all:"All", filter_plan:"≡ My List", filter_watched:"Watched",
+    search_btn:"Search", find_btn:"Find",
+    your_rating:"Your Rating", notes:"Notes", send_to:"Send to", msg_opt:"Message (optional)",
+    display_name_lbl:"Display Name", backup_lbl:"Backup", friends_lbl:"Friends",
+    add_friend:"Add", save:"Save",
+    export_csv:"↓ Export CSV", import_csv:"↑ Import CSV",
+    save_drive:"Save to Drive", restore_drive:"Restore",
+    ob1_title:"MOVIE NIGHT", ob1_body:"Your personal cinema companion. Track what you've seen, discover what's next.",
+    ob2_title:"Track & Discover", ob2_body:"Build your watchlist, rate films you've seen, and get AI-powered recommendations based on your taste.",
+    ob3_title:"Watch Together", ob3_body:"Create shared lists with friends, send film recommendations, and plan your next movie night.",
+    ob_next:"Next", ob_start:"Get Started", ob_skip:"Skip",
+    empty_list_title:"Your List Is Empty", empty_list_sub:"Search for films and add them to your list", empty_list_btn:"Browse Films",
+    empty_shared_sub:"Search for a film and tap ≡ to add it here",
+    nothing_yet:"Nothing Here Yet", mark_seen:"Mark films as seen", save_to_list:"Save films to your list",
+    surprise:"✨ Surprise Me",
+    lang_label:"Language",
+    search_ph:"Movie or series title…",
+    friend_search_ph:"Search by name to add…",
+  },
+  ru: {
+    auth_tagline:"Фильмы · AI подборки · Друзья",
+    sign_in_title:"С возвращением", sign_up_title:"Регистрация",
+    email:"Эл. почта", password:"Пароль", display_name:"Имя",
+    back:"← Назад", back_to_signin:"← Вернуться ко входу",
+    new_here:"Нет аккаунта?", create_acct_link:"Создать",
+    have_acct:"Уже есть аккаунт?", sign_in_link:"Войти",
+    check_inbox_title:"Проверьте почту",
+    email_sent:"Мы отправили ссылку на вашу почту.<br>Нажмите на неё, чтобы активировать аккаунт.",
+    check_spam:"Не пришло? Проверьте папку Спам.",
+    sign_in:"Войти", sign_up:"Создать аккаунт", close:"Закрыть", sign_out:"Выйти",
+    tab_search:"🔍 Поиск", tab_picks:"✨ Подборки", tab_lists:"📋 Списки", tab_inbox:"📬 Входящие", tab_inbox_label:"Входящие",
+    filter_all:"Все", filter_plan:"≡ Мой список", filter_watched:"Просмотрено",
+    search_btn:"Найти", find_btn:"Найти",
+    your_rating:"Ваша оценка", notes:"Заметки", send_to:"Кому", msg_opt:"Сообщение (необязательно)",
+    display_name_lbl:"Имя", backup_lbl:"Резервная копия", friends_lbl:"Друзья",
+    add_friend:"Добавить", save:"Сохранить",
+    export_csv:"↓ Экспорт CSV", import_csv:"↑ Импорт CSV",
+    save_drive:"Сохранить в Drive", restore_drive:"Восстановить",
+    ob1_title:"MOVIE NIGHT", ob1_body:"Ваш личный киноспутник. Отслеживайте просмотренное, открывайте новое.",
+    ob2_title:"Смотри и открывай", ob2_body:"Составляйте список, оценивайте фильмы и получайте AI-подборки на основе ваших вкусов.",
+    ob3_title:"Смотрите вместе", ob3_body:"Создавайте совместные списки, делитесь рекомендациями и планируйте вечер кино.",
+    ob_next:"Далее", ob_start:"Начать", ob_skip:"Пропустить",
+    empty_list_title:"Список пуст", empty_list_sub:"Найдите фильмы и добавьте их в список", empty_list_btn:"Перейти к поиску",
+    empty_shared_sub:"Найдите фильм и нажмите ≡, чтобы добавить его сюда",
+    nothing_yet:"Пока пусто", mark_seen:"Отмечайте просмотренные фильмы", save_to_list:"Добавляйте фильмы в список",
+    surprise:"✨ Удиви меня",
+    lang_label:"Язык",
+    search_ph:"Название фильма или сериала…",
+    friend_search_ph:"Поиск по имени…",
+  }
+};
+let _lang = localStorage.getItem('lang') || (navigator.language.startsWith('ru') ? 'ru' : 'en');
+function t(key) { return I18N[_lang]?.[key] ?? I18N.en[key] ?? key; }
+function setLang(l) {
+  _lang = l; localStorage.setItem('lang', l);
+  _applyI18n();
+  // Re-render dynamic content
+  renderHistory(); renderListTabs();
+  const activeTab = ["search","recs","history","inbox"].find(n => document.getElementById("tab-"+n)?.style.display !== "none");
+  if (activeTab === "inbox") renderInbox();
+}
+function _applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    const v = t(key);
+    if (el.dataset.i18nHtml) el.innerHTML = v; else el.textContent = v;
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+  // Sync Drive button labels
+  const sl = document.getElementById('btn-drive-save-lbl');
+  const rl = document.getElementById('btn-drive-restore-lbl');
+  if (sl) sl.textContent = t('save_drive');
+  if (rl) rl.textContent = t('restore_drive');
+  // Sync lang toggle
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === _lang));
+}
+
 // ── Auth helpers ──────────────────────────────────────────────────────────────
 /* ── Onboarding ─────────────────────────────────────────────────────────── */
 let _obSlide = 0;
@@ -1744,7 +1850,7 @@ function _obGoTo(idx) {
   document.querySelectorAll('.ob-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
   const nextBtn = document.getElementById('ob-next-btn');
   const skipBtn = document.getElementById('ob-skip-btn');
-  if (nextBtn) nextBtn.textContent = idx === _OB_TOTAL - 1 ? 'Get Started' : 'Next';
+  if (nextBtn) nextBtn.textContent = idx === _OB_TOTAL - 1 ? t('ob_start') : t('ob_next');
   if (skipBtn) skipBtn.style.visibility = idx === _OB_TOTAL - 1 ? 'hidden' : 'visible';
 }
 
@@ -2648,14 +2754,14 @@ function renderHistory() {
     filtered = filtered.filter(h => h.listId === _activeListId);
   }
   if (!watchHistory.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">Your List Is Empty</div><p>Search for films and add them to your list</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600">Browse Films</button></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">${t('empty_list_title')}</div><p>${t('empty_list_sub')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
     return;
   }
   if (!filtered.length) {
     const activeList = _listsCache.find(l => l.id === _activeListId);
     const emptyMsg = activeList
-      ? `<div class="empty-state"><div class="empty-state-icon">🎬</div><div class="empty-state-title">No films in "${activeList.name}"</div><p>Search for a film and tap ≡ to add it here</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600">Browse Films</button></div>`
-      : `<div class="empty-state"><div class="empty-state-icon">🔍</div><div class="empty-state-title">Nothing Here Yet</div><p>${historyFilter === "watched" ? "Mark films as seen" : "Save films to your list"}</p></div>`;
+      ? `<div class="empty-state"><div class="empty-state-icon">🎬</div><div class="empty-state-title">${activeList.name}</div><p>${t('empty_shared_sub')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`
+      : `<div class="empty-state"><div class="empty-state-icon">🔍</div><div class="empty-state-title">${t('nothing_yet')}</div><p>${historyFilter === "watched" ? t('mark_seen') : t('save_to_list')}</p></div>`;
     el.innerHTML = emptyMsg;
     return;
   }
@@ -2689,7 +2795,8 @@ function renderHistory() {
       <div class="stats-block-body" id="stats-body-${id}">${rows}</div>
     </div>`;
   }
-  const showStats = historyFilter === "watched";
+  // Show stats on personal list when enough watched films (regardless of active filter)
+  const showStats = _activeListId === 'personal' && watched.length >= 3;
   const topDirectors = showStats ? buildTopStats(watched, "director", 2, 5) : [];
   const topComposers = showStats ? buildTopStats(watched, "composer", 2, 5) : [];
 
@@ -3055,10 +3162,23 @@ async function loadListsCache() {
 
     if (allLists.length) {
       const ids = allLists.map(l => l.id);
-      const { data: members } = await sbClient.from('list_members').select('list_id').in('list_id', ids);
-      const counts = {};
-      (members || []).forEach(m => { counts[m.list_id] = (counts[m.list_id] || 0) + 1; });
-      allLists.forEach(l => { l.memberCount = counts[l.id] || 0; });
+      const { data: members } = await sbClient.from('list_members')
+        .select('list_id,user_id,role,profiles(display_name)')
+        .in('list_id', ids);
+      const memberMap = {}; // list_id → [{user_id, role, name}]
+      (members || []).forEach(m => {
+        if (!memberMap[m.list_id]) memberMap[m.list_id] = [];
+        memberMap[m.list_id].push({
+          user_id: m.user_id,
+          role: m.role,
+          name: m.profiles?.display_name || 'Unknown'
+        });
+      });
+      allLists.forEach(l => {
+        l.members = memberMap[l.id] || [];
+        // memberCount = total members minus the owner (who is always included)
+        l.memberCount = l.members.length; // includes owner
+      });
     }
 
     _listsCache = allLists;
@@ -3198,6 +3318,34 @@ function renderListManageStrip() {
     return;
   }
 
+  if (_listManageMode === 'members') {
+    const members = list.members || [];
+    const rows = members.map(m => {
+      const isMe = m.user_id === currentUser?.id;
+      const canKick = isOwner && !isMe && m.role !== 'owner';
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--muted)">
+            ${(m.name||'?')[0].toUpperCase()}
+          </div>
+          <div>
+            <div style="font-size:13px;color:var(--text)">${m.name}${isMe ? ' <span style="color:var(--muted);font-size:11px">(you)</span>' : ''}</div>
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">${m.role}</div>
+          </div>
+        </div>
+        ${canKick ? `<button onclick="_kickMember('${list.id}','${m.user_id}')" style="background:none;border:1px solid rgba(248,113,113,0.3);color:#f87171;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">Remove</button>` : ''}
+      </div>`;
+    }).join('');
+    el.innerHTML = `<div style="padding:10px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid var(--border)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:12px;color:var(--muted)">Members · <strong style="color:var(--text)">${list.name}</strong></span>
+        <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;padding:2px 4px">×</button>
+      </div>
+      ${rows || '<div style="font-size:12px;color:var(--muted);padding:4px 0">No members yet</div>'}
+    </div>`;
+    return;
+  }
+
   if (_listManageMode === 'link') {
     el.innerHTML = `<div style="padding:10px;background:rgba(124,58,237,0.05);border-radius:10px;border:1px solid rgba(124,58,237,0.15)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
@@ -3223,7 +3371,10 @@ function renderListManageStrip() {
         style="padding:4px 12px;border-radius:20px;border:1px solid rgba(124,58,237,0.3);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" style="vertical-align:middle;margin-right:3px"><circle cx="11" cy="2.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="11" cy="11.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="3" cy="7" r="1.8" stroke="currentColor" stroke-width="1.4"/><line x1="4.7" y1="6.1" x2="9.3" y2="3.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="4.7" y1="7.9" x2="9.3" y2="10.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Link</button>` : ''}
       <button onclick="_listManageMode='confirm-delete';renderListManageStrip()"
         style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:none;color:#666;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">${isOwner ? 'Delete' : 'Leave'}</button>
-      <span style="font-size:11px;color:#444;margin-left:2px">${list.memberCount ? list.memberCount + ' member' + (list.memberCount !== 1 ? 's' : '') : ''}</span>
+      ${list.memberCount > 0 ? `<button onclick="_listManageMode='members';renderListManageStrip()"
+        style="padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);background:none;color:#555;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">
+        👥 ${list.memberCount} ${list.memberCount !== 1 ? 'members' : 'member'}
+      </button>` : ''}
     </div>`;
 }
 
@@ -3435,6 +3586,17 @@ async function inviteToList(listId, userId, userName, listName) {
     renderListManageStrip();
     renderListTabs();
     showToast(`Invite sent to ${userName}`);
+  } catch(e) { showToast('Error: ' + e.message, true); }
+}
+
+async function _kickMember(listId, userId) {
+  try {
+    const { error } = await sbClient.from('list_members')
+      .delete().eq('list_id', listId).eq('user_id', userId);
+    if (error) throw new Error(error.message);
+    await loadListsCache();
+    renderListManageStrip();
+    showToast('Member removed');
   } catch(e) { showToast('Error: ' + e.message, true); }
 }
 
@@ -4722,6 +4884,7 @@ function initUI() {
   const {data:{session}}=await sbClient.auth.getSession();
   if(session){await onSignedIn(session.user);}
   else{ if(!_maybeShowOnboarding()) showScreen("signin"); }
+  _applyI18n(); // apply stored language preference to static elements
   _checkJoinToken(); // capture ?join= before anything else
   sbClient.auth.onAuthStateChange(async(event,session)=>{
     if(event==="SIGNED_IN"&&session)await onSignedIn(session.user);
