@@ -391,8 +391,8 @@ body {
   color: #aaa;
 }
 .btn-watched {
-  border: 1px solid rgba(245,197,24,0.35);
-  color: #aaa;
+  border: 1px solid rgba(245,197,24,0.5);
+  color: #888;
 }
 @media (hover: hover) {
   .btn-watchlist:hover { border-color: var(--accent); color: var(--accent-text); background: var(--accent-soft); }
@@ -723,10 +723,10 @@ body {
 .btn-modal-add-watched {
   flex: 2; padding: 10px; border-radius: 9px;
   background: transparent; border: 1px solid var(--primary-border);
-  color: var(--primary); font-family: 'Bebas Neue', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  color: #888; font-family: 'Bebas Neue', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 14px; letter-spacing: 1px; cursor: pointer; transition: all 0.15s;
 }
-.btn-modal-add-watched:hover { background: var(--primary-soft); border-color: var(--primary); }
+.btn-modal-add-watched:hover { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
 .btn-modal-save {
   flex: 2; padding: 10px; border-radius: 9px;
   background: var(--primary); border: none;
@@ -1308,6 +1308,49 @@ body {
 }
 .lang-btn.active { background:var(--accent-soft); border-color:var(--accent-border); color:var(--accent-text); font-weight:600; }
 
+/* ── Avatar Picker ────────────────────────────────────────────────────────────── */
+.avatar-wrap { position:relative; display:inline-block; cursor:pointer; margin:0 auto 12px; }
+.avatar-edit-badge {
+  position:absolute; bottom:1px; right:1px;
+  width:22px; height:22px; border-radius:50%;
+  background:var(--surface2); border:1.5px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; pointer-events:none;
+  transition:border-color 0.15s;
+}
+.avatar-wrap:hover .avatar-edit-badge { border-color:rgba(255,255,255,0.3); }
+.avatar-picker-wrap {
+  display:none; background:var(--surface2);
+  border:1px solid var(--border); border-radius:12px;
+  padding:14px 14px 10px; margin-bottom:16px;
+  text-align:left;
+}
+.avatar-picker-wrap.open { display:block; }
+.avatar-picker-label {
+  font-size:10px; color:var(--muted);
+  text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;
+}
+.avatar-emoji-grid { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
+.avatar-emoji-btn {
+  width:34px; height:34px; border-radius:8px;
+  border:1.5px solid transparent;
+  background:rgba(255,255,255,0.04);
+  font-size:19px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:border-color 0.13s, background 0.13s; line-height:1;
+}
+.avatar-emoji-btn:hover { background:rgba(255,255,255,0.09); }
+.avatar-emoji-btn.active { border-color:var(--primary); background:var(--primary-soft); }
+.avatar-color-row { display:flex; gap:8px; flex-wrap:wrap; }
+.avatar-color-dot {
+  width:26px; height:26px; border-radius:50%; cursor:pointer;
+  border:2px solid transparent;
+  outline:2px solid transparent; outline-offset:2px;
+  transition:outline-color 0.13s, transform 0.13s;
+}
+.avatar-color-dot:hover { transform:scale(1.15); }
+.avatar-color-dot.active { outline-color:var(--primary); }
+
 /* ── Lightbox ─────────────────────────────────────────────────────────────────── */
 #lightbox-overlay {
   position: fixed; inset: 0; z-index: 9999;
@@ -1669,7 +1712,11 @@ body {
   <div style="padding:20px;width:100%;display:flex;justify-content:center;min-height:100%" onclick="event.stopPropagation()">
     <div class="modal-sheet" style="max-width:360px;width:100%;height:fit-content;align-self:flex-start" id="account-modal-sheet" onclick="event.stopPropagation()">
       <div style="text-align:center;padding:8px 0 20px">
-        <div class="acc-avatar" id="acc-modal-avatar">U</div>
+        <div class="avatar-wrap" onclick="toggleAvatarPicker()">
+          <div class="acc-avatar" id="acc-modal-avatar" style="margin:0">U</div>
+          <div class="avatar-edit-badge">✏️</div>
+        </div>
+        <div id="avatar-picker-wrap" class="avatar-picker-wrap"></div>
         <div style="font-family:'Bebas Neue',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:24px;letter-spacing:0.5px;color:var(--text)" id="acc-name-display">User</div>
         <div style="font-size:13px;color:#aaa;margin-top:2px" id="acc-email-display"></div>
       </div>
@@ -2479,7 +2526,7 @@ function movieCardHTML(m, why) {
       <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">✓ Watched</button>`;
   } else {
     actionBtns = `
-      <button class="btn-watchlist" onclick="_maybePickList(_movieRegistry['${key}'],'plan')">≡ My List</button>
+      <button class="btn-watchlist" onclick="_maybePickList(_movieRegistry['${key}'],'plan')">≡ Add to list</button>
       <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">✓ Watched</button>`;
   }
   const topRadius = why ? "12px 12px 0 0" : "12px";
@@ -2610,7 +2657,7 @@ async function openDetail(id, type) {
       actionBtns += `<div class="already-badge">✓ Watched</div>`;
     } else {
       if (!showChecklist) {
-        actionBtns += `<button class="btn-modal-plan" onclick="_maybePickList(window._detailMovie,'plan')">≡ My List</button>`;
+        actionBtns += `<button class="btn-modal-plan" onclick="_maybePickList(window._detailMovie,'plan')">≡ Add to list</button>`;
       }
       actionBtns += `<button class="btn-modal-add-watched" onclick="openAdd(window._detailMovie,'watched')">✓ Watched</button>`;
     }
@@ -2641,6 +2688,69 @@ function closeDetail() {
   document.getElementById("detail-overlay").style.display = "none";
   _clearModalStack();
 }
+
+// ── Avatar customisation ──────────────────────────────────────────────────────
+const _AVATAR_EMOJIS = ['🎬','🎭','🎞','🍿','🌟','👻','🦸','🧙','🐉','🦊','🌙','⚡','🔥','💫','🚀','👁','🌊','🎯','🎲','🦋'];
+const _AVATAR_COLORS = [
+  '#F5C518', // gold (default)
+  '#a78bfa', // soft violet
+  '#60a5fa', // sky blue
+  '#34d399', // mint
+  '#f87171', // coral
+  '#fb923c', // amber
+  '#e879f9', // fuchsia
+  '#22d3ee', // cyan
+];
+function getAvatarPrefs() {
+  return { emoji: localStorage.getItem('avEmoji')||'', color: localStorage.getItem('avColor')||'#F5C518' };
+}
+function _applyAvatar() {
+  const { emoji, color } = getAvatarPrefs();
+  const name = currentUser?.displayName || currentUser?.email?.split('@')[0] || 'U';
+  const initial = name.charAt(0).toUpperCase();
+  const label = emoji || initial;
+  // Account modal avatar
+  const accAv = document.getElementById('acc-modal-avatar');
+  if (accAv) { accAv.textContent = label; accAv.style.background = color; accAv.style.fontSize = emoji ? '30px' : '32px'; }
+  // Nav bar avatar
+  const navAv = document.getElementById('btn-avatar');
+  if (navAv) {
+    const badge = navAv.querySelector('.friend-req-badge');
+    navAv.textContent = emoji || initial;
+    if (badge) navAv.appendChild(badge);
+    navAv.style.background = color;
+    navAv.style.fontSize = emoji ? '16px' : '15px';
+    navAv.style.transition = 'background 0.2s';
+  }
+}
+function toggleAvatarPicker() {
+  const wrap = document.getElementById('avatar-picker-wrap');
+  if (!wrap) return;
+  if (wrap.classList.contains('open')) { wrap.classList.remove('open'); return; }
+  _renderAvatarPicker();
+  wrap.classList.add('open');
+}
+function _renderAvatarPicker() {
+  const wrap = document.getElementById('avatar-picker-wrap');
+  if (!wrap) return;
+  const { emoji: curEmoji, color: curColor } = getAvatarPrefs();
+  const emojiHTML = _AVATAR_EMOJIS.map(e =>
+    `<button class="avatar-emoji-btn${e===curEmoji?' active':''}" onclick="pickAvatarEmoji('${e}')">${e}</button>`
+  ).join('');
+  const colorHTML = _AVATAR_COLORS.map(c =>
+    `<div class="avatar-color-dot${c===curColor?' active':''}" style="background:${c}" onclick="pickAvatarColor('${c}')"></div>`
+  ).join('');
+  wrap.innerHTML = `
+    <div class="avatar-picker-label">Emoji</div>
+    <div class="avatar-emoji-grid">${emojiHTML}</div>
+    <div class="avatar-picker-label">Color</div>
+    <div class="avatar-color-row">${colorHTML}</div>
+    ${curEmoji ? `<button onclick="clearAvatarEmoji()" style="margin-top:10px;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:2px 0;font-family:'DM Sans',sans-serif">✕ Remove emoji</button>` : ''}
+  `;
+}
+function pickAvatarEmoji(e) { localStorage.setItem('avEmoji', e); _applyAvatar(); _renderAvatarPicker(); }
+function pickAvatarColor(c) { localStorage.setItem('avColor', c); _applyAvatar(); _renderAvatarPicker(); }
+function clearAvatarEmoji() { localStorage.removeItem('avEmoji'); _applyAvatar(); _renderAvatarPicker(); }
 
 // ── Lightbox ──────────────────────────────────────────────────────────────────
 function openLightbox(url, title) {
@@ -3739,24 +3849,37 @@ async function confirmListDelete(listId) {
   } catch(e) { showToast('Error: ' + e.message, true); }
 }
 
-function openListPicker(movie, status) {
-  if (!_listsCache.length) { openAdd(movie, status, null); return; }
+let _listPickerCallback = null;
+
+function _onListPicked(listId) {
+  if (_listPickerCallback) {
+    const cb = _listPickerCallback;
+    _listPickerCallback = null;
+    cb(listId);
+  } else {
+    openAdd(_listPickerMovie, _listPickerStatus, listId);
+  }
+}
+
+function openListPicker(movie, status, callback = null) {
+  if (!_listsCache.length && !callback) { openAdd(movie, status, null); return; }
   _listPickerMovie = movie;
   _listPickerStatus = status;
+  _listPickerCallback = callback || null;
   const opts = document.getElementById('list-picker-options');
   const isPersonalActive = _activeListId === 'personal' || _activeListId === null;
   const activeStyle = 'border-color:var(--accent);background:rgba(124,58,237,0.08);';
   if (opts) opts.innerHTML = `
-    <button class="list-picker-opt" style="${isPersonalActive ? activeStyle : ''}" onclick="closeListPicker();openAdd(_listPickerMovie,_listPickerStatus,null)">
+    <button class="list-picker-opt" style="${isPersonalActive && !callback ? activeStyle : ''}" onclick="closeListPicker();_onListPicked(null)">
       <div style="display:flex;align-items:center;gap:6px">
         <div style="font-size:14px;font-family:'Bebas Neue',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">${(currentUser?.displayName||currentUser?.email?.split('@')[0]||'My')+"'s List"}</div>
-        ${isPersonalActive ? '<span style="font-size:10px;color:var(--accent-text);background:rgba(124,58,237,0.15);padding:1px 7px;border-radius:10px">active</span>' : ''}
+        ${isPersonalActive && !callback ? '<span style="font-size:10px;color:var(--accent-text);background:rgba(124,58,237,0.15);padding:1px 7px;border-radius:10px">active</span>' : ''}
       </div>
       <div style="font-size:11px;color:var(--muted);margin-top:2px">Personal</div>
     </button>
     ${_listsCache.map(l => {
-      const isActive = _activeListId === l.id;
-      return `<button class="list-picker-opt" style="${isActive ? activeStyle : ''}" onclick="closeListPicker();openAdd(_listPickerMovie,_listPickerStatus,'${l.id}')">
+      const isActive = !callback && _activeListId === l.id;
+      return `<button class="list-picker-opt" style="${isActive ? activeStyle : ''}" onclick="closeListPicker();_onListPicked('${l.id}')">
         <div style="display:flex;align-items:center;gap:6px">
           <div style="font-size:14px;font-family:'Bebas Neue',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">${l.name}</div>
           ${isActive ? '<span style="font-size:10px;color:var(--accent-text);background:rgba(124,58,237,0.15);padding:1px 7px;border-radius:10px">active</span>' : ''}
@@ -3769,6 +3892,7 @@ function openListPicker(movie, status) {
 }
 
 function closeListPicker() {
+  _listPickerCallback = null;
   document.getElementById('list-picker-overlay').style.display = 'none';
 }
 
@@ -3778,6 +3902,40 @@ function _maybePickList(movie, status) {
   } else {
     openAdd(movie, status, null);
   }
+}
+
+// ── Accept film invite with list picker ───────────────────────────────────────
+function acceptFilmInvite(invId) {
+  const inv = _inboxCache.received.find(i => i.id === invId);
+  if (!inv) { showToast("Invite not found", true); return; }
+  if (!_listsCache.length) {
+    // No shared lists — accept directly to personal
+    respondInviteById(invId, 'accepted');
+    return;
+  }
+  openListPicker(null, null, (listId) => _doAcceptFilmInvite(invId, inv, listId));
+}
+
+async function _doAcceptFilmInvite(invId, inv, listId) {
+  try {
+    const upd = { status: 'accepted' };
+    if (listId) upd.list_id = listId;
+    const { error } = await sbClient.from('invites').update(upd).eq('id', invId);
+    if (error) throw new Error(error.message);
+    // Update local cache
+    const idx = _inboxCache.received.findIndex(i => i.id === invId);
+    if (idx >= 0) { _inboxCache.received[idx].status = 'accepted'; if (listId) _inboxCache.received[idx].list_id = listId; }
+    // Add film to watchlist
+    await saveEntryToDB({ tmdbID: inv.tmdb_id, title: inv.title, year: inv.year, poster: inv.poster,
+      stars: 0, comment: '', status: 'plan', mediaType: inv.media_type || 'movie', listId: listId || null });
+    const newHistory = await loadHistoryFromDB();
+    if (newHistory.length > 0 || watchHistory.length === 0) watchHistory = newHistory;
+    renderHistory();
+    const listName = listId ? _getListName(listId) : (currentUser?.displayName || 'My') + "'s List";
+    showToast(`"${inv.title}" → ${listName}`);
+    _updateInboxBadge();
+  } catch(e) { showToast('Error: ' + e.message, true); }
+  renderInboxFromCache();
 }
 
 // ── Share ─────────────────────────────────────────────────────────────────────
@@ -4131,7 +4289,7 @@ function _renderInvCard(inv) {
         </div>
         ${inv.message ? `<div style="color:#aaa;font-size:12px;font-style:italic;margin-top:4px">"${inv.message}"</div>` : ""}
         ${isPending ? `<div style="display:flex;gap:8px;margin-top:8px" onclick="event.stopPropagation()">
-          <button onclick="respondInviteById('${inv.id}','accepted')" style="padding:4px 12px;border-radius:6px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">≡ My List</button>
+          <button onclick="acceptFilmInvite('${inv.id}')" style="padding:4px 12px;border-radius:6px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">+ Add to List</button>
           <button onclick="respondInviteById('${inv.id}','declined')" style="padding:4px 12px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">✕ Decline</button>
         </div>` : ""}
       </div>
@@ -4467,7 +4625,7 @@ async function openAccount() {
 
   const name = currentUser.displayName || currentUser.email?.split("@")[0] || "User";
   const initial = name.charAt(0).toUpperCase();
-  document.getElementById("acc-modal-avatar").textContent = initial;
+  _applyAvatar();
   document.getElementById("acc-name-display").textContent = name;
   document.getElementById("acc-email-display").textContent = currentUser.email || "";
   document.getElementById("acc-name-input").value = name;
@@ -4551,9 +4709,7 @@ async function saveDisplayName() {
   try {
     await sbClient.from("profiles").upsert({id:currentUser.id,display_name:newName});
     currentUser.displayName=newName;
-    const initial=newName.charAt(0).toUpperCase();
-    document.getElementById("btn-avatar").textContent=initial;
-    document.getElementById("acc-modal-avatar").textContent=initial;
+    _applyAvatar();
     document.getElementById("acc-name-display").textContent=newName;
     showToast("✅ Name updated");
   } catch(e){showToast("Error updating name: "+e.message,true);}
@@ -5074,11 +5230,7 @@ async function loadFeedbackReplies() {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 function initUI() {
-  const btnAvatar=document.getElementById("btn-avatar");
-  if(btnAvatar&&currentUser){
-    const name=currentUser.displayName||currentUser.email?.split("@")[0]||"User";
-    btnAvatar.textContent=name.charAt(0).toUpperCase();
-  }
+  if (currentUser) _applyAvatar();
 }
 
 (async () => {
