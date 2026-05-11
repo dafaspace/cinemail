@@ -1118,6 +1118,16 @@ body {
   border-color: var(--primary);
   color: #111;
 }
+.list-tab.watched {
+  border-color: rgba(245,197,24,0.35);
+  color: #888;
+  margin-left: 4px;
+}
+.list-tab.watched.active {
+  background: rgba(245,197,24,0.15);
+  border-color: var(--primary);
+  color: var(--primary);
+}
 .list-tab-add {
   padding: 6px 12px;
   border-radius: 20px;
@@ -1371,6 +1381,11 @@ body {
   cursor: default;
 }
 #lightbox-overlay.visible #lightbox-img { transform: scale(1); }
+#lightbox-stage {
+  position: relative;
+  display: inline-flex;
+  cursor: zoom-out;
+}
 #lightbox-title {
   position: absolute; bottom: 28px; left: 0; right: 0;
   text-align: center; color: rgba(255,255,255,0.7);
@@ -1378,14 +1393,16 @@ body {
   pointer-events: none;
 }
 #lightbox-close {
-  position: absolute; top: 16px; right: 16px;
-  width: 36px; height: 36px; border-radius: 50%;
-  background: rgba(255,255,255,0.12); border: none;
-  color: #fff; font-size: 20px; cursor: pointer;
+  position: absolute; top: 8px; right: 8px;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #fff; font-size: 18px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background 0.15s; line-height: 1;
+  z-index: 2;
 }
-#lightbox-close:hover { background: rgba(255,255,255,0.22); }
+#lightbox-close:hover { background: rgba(0,0,0,0.75); }
 .poster-zoomable { cursor: zoom-in; transition: filter 0.15s, opacity 0.15s; }
 .poster-zoomable:hover { filter: brightness(1.12); opacity: 0.92; }
 </style>
@@ -1594,12 +1611,6 @@ body {
       <!-- rendered by renderListTabs() -->
     </div>
     <div id="list-manage-strip" style="margin-bottom:10px"></div>
-    <!-- status pills — hidden when shared list is active -->
-    <div class="filter-row" id="status-filter-row">
-      <button class="filter-pill active" id="pill-all" onclick="setFilter('all')" data-i18n="filter_all">All</button>
-      <button class="filter-pill" id="pill-plan" onclick="setFilter('plan')" data-i18n="filter_plan">≡ My List</button>
-      <button class="filter-pill" id="pill-watched" onclick="setFilter('watched')" data-i18n="filter_watched">Watched</button>
-    </div>
     <div id="history-list"></div>
   </div>
 
@@ -1634,8 +1645,10 @@ body {
 
 <!-- Lightbox -->
 <div id="lightbox-overlay" style="display:none" onclick="closeLightbox()">
-  <button id="lightbox-close" onclick="event.stopPropagation();closeLightbox()">×</button>
-  <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()">
+  <div id="lightbox-stage" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="" onclick="closeLightbox()">
+    <button id="lightbox-close" onclick="event.stopPropagation();closeLightbox()" aria-label="Close">×</button>
+  </div>
   <div id="lightbox-title"></div>
 </div>
 
@@ -1858,7 +1871,7 @@ const I18N = {
     check_spam:"Didn't get it? Check your spam folder.",
     sign_in:"Sign In", sign_up:"Create Account", close:"Close", sign_out:"Sign Out",
     tab_search:"🔍 Search", tab_picks:"✨ Picks", tab_lists:"📋 Lists", tab_inbox:"📬 Inbox", tab_inbox_label:"Inbox",
-    filter_all:"All", filter_plan:"≡ My List", filter_watched:"Watched",
+    tab_watched:"✓ Watched", new_list_tab:"+ New",
     search_btn:"Search", find_btn:"Find",
     your_rating:"Your Rating", notes:"Notes", send_to:"Send to", msg_opt:"Message (optional)",
     display_name_lbl:"Display Name", backup_lbl:"Backup", friends_lbl:"Friends",
@@ -1890,7 +1903,7 @@ const I18N = {
     check_spam:"Не пришло? Проверьте папку Спам.",
     sign_in:"Войти", sign_up:"Создать аккаунт", close:"Закрыть", sign_out:"Выйти",
     tab_search:"🔍 Поиск", tab_picks:"✨ Подборки", tab_lists:"📋 Списки", tab_inbox:"📬 Входящие", tab_inbox_label:"Входящие",
-    filter_all:"Все", filter_plan:"≡ Мой список", filter_watched:"Просмотрено",
+    tab_watched:"✓ Просмотрено", new_list_tab:"+ Создать",
     search_btn:"Найти", find_btn:"Найти",
     your_rating:"Ваша оценка", notes:"Заметки", send_to:"Кому", msg_opt:"Сообщение (необязательно)",
     display_name_lbl:"Имя", backup_lbl:"Резервная копия", friends_lbl:"Друзья",
@@ -2065,9 +2078,14 @@ function showSignUpError(msg) {
 function showAuthError(msg) { showSignInError(msg); }
 
 async function onSignedIn(user) {
+  // Sticky displayName: if we already had a real (non-email-prefix) name for this user, keep it.
+  // Prevents transient downgrade to email-prefix during token refresh / SIGNED_IN re-fires.
+  const emailPrefix = user.email?.split("@")[0] || "";
+  const preservedName = (currentUser && currentUser.id === user.id
+    && currentUser.displayName && currentUser.displayName !== emailPrefix)
+    ? currentUser.displayName : null;
   currentUser = user;
-  // Use metadata name immediately — available from JWT, no network request
-  currentUser.displayName = user.user_metadata?.display_name || user.email?.split("@")[0] || "";
+  currentUser.displayName = preservedName || user.user_metadata?.display_name || emailPrefix;
   ["signin","signup","check-email"].forEach(s => {
     const el = document.getElementById("screen-"+s);
     if (el) el.style.display = "none";
@@ -2075,12 +2093,18 @@ async function onSignedIn(user) {
   document.getElementById("main-app").style.display = "block";
   initUI(); // Show correct initial right away
   try { await loadListsCache(); } catch(e) { console.warn('[lists]', e); }
-  try { watchHistory = await loadHistoryFromDB(); } catch(e) { console.warn(e); }
+  // Protected history load: don't wipe existing cache with empty result on transient failures
+  try {
+    const newH = await loadHistoryFromDB();
+    if (newH.length > 0 || watchHistory.length === 0) watchHistory = newH;
+  } catch(e) { console.warn(e); }
   try {
     const metaName = user.user_metadata?.display_name || "";
     const { data: pd } = await sbClient.from("profiles").select("display_name").eq("id", user.id).limit(1);
     const profileName = pd?.[0]?.display_name || "";
-    currentUser.displayName = profileName || metaName || user.email?.split("@")[0] || "";
+    // Only update displayName if we got a real name; never downgrade to email prefix
+    const resolved = profileName || metaName || preservedName || user.email?.split("@")[0] || "";
+    if (resolved) currentUser.displayName = resolved;
     if (!profileName && metaName) { try { await sbClient.from("profiles").upsert({ id: user.id, display_name: metaName }); } catch(e2) {} }
   } catch(e) { console.warn("[profile]", e.message); }
   initUI(); // Update again if DB name differs from metadata
@@ -2378,7 +2402,7 @@ let watchHistory = [];
 let currentAddMovie = null;
 let currentAddStatus = "watched";
 let currentStars = 0;
-let historyFilter = "all";
+// historyFilter removed — list tab itself determines what is shown
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
 function switchTab(name) {
@@ -2920,7 +2944,12 @@ async function confirmAdd() {
   try {
     if (existing) {
       const fields = { status: currentAddStatus };
-      if (currentAddStatus === "watched") { fields.stars = currentStars; fields.comment = document.getElementById("add-note").value; }
+      if (currentAddStatus === "watched") {
+        fields.stars = currentStars;
+        fields.comment = document.getElementById("add-note").value;
+        // Film "moves" to global Watched view — drop list affiliation on transition
+        if (existing.listId) fields.list_id = null;
+      }
       if (composer && !existing.composer) fields.composer = composer;
       if (director && !existing.director) fields.director = director;
       await updateEntryInDB(existing.id, fields);
@@ -2972,19 +3001,20 @@ async function deleteItem(id) {
 }
 
 // ── History ───────────────────────────────────────────────────────────────────
-function setFilter(f) {
-  historyFilter = f;
-  ["all","watched","plan"].forEach(p => { document.getElementById("pill-"+p).classList.toggle("active", p === f); });
-  renderHistory();
-}
-
 function renderHistory() {
   const el = document.getElementById("history-list");
-  let filtered = historyFilter === "all" ? [...watchHistory] : watchHistory.filter(h => h.status === historyFilter);
-  if (_activeListId === "personal") {
-    filtered = filtered.filter(h => !h.listId);
-  } else if (_activeListId !== null) {
-    filtered = filtered.filter(h => h.listId === _activeListId);
+  // New filter logic based on active list tab:
+  //   'watched' → all status='watched' entries (regardless of original list)
+  //   'personal' → status='plan' AND no list_id
+  //   <uuid>    → status='plan' AND list_id matches
+  let filtered;
+  const isWatchedTab = _activeListId === 'watched';
+  if (isWatchedTab) {
+    filtered = watchHistory.filter(h => h.status === 'watched');
+  } else if (_activeListId === 'personal') {
+    filtered = watchHistory.filter(h => h.status === 'plan' && !h.listId);
+  } else {
+    filtered = watchHistory.filter(h => h.status === 'plan' && h.listId === _activeListId);
   }
   if (!watchHistory.length) {
     el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">${t('empty_list_title')}</div><p>${t('empty_list_sub')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
@@ -2992,9 +3022,14 @@ function renderHistory() {
   }
   if (!filtered.length) {
     const activeList = _listsCache.find(l => l.id === _activeListId);
-    const emptyMsg = activeList
-      ? `<div class="empty-state"><div class="empty-state-icon">🎬</div><div class="empty-state-title">${activeList.name}</div><p>${t('empty_shared_sub')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`
-      : `<div class="empty-state"><div class="empty-state-icon">🔍</div><div class="empty-state-title">${t('nothing_yet')}</div><p>${historyFilter === "watched" ? t('mark_seen') : t('save_to_list')}</p></div>`;
+    let emptyMsg;
+    if (isWatchedTab) {
+      emptyMsg = `<div class="empty-state"><div class="empty-state-icon">🍿</div><div class="empty-state-title">${t('nothing_yet')}</div><p>${t('mark_seen')}</p></div>`;
+    } else if (activeList) {
+      emptyMsg = `<div class="empty-state"><div class="empty-state-icon">🎬</div><div class="empty-state-title">${activeList.name}</div><p>${t('empty_shared_sub')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
+    } else {
+      emptyMsg = `<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">${t('nothing_yet')}</div><p>${t('save_to_list')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
+    }
     el.innerHTML = emptyMsg;
     return;
   }
@@ -3028,11 +3063,18 @@ function renderHistory() {
       <div class="stats-block-body" id="stats-body-${id}">${rows}</div>
     </div>`;
   }
+  // Contextual header per tab
+  let headerHTML;
+  if (isWatchedTab) {
+    headerHTML = `<span>${filtered.length} film${filtered.length===1?'':'s'} seen</span><span>Avg: ${avg}</span>`;
+  } else {
+    const tabName = _activeListId === 'personal'
+      ? ((currentUser?.displayName||'My')+"'s List")
+      : (_listsCache.find(l => l.id === _activeListId)?.name || 'List');
+    headerHTML = `<span>${filtered.length} to watch</span><span style="color:var(--muted)">${tabName}</span>`;
+  }
   el.innerHTML = `
-    <div class="history-header">
-      <span>${watched.length} seen · ${plan.length} to watch</span>
-      <span>Avg: ${avg}</span>
-    </div>
+    <div class="history-header">${headerHTML}</div>
     <div class="card-list">
       ${filtered.map(item => {
         const key = regMovie({ tmdbID: item.tmdbID, Title: item.title, Year: item.year, Poster: item.poster, type: item.mediaType||"movie" });
@@ -3043,10 +3085,8 @@ function renderHistory() {
             <div class="hist-title">${item.title}</div>
             <div class="hist-meta">${item.year} · ${item.date}</div>
             ${item.status==="watched"
-              ?`<div style="display:flex;gap:2px;margin-top:3px">${starsHTML(item.stars)}</div>`
-              : item.listId
-                ? `<span class="list-chip">${_getListName(item.listId)}</span>`
-                : `<span class="status-tag plan">≡ My List</span>`}
+              ? `<div style="display:flex;gap:2px;margin-top:3px">${starsHTML(item.stars)}</div>`
+              : ''}
             ${item.comment?`<div class="hist-note">"${item.comment}" <span style="color:var(--muted);font-style:normal;font-size:10px">— ${item.date}</span></div>`:""}
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;margin-left:8px">
@@ -3424,36 +3464,35 @@ function renderListTabs() {
   if (!row) return;
 
   // Ensure a valid active tab
-  if (_activeListId !== 'personal' && !_listsCache.find(l => l.id === _activeListId)) {
-    _activeListId = 'personal';
-  }
+  const valid = _activeListId === ‘personal’ || _activeListId === ‘watched’
+    || _listsCache.find(l => l.id === _activeListId);
+  if (!valid) _activeListId = ‘personal’;
 
-  const _personalName = (currentUser?.displayName || currentUser?.email?.split('@')[0] || 'My') + "’s List";
-  let html = `<button class="list-tab personal ${_activeListId === 'personal' ? 'active' : ''}" onclick="switchListTab('personal')">${_personalName}</button>`;
+  const _personalName = (currentUser?.displayName || currentUser?.email?.split(‘@’)[0] || ‘My’) + "’s List";
+  let html = `<button class="list-tab personal ${_activeListId === ‘personal’ ? ‘active’ : ‘’}" onclick="switchListTab(‘personal’)">${_personalName}</button>`;
 
   _listsCache.forEach(l => {
-    html += `<button class="list-tab ${_activeListId === l.id ? 'active' : ''}" onclick="switchListTab('${l.id}')">${l.name}</button>`;
+    html += `<button class="list-tab ${_activeListId === l.id ? ‘active’ : ‘’}" onclick="switchListTab(‘${l.id}’)">${l.name}</button>`;
   });
 
   if (_listTabCreating) {
     html += `<input id="list-tab-input" type="text" placeholder="List name…"
-      style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:rgba(124,58,237,0.1);color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;width:110px;flex-shrink:0"
-      onkeydown="if(event.key==='Enter')_confirmNewListTab();if(event.key==='Escape')_cancelNewListTab()"
+      style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:rgba(124,58,237,0.1);color:var(--text);font-size:12px;font-family:’DM Sans’,sans-serif;outline:none;width:110px;flex-shrink:0"
+      onkeydown="if(event.key===’Enter’)_confirmNewListTab();if(event.key===’Escape’)_cancelNewListTab()"
       onblur="_cancelNewListTab()">
-    <button onclick="_confirmNewListTab()" style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'Bebas Neue',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px;flex-shrink:0">Create</button>`;
+    <button onclick="_confirmNewListTab()" style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--accent-text);font-size:11px;cursor:pointer;font-family:’Bebas Neue’,-apple-system,’SF Pro Display’,’Helvetica Neue’,Arial,sans-serif;letter-spacing:0.5px;flex-shrink:0">Create</button>`;
   } else {
-    html += `<button class="list-tab-add" onclick="_startNewListTab()">+ New</button>`;
+    html += `<button class="list-tab-add" onclick="_startNewListTab()" data-i18n="new_list_tab">+ New</button>`;
   }
+
+  // Watched tab — always last
+  html += `<button class="list-tab watched ${_activeListId === ‘watched’ ? ‘active’ : ‘’}" onclick="switchListTab(‘watched’)" data-i18n="tab_watched">✓ Watched</button>`;
 
   row.innerHTML = html;
   if (_listTabCreating) {
-    const inp = document.getElementById('list-tab-input');
+    const inp = document.getElementById(‘list-tab-input’);
     if (inp) { inp.focus(); }
   }
-
-  // Show/hide status pills
-  const statusRow = document.getElementById('status-filter-row');
-  if (statusRow) statusRow.style.display = _activeListId === 'personal' ? 'flex' : 'none';
 
   renderListManageStrip();
 }
@@ -3887,12 +3926,52 @@ function openListPicker(movie, status, callback = null) {
         <div style="font-size:11px;color:var(--muted);margin-top:2px">${l.memberCount ? l.memberCount + ' member' + (l.memberCount !== 1 ? 's' : '') : l.role}</div>
       </button>`;
     }).join('')}
+    <div id="list-picker-new-row" style="margin-top:8px"></div>
   `;
+  _renderListPickerNewRow();
   document.getElementById('list-picker-overlay').style.display = 'flex';
+}
+
+let _listPickerNewMode = false;
+function _renderListPickerNewRow() {
+  const row = document.getElementById('list-picker-new-row');
+  if (!row) return;
+  if (_listPickerNewMode) {
+    row.innerHTML = `
+      <div style="display:flex;gap:6px">
+        <input id="list-picker-new-input" type="text" placeholder="New list name…" maxlength="40"
+          style="flex:1;padding:9px 11px;border-radius:8px;border:1px solid var(--accent-border);background:rgba(124,58,237,0.08);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none"
+          onkeydown="if(event.key==='Enter')_createListFromPicker();if(event.key==='Escape'){_listPickerNewMode=false;_renderListPickerNewRow()}">
+        <button onclick="_createListFromPicker()" style="padding:9px 14px;border-radius:8px;border:none;background:var(--accent);color:var(--accent-text);font-size:12px;cursor:pointer;font-family:'Bebas Neue',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">Create</button>
+      </div>`;
+    setTimeout(() => document.getElementById('list-picker-new-input')?.focus(), 30);
+  } else {
+    row.innerHTML = `
+      <button onclick="_listPickerNewMode=true;_renderListPickerNewRow()" class="list-picker-opt" style="border-style:dashed;color:var(--accent-text);text-align:center;display:block;font-size:13px">
+        + New list
+      </button>`;
+  }
+}
+
+async function _createListFromPicker() {
+  const inp = document.getElementById('list-picker-new-input');
+  const name = (inp?.value || '').trim();
+  if (!name) { showToast('Enter a name', true); return; }
+  try {
+    const { data, error } = await sbClient.from('lists').insert({ name, owner_id: currentUser.id }).select().single();
+    if (error) throw new Error(error.message);
+    await sbClient.from('list_members').insert({ list_id: data.id, user_id: currentUser.id, role: 'owner' });
+    await loadListsCache();
+    _listPickerNewMode = false;
+    closeListPicker();
+    _onListPicked(data.id);
+    showToast(`"${name}" created`);
+  } catch(e) { showToast('Error: ' + e.message, true); }
 }
 
 function closeListPicker() {
   _listPickerCallback = null;
+  _listPickerNewMode = false;
   document.getElementById('list-picker-overlay').style.display = 'none';
 }
 
@@ -4005,6 +4084,24 @@ async function confirmShare() {
 
 // ── Inbox ─────────────────────────────────────────────────────────────────────
 // ── Inbox cache ────────────────────────────────────────────────────────────────
+// Merge messages by unique (from + at + text/type) key, preserving local optimistic msgs
+// that may not yet be in the server-authoritative array delivered by realtime.
+function _mergeMessages(oldMsgs, newMsgs) {
+  const a = Array.isArray(oldMsgs) ? oldMsgs : [];
+  const b = Array.isArray(newMsgs) ? newMsgs : [];
+  const seen = new Set();
+  const merged = [];
+  // Order matters: take server-authoritative first, then preserve any local-only entries
+  [...b, ...a].forEach(m => {
+    if (!m) return;
+    const key = `${m.from||''}|${m.at||''}|${m.text||''}|${m.type||''}`;
+    if (seen.has(key)) return;
+    seen.add(key); merged.push(m);
+  });
+  merged.sort((x,y) => new Date(x.at||0) - new Date(y.at||0));
+  return merged;
+}
+
 async function loadInboxCache() {
   if (!currentUser) return;
   try {
@@ -4507,7 +4604,12 @@ function startInboxPolling() {
     })
     .on("postgres_changes",{event:"UPDATE",schema:"public",table:"invites",filter:`to_user_id=eq.${uid}`},(payload)=>{
       const idx=_inboxCache.received.findIndex(i=>i.id===payload.new.id);
-      if(idx>=0) _inboxCache.received[idx]={..._inboxCache.received[idx],...payload.new};
+      if(idx>=0) {
+        const old = _inboxCache.received[idx];
+        // Merge messages array (preserves optimistic local msgs awaiting their own echo)
+        const merged = _mergeMessages(old.messages, payload.new.messages);
+        _inboxCache.received[idx] = {...old, ...payload.new, messages: merged};
+      }
       _updateInboxBadge();
       if(document.getElementById("tab-inbox")?.style.display!=="none") renderInboxFromCache();
     })
@@ -4528,7 +4630,9 @@ function startInboxPolling() {
           const last=(upd.messages||[])[newLen-1];
           if(last&&last.from!==uid){playNotificationSound();showToast(`💬 ${upd.to_name||"Someone"} replied to "${upd.title}"`);}
         }
-        _inboxCache.sent[idx]={...old,...upd};
+        // Merge messages array (preserves optimistic local msgs awaiting their own echo)
+        const merged = _mergeMessages(old.messages, upd.messages);
+        _inboxCache.sent[idx] = {...old, ...upd, messages: merged};
       }
       _updateInboxBadge();
       if(document.getElementById("tab-inbox")?.style.display!=="none") renderInboxFromCache();
@@ -5250,7 +5354,20 @@ function initUI() {
   _applyI18n(); // apply stored language preference to static elements
   _checkJoinToken(); // capture ?join= before anything else
   sbClient.auth.onAuthStateChange(async(event,session)=>{
-    if(event==="SIGNED_IN"&&session)await onSignedIn(session.user);
+    if(event==="SIGNED_IN"&&session){
+      // Distinguish a genuine sign-in (new user / first time) from a token-refresh re-fire.
+      // Supabase fires SIGNED_IN on token refresh too, which would otherwise wipe currentUser
+      // and trigger a full re-init (history flicker, name downgrade to email prefix).
+      if(currentUser && currentUser.id === session.user.id){
+        // Token refresh — keep our enriched currentUser (with real displayName, etc.).
+        // Just sync the latest auth fields without overwriting displayName.
+        const keptName = currentUser.displayName;
+        currentUser = session.user;
+        currentUser.displayName = keptName || session.user.user_metadata?.display_name || session.user.email?.split("@")[0] || "";
+        return;
+      }
+      await onSignedIn(session.user);
+    }
     else if(event==="SIGNED_OUT"){showScreen("signin");document.getElementById("main-app").style.display="none";}
   });
 })();
