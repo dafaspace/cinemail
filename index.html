@@ -4026,11 +4026,30 @@ function _renderChatDetail(partnerId) {
 }
 
 function _sentStatusHTML(inv) {
-  const to = inv.to_name ? `<span style="color:var(--accent-text)">↑ to ${inv.to_name}</span>  ` : "";
-  if (inv.status === "accepted") return `${to}<span style="color:#4ade80">Accepted</span>`;
+  const to = inv.to_name
+    ? `<span style="color:var(--accent-text)">↑ to ${inv.to_name}</span><span style="display:inline-block;width:8px"></span>`
+    : "";
+  if (inv.status === "accepted") {
+    const listName = inv.list_id ? _getListName(inv.list_id) : null;
+    const addedLabel = listName ? `Added to "${listName}"` : "Accepted";
+    return `${to}<span style="color:#4ade80">${addedLabel}</span>`;
+  }
   if (inv.status === "declined") return `${to}<span style="color:#f87171">Declined</span>`;
   if (inv.read_at) return `${to}<span style="color:#777">Pending</span>`;
   return `${to}<span style="color:#555">📤 Sent</span>`;
+}
+
+function _receivedStatusHTML(inv) {
+  const from = `<span style="color:var(--accent-text)">↓ from ${inv.from_name || "someone"}</span>`;
+  if (inv.status === "accepted") {
+    const listName = inv.list_id ? _getListName(inv.list_id) : null;
+    const addedLabel = listName ? `Added to "${listName}"` : "Added";
+    return `${from}<span style="display:inline-block;width:8px"></span><span style="color:#4ade80">${addedLabel}</span>`;
+  }
+  if (inv.status === "declined") {
+    return `${from}<span style="display:inline-block;width:8px"></span><span style="color:#f87171">Declined</span>`;
+  }
+  return from;
 }
 
 // Returns true if msg from other person is newer than last local read
@@ -4055,9 +4074,9 @@ function _renderListInvCard(inv) {
   if (isReceived) {
     statusLine = `<span style="color:var(--accent-text)">↓ ${inv.from_name || 'Someone'} invited you</span>`;
   } else {
-    if (inv.status === 'accepted') statusLine = `<span style="color:var(--accent-text)">↑ to ${inv.to_name || '?'}</span>  <span style="color:#4ade80">Accepted</span>`;
-    else if (inv.status === 'declined') statusLine = `<span style="color:var(--accent-text)">↑ to ${inv.to_name || '?'}</span>  <span style="color:#f87171">Declined</span>`;
-    else statusLine = `<span style="color:var(--accent-text)">↑ to ${inv.to_name || '?'}</span>  <span style="color:#555">📤 Sent</span>`;
+    if (inv.status === 'accepted') statusLine = `<span style="color:var(--accent-text)">↑ to ${inv.to_name || '?'}</span><span style="display:inline-block;width:8px"></span><span style="color:#4ade80">Accepted</span>`;
+    else if (inv.status === 'declined') statusLine = `<span style="color:var(--accent-text)">↑ to ${inv.to_name || '?'}</span><span style="display:inline-block;width:8px"></span><span style="color:#f87171">Declined</span>`;
+    else statusLine = `<span style="color:var(--accent-text)">↑ to ${inv.to_name || '?'}</span><span style="display:inline-block;width:8px"></span><span style="color:#555">📤 Sent</span>`;
   }
 
   return `<div class="inv-card${isCardUnread ? ' inv-unread' : ''}" id="inv-card-${inv.id}">
@@ -4104,10 +4123,7 @@ function _renderInvCard(inv) {
           <div>
             <div style="font-family:'Bebas Neue',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;line-height:1.2">${inv.title}${inv.year ? ` (${inv.year})` : ""}</div>
             <div style="font-size:11px;margin-top:2px;display:flex;align-items:center;flex-wrap:wrap;gap:2px">
-              ${isReceived
-                ? `<span style="color:var(--accent-text)">↓ from ${inv.from_name || "someone"}</span>`
-                : _sentStatusHTML(inv)
-              }
+              ${isReceived ? _receivedStatusHTML(inv) : _sentStatusHTML(inv)}
               ${msgBadge}
             </div>
           </div>
@@ -4505,9 +4521,9 @@ function renderProfileStats(watched) {
     return `<div class="stats-block" style="margin-bottom:6px">
       <div class="stats-block-header" onclick="toggleStatsBlock('acc-${id}')">
         <div class="stats-block-title">${icon} ${label}</div>
-        <span class="stats-block-arrow" id="stats-arrow-acc-${id}">▲</span>
+        <span class="stats-block-arrow" id="stats-arrow-acc-${id}">▼</span>
       </div>
-      <div class="stats-block-body" id="stats-body-acc-${id}" style="display:block">${rows}</div>
+      <div class="stats-block-body" id="stats-body-acc-${id}">${rows}</div>
     </div>`;
   }
 
