@@ -1307,6 +1307,44 @@ body {
   font-family:'DM Sans',sans-serif; transition:all 0.15s;
 }
 .lang-btn.active { background:var(--accent-soft); border-color:var(--accent-border); color:var(--accent-text); font-weight:600; }
+
+/* ── Lightbox ─────────────────────────────────────────────────────────────────── */
+#lightbox-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,0.92);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.22s ease;
+  cursor: zoom-out;
+}
+#lightbox-overlay.visible { opacity: 1; }
+#lightbox-img {
+  max-width: min(85vw, 340px);
+  max-height: 85vh;
+  border-radius: 12px;
+  object-fit: contain;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.8);
+  transform: scale(0.92);
+  transition: transform 0.22s ease;
+  cursor: default;
+}
+#lightbox-overlay.visible #lightbox-img { transform: scale(1); }
+#lightbox-title {
+  position: absolute; bottom: 28px; left: 0; right: 0;
+  text-align: center; color: rgba(255,255,255,0.7);
+  font-size: 13px; font-weight: 500; padding: 0 32px;
+  pointer-events: none;
+}
+#lightbox-close {
+  position: absolute; top: 16px; right: 16px;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,0.12); border: none;
+  color: #fff; font-size: 20px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s; line-height: 1;
+}
+#lightbox-close:hover { background: rgba(255,255,255,0.22); }
+.poster-zoomable { cursor: zoom-in; transition: filter 0.15s, opacity 0.15s; }
+.poster-zoomable:hover { filter: brightness(1.12); opacity: 0.92; }
 </style>
 </head>
 <body>
@@ -1537,17 +1575,25 @@ body {
 <div id="detail-overlay" class="overlay" style="display:none" onclick="closeDetail()">
   <div class="modal" onclick="event.stopPropagation()" style="position:relative">
     <div class="modal-handle"></div>
-    <button onclick="closeDetail()" style="position:absolute;top:18px;right:14px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:6px;z-index:1">×</button>
+    <button onclick="navModalBack()" style="position:absolute;top:18px;right:14px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:6px;z-index:1">×</button>
     <div id="detail-content" class="modal-body"></div>
   </div>
 </div>
 
 <!-- Person Modal -->
 <div id="person-overlay" class="overlay" style="display:none" onclick="closePerson()">
-  <div class="modal" onclick="event.stopPropagation()">
+  <div class="modal" onclick="event.stopPropagation()" style="position:relative">
+    <button onclick="navModalBack()" style="position:absolute;top:18px;right:14px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:6px;z-index:1">×</button>
     <div class="modal-handle"></div>
     <div id="person-content" class="modal-body"></div>
   </div>
+</div>
+
+<!-- Lightbox -->
+<div id="lightbox-overlay" style="display:none" onclick="closeLightbox()">
+  <button id="lightbox-close" onclick="event.stopPropagation();closeLightbox()">×</button>
+  <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()">
+  <div id="lightbox-title"></div>
 </div>
 
 <!-- Add Modal -->
@@ -1686,6 +1732,8 @@ body {
         <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">🇷🇺 Русский</button>
       </div>
 
+      <button onclick="replayOnboarding()" data-i18n="replay_onboarding" style="width:100%;padding:9px;border-radius:9px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:14px;transition:all 0.15s" onmouseover="this.style.borderColor='var(--accent-border)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">🎬 Replay Welcome Tour</button>
+
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" data-i18n="close" onclick="closeAccount()">Close</button>
         <button class="btn-modal-close" data-i18n="sign_out" onclick="closeAccount();signOut();" style="color:#f87171;border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.05)">Sign Out</button>
@@ -1781,6 +1829,7 @@ const I18N = {
     lang_label:"Language",
     search_ph:"Movie or series title…",
     friend_search_ph:"Search by name to add…",
+    replay_onboarding:"🎬 Replay Welcome Tour",
   },
   ru: {
     auth_tagline:"Фильмы · AI подборки · Друзья",
@@ -1812,6 +1861,7 @@ const I18N = {
     lang_label:"Язык",
     search_ph:"Название фильма или сериала…",
     friend_search_ph:"Поиск по имени…",
+    replay_onboarding:"🎬 Пройти тур заново",
   }
 };
 let _lang = localStorage.getItem('lang') || (navigator.language.startsWith('ru') ? 'ru' : 'en');
@@ -1864,8 +1914,15 @@ function _obNext() {
 function _obFinish() {
   localStorage.setItem('onboarded', '1');
   const el = document.getElementById('screen-onboarding');
-  if (el) { el.style.opacity = '0'; el.style.transition = 'opacity 0.3s'; setTimeout(() => { el.style.display = 'none'; }, 300); }
-  showScreen('signin');
+  if (el) { el.style.opacity = '0'; el.style.transition = 'opacity 0.3s'; setTimeout(() => { el.style.display = 'none'; el.style.opacity = '1'; }, 300); }
+  // If user is already signed in (replay from account), just hide onboarding — don't redirect to sign-in
+  if (!currentUser) showScreen('signin');
+}
+
+function replayOnboarding() {
+  closeAccount();
+  localStorage.removeItem('onboarded');
+  setTimeout(() => { _maybeShowOnboarding(); }, 100);
 }
 
 function _maybeShowOnboarding() {
@@ -2294,9 +2351,14 @@ function switchTab(name) {
 }
 
 // ── UI helpers ────────────────────────────────────────────────────────────────
-function posterHTML(src, title, w=56, h=80) {
+function posterHTML(src, title, w=56, h=80, lightbox=false) {
   const s = `width:${w}px;height:${h}px;flex-shrink:0;border-radius:8px;overflow:hidden;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:22px`;
-  if (src && src !== "N/A") return `<div style="${s}"><img src="${src}" alt="${title||''}" style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.parentNode.innerHTML='🎬'"></div>`;
+  if (src && src !== "N/A") {
+    const safeTitle = (title||'').replace(/'/g, "\\'");
+    const imgClass = lightbox ? 'class="poster-zoomable"' : '';
+    const imgClick = lightbox ? `onclick="event.stopPropagation();openLightbox('${src}','${safeTitle}')"` : '';
+    return `<div style="${s}"><img src="${src}" alt="${title||''}" ${imgClass} ${imgClick} style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.parentNode.innerHTML='🎬'"></div>`;
+  }
   return `<div style="${s}">🎬</div>`;
 }
 function starsHTML(n, size=13) {
@@ -2475,12 +2537,42 @@ function clickableNames(str, closeModal) {
   if (!str) return "";
   return str.split(", ").map(name => {
     const safe = name.trim().replace(/'/g, "\\'");
-    const close = closeModal ? "closeDetail();" : "";
-    return `<span onclick="${close}openPerson('${safe}')" style="cursor:pointer;color:#ddd;border-bottom:1px dotted rgba(255,255,255,0.2);transition:color .15s;white-space:nowrap" onmouseover="this.style.color='var(--primary)';this.style.borderBottomColor='var(--primary)'" onmouseout="this.style.color='#ddd';this.style.borderBottomColor='rgba(255,255,255,0.2)'">${name.trim()}</span>`;
+    // Use back-nav-friendly transition when called from inside detail modal
+    const handler = closeModal ? `_transitionToPerson('${safe}')` : `openPerson('${safe}')`;
+    return `<span onclick="${handler}" style="cursor:pointer;color:#ddd;border-bottom:1px dotted rgba(255,255,255,0.2);transition:color .15s;white-space:nowrap" onmouseover="this.style.color='var(--primary)';this.style.borderBottomColor='var(--primary)'" onmouseout="this.style.color='#ddd';this.style.borderBottomColor='rgba(255,255,255,0.2)'">${name.trim()}</span>`;
   }).join('<span style="color:var(--muted)">, </span>');
 }
 
+// ── Modal navigation stack (detail ↔ person back navigation) ─────────────────
+let _modalStack = [];        // history of previous modal states
+let _currentModal = null;    // current state: {type:'detail',id,mediaType} or {type:'person',name}
+
+function _transitionToPerson(name) {
+  // From detail → person: push current detail to stack, hide detail, open person
+  if (_currentModal) _modalStack.push(_currentModal);
+  document.getElementById("detail-overlay").style.display = "none";
+  openPerson(name);
+}
+function _transitionToDetail(id, type) {
+  // From person → detail: push current person to stack, hide person, open detail
+  if (_currentModal) _modalStack.push(_currentModal);
+  document.getElementById("person-overlay").style.display = "none";
+  openDetail(id, type);
+}
+function navModalBack() {
+  // Used by X / Close buttons inside modal: pop stack and reopen previous, or fully close
+  document.getElementById("detail-overlay").style.display = "none";
+  document.getElementById("person-overlay").style.display = "none";
+  _currentModal = null;
+  if (_modalStack.length === 0) return;
+  const prev = _modalStack.pop();
+  if (prev.type === 'detail') openDetail(prev.id, prev.mediaType);
+  else if (prev.type === 'person') openPerson(prev.name);
+}
+function _clearModalStack() { _modalStack = []; _currentModal = null; }
+
 async function openDetail(id, type) {
+  _currentModal = { type: 'detail', id, mediaType: type };
   document.getElementById("detail-overlay").style.display = "flex";
   document.getElementById("detail-content").innerHTML = loadingHTML(randQuote(), false);
   try {
@@ -2513,7 +2605,7 @@ async function openDetail(id, type) {
       ? `<div class="list-check-section"><div id="detail-list-checklist">${_buildListChecklistHTML(String(id))}</div></div>`
       : '';
 
-    let actionBtns = `<button class="btn-modal-close" onclick="closeDetail()">Close</button>`;
+    let actionBtns = `<button class="btn-modal-close" onclick="navModalBack()">Close</button>`;
     if (status === "watched") {
       actionBtns += `<div class="already-badge">✓ Watched</div>`;
     } else {
@@ -2525,7 +2617,7 @@ async function openDetail(id, type) {
 
     document.getElementById("detail-content").innerHTML = `
       <div style="display:flex;gap:14px;margin-bottom:16px">
-        ${posterHTML(d.Poster, d.Title, 90, 134)}
+        ${posterHTML(d.Poster, d.Title, 90, 134, true)}
         <div style="flex:1;min-width:0">
           <div class="modal-title">${d.Title}</div>
           ${d.OriginalTitle && d.OriginalTitle !== d.Title ? `<div style="color:var(--muted);font-size:11px;margin-top:1px">${d.OriginalTitle}</div>` : ""}
@@ -2545,10 +2637,38 @@ async function openDetail(id, type) {
     document.getElementById("detail-content").innerHTML = `<div class="empty-state"><div class="empty-state-title">Error</div><p>${e.message}</p></div>`;
   }
 }
-function closeDetail() { document.getElementById("detail-overlay").style.display = "none"; }
+function closeDetail() {
+  document.getElementById("detail-overlay").style.display = "none";
+  _clearModalStack();
+}
+
+// ── Lightbox ──────────────────────────────────────────────────────────────────
+function openLightbox(url, title) {
+  if (!url || url === "N/A") return;
+  // Upgrade to higher-res TMDB image if it's a w300 url
+  const hiRes = url.replace('/w300/', '/w780/').replace('/w185/', '/w500/');
+  const ov = document.getElementById("lightbox-overlay");
+  const img = document.getElementById("lightbox-img");
+  const ttl = document.getElementById("lightbox-title");
+  img.src = hiRes;
+  ttl.textContent = title || "";
+  ov.style.display = "flex";
+  requestAnimationFrame(() => { requestAnimationFrame(() => { ov.classList.add("visible"); }); });
+}
+function closeLightbox() {
+  const ov = document.getElementById("lightbox-overlay");
+  ov.classList.remove("visible");
+  setTimeout(() => { ov.style.display = "none"; }, 230);
+}
+// Close lightbox on ESC
+document.addEventListener("keydown", e => { if (e.key === "Escape") { closeLightbox(); } });
 
 // ── Person ────────────────────────────────────────────────────────────────────
-function closePerson() { document.getElementById("person-overlay").style.display = "none"; }
+function closePerson() {
+  document.getElementById("person-overlay").style.display = "none";
+  _clearModalStack();
+}
+
 
 // ── Streaming links ───────────────────────────────────────────────────────────
 function streamingLinks(query, compact) {
@@ -2582,6 +2702,7 @@ function streamingLinks(query, compact) {
 function openStreaming(deepLink, webUrl) { window.location.href = deepLink; setTimeout(() => { window.open(webUrl, "_blank"); }, 600); }
 
 async function openPerson(name) {
+  _currentModal = { type: 'person', name };
   const el = document.getElementById("person-content");
   document.getElementById("person-overlay").style.display = "flex";
   el.innerHTML = loadingHTML(randQuote(), false);
@@ -2590,7 +2711,7 @@ async function openPerson(name) {
     const person = searchRes.results?.[0];
     if (!person) {
       el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🤷</div><div class="empty-state-title">Not Found</div><p>No results for "${name}"</p></div>
-        <div style="margin-top:16px"><button class="btn-modal-close w-full" onclick="closePerson()">Close</button></div>`;
+        <div style="margin-top:16px"><button class="btn-modal-close w-full" onclick="navModalBack()">Close</button></div>`;
       return;
     }
     const credits = await tmdbFetch(`/person/${person.id}/combined_credits?language=en-US`);
@@ -2636,8 +2757,8 @@ async function openPerson(name) {
             <button class="btn-watched" style="font-size:10px;padding:2px 7px" onclick="openAdd(_movieRegistry['${key}'],'watched')">✓</button>`;
           return `
           <div class="card" style="align-items:center">
-            <div onclick="closePerson();openDetail('${m.tmdbID}','${m.type}')" style="display:flex;gap:11px;flex:1;min-width:0;cursor:pointer">
-              ${posterHTML(m.Poster, m.Title)}
+            <div onclick="_transitionToDetail('${m.tmdbID}','${m.type}')" style="display:flex;gap:11px;flex:1;min-width:0;cursor:pointer">
+              ${posterHTML(m.Poster, m.Title, 56, 80, true)}
               <div class="card-body">
                 <div class="card-title">${m.Title}</div>
                 <div class="card-meta">${m.Year}${m.Rating ? ` · ★ ${m.Rating}` : ""}${m.type === "tv" ? " · TV" : ""}</div>
@@ -2648,10 +2769,10 @@ async function openPerson(name) {
           </div>`;
         }).join("")}
       </div>
-      <div style="margin-top:16px"><button class="btn-modal-close w-full" onclick="closePerson()">Close</button></div>`;
+      <div style="margin-top:16px"><button class="btn-modal-close w-full" onclick="navModalBack()">Close</button></div>`;
   } catch(e) {
     el.innerHTML = `<div class="empty-state"><div class="empty-state-title">Error</div><p>${e.message}</p></div>
-      <div style="margin-top:16px"><button class="btn-modal-close" onclick="closePerson()">Close</button></div>`;
+      <div style="margin-top:16px"><button class="btn-modal-close" onclick="navModalBack()">Close</button></div>`;
   }
 }
 
@@ -2807,7 +2928,7 @@ function renderHistory() {
         const key = regMovie({ tmdbID: item.tmdbID, Title: item.title, Year: item.year, Poster: item.poster, type: item.mediaType||"movie" });
         return `
         <div class="hist-card ${item.status==='plan'?'plan':''}" onclick="${item.tmdbID?`openDetail('${item.tmdbID}','${item.mediaType||"movie"}')`:''}">
-          <div class="hist-poster">${item.poster&&item.poster!=="N/A"?`<img src="${item.poster}" alt="" onerror="this.parentNode.innerHTML='🎬'">`:"🎬"}</div>
+          <div class="hist-poster">${item.poster&&item.poster!=="N/A"?`<img src="${item.poster}" alt="" class="poster-zoomable" onclick="event.stopPropagation();openLightbox('${item.poster}','${(item.title||'').replace(/'/g,"\\'")}${item.year?' ('+item.year+')':''}')" onerror="this.parentNode.innerHTML='🎬'"`+`>`:"🎬"}</div>
           <div style="flex:1;min-width:0">
             <div class="hist-title">${item.title}</div>
             <div class="hist-meta">${item.year} · ${item.date}</div>
@@ -4065,15 +4186,23 @@ async function sendInviteMsg(inviteId, text, type = "text") {
   const inv = allInvs.find(i => i.id === inviteId);
   if (!inv) return;
   const newMsg = { from: currentUser.id, name: currentUser.displayName || "User", text, type, at: new Date().toISOString() };
+  // Optimistic UI: append locally (will be replaced by authoritative array via realtime echo)
   if (!inv.messages) inv.messages = [];
   inv.messages.push(newMsg);
   inv.last_msg_at = newMsg.at;
   renderInboxFromCache();
   try {
-    await sbClient.from("invites").update({ messages: inv.messages, last_msg_at: newMsg.at }).eq("id", inviteId);
+    // Atomic append at DB level — prevents lost-update races between concurrent senders
+    const { error } = await sbClient.rpc('append_invite_message', {
+      p_invite_id: inviteId,
+      p_msg: newMsg
+    });
+    if (error) throw new Error(error.message);
   } catch(e) {
     showToast("Failed to send: " + e.message, true);
-    inv.messages.pop();
+    // Revert optimistic push
+    const i = inv.messages.indexOf(newMsg);
+    if (i >= 0) inv.messages.splice(i, 1);
     renderInboxFromCache();
   }
 }
