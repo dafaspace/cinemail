@@ -1648,11 +1648,11 @@ body {
       <div class="backup-row">
         <button class="btn-backup btn-backup-drive-action" id="btn-drive-save" onclick="backupSaveToDrive()">
           <svg viewBox="0 0 87.3 78" width="13" height="13" style="flex-shrink:0" xmlns="http://www.w3.org/2000/svg"><path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/><path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/><path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/><path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/><path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/><path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 27h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/></svg>
-          Save to Drive
+          <span id="btn-drive-save-lbl">Save to Drive</span>
         </button>
         <button class="btn-backup btn-backup-drive-action" id="btn-drive-restore" onclick="backupRestoreFromDrive()">
           <svg viewBox="0 0 87.3 78" width="13" height="13" style="flex-shrink:0" xmlns="http://www.w3.org/2000/svg"><path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/><path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/><path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/><path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/><path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/><path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 27h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/></svg>
-          Restore
+          <span id="btn-drive-restore-lbl">Restore</span>
         </button>
       </div>
       <div id="drive-backup-meta" style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:14px;min-height:14px"></div>
@@ -4223,17 +4223,26 @@ async function applyBackupData(rows) {
 // Preserves user data (stars, comment, status) — only fills in media metadata
 async function _enrichFromTMDB(rows, onProgress) {
   const enriched = [];
+  const _delay = ms => new Promise(res => setTimeout(res, ms));
   for (let i = 0; i < rows.length; i++) {
     onProgress?.(i + 1, rows.length);
+    if (i > 0 && i % 20 === 0) await _delay(500); // avoid TMDB rate limit
     const r = { ...rows[i] };
     if (r.imdb_id) {
       const type = r.media_type === "tv" ? "tv" : "movie";
+      const alt  = type === "tv" ? "movie" : "tv";
       try {
-        const detail = await tmdbFetch(`/${type}/${r.imdb_id}?language=en-US`);
+        let detail = await tmdbFetch(`/${type}/${r.imdb_id}?language=en-US`);
+        // Try alternate type if primary returned not-found
+        if (detail?.status_code === 34 || !detail || detail.success === false) {
+          detail = await tmdbFetch(`/${alt}/${r.imdb_id}?language=en-US`);
+          if (detail && !detail.status_code) r.media_type = alt;
+        }
         if (detail && !detail.status_code) {
-          r.poster   = detail.poster_path ? TMDB_IMG + detail.poster_path : r.poster || "";
-          r.title    = (type === "tv" ? detail.name : detail.title) || r.title;
-          r.year     = ((type === "tv" ? detail.first_air_date : detail.release_date) || "").slice(0, 4) || r.year;
+          const isTV = r.media_type === "tv";
+          r.poster = detail.poster_path ? TMDB_IMG + detail.poster_path : r.poster || "";
+          r.title  = (isTV ? detail.name : detail.title) || r.title;
+          r.year   = ((isTV ? detail.first_air_date : detail.release_date) || "").slice(0, 4) || r.year;
         }
       } catch(e) { /* keep original values on network error */ }
     }
@@ -4446,8 +4455,12 @@ function _setDriveMeta(text) {
 function _setDriveBtns(disabled, saveLabel = "Save to Drive", restoreLabel = "Restore") {
   const s = document.getElementById("btn-drive-save");
   const r = document.getElementById("btn-drive-restore");
-  if (s) { s.disabled = disabled; if (saveLabel) s.childNodes[s.childNodes.length - 1].textContent = " " + saveLabel; }
-  if (r) { r.disabled = disabled; if (restoreLabel) r.childNodes[r.childNodes.length - 1].textContent = " " + restoreLabel; }
+  const sl = document.getElementById("btn-drive-save-lbl");
+  const rl = document.getElementById("btn-drive-restore-lbl");
+  if (s) s.disabled = disabled;
+  if (r) r.disabled = disabled;
+  if (sl && saveLabel) sl.textContent = saveLabel;
+  if (rl && restoreLabel) rl.textContent = restoreLabel;
 }
 
 async function backupSaveToDrive() {
@@ -4461,7 +4474,9 @@ async function backupSaveToDrive() {
     if (!rows.length) { showToast("Nothing to export yet"); return; }
     await BackupDrive.export(rows);
     const now = new Date();
-    _setDriveMeta(`Last saved: ${now.toLocaleDateString()} ${now.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`);
+    const metaStr = `Last saved: ${now.toLocaleDateString()} ${now.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`;
+    localStorage.setItem('driveLastSaved', metaStr);
+    _setDriveMeta(metaStr);
     showToast(`✓ Saved ${rows.length} items to Google Drive`);
   } catch(e) {
     const msg = e.message === "popup_closed_by_user" ? "Authorization cancelled" : e.message;
@@ -4504,12 +4519,19 @@ async function refreshDriveMeta() {
     _setDriveMeta("Add Client ID to enable Google Drive");
     return;
   }
-  // Only check if we already have a token (no silent popup)
+  // Show cached date immediately (no popup needed)
+  const cached = localStorage.getItem('driveLastSaved');
+  if (cached) { _setDriveMeta(cached); return; }
+  // Only query Drive API if we already have a valid token
   if (!BackupDrive._token || Date.now() >= BackupDrive._tokenExpiry - 60_000) {
     _setDriveMeta(""); return;
   }
   const d = await BackupDrive.getLastBackupInfo();
-  if (d) _setDriveMeta(`Last saved: ${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`);
+  if (d) {
+    const metaStr = `Last saved: ${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`;
+    localStorage.setItem('driveLastSaved', metaStr);
+    _setDriveMeta(metaStr);
+  }
 }
 
 // ── Public backup actions ──────────────────────────────────────────────────────
