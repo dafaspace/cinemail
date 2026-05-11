@@ -1619,9 +1619,9 @@ body {
 </div>
 
 <!-- Account Modal -->
-<div id="account-overlay" class="overlay" style="display:none" onclick="closeAccount()">
-  <div style="padding:20px;width:100%;display:flex;justify-content:center" onclick="event.stopPropagation()">
-    <div class="modal-sheet" style="max-width:360px" onclick="event.stopPropagation()">
+<div id="account-overlay" class="overlay" style="display:none;align-items:flex-start;overflow-y:auto;padding-top:env(safe-area-inset-top)" onclick="closeAccount()">
+  <div style="padding:20px;width:100%;display:flex;justify-content:center;min-height:100%" onclick="event.stopPropagation()">
+    <div class="modal-sheet" style="max-width:360px;width:100%;height:fit-content;align-self:flex-start" id="account-modal-sheet" onclick="event.stopPropagation()">
       <div style="text-align:center;padding:8px 0 20px">
         <div class="acc-avatar" id="acc-modal-avatar">U</div>
         <div style="font-family:'Bebas Neue',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:24px;letter-spacing:0.5px;color:var(--text)" id="acc-name-display">User</div>
@@ -4306,25 +4306,44 @@ function showToast(msg, isError=false) {
 }
 
 // ── Account ───────────────────────────────────────────────────────────────────
-function openAccount() {
+async function openAccount() {
   if(!currentUser)return;
-  const name=currentUser.displayName||currentUser.email?.split("@")[0]||"User";
-  const initial=name.charAt(0).toUpperCase();
-  document.getElementById("acc-modal-avatar").textContent=initial;
-  document.getElementById("acc-name-display").textContent=name;
-  document.getElementById("acc-email-display").textContent=currentUser.email||"";
-  document.getElementById("acc-name-input").value=name;
-  const watched=watchHistory.filter(h=>h.status==="watched");
-  const plan=watchHistory.filter(h=>h.status==="plan");
-  const rated=watched.filter(h=>h.stars>0);
-  const avg=rated.length?(rated.reduce((sum,h)=>sum+h.stars,0)/rated.length).toFixed(1):"0.0";
-  document.getElementById("acc-stat-watched").textContent=watched.length;
-  document.getElementById("acc-stat-plan").textContent=plan.length;
-  document.getElementById("acc-stat-avg").textContent=avg;
+
+  // Show modal immediately with whatever we have
   document.getElementById("account-overlay").style.display="flex";
+  const sheet = document.getElementById("account-modal-sheet");
+  if (sheet) sheet.scrollTop = 0;
+
+  // Always re-fetch display name from DB to avoid stale cache
+  try {
+    const { data: pd } = await sbClient.from("profiles").select("display_name").eq("id", currentUser.id).limit(1);
+    if (pd?.[0]?.display_name) currentUser.displayName = pd[0].display_name;
+  } catch(e) {}
+
+  const name = currentUser.displayName || currentUser.email?.split("@")[0] || "User";
+  const initial = name.charAt(0).toUpperCase();
+  document.getElementById("acc-modal-avatar").textContent = initial;
+  document.getElementById("acc-name-display").textContent = name;
+  document.getElementById("acc-email-display").textContent = currentUser.email || "";
+  document.getElementById("acc-name-input").value = name;
+
+  // Always re-fetch history to get fresh data
+  try { watchHistory = await loadHistoryFromDB(); } catch(e) {}
+
+  _updateAccountStats();
   refreshDriveMeta();
   renderListsSection();
   renderFriendsSection();
+}
+
+function _updateAccountStats() {
+  const watched = watchHistory.filter(h => h.status === "watched");
+  const plan    = watchHistory.filter(h => h.status === "plan");
+  const rated   = watched.filter(h => h.stars > 0);
+  const avg     = rated.length ? (rated.reduce((s,h)=>s+h.stars,0)/rated.length).toFixed(1) : "0.0";
+  document.getElementById("acc-stat-watched").textContent = watched.length;
+  document.getElementById("acc-stat-plan").textContent    = plan.length;
+  document.getElementById("acc-stat-avg").textContent     = avg;
   renderProfileStats(watched);
 }
 
@@ -4374,7 +4393,11 @@ function renderProfileStats(watched) {
     ${barBlock('composers', '🎵', 'Top Composers', composers)}
   `;
 }
-function closeAccount(){document.getElementById("account-overlay").style.display="none";}
+function closeAccount(){
+  const ov = document.getElementById("account-overlay");
+  ov.style.display="none";
+  ov.scrollTop = 0;
+}
 async function saveDisplayName() {
   const newName=document.getElementById("acc-name-input").value.trim();
   if(!newName){showToast("Name cannot be empty",true);return;}
