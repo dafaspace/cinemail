@@ -3464,33 +3464,33 @@ function renderListTabs() {
   if (!row) return;
 
   // Ensure a valid active tab
-  const valid = _activeListId === ‘personal’ || _activeListId === ‘watched’
+  const valid = _activeListId === 'personal' || _activeListId === 'watched'
     || _listsCache.find(l => l.id === _activeListId);
-  if (!valid) _activeListId = ‘personal’;
+  if (!valid) _activeListId = 'personal';
 
-  const _personalName = (currentUser?.displayName || currentUser?.email?.split(‘@’)[0] || ‘My’) + "’s List";
-  let html = `<button class="list-tab personal ${_activeListId === ‘personal’ ? ‘active’ : ‘’}" onclick="switchListTab(‘personal’)">${_personalName}</button>`;
+  const _personalName = (currentUser?.displayName || currentUser?.email?.split('@')[0] || 'My') + "'s List";
+  let html = `<button class="list-tab personal ${_activeListId === 'personal' ? 'active' : ''}" onclick="switchListTab('personal')">${_personalName}</button>`;
 
   _listsCache.forEach(l => {
-    html += `<button class="list-tab ${_activeListId === l.id ? ‘active’ : ‘’}" onclick="switchListTab(‘${l.id}’)">${l.name}</button>`;
+    html += `<button class="list-tab ${_activeListId === l.id ? 'active' : ''}" onclick="switchListTab('${l.id}')">${l.name}</button>`;
   });
 
   if (_listTabCreating) {
     html += `<input id="list-tab-input" type="text" placeholder="List name…"
-      style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:rgba(124,58,237,0.1);color:var(--text);font-size:12px;font-family:’DM Sans’,sans-serif;outline:none;width:110px;flex-shrink:0"
-      onkeydown="if(event.key===’Enter’)_confirmNewListTab();if(event.key===’Escape’)_cancelNewListTab()"
+      style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:rgba(124,58,237,0.1);color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;width:110px;flex-shrink:0"
+      onkeydown="if(event.key==='Enter')_confirmNewListTab();if(event.key==='Escape')_cancelNewListTab()"
       onblur="_cancelNewListTab()">
-    <button onclick="_confirmNewListTab()" style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--accent-text);font-size:11px;cursor:pointer;font-family:’Bebas Neue’,-apple-system,’SF Pro Display’,’Helvetica Neue’,Arial,sans-serif;letter-spacing:0.5px;flex-shrink:0">Create</button>`;
+    <button onclick="_confirmNewListTab()" style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'Bebas Neue',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px;flex-shrink:0">Create</button>`;
   } else {
     html += `<button class="list-tab-add" onclick="_startNewListTab()" data-i18n="new_list_tab">+ New</button>`;
   }
 
   // Watched tab — always last
-  html += `<button class="list-tab watched ${_activeListId === ‘watched’ ? ‘active’ : ‘’}" onclick="switchListTab(‘watched’)" data-i18n="tab_watched">✓ Watched</button>`;
+  html += `<button class="list-tab watched ${_activeListId === 'watched' ? 'active' : ''}" onclick="switchListTab('watched')" data-i18n="tab_watched">✓ Watched</button>`;
 
   row.innerHTML = html;
   if (_listTabCreating) {
-    const inp = document.getElementById(‘list-tab-input’);
+    const inp = document.getElementById('list-tab-input');
     if (inp) { inp.focus(); }
   }
 
