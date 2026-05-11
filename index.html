@@ -2884,11 +2884,12 @@ async function openPerson(name) {
           const status = getEntryStatus(m.tmdbID);
           const role = r.character || r.job || "";
           let actionBtns = "";
-          if (status === "watched") actionBtns = `<span class="badge-watched" style="font-size:10px">✓</span>`;
-          else if (status === "plan") actionBtns = `<span style="color:#aaa;font-size:12px">≡</span>`;
+          if (status === "watched") actionBtns = `<span class="badge-watched" style="font-size:11px;padding:3px 8px">✓</span>`;
+          else if (status === "plan") actionBtns = `<span style="color:#aaa;font-size:13px;padding:3px 8px">≡</span>`;
           else actionBtns = `
-            <button class="btn-watchlist" style="font-size:10px;padding:2px 7px" onclick="_maybePickList(_movieRegistry['${key}'],'plan')">+</button>
-            <button class="btn-watched" style="font-size:10px;padding:2px 7px" onclick="openAdd(_movieRegistry['${key}'],'watched')">✓</button>`;
+            <button class="btn-watchlist" style="font-size:13px;padding:4px 11px;min-width:32px" onclick="event.stopPropagation();_maybePickList(_movieRegistry['${key}'],'plan')">+</button>
+            <button class="btn-watched" style="font-size:13px;padding:4px 11px;min-width:32px" onclick="event.stopPropagation();openAdd(_movieRegistry['${key}'],'watched')">✓</button>`;
+          const shareBtn = `<button onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" title="Share" style="background:none;border:1px solid var(--accent-border);color:var(--accent-text);border-radius:6px;padding:3px 7px;cursor:pointer;transition:border-color .15s;display:inline-flex;align-items:center;justify-content:center" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--accent-border)'"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5.5 6.5M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
           return `
           <div class="card" style="align-items:center">
             <div onclick="_transitionToDetail('${m.tmdbID}','${m.type}')" style="display:flex;gap:11px;flex:1;min-width:0;cursor:pointer">
@@ -2899,7 +2900,7 @@ async function openPerson(name) {
                 ${role ? `<div style="color:var(--muted);font-size:11px;margin-top:2px;font-style:italic">${role}</div>` : ""}
               </div>
             </div>
-            <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;margin-left:6px">${actionBtns}</div>
+            <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;margin-left:6px;align-items:stretch">${actionBtns}${shareBtn}</div>
           </div>`;
         }).join("")}
       </div>
