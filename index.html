@@ -1641,6 +1641,7 @@ body {
           <div class="acc-stat-lbl">Avg ★</div>
         </div>
       </div>
+      <div id="acc-profile-stats" style="margin-bottom:4px"></div>
       <div class="add-label" data-i18n="display_name_lbl">Display Name</div>
       <div style="display:flex;gap:8px;margin-bottom:24px">
         <input type="text" id="acc-name-input" data-i18n-ph="display_name" placeholder="Your name"
@@ -2796,18 +2797,11 @@ function renderHistory() {
       <div class="stats-block-body" id="stats-body-${id}">${rows}</div>
     </div>`;
   }
-  // Show stats on personal list when enough watched films (regardless of active filter)
-  const showStats = _activeListId === 'personal' && watched.length >= 3;
-  const topDirectors = showStats ? buildTopStats(watched, "director", 2, 5) : [];
-  const topComposers = showStats ? buildTopStats(watched, "composer", 2, 5) : [];
-
   el.innerHTML = `
     <div class="history-header">
       <span>${watched.length} seen · ${plan.length} to watch</span>
       <span>Avg: ${avg}</span>
     </div>
-    ${collapsibleStatsBlock("directors", "🎬", "Your top directors", topDirectors)}
-    ${collapsibleStatsBlock("composers", "🎵", "Your top composers", topComposers)}
     <div class="card-list">
       ${filtered.map(item => {
         const key = regMovie({ tmdbID: item.tmdbID, Title: item.title, Year: item.year, Poster: item.poster, type: item.mediaType||"movie" });
@@ -4331,6 +4325,54 @@ function openAccount() {
   refreshDriveMeta();
   renderListsSection();
   renderFriendsSection();
+  renderProfileStats(watched);
+}
+
+function renderProfileStats(watched) {
+  const el = document.getElementById('acc-profile-stats');
+  if (!el) return;
+  if (!watched || watched.length < 1) { el.innerHTML = ''; return; }
+
+  function topNames(field, min, max) {
+    const map = {};
+    watched.forEach(h => {
+      if (!h[field]) return;
+      h[field].split(', ').forEach(n => { n = n.trim(); if (n) map[n] = (map[n]||0)+1; });
+    });
+    return Object.entries(map).filter(([,c])=>c>=min).sort((a,b)=>b[1]-a[1]).slice(0,max);
+  }
+
+  function barBlock(id, icon, label, items) {
+    if (!items.length) return '';
+    const maxC = items[0][1];
+    const rows = items.map(([name, count]) => {
+      const pct = Math.round((count/maxC)*100);
+      const safe = name.replace(/'/g,"\\'");
+      return `<div class="stats-bar-row" onclick="closeAccount();openPerson('${safe}')">
+        <div class="stats-bar-name">${name}</div>
+        <div class="stats-bar-track"><div class="stats-bar-fill" style="width:${pct}%"></div></div>
+        <div class="stats-bar-count">${count} film${count>1?'s':''}</div>
+      </div>`;
+    }).join('');
+    return `<div class="stats-block" style="margin-bottom:6px">
+      <div class="stats-block-header" onclick="toggleStatsBlock('acc-${id}')">
+        <div class="stats-block-title">${icon} ${label}</div>
+        <span class="stats-block-arrow" id="stats-arrow-acc-${id}">▲</span>
+      </div>
+      <div class="stats-block-body" id="stats-body-acc-${id}" style="display:block">${rows}</div>
+    </div>`;
+  }
+
+  const directors = topNames('director', 1, 5);
+  const composers = topNames('composer', 1, 5);
+
+  if (!directors.length && !composers.length) { el.innerHTML = ''; return; }
+
+  el.innerHTML = `
+    <div class="add-label" style="margin-bottom:6px">Your Cinema Profile</div>
+    ${barBlock('directors', '🎬', 'Top Directors', directors)}
+    ${barBlock('composers', '🎵', 'Top Composers', composers)}
+  `;
 }
 function closeAccount(){document.getElementById("account-overlay").style.display="none";}
 async function saveDisplayName() {
