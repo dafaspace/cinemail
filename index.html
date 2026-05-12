@@ -1268,34 +1268,42 @@ body {
 }
 .ob-slide {
   min-width: 100vw; width: 100vw; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; padding: 40px 32px 180px;
-  text-align: center;
-}
-.ob-icon {
-  font-size: 72px; margin-bottom: 28px; line-height: 1;
-  filter: drop-shadow(0 0 32px rgba(124,58,237,0.35));
+  align-items: center; justify-content: center; padding: 24px 28px 190px; gap: 4px;
 }
 .ob-title {
   font-family: 'Bebas Neue', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
-  font-size: 38px; letter-spacing: 1.5px; color: var(--text);
-  margin-bottom: 14px; line-height: 1.1;
+  font-size: 30px; letter-spacing: 1.5px; color: var(--text);
+  margin-bottom: 4px; line-height: 1.1; text-align: center;
 }
 .ob-title span { color: var(--primary); }
-.ob-body {
-  font-size: 15px; color: var(--muted); line-height: 1.6; max-width: 280px;
+.ob-body { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 280px; text-align: center; }
+/* Arrow animation */
+.ob-arr {
+  display: flex; justify-content: center; margin: 3px 0;
+  animation: ob-bounce 1.5s ease-in-out infinite;
 }
+@keyframes ob-bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+@keyframes ob-pulse-y {
+  0%,100%{box-shadow:0 0 0 0 rgba(245,197,24,0.35)}
+  50%{box-shadow:0 0 0 7px rgba(245,197,24,0)}
+}
+@keyframes ob-pulse-v {
+  0%,100%{box-shadow:0 0 0 0 rgba(124,58,237,0.4)}
+  50%{box-shadow:0 0 0 8px rgba(124,58,237,0)}
+}
+/* Bottom controls */
 .ob-bottom {
   position: absolute; bottom: 0; left: 0; right: 0;
-  padding: 24px 28px max(28px, env(safe-area-inset-bottom));
-  display: flex; flex-direction: column; align-items: center; gap: 20px;
+  padding: 20px 28px max(28px, env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
   background: linear-gradient(to top, var(--bg) 70%, transparent);
 }
-.ob-dots { display: flex; gap: 8px; }
+.ob-dots { display: flex; gap: 6px; }
 .ob-dot {
-  width: 7px; height: 7px; border-radius: 50%; background: var(--border);
+  width: 6px; height: 6px; border-radius: 50%; background: var(--border);
   transition: background 0.3s, width 0.3s; cursor: pointer;
 }
-.ob-dot.active { background: var(--primary); width: 20px; border-radius: 4px; }
+.ob-dot.active { background: var(--primary); width: 18px; border-radius: 3px; }
 .ob-btn-row { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 12px; }
 .ob-btn-skip {
   background: none; border: none; color: var(--muted); font-size: 14px;
@@ -1308,6 +1316,140 @@ body {
   font-family: 'DM Sans', sans-serif; transition: opacity 0.15s;
 }
 .ob-btn-next:active { opacity: 0.8; }
+/* ── Mock UI elements ────────────────────────────────────────────── */
+.ob-mock {
+  width: 100%; max-width: 300px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 14px;
+  padding: 12px 14px; overflow: hidden;
+}
+.ob-mock-search {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface2); border-radius: 8px;
+  padding: 8px 12px; border: 1px solid var(--border); margin-bottom: 8px;
+}
+.ob-mock-poster {
+  width: 32px; height: 46px; border-radius: 5px; flex-shrink: 0;
+  background: linear-gradient(145deg,#1a1a3e 0%,#2d1b4e 100%);
+  display: flex; align-items: center; justify-content: center; font-size: 14px; opacity: 0.75;
+}
+.ob-mock-row { display: flex; align-items: center; gap: 10px; }
+.ob-mock-ftitle { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.3; }
+.ob-mock-fmeta { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.ob-mock-add {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  background: var(--primary-soft); border: 1.5px solid var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: var(--primary);
+  animation: ob-pulse-y 2s ease-in-out infinite;
+}
+.ob-mock-sep { height: 1px; background: var(--border); margin: 8px 0; }
+.ob-mock-stars { display: flex; gap: 3px; font-size: 18px; margin: 5px 0 2px; }
+.ob-mock-btn-pair { display: flex; gap: 8px; margin-bottom: 4px; }
+.ob-mock-btn {
+  flex: 1; padding: 7px 0; border-radius: 8px; text-align: center;
+  border: 1px solid var(--border); background: var(--surface2);
+  color: var(--muted); font-size: 12px;
+}
+.ob-mock-btn-hl {
+  flex: 1; padding: 7px 0; border-radius: 8px; text-align: center;
+  border: 1.5px solid var(--primary); background: var(--primary-soft);
+  color: var(--primary); font-size: 12px; font-weight: 600;
+  animation: ob-pulse-y 2s ease-in-out infinite;
+}
+.ob-mock-surprise {
+  padding: 13px 24px; border-radius: 12px; border: none;
+  background: var(--accent); color: var(--accent-text);
+  font-size: 15px; font-weight: 600; width: 100%; cursor: default;
+  animation: ob-pulse-v 2s ease-in-out infinite;
+}
+.ob-mock-tab-row { display: flex; gap: 6px; overflow: hidden; margin-bottom: 8px; }
+.ob-mock-tab {
+  padding: 6px 11px; border-radius: 7px;
+  border: 1px solid var(--border); background: var(--surface2);
+  color: var(--muted); font-size: 12px; white-space: nowrap;
+}
+.ob-mock-tab-hl {
+  padding: 6px 11px; border-radius: 7px;
+  border: 1.5px solid var(--primary); background: rgba(245,197,24,0.12);
+  color: var(--primary); font-size: 12px; font-weight: 600; white-space: nowrap;
+  animation: ob-pulse-y 2s ease-in-out infinite;
+}
+.ob-mock-msg-from { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.ob-mock-av {
+  width: 26px; height: 26px; border-radius: 50%; background: #7c3aed;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: #fff; font-weight: 700; flex-shrink: 0;
+}
+.ob-mock-film-chip {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(245,197,24,0.07); border: 1px solid rgba(245,197,24,0.2);
+  border-radius: 8px; padding: 7px 10px;
+}
+.ob-mock-link { color: var(--accent-text); text-decoration: underline; font-size: 12px; }
+.ob-mock-credit { font-size: 12px; color: var(--muted); margin-top: 5px; }
+.ob-mock-acc-hd { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.ob-mock-acc-av {
+  width: 48px; height: 48px; border-radius: 50%; background: #7c3aed;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; flex-shrink: 0;
+  animation: ob-pulse-v 2s ease-in-out infinite;
+}
+.ob-mock-stats { display: flex; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+.ob-mock-stat {
+  flex: 1; padding: 8px 4px; text-align: center;
+  background: var(--surface2); border-right: 1px solid var(--border);
+}
+.ob-mock-stat:last-child { border-right: none; }
+.ob-mock-stat-n { font-size: 15px; font-weight: 700; color: var(--primary); }
+.ob-mock-stat-l { font-size: 10px; color: var(--muted); margin-top: 1px; }
+/* Streaming icons row (soundtracks) */
+.ob-mock-stream-row {
+  display: flex; gap: 7px;
+  padding: 6px; border-radius: 10px;
+  background: rgba(245,197,24,0.06);
+  border: 1.5px solid rgba(245,197,24,0.45);
+  width: fit-content;
+  animation: ob-pulse-y 2s ease-in-out infinite;
+}
+.ob-mock-stream-btn {
+  width: 28px; height: 28px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: 1px solid rgba(255,255,255,0.12);
+}
+.ob-mock-stream-btn.spotify { border-radius: 50%; }
+.ob-mock-section-label {
+  font-size: 10px; color: var(--muted);
+  letter-spacing: 0.5px; text-transform: uppercase;
+  margin-top: 8px; margin-bottom: 3px;
+}
+.ob-mock-composer { font-size: 13px; color: var(--text); margin-bottom: 8px; }
+/* Mini stats bars (top directors) */
+.ob-mock-mini-block { margin-top: 10px; }
+.ob-mock-mini-title {
+  font-size: 10px; color: var(--muted);
+  letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px;
+}
+.ob-mock-bar-row {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--text); margin-bottom: 3px;
+}
+.ob-mock-bar-name { flex-shrink: 0; min-width: 60px; }
+.ob-mock-bar-track {
+  flex: 1; height: 5px; border-radius: 3px;
+  background: rgba(255,255,255,0.05); position: relative; overflow: hidden;
+}
+.ob-mock-bar-fill {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+  border-radius: 3px;
+}
+/* Mini backup buttons */
+.ob-mock-backup-row { display: flex; gap: 6px; margin-top: 10px; }
+.ob-mock-mini-btn {
+  flex: 1; padding: 6px 0; text-align: center;
+  border-radius: 8px; font-size: 11px;
+  border: 1px solid var(--border); background: var(--surface2); color: var(--muted);
+}
 
 /* ── Language toggle ─────────────────────────────────────────────────────────── */
 .lang-toggle { display:flex; gap:6px; }
@@ -1420,25 +1562,235 @@ body {
 <div id="screen-onboarding">
   <div class="ob-slides-wrap" id="ob-slides-wrap">
 
-    <!-- Slide 1: Welcome -->
+    <!-- Slide 0: Welcome -->
     <div class="ob-slide">
-      <div class="ob-icon">🎬</div>
-      <div class="ob-title" data-i18n="ob1_title">MOVIE NIGHT</div>
-      <div class="ob-body" data-i18n="ob1_body">Your personal cinema companion. Track what you've seen, discover what's next.</div>
+      <div style="font-size:64px;margin-bottom:14px;line-height:1;filter:drop-shadow(0 0 28px rgba(245,197,24,0.25))">🎬</div>
+      <div class="ob-title" style="font-size:40px;letter-spacing:3px;margin-bottom:8px">MOVIE <span>NIGHT</span></div>
+      <div class="ob-body" data-i18n="ob0_body" style="margin-bottom:28px">Films · AI picks · Friends</div>
+      <div style="display:flex;gap:8px">
+        <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+      </div>
     </div>
 
-    <!-- Slide 2: Track & Discover -->
+    <!-- Slide 1: Find + Save -->
     <div class="ob-slide">
-      <div class="ob-icon">📋</div>
-      <div class="ob-title" data-i18n="ob2_title">Track &amp; Discover</div>
-      <div class="ob-body" data-i18n="ob2_body">Build your watchlist, rate films you've seen, and get AI-powered recommendations based on your taste.</div>
+      <div class="ob-mock">
+        <div class="ob-mock-search">
+          <span style="opacity:0.4;font-size:13px">🔍</span>
+          <span style="color:var(--text);font-size:13px">Inception</span>
+        </div>
+        <div class="ob-mock-row">
+          <div class="ob-mock-poster">🎬</div>
+          <div style="flex:1;min-width:0">
+            <div class="ob-mock-ftitle">Inception</div>
+            <div class="ob-mock-fmeta">2010 · Sci-Fi · ★ 8.8</div>
+          </div>
+          <div class="ob-mock-add">+</div>
+        </div>
+      </div>
+      <div class="ob-arr">
+        <svg viewBox="0 0 28 40" width="28" height="40" fill="none">
+          <line x1="14" y1="38" x2="14" y2="10" stroke="#F5C518" stroke-width="2.5" stroke-linecap="round"/>
+          <polyline points="6,18 14,8 22,18" fill="none" stroke="#F5C518" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="ob-title" data-i18n="ob1_title">Find. Save.</div>
+      <div class="ob-body" data-i18n="ob1_body">Search any title and tap + to add it to your list.</div>
     </div>
 
-    <!-- Slide 3: Share -->
+    <!-- Slide 2: Watched + Rate -->
     <div class="ob-slide">
-      <div class="ob-icon">👥</div>
-      <div class="ob-title" data-i18n="ob3_title">Watch Together</div>
-      <div class="ob-body" data-i18n="ob3_body">Create shared lists with friends, send film recommendations, and plan your next movie night.</div>
+      <div class="ob-mock">
+        <div class="ob-mock-row" style="margin-bottom:8px">
+          <div class="ob-mock-poster">🎬</div>
+          <div style="flex:1;min-width:0">
+            <div class="ob-mock-ftitle">Oppenheimer</div>
+            <div class="ob-mock-fmeta">2023 · Drama</div>
+          </div>
+        </div>
+        <div class="ob-mock-btn-pair">
+          <div class="ob-mock-btn" style="font-size:11px">≡ Add to list</div>
+          <div class="ob-mock-btn-hl">✓ Watched</div>
+        </div>
+        <div class="ob-mock-stars">★★★★☆</div>
+      </div>
+      <div class="ob-arr">
+        <svg viewBox="0 0 28 40" width="28" height="40" fill="none">
+          <line x1="14" y1="38" x2="14" y2="10" stroke="#F5C518" stroke-width="2.5" stroke-linecap="round"/>
+          <polyline points="6,18 14,8 22,18" fill="none" stroke="#F5C518" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="ob-title" data-i18n="ob2_title">Watched. Rated.</div>
+      <div class="ob-body" data-i18n="ob2_body">Mark it watched, leave a star rating and a note.</div>
+    </div>
+
+    <!-- Slide 3: Surprise Me / AI Picks -->
+    <div class="ob-slide">
+      <div class="ob-mock">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;letter-spacing:0.3px;text-transform:uppercase">✨ AI picks for you</div>
+        <button class="ob-mock-surprise">✨ Surprise Me</button>
+      </div>
+      <div class="ob-arr">
+        <svg viewBox="0 0 28 40" width="28" height="40" fill="none">
+          <line x1="14" y1="38" x2="14" y2="10" stroke="#F5C518" stroke-width="2.5" stroke-linecap="round"/>
+          <polyline points="6,18 14,8 22,18" fill="none" stroke="#F5C518" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="ob-title" data-i18n="ob3_title">No idea what to watch?</div>
+      <div class="ob-body" data-i18n="ob3_body">Surprise Me picks something based on what you've already seen and rated.</div>
+    </div>
+
+    <!-- Slide 4: Lists + Watched tab -->
+    <div class="ob-slide">
+      <div class="ob-mock">
+        <div class="ob-mock-tab-row">
+          <div class="ob-mock-tab">My Films</div>
+          <div class="ob-mock-tab" style="overflow:hidden;max-width:80px;text-overflow:ellipsis">Friends'</div>
+          <div class="ob-mock-tab-hl">✓ Watched</div>
+        </div>
+        <div class="ob-mock-sep"></div>
+        <div class="ob-mock-row" style="opacity:0.55">
+          <div class="ob-mock-poster" style="width:28px;height:40px;font-size:12px">🎬</div>
+          <div style="flex:1"><div class="ob-mock-ftitle">Interstellar</div><div class="ob-mock-fmeta">★★★★★</div></div>
+        </div>
+      </div>
+      <div class="ob-arr">
+        <svg viewBox="0 0 28 40" width="28" height="40" fill="none">
+          <line x1="14" y1="38" x2="14" y2="10" stroke="#F5C518" stroke-width="2.5" stroke-linecap="round"/>
+          <polyline points="6,18 14,8 22,18" fill="none" stroke="#F5C518" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="ob-title" data-i18n="ob4_title">Lists & History</div>
+      <div class="ob-body" data-i18n="ob4_body">Organize by list. Films move to Watched automatically when you check them off.</div>
+    </div>
+
+    <!-- Slide 5: Friends + Inbox -->
+    <div class="ob-slide">
+      <div class="ob-mock">
+        <div class="ob-mock-msg-from">
+          <div class="ob-mock-av">A</div>
+          <div style="flex:1">
+            <div style="font-size:12px;color:var(--text);font-weight:600">Alex</div>
+            <div style="font-size:11px;color:var(--muted)">recommended a film</div>
+          </div>
+        </div>
+        <div class="ob-mock-film-chip">
+          <div class="ob-mock-poster" style="width:28px;height:40px;font-size:12px">🎬</div>
+          <div>
+            <div class="ob-mock-ftitle">Drive</div>
+            <div class="ob-mock-fmeta">2011 · ★ 7.8</div>
+          </div>
+        </div>
+      </div>
+      <div class="ob-arr">
+        <svg viewBox="0 0 28 40" width="28" height="40" fill="none">
+          <line x1="14" y1="38" x2="14" y2="10" stroke="#F5C518" stroke-width="2.5" stroke-linecap="round"/>
+          <polyline points="6,18 14,8 22,18" fill="none" stroke="#F5C518" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="ob-title" data-i18n="ob5_title">Friends & Inbox</div>
+      <div class="ob-body" data-i18n="ob5_body">Send film picks to friends. Everything lands in Inbox.</div>
+    </div>
+
+    <!-- Slide 6: People / Filmography -->
+    <div class="ob-slide">
+      <div class="ob-mock">
+        <div class="ob-mock-row">
+          <div class="ob-mock-poster">🎬</div>
+          <div style="flex:1;min-width:0">
+            <div class="ob-mock-ftitle">Tenet</div>
+            <div class="ob-mock-fmeta">2020 · Sci-Fi</div>
+            <div class="ob-mock-credit">Dir. <span class="ob-mock-link">Christopher Nolan</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="ob-arr">
+        <svg viewBox="0 0 28 40" width="28" height="40" fill="none">
+          <line x1="14" y1="38" x2="14" y2="10" stroke="#F5C518" stroke-width="2.5" stroke-linecap="round"/>
+          <polyline points="6,18 14,8 22,18" fill="none" stroke="#F5C518" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="ob-title" data-i18n="ob6_title">Explore People</div>
+      <div class="ob-body" data-i18n="ob6_body">Tap any director or actor name to browse their full filmography.</div>
+    </div>
+
+    <!-- Slide 7: Soundtracks -->
+    <div class="ob-slide">
+      <div class="ob-mock">
+        <div class="ob-mock-row" style="margin-bottom:6px">
+          <div class="ob-mock-poster">🎬</div>
+          <div style="flex:1;min-width:0">
+            <div class="ob-mock-ftitle">Interstellar</div>
+            <div class="ob-mock-fmeta">2014 · Sci-Fi</div>
+          </div>
+        </div>
+        <div class="ob-mock-section-label">🎵 Composer</div>
+        <div class="ob-mock-composer">Hans Zimmer</div>
+        <div class="ob-mock-stream-row">
+          <div class="ob-mock-stream-btn spotify">
+            <svg width="16" height="16" viewBox="0 0 168 168"><circle cx="84" cy="84" r="84" fill="#1DB954"/><path d="M120.7 116.4c-1.6 2.7-5.1 3.5-7.7 1.9-21.2-13-47.9-15.9-79.3-8.7-3 .7-6.1-1.2-6.8-4.2-.7-3 1.2-6.1 4.2-6.8 34.4-7.9 64-4.5 87.8 10.1 2.7 1.6 3.5 5.1 1.9 7.7zm10.2-22.8c-2 3.4-6.4 4.5-9.8 2.5-24.3-14.9-61.3-19.3-90-10.5-3.7 1.1-7.6-1-8.7-4.7-1.1-3.7 1-7.6 4.7-8.7 32.8-10 73.5-5.1 101.3 12 3.4 2 4.5 6.4 2.5 9.8zm.9-23.8c-29.1-17.3-77.2-18.9-105-10.5-4.5 1.4-9.2-1.2-10.5-5.6-1.4-4.5 1.2-9.2 5.6-10.5 31.9-9.7 84.9-7.8 118.4 12.1 4 2.4 5.4 7.6 3 11.6-2.4 4.1-7.6 5.4-11.6 3z" fill="white"/></svg>
+          </div>
+          <div class="ob-mock-stream-btn">
+            <svg width="16" height="16" viewBox="0 0 16 16"><defs><linearGradient id="apm_ob" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f984a0"/><stop offset="100%" stop-color="#d3001a"/></linearGradient></defs><rect width="16" height="16" rx="3.5" fill="url(#apm_ob)"/><path d="M10.9 2.5 6.13 3.46a.5.5 0 0 0-.46.49v5.95c0 .14-.01.27-.1.39-.1.11-.22.15-.35.18l-.31.06c-.5.1-.91.56-.91 1.1 0 .6.5 1.1 1.1 1.1.17 0 .34-.04.5-.12.43-.2.72-.64.72-1.13V5.2l3.83-.77v3.96c0 .14-.01.28-.1.39-.1.12-.22.15-.35.18l-.31.06c-.5.1-.91.56-.91 1.1 0 .6.5 1.1 1.1 1.1.17 0 .34-.04.5-.12.43-.2.72-.64.72-1.13V3.0a.5.5 0 0 0-.6-.49z" fill="white"/></svg>
+          </div>
+          <div class="ob-mock-stream-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#FF0000"/><path d="M21.6 7.2s-.2-1.4-.8-2c-.8-.8-1.7-.8-2.1-.9C16.2 4 12 4 12 4s-4.2 0-6.7.3c-.4.1-1.3.1-2.1.9-.6.6-.8 2-.8 2S2 8.8 2 10.4v1.5c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.3.8C7 18 12 18 12 18s4.2 0 6.7-.3c.4-.1 1.3-.1 2.1-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5c0-1.6-.2-3.2-.2-3.2zm-12.4 6.5V8.3l5.7 2.7-5.7 2.7z" fill="white"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="ob-arr">
+        <svg viewBox="0 0 28 40" width="28" height="40" fill="none">
+          <line x1="14" y1="38" x2="14" y2="10" stroke="#F5C518" stroke-width="2.5" stroke-linecap="round"/>
+          <polyline points="6,18 14,8 22,18" fill="none" stroke="#F5C518" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="ob-title" data-i18n="ob7_title">Soundtracks</div>
+      <div class="ob-body" data-i18n="ob7_body">Open the score on Spotify, Apple Music or YouTube Music with one tap.</div>
+    </div>
+
+    <!-- Slide 8: Account panel - finale -->
+    <div class="ob-slide">
+      <div class="ob-mock">
+        <div class="ob-mock-acc-hd">
+          <div class="ob-mock-acc-av">🎬</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:600;color:var(--text)">Your Name</div>
+            <div style="font-size:11px;color:var(--muted)">name@email.com</div>
+          </div>
+        </div>
+        <div class="ob-mock-stats">
+          <div class="ob-mock-stat">
+            <div class="ob-mock-stat-n">24</div>
+            <div class="ob-mock-stat-l">Watched</div>
+          </div>
+          <div class="ob-mock-stat">
+            <div class="ob-mock-stat-n">12</div>
+            <div class="ob-mock-stat-l">To watch</div>
+          </div>
+          <div class="ob-mock-stat">
+            <div class="ob-mock-stat-n">7.8</div>
+            <div class="ob-mock-stat-l">Avg ★</div>
+          </div>
+        </div>
+        <div class="ob-mock-mini-block">
+          <div class="ob-mock-mini-title">🎬 Top Directors</div>
+          <div class="ob-mock-bar-row">
+            <div class="ob-mock-bar-name">Nolan</div>
+            <div class="ob-mock-bar-track"><div class="ob-mock-bar-fill" style="width:85%"></div></div>
+          </div>
+          <div class="ob-mock-bar-row">
+            <div class="ob-mock-bar-name">Villeneuve</div>
+            <div class="ob-mock-bar-track"><div class="ob-mock-bar-fill" style="width:60%"></div></div>
+          </div>
+        </div>
+        <div class="ob-mock-backup-row">
+          <div class="ob-mock-mini-btn">↓ CSV</div>
+          <div class="ob-mock-mini-btn">☁ Drive</div>
+        </div>
+      </div>
+      <div class="ob-title" data-i18n="ob8_title" style="margin-top:6px">That's it.</div>
+      <div class="ob-body" data-i18n="ob8_body">Stats, top directors, backups - everything lives in your profile.</div>
     </div>
 
   </div>
@@ -1448,6 +1800,12 @@ body {
       <div class="ob-dot active" onclick="_obGoTo(0)"></div>
       <div class="ob-dot" onclick="_obGoTo(1)"></div>
       <div class="ob-dot" onclick="_obGoTo(2)"></div>
+      <div class="ob-dot" onclick="_obGoTo(3)"></div>
+      <div class="ob-dot" onclick="_obGoTo(4)"></div>
+      <div class="ob-dot" onclick="_obGoTo(5)"></div>
+      <div class="ob-dot" onclick="_obGoTo(6)"></div>
+      <div class="ob-dot" onclick="_obGoTo(7)"></div>
+      <div class="ob-dot" onclick="_obGoTo(8)"></div>
     </div>
     <div class="ob-btn-row">
       <button class="ob-btn-skip" id="ob-skip-btn" onclick="_obFinish()" data-i18n="ob_skip">Skip</button>
@@ -1879,10 +2237,16 @@ const I18N = {
     add_friend:"Add", save:"Save",
     export_csv:"↓ Export CSV", import_csv:"↑ Import CSV",
     save_drive:"Save to Drive", restore_drive:"Restore",
-    ob1_title:"MOVIE NIGHT", ob1_body:"Your personal cinema companion. Track what you've seen, discover what's next.",
-    ob2_title:"Track & Discover", ob2_body:"Build your watchlist, rate films you've seen, and get AI-powered recommendations based on your taste.",
-    ob3_title:"Watch Together", ob3_body:"Create shared lists with friends, send film recommendations, and plan your next movie night.",
-    ob_next:"Next", ob_start:"Get Started", ob_skip:"Skip",
+    ob0_body:"Films · AI picks · Friends",
+    ob1_title:"Find. Save.", ob1_body:"Search any title and tap + to add it to your list.",
+    ob2_title:"Watched. Rated.", ob2_body:"Mark it watched, leave a star rating and a note.",
+    ob3_title:"No idea what to watch?", ob3_body:"Surprise Me picks something based on what you've already seen and rated.",
+    ob4_title:"Lists & History", ob4_body:"Organize by list. Films move to Watched automatically when you check them off.",
+    ob5_title:"Friends & Inbox", ob5_body:"Send film picks to friends. Everything lands in Inbox.",
+    ob6_title:"Explore People", ob6_body:"Tap any director or actor name to browse their full filmography.",
+    ob7_title:"Soundtracks", ob7_body:"Open the score on Spotify, Apple Music or YouTube Music with one tap.",
+    ob8_title:"That's it.", ob8_body:"Stats, top directors, backups - everything lives in your profile.",
+    ob_next:"Next", ob_start:"Find your first film →", ob_skip:"Skip",
     empty_list_title:"Your List Is Empty", empty_list_sub:"Search for films and add them to your list", empty_list_btn:"Browse Films",
     empty_shared_sub:"Search for a film and tap ≡ to add it here",
     nothing_yet:"Nothing Here Yet", mark_seen:"Mark films as seen", save_to_list:"Save films to your list",
@@ -1912,10 +2276,16 @@ const I18N = {
     add_friend:"Добавить", save:"Сохранить",
     export_csv:"↓ Экспорт CSV", import_csv:"↑ Импорт CSV",
     save_drive:"Сохранить в Drive", restore_drive:"Восстановить",
-    ob1_title:"MOVIE NIGHT", ob1_body:"Ваш личный киноспутник. Отслеживайте просмотренное, открывайте новое.",
-    ob2_title:"Смотри и открывай", ob2_body:"Составляйте список, оценивайте фильмы и получайте AI-подборки на основе ваших вкусов.",
-    ob3_title:"Смотрите вместе", ob3_body:"Создавайте совместные списки, делитесь рекомендациями и планируйте вечер кино.",
-    ob_next:"Далее", ob_start:"Начать", ob_skip:"Пропустить",
+    ob0_body:"Фильмы · AI-подборки · Друзья",
+    ob1_title:"Найди. Сохрани.", ob1_body:"Ищи любой фильм и нажимай +, чтобы добавить в список.",
+    ob2_title:"Просмотрено. Оценено.", ob2_body:"Отметь как просмотренное, поставь звёзды и оставь заметку.",
+    ob3_title:"Не знаешь, что смотреть?", ob3_body:"«Удиви меня» подберёт фильм на основе уже просмотренного.",
+    ob4_title:"Списки и история", ob4_body:"Распределяй по спискам. Фильмы переходят во «Просмотрено» автоматически.",
+    ob5_title:"Друзья и входящие", ob5_body:"Отправляй фильмы друзьям. Всё приходит во входящие.",
+    ob6_title:"Режиссёры и актёры", ob6_body:"Нажми на любое имя - откроется полная фильмография.",
+    ob7_title:"Саундтреки", ob7_body:"Открой саундтрек в Spotify, Apple Music или YouTube Music одним нажатием.",
+    ob8_title:"Готово.", ob8_body:"Статистика, любимые режиссёры, бэкап - всё в личном кабинете.",
+    ob_next:"Далее", ob_start:"Найти первый фильм →", ob_skip:"Пропустить",
     empty_list_title:"Список пуст", empty_list_sub:"Найдите фильмы и добавьте их в список", empty_list_btn:"Перейти к поиску",
     empty_shared_sub:"Найдите фильм и нажмите ≡, чтобы добавить его сюда",
     nothing_yet:"Пока пусто", mark_seen:"Отмечайте просмотренные фильмы", save_to_list:"Добавляйте фильмы в список",
@@ -1955,7 +2325,7 @@ function _applyI18n() {
 // ── Auth helpers ──────────────────────────────────────────────────────────────
 /* ── Onboarding ─────────────────────────────────────────────────────────── */
 let _obSlide = 0;
-const _OB_TOTAL = 3;
+const _OB_TOTAL = 9;
 
 function _obGoTo(idx) {
   _obSlide = idx;
@@ -4840,16 +5210,30 @@ async function applyBackupData(rows) {
   for (const r of rows) {
     if (!r.imdb_id || !r.title) { skipped++; continue; }
     if (existingKeys.has(`${r.imdb_id}|${r.status}`)) { skipped++; continue; }
-    await saveEntryToDB({
-      tmdbID: r.imdb_id, title: r.title, year: r.year,
-      poster: r.poster || "",
-      stars: parseInt(r.stars) || 0,
-      comment: r.comment || "",
-      status: r.status || "watched",
-      mediaType: r.media_type || "movie",
-      director: r.director || "",
-      composer: r.composer || ""
-    });
+    try {
+      await saveEntryToDB({
+        tmdbID: r.imdb_id, title: r.title, year: r.year,
+        poster: r.poster || "",
+        stars: parseInt(r.stars) || 0,
+        comment: r.comment || "",
+        status: r.status || "watched",
+        mediaType: r.media_type || "movie",
+        director: r.director || "",
+        composer: r.composer || "",
+        listId: r.list_id || null   // preserve list membership (works for same-account restore)
+      });
+    } catch(e) {
+      // FK violation: list no longer exists — retry without list_id
+      if (e.message?.includes('foreign key') || e.message?.includes('violates')) {
+        await saveEntryToDB({
+          tmdbID: r.imdb_id, title: r.title, year: r.year,
+          poster: r.poster || "", stars: parseInt(r.stars) || 0,
+          comment: r.comment || "", status: r.status || "watched",
+          mediaType: r.media_type || "movie",
+          director: r.director || "", composer: r.composer || ""
+        });
+      } else { throw e; }
+    }
     added++;
   }
   return { added, skipped };
@@ -4995,22 +5379,36 @@ const BackupDrive = {
     });
   },
 
-  // Get a valid access token (shows popup on first use, silent after)
+  // Get a valid access token (silent if already authorized, popup only on first use)
   getToken() {
     return new Promise((resolve, reject) => {
       // Reuse cached token if still valid (with 60s buffer)
       if (this._token && Date.now() < this._tokenExpiry - 60_000) {
         return resolve(this._token);
       }
+      // iOS Safari in standalone (PWA) mode blocks popups entirely
+      const isIOSPWA = window.navigator.standalone === true;
+      if (isIOSPWA) {
+        return reject(new Error("pwa_safari_popup_blocked"));
+      }
       try { this._initClient(); } catch(e) { return reject(e); }
+      let _silentTried = false;
       this._tokenClient.callback = (resp) => {
-        if (resp.error) return reject(new Error(resp.error_description || resp.error));
+        if (resp.error) {
+          // Silent auth failed because user hasn't granted yet → ask interactively
+          if (!_silentTried && (resp.error === "interaction_required" || resp.error === "access_denied")) {
+            _silentTried = true;
+            this._tokenClient.requestAccessToken({ prompt: "select_account" });
+            return;
+          }
+          return reject(new Error(resp.error_description || resp.error));
+        }
         this._token = resp.access_token;
         this._tokenExpiry = Date.now() + resp.expires_in * 1000;
         resolve(this._token);
       };
-      // prompt:"" = silent if already authorised; shows popup on first time
-      this._tokenClient.requestAccessToken({ prompt: this._token ? "" : "consent" });
+      // Try silent first (no UI); works automatically for returning users
+      this._tokenClient.requestAccessToken({ prompt: "" });
     });
   },
 
@@ -5088,7 +5486,9 @@ function _setDriveMeta(text) {
   const el = document.getElementById("drive-backup-meta");
   if (el) el.textContent = text;
 }
-function _setDriveBtns(disabled, saveLabel = "Save to Drive", restoreLabel = "Restore") {
+function _setDriveBtns(disabled, saveLabel, restoreLabel) {
+  saveLabel    = saveLabel    ?? t('save_drive');
+  restoreLabel = restoreLabel ?? t('restore_drive');
   const s = document.getElementById("btn-drive-save");
   const r = document.getElementById("btn-drive-restore");
   const sl = document.getElementById("btn-drive-save-lbl");
@@ -5103,7 +5503,7 @@ async function backupSaveToDrive() {
   if (GOOGLE_DRIVE_CLIENT_ID === "PASTE_YOUR_CLIENT_ID_HERE") {
     showToast("Add your Google Client ID first", true); return;
   }
-  _setDriveBtns(true, "Saving…", "Restore");
+  _setDriveBtns(true, "Saving…", t('restore_drive'));
   _setDriveMeta("");
   try {
     const rows = await getBackupData();
@@ -5115,10 +5515,14 @@ async function backupSaveToDrive() {
     _setDriveMeta(metaStr);
     showToast(`✓ Saved ${rows.length} items to Google Drive`);
   } catch(e) {
-    const msg = e.message === "popup_closed_by_user" ? "Authorization cancelled" : e.message;
-    showToast("Drive save failed: " + msg, true);
+    if (e.message === "pwa_safari_popup_blocked")
+      showToast("Open in Safari (not the app) to use Google Drive", true);
+    else if (e.message === "popup_closed_by_user")
+      showToast("Authorization cancelled", true);
+    else
+      showToast("Drive save failed: " + e.message, true);
   } finally {
-    _setDriveBtns(false, "Save to Drive", "Restore");
+    _setDriveBtns(false, t('save_drive'), t('restore_drive'));
   }
 }
 
@@ -5126,7 +5530,7 @@ async function backupRestoreFromDrive() {
   if (GOOGLE_DRIVE_CLIENT_ID === "PASTE_YOUR_CLIENT_ID_HERE") {
     showToast("Add your Google Client ID first", true); return;
   }
-  _setDriveBtns(true, "Save to Drive", "Restoring…");
+  _setDriveBtns(true, t('save_drive'), "Restoring…");
   _setDriveMeta("");
   try {
     const { items, exportedAt } = await BackupDrive.import();
@@ -5140,12 +5544,14 @@ async function backupRestoreFromDrive() {
       : `Nothing new — all ${skipped} items already in your list`;
     showToast(msg);
   } catch(e) {
-    if (e.message === "no_backup")       showToast("No backup found in Google Drive", true);
-    else if (e.message === "empty_backup") showToast("Backup file is empty", true);
-    else if (e.message === "popup_closed_by_user") { /* user cancelled, do nothing */ }
+    if (e.message === "no_backup")              showToast("No backup found in Google Drive", true);
+    else if (e.message === "empty_backup")      showToast("Backup file is empty", true);
+    else if (e.message === "popup_closed_by_user") { /* user cancelled, no toast */ }
+    else if (e.message === "pwa_safari_popup_blocked")
+      showToast("Open in Safari (not the app) to use Google Drive", true);
     else showToast("Drive restore failed: " + e.message, true);
   } finally {
-    _setDriveBtns(false, "Save to Drive", "Restore");
+    _setDriveBtns(false, t('save_drive'), t('restore_drive'));
   }
 }
 
