@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Movie Night</title>
+<title>Cinemail</title>
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Movie Night">
+<meta name="apple-mobile-web-app-title" content="Cinemail">
 <meta name="theme-color" content="#0d0d1a">
 <link rel="apple-touch-icon" href="icon.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1588,7 +1588,7 @@ body {
     <!-- Slide 0: Welcome -->
     <div class="ob-slide">
       <div style="font-size:64px;margin-bottom:14px;line-height:1;filter:drop-shadow(0 0 28px rgba(245,197,24,0.25))">🎬</div>
-      <div class="ob-title" style="font-size:40px;letter-spacing:3px;margin-bottom:8px">MOVIE <span>NIGHT</span></div>
+      <div class="ob-title" style="font-size:40px;letter-spacing:3px;margin-bottom:8px"><span>CINE</span>MAIL</div>
       <div class="ob-body" data-i18n="ob0_body" style="margin-bottom:28px">Films · AI picks · Friends</div>
       <div style="display:flex;gap:8px">
         <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
@@ -1844,7 +1844,7 @@ body {
 <!-- Sign In -->
 <div id="screen-signin" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;overflow-y:auto">
   <div class="auth-wrap">
-    <div class="auth-logo"><span>MOVIE</span> NIGHT</div>
+    <div class="auth-logo"><span>CINE</span>MAIL</div>
     <div class="auth-tagline" data-i18n="auth_tagline">Track films · Get AI picks · Share with friends</div>
     <div class="auth-card">
       <h2 data-i18n="sign_in_title">Welcome Back</h2>
@@ -1863,7 +1863,7 @@ body {
       </div>
     </div>
     <div class="auth-footer">
-      <span data-i18n="new_here">New to Movie Night?</span> <a onclick="showScreen('signup')" data-i18n="create_acct_link">Create account</a>
+      <span data-i18n="new_here">New to Cinemail?</span> <a onclick="showScreen('signup')" data-i18n="create_acct_link">Create account</a>
     </div>
   </div>
 </div>
@@ -1871,7 +1871,7 @@ body {
 <!-- Sign Up -->
 <div id="screen-signup" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;overflow-y:auto">
   <div class="auth-wrap">
-    <div class="auth-logo"><span>MOVIE</span> NIGHT</div>
+    <div class="auth-logo"><span>CINE</span>MAIL</div>
     <div class="auth-tagline" data-i18n="auth_tagline">Track films · Get AI picks · Share with friends</div>
     <div class="auth-card">
       <button onclick="showScreen('signin')" data-i18n="back" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:16px;padding:0;display:flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif">← Back</button>
@@ -1927,7 +1927,7 @@ body {
 
   <!-- Topbar -->
   <div class="topbar">
-    <div class="topbar-logo"><span>MOVIE</span> NIGHT</div>
+    <div class="topbar-logo"><span>CINE</span>MAIL</div>
     <div class="topbar-actions">
       <button class="feedback-btn" id="btn-open-feedback" onclick="openFeedback()" title="Feedback">
         <span id="feedback-icon-wrap">
@@ -2143,6 +2143,9 @@ body {
         <button class="btn-backup" onclick="backupImportCSV()" data-i18n="import_csv">↑ Import CSV</button>
         <input type="file" id="backup-import-input" accept=".csv" style="display:none">
       </div>
+      <div class="backup-row">
+        <button class="btn-backup" onclick="backupExportJSON()" data-i18n="export_json">↓ Export JSON</button>
+      </div>
       <div class="backup-row" id="drive-backup-row">
         <button class="btn-backup btn-backup-drive-action" id="btn-drive-save" onclick="backupSaveToDrive()">
           <svg viewBox="0 0 87.3 78" width="13" height="13" style="flex-shrink:0" xmlns="http://www.w3.org/2000/svg"><path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/><path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/><path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/><path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/><path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/><path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 27h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/></svg>
@@ -2174,6 +2177,20 @@ body {
       </div>
 
       <button onclick="replayOnboarding()" data-i18n="replay_onboarding" style="width:100%;padding:9px;border-radius:9px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:14px;transition:all 0.15s" onmouseover="this.style.borderColor='var(--accent-border)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">🎬 Replay Welcome Tour</button>
+
+      <!-- About / Attribution -->
+      <div style="margin-top:8px;margin-bottom:18px;padding:12px 14px;background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:10px;font-size:11px;line-height:1.6;color:var(--muted)">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+          <svg viewBox="0 0 273.5 199.6" width="34" height="14" style="flex-shrink:0" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="tmdb-grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#90cea1"/><stop offset="56%" stop-color="#3cbec9"/><stop offset="100%" stop-color="#00b3e5"/></linearGradient></defs><path fill="url(#tmdb-grad)" d="M105.7 76.9h60.9c4.2 0 7.6 3.4 7.6 7.6v30.5c0 4.2-3.4 7.6-7.6 7.6h-60.9c-4.2 0-7.6-3.4-7.6-7.6V84.6c0-4.2 3.4-7.6 7.6-7.6zM7.6 76.9h60.9c4.2 0 7.6 3.4 7.6 7.6v30.5c0 4.2-3.4 7.6-7.6 7.6H7.6C3.4 122.7 0 119.3 0 115.1V84.6c0-4.2 3.4-7.6 7.6-7.6zm196.3 0h60.9c4.2 0 7.6 3.4 7.6 7.6v30.5c0 4.2-3.4 7.6-7.6 7.6h-60.9c-4.2 0-7.6-3.4-7.6-7.6V84.6c.1-4.2 3.5-7.6 7.6-7.6z"/></svg>
+          <span style="color:var(--text);font-weight:600;font-size:11px;letter-spacing:0.3px">About Cinemail</span>
+        </div>
+        <div data-i18n="about_tmdb" data-i18n-html="1">
+          Film data, posters and crew info from <a href="https://www.themoviedb.org" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">TMDB</a>. Cinemail uses the TMDB API but is not endorsed or certified by TMDB.
+        </div>
+        <div style="margin-top:6px" data-i18n="about_author" data-i18n-html="1">
+          Made by <a href="https://dafaspace.com" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">@dafaspace</a>.
+        </div>
+      </div>
 
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" data-i18n="close" onclick="closeAccount()">Close</button>
@@ -2210,7 +2227,21 @@ body {
           <button id="fb-type-other" onclick="setFbType('other')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s">💬 Other</button>
         </div>
         <div class="add-label">Message</div>
-        <textarea id="fb-message" placeholder="Tell me what's on your mind..." style="min-height:70px;margin-bottom:12px;width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 12px;outline:none;resize:vertical;transition:border-color .2s"></textarea>
+        <textarea id="fb-message" placeholder="Tell me what's on your mind..." style="min-height:70px;margin-bottom:10px;width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 12px;outline:none;resize:vertical;transition:border-color .2s"></textarea>
+
+        <!-- Screenshot attach -->
+        <input type="file" id="fb-screenshot" accept="image/*" style="display:none" onchange="onFbScreenshotPicked(event)">
+        <div id="fb-attach-row" style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <button id="fb-attach-btn" onclick="document.getElementById('fb-screenshot').click()" style="display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span id="fb-attach-lbl">Attach screenshot</span>
+          </button>
+          <div id="fb-attach-preview" style="display:none;align-items:center;gap:6px">
+            <img id="fb-attach-thumb" src="" style="height:32px;width:32px;border-radius:5px;object-fit:cover;border:1px solid var(--border)">
+            <button onclick="clearFbScreenshot()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:0 4px;line-height:1" title="Remove">×</button>
+          </div>
+        </div>
+
         <div style="display:flex;gap:9px;margin-bottom:14px">
           <button class="btn-modal-close" onclick="closeFeedback()">Cancel</button>
           <button class="btn-modal-save" id="fb-submit-btn" onclick="submitFeedback()">SEND</button>
@@ -2245,7 +2276,7 @@ const I18N = {
     sign_in_title:"Welcome Back", sign_up_title:"Create Account",
     email:"Email", password:"Password", display_name:"Display Name",
     back:"← Back", back_to_signin:"← Back to Sign In",
-    new_here:"New to Movie Night?", create_acct_link:"Create account",
+    new_here:"New to Cinemail?", create_acct_link:"Create account",
     have_acct:"Already have an account?", sign_in_link:"Sign in",
     check_inbox_title:"Check Your Inbox",
     email_sent:"We sent a confirmation link to your email.<br>Click it to activate your account.",
@@ -2258,7 +2289,7 @@ const I18N = {
     your_rating:"Your Rating", notes:"Notes", send_to:"Send to", msg_opt:"Message (optional)",
     display_name_lbl:"Display Name", backup_lbl:"Backup", friends_lbl:"Friends",
     add_friend:"Add", save:"Save",
-    export_csv:"↓ Export CSV", import_csv:"↑ Import CSV",
+    export_csv:"↓ Export CSV", import_csv:"↑ Import CSV", export_json:"↓ Export JSON",
     save_drive:"Save to Drive", restore_drive:"Restore",
     ob0_body:"Films · AI picks · Friends",
     ob1_title:"Find. Save.", ob1_body:"Search any title and tap + to add it to your list.",
@@ -2278,6 +2309,8 @@ const I18N = {
     search_ph:"Movie or series title…",
     friend_search_ph:"Search by name to add…",
     replay_onboarding:"🎬 Replay Welcome Tour",
+    about_tmdb:"Film data, posters and crew info from <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail uses the TMDB API but is not endorsed or certified by TMDB.",
+    about_author:"Made by <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
   },
   ru: {
     auth_tagline:"Фильмы · AI подборки · Друзья",
@@ -2297,7 +2330,7 @@ const I18N = {
     your_rating:"Ваша оценка", notes:"Заметки", send_to:"Кому", msg_opt:"Сообщение (необязательно)",
     display_name_lbl:"Имя", backup_lbl:"Резервная копия", friends_lbl:"Друзья",
     add_friend:"Добавить", save:"Сохранить",
-    export_csv:"↓ Экспорт CSV", import_csv:"↑ Импорт CSV",
+    export_csv:"↓ Экспорт CSV", import_csv:"↑ Импорт CSV", export_json:"↓ Экспорт JSON",
     save_drive:"Сохранить в Drive", restore_drive:"Восстановить",
     ob0_body:"Фильмы · AI-подборки · Друзья",
     ob1_title:"Найди. Сохрани.", ob1_body:"Ищи любой фильм и нажимай +, чтобы добавить в список.",
@@ -2317,6 +2350,8 @@ const I18N = {
     search_ph:"Название фильма или сериала…",
     friend_search_ph:"Поиск по имени…",
     replay_onboarding:"🎬 Пройти тур заново",
+    about_tmdb:"Данные о фильмах, постеры и creative crew - из <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail использует TMDB API, но не сертифицирован TMDB.",
+    about_author:"Сделано <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
   }
 };
 let _lang = localStorage.getItem('lang') || (navigator.language.startsWith('ru') ? 'ru' : 'en');
@@ -2678,6 +2713,7 @@ async function loadHistoryFromDB() {
     poster: r.poster, stars: r.stars || 0, comment: r.comment || "",
     status: r.status || "watched", mediaType: r.media_type || "movie",
     composer: r.composer || "", director: r.director || "",
+    cinematographer: r.cinematographer || "",
     date: new Date(r.created_at).toLocaleDateString("en-GB"),
     listId: r.list_id || null,
     addedBy: r.user_id || null
@@ -2687,7 +2723,9 @@ async function saveEntryToDB(entry) {
   await sbFetch("watchlist", { method: "POST", prefer: "return=representation", body: JSON.stringify({
     imdb_id: entry.tmdbID, title: entry.title, year: entry.year, poster: entry.poster,
     stars: entry.stars, comment: entry.comment, status: entry.status,
-    media_type: entry.mediaType || "movie", composer: entry.composer || null, director: entry.director || null,
+    media_type: entry.mediaType || "movie",
+    composer: entry.composer || null, director: entry.director || null,
+    cinematographer: entry.cinematographer || null,
     user_id: currentUser ? currentUser.id : null,
     list_id: entry.listId || null
   })});
@@ -2746,6 +2784,7 @@ async function tmdbDetail(id, type) {
   const cast = credits.cast?.slice(0,6).map(c => c.name).join(", ") || "";
   const writers = credits.crew?.filter(c => ["Screenplay","Writer","Story"].includes(c.job)).slice(0,3).map(c => c.name).join(", ") || "";
   const composer = credits.crew?.filter(c => ["Original Music Composer","Music","Composer"].includes(c.job)).map(c => c.name).filter((v,i,a)=>a.indexOf(v)===i).join(", ") || "";
+  const cinematographer = credits.crew?.filter(c => ["Director of Photography","Cinematography"].includes(c.job)).map(c => c.name).filter((v,i,a)=>a.indexOf(v)===i).join(", ") || "";
   return {
     tmdbID: String(id), type,
     Title: detail.title || detail.name || "",
@@ -2756,7 +2795,7 @@ async function tmdbDetail(id, type) {
     Rating: detail.vote_average ? detail.vote_average.toFixed(1) : null,
     Plot: detail.overview || "",
     Genre: (detail.genres||[]).map(g=>g.name).join(", "),
-    Director: director, Cast: cast, Writers: writers, Composer: composer,
+    Director: director, Cast: cast, Writers: writers, Composer: composer, Cinematographer: cinematographer,
     Country: (detail.production_countries||[]).map(c=>c.name).join(", "),
     Language: (detail.spoken_languages||[]).map(l=>l.english_name).join(", "),
     Tagline: detail.tagline || "", Status: detail.status || "",
@@ -2916,6 +2955,7 @@ async function toggleFilmInList(listId, tmdbID) {
         poster: movie.Poster || '', stars: 0, comment: '', status: 'plan',
         mediaType: movie.type || movie.mediaType || 'movie',
         composer: movie.Composer || null, director: movie.Director || null,
+        cinematographer: movie.Cinematographer || null,
         listId: listId
       });
       watchHistory = await loadHistoryFromDB();
@@ -3046,10 +3086,11 @@ async function openDetail(id, type) {
     const status = getEntryStatus(id);
     const chips = d.Genre.split(", ").filter(Boolean).map(g => `<span class="chip">${g}</span>`).join("");
     const crew = [
-      d.Director ? `<div class="crew-label">🎬 Director</div><div class="crew-val">${clickableNames(d.Director, true)}</div>` : "",
-      d.Composer ? `<div class="crew-label">🎵 Composer</div><div class="crew-val">${clickableNames(d.Composer, true)}${streamingLinks(`${d.Title} soundtrack`)}</div>` : "",
-      d.Writers  ? `<div class="crew-label">✍️ Screenplay</div><div class="crew-val">${clickableNames(d.Writers, true)}</div>` : "",
-      d.Cast     ? `<div class="crew-label">🌟 Cast</div><div class="crew-val">${clickableNames(d.Cast, true)}</div>` : "",
+      d.Director        ? `<div class="crew-label">🎬 Director</div><div class="crew-val">${clickableNames(d.Director, true)}</div>` : "",
+      d.Cinematographer ? `<div class="crew-label">📷 Cinematography</div><div class="crew-val">${clickableNames(d.Cinematographer, true)}</div>` : "",
+      d.Composer        ? `<div class="crew-label">🎵 Composer</div><div class="crew-val">${clickableNames(d.Composer, true)}${streamingLinks(`${d.Title} soundtrack`)}</div>` : "",
+      d.Writers         ? `<div class="crew-label">✍️ Screenplay</div><div class="crew-val">${clickableNames(d.Writers, true)}</div>` : "",
+      d.Cast            ? `<div class="crew-label">🌟 Cast</div><div class="crew-val">${clickableNames(d.Cast, true)}</div>` : "",
     ].join("");
     const tvInfo = d.Seasons ? `<div class="crew-label">Seasons / Episodes</div><div class="crew-val">${d.Seasons} seasons · ${d.Episodes} episodes${d.Networks ? ` · ${d.Networks}` : ""}</div>` : "";
 
@@ -3058,6 +3099,7 @@ async function openDetail(id, type) {
       const patch = {};
       if (!existing.composer && d.Composer) patch.composer = d.Composer;
       if (!existing.director && d.Director) patch.director = d.Director;
+      if (!existing.cinematographer && d.Cinematographer) patch.cinematographer = d.Cinematographer;
       if (Object.keys(patch).length) { updateEntryInDB(existing.id, patch).then(async () => { watchHistory = await loadHistoryFromDB(); }).catch(() => {}); }
     }
 
@@ -3333,9 +3375,11 @@ async function confirmAdd() {
   const existing = watchHistory.find(h => h.tmdbID === tmdbID);
   let composer = m.Composer || "";
   let director = m.Director || "";
+  let cinematographer = m.Cinematographer || "";
   if (window._detailMovie && String(window._detailMovie.tmdbID) === tmdbID) {
-    if (!composer) composer = window._detailMovie.Composer || "";
-    if (!director) director = window._detailMovie.Director || "";
+    if (!composer)        composer = window._detailMovie.Composer || "";
+    if (!director)        director = window._detailMovie.Director || "";
+    if (!cinematographer) cinematographer = window._detailMovie.Cinematographer || "";
   }
   try {
     if (existing) {
@@ -3346,8 +3390,9 @@ async function confirmAdd() {
         // Film "moves" to global Watched view — drop list affiliation on transition
         if (existing.listId) fields.list_id = null;
       }
-      if (composer && !existing.composer) fields.composer = composer;
-      if (director && !existing.director) fields.director = director;
+      if (composer        && !existing.composer)        fields.composer = composer;
+      if (director        && !existing.director)        fields.director = director;
+      if (cinematographer && !existing.cinematographer) fields.cinematographer = cinematographer;
       await updateEntryInDB(existing.id, fields);
     } else {
       await saveEntryToDB({ tmdbID, title: m.Title||"", year: m.Year||"", poster: m.Poster||"",
@@ -3355,6 +3400,7 @@ async function confirmAdd() {
         comment: currentAddStatus==="plan"?"":document.getElementById("add-note").value,
         status: currentAddStatus, mediaType: m.type||m.mediaType||"movie",
         composer: composer||null, director: director||null,
+        cinematographer: cinematographer||null,
         listId: currentAddListId });
     }
     const newHistory = await loadHistoryFromDB();
@@ -3530,9 +3576,13 @@ function getTasteContext(watchedEntries) {
     watchedEntries.forEach(h => { if (!h[field]) return; h[field].split(", ").forEach(name => { name=name.trim(); if(name) map[name]=(map[name]||0)+1; }); });
     return Object.entries(map).filter(([,c])=>c>=min).sort((a,b)=>b[1]-a[1]).slice(0,max).map(([name,c])=>`${name} (${c})`).join(", ");
   }
-  const composers = topNames("composer",2,3), directors = topNames("director",2,3), lines = [];
-  if (composers) lines.push(`Favourite composers by films watched: ${composers}`);
-  if (directors) lines.push(`Favourite directors by films watched: ${directors}`);
+  const composers        = topNames("composer",2,3);
+  const directors        = topNames("director",2,3);
+  const cinematographers = topNames("cinematographer",2,3);
+  const lines = [];
+  if (composers)        lines.push(`Favourite composers by films watched: ${composers}`);
+  if (directors)        lines.push(`Favourite directors by films watched: ${directors}`);
+  if (cinematographers) lines.push(`Favourite cinematographers by films watched: ${cinematographers}`);
   return lines.join("\n");
 }
 
@@ -5188,14 +5238,16 @@ function renderProfileStats(watched) {
     </div>`;
   }
 
-  const directors = topNames('director', 1, 5);
-  const composers = topNames('composer', 1, 5);
+  const directors        = topNames('director', 1, 5);
+  const cinematographers = topNames('cinematographer', 1, 5);
+  const composers        = topNames('composer', 1, 5);
 
-  if (!directors.length && !composers.length) { el.innerHTML = ''; return; }
+  if (!directors.length && !composers.length && !cinematographers.length) { el.innerHTML = ''; return; }
 
   el.innerHTML = `
     <div class="add-label" style="margin-bottom:6px">Your Cinema Profile</div>
     ${barBlock('directors', '🎬', 'Top Directors', directors)}
+    ${barBlock('cinematographers', '📷', 'Top Cinematographers', cinematographers)}
     ${barBlock('composers', '🎵', 'Top Composers', composers)}
   `;
 }
@@ -5246,6 +5298,7 @@ async function applyBackupData(rows) {
         mediaType: r.media_type || "movie",
         director: r.director || "",
         composer: r.composer || "",
+        cinematographer: r.cinematographer || "",
         listId: r.list_id || null   // preserve list membership (works for same-account restore)
       });
     } catch(e) {
@@ -5256,7 +5309,8 @@ async function applyBackupData(rows) {
           poster: r.poster || "", stars: parseInt(r.stars) || 0,
           comment: r.comment || "", status: r.status || "watched",
           mediaType: r.media_type || "movie",
-          director: r.director || "", composer: r.composer || ""
+          director: r.director || "", composer: r.composer || "",
+          cinematographer: r.cinematographer || ""
         });
       } else { throw e; }
     }
@@ -5320,16 +5374,17 @@ function _parseCSV(text) {
     const obj = {};
     headers.forEach((h, i) => obj[h] = (vals[i]||"").replace(/^"|"$/g,"").trim());
     return {
-      imdb_id:    obj.tmdb_id    || "",
-      title:      obj.title      || "",
-      year:       obj.year       || "",
-      media_type: obj.type       || "movie",
-      status:     obj.status     || "watched",
-      stars:      parseInt(obj.rating) || 0,
-      comment:    obj.comment    || "",
-      director:   obj.director   || "",
-      composer:   obj.composer   || "",
-      poster:     obj.poster     || ""   // fallback if TMDB call fails
+      imdb_id:         obj.tmdb_id         || "",
+      title:           obj.title           || "",
+      year:            obj.year            || "",
+      media_type:      obj.type            || "movie",
+      status:          obj.status          || "watched",
+      stars:           parseInt(obj.rating) || 0,
+      comment:         obj.comment         || "",
+      director:        obj.director        || "",
+      composer:        obj.composer        || "",
+      cinematographer: obj.cinematographer || "",
+      poster:          obj.poster          || ""   // fallback if TMDB call fails
     };
   }).filter(r => r.imdb_id && r.title);
 }
@@ -5340,22 +5395,22 @@ function _todayStr() { return new Date().toISOString().slice(0,10); }
 const BackupLocal = {
   export(rows) {
     // Include poster URL so it works as a fallback if TMDB is unavailable on import
-    const cols = ["tmdb_id","title","year","type","status","rating","comment","director","composer","poster","added_at"];
+    const cols = ["tmdb_id","title","year","type","status","rating","comment","director","cinematographer","composer","poster","added_at"];
     const lines = [cols.join(",")];
     for (const r of rows) {
       lines.push([
-        _csvEscape(r.imdb_id),          _csvEscape(r.title),
-        _csvEscape(r.year),              _csvEscape(r.media_type||"movie"),
-        _csvEscape(r.status||"watched"), _csvEscape(r.stars||0),
-        _csvEscape(r.comment||""),       _csvEscape(r.director||""),
-        _csvEscape(r.composer||""),      _csvEscape(r.poster||""),
-        _csvEscape(r.created_at||"")
+        _csvEscape(r.imdb_id),               _csvEscape(r.title),
+        _csvEscape(r.year),                  _csvEscape(r.media_type||"movie"),
+        _csvEscape(r.status||"watched"),     _csvEscape(r.stars||0),
+        _csvEscape(r.comment||""),           _csvEscape(r.director||""),
+        _csvEscape(r.cinematographer||""),   _csvEscape(r.composer||""),
+        _csvEscape(r.poster||""),            _csvEscape(r.created_at||"")
       ].join(","));
     }
     const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = `movie-night-backup-${_todayStr()}.csv`;
+    a.href = url; a.download = `cinemail-backup-${_todayStr()}.csv`;
     document.body.appendChild(a); a.click();
     document.body.removeChild(a); URL.revokeObjectURL(url);
   },
@@ -5615,6 +5670,40 @@ async function backupExportCSV() {
   finally { if (btn) { btn.textContent = "↓ Export CSV"; btn.disabled = false; } }
 }
 
+// Full structured JSON export — includes lists + members for round-tripping
+async function backupExportJSON() {
+  const btn = event?.currentTarget;
+  if (btn) { btn.textContent = "Exporting…"; btn.disabled = true; }
+  try {
+    const watchlist = await getBackupData();
+    if (!watchlist.length) { showToast("Nothing to export yet"); return; }
+    // Bundle lists + memberships if any (best-effort)
+    let lists = [], members = [];
+    try { lists   = await sbFetch("lists?select=*"); } catch(e) {}
+    try { members = await sbFetch("list_members?select=*"); } catch(e) {}
+
+    const payload = {
+      app: "cinemail",
+      format_version: 1,
+      exported_at: new Date().toISOString(),
+      user: { id: currentUser?.id, email: currentUser?.email, display_name: currentUser?.displayName },
+      counts: { watchlist: watchlist.length, lists: lists?.length || 0, list_members: members?.length || 0 },
+      watchlist,
+      lists: lists || [],
+      list_members: members || []
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `cinemail-backup-${_todayStr()}.json`;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+    showToast(`✓ Exported ${watchlist.length} items + ${lists?.length || 0} lists as JSON`);
+  } catch(e) { showToast("JSON export failed: " + e.message, true); }
+  finally { if (btn) { btn.textContent = "↓ Export JSON"; btn.disabled = false; } }
+}
+
 async function backupImportCSV() {
   const importBtn = document.querySelector('.btn-backup[onclick="backupImportCSV()"]');
   try {
@@ -5647,14 +5736,47 @@ async function backupImportCSV() {
 
 // ── Feedback ──────────────────────────────────────────────────────────────────
 let _fbType="other";
+let _fbScreenshotFile = null;
+
 function openFeedback() {
   _fbType="other";
   document.getElementById("fb-message").value="";
   setFbType("other");
+  clearFbScreenshot();
   const el=document.getElementById("fb-replies");
   if(el){el.style.display="block";el.innerHTML=`<div style="color:var(--muted);font-size:12px;padding:8px 0">Loading history…</div>`;}
   document.getElementById("feedback-overlay").style.display="flex";
   loadFeedbackReplies();
+}
+function onFbScreenshotPicked(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast("Image too large (max 5MB)", true); event.target.value = ""; return; }
+  _fbScreenshotFile = file;
+  const url = URL.createObjectURL(file);
+  document.getElementById("fb-attach-thumb").src = url;
+  document.getElementById("fb-attach-preview").style.display = "flex";
+  document.getElementById("fb-attach-lbl").textContent = "Change";
+}
+function clearFbScreenshot() {
+  _fbScreenshotFile = null;
+  const inp = document.getElementById("fb-screenshot");
+  if (inp) inp.value = "";
+  const prev = document.getElementById("fb-attach-preview");
+  if (prev) prev.style.display = "none";
+  const lbl = document.getElementById("fb-attach-lbl");
+  if (lbl) lbl.textContent = "Attach screenshot";
+}
+async function _uploadFbScreenshot(file) {
+  if (!file || !currentUser) return null;
+  const ext = (file.name.split('.').pop() || 'png').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const path = `${currentUser.id}/${Date.now()}.${ext}`;
+  const { error } = await sbClient.storage.from('feedback-screenshots').upload(path, file, {
+    cacheControl: '3600', upsert: false, contentType: file.type
+  });
+  if (error) throw new Error('Screenshot upload failed: ' + error.message);
+  const { data: pub } = sbClient.storage.from('feedback-screenshots').getPublicUrl(path);
+  return pub?.publicUrl || null;
 }
 function setFeedbackUnread(has) {
   const icon=document.getElementById("feedback-icon");
@@ -5683,18 +5805,28 @@ function setFbType(type) {
 async function submitFeedback() {
   const message = document.getElementById("fb-message").value.trim();
   if (!message) { showToast("Please write something first", true); return; }
-  
+
   const btn = document.getElementById("fb-submit-btn");
   btn.textContent = "SENDING..."; btn.disabled = true;
-  
+
   try {
+    // Upload screenshot first if present (so we have URL to include with feedback)
+    let screenshotUrl = null;
+    if (_fbScreenshotFile) {
+      btn.textContent = "UPLOADING...";
+      try { screenshotUrl = await _uploadFbScreenshot(_fbScreenshotFile); }
+      catch(err) { console.warn(err); /* don't block feedback on screenshot fail */ }
+      btn.textContent = "SENDING...";
+    }
+
     const { data, error } = await sbClient.from("feedback").insert({
       user_id: currentUser.id,
       user_email: currentUser.email || "",
       user_name: currentUser.displayName || "",
       type: _fbType,
       message,
-      app_version: "0.2.0",
+      screenshot_url: screenshotUrl,
+      app_version: "1.0.0",
       user_agent: navigator.userAgent
     }).select();
 
@@ -5710,10 +5842,12 @@ async function submitFeedback() {
         user_email: currentUser.email || "",
         user_name: currentUser.displayName || currentUser.email?.split("@")[0] || "someone",
         type: _fbType,
-        message
+        message,
+        screenshot_url: screenshotUrl
       }).catch(() => {});
     }
 
+    clearFbScreenshot();
     document.getElementById("fb-message").value = "";
     closeFeedback();
     showToast("Got it! I read everything personally 🙏");
@@ -5740,7 +5874,7 @@ async function loadFeedbackReplies() {
   const el=document.getElementById("fb-replies");if(!el||!currentUser)return;
   try {
     const {data,error}=await sbQuery(
-      sig => sbClient.from("feedback").select("id,type,message,reply,replied_at,read_by_user,created_at").eq("user_id",currentUser.id).order("created_at",{ascending:false}).limit(10).abortSignal(sig),
+      sig => sbClient.from("feedback").select("id,type,message,reply,replied_at,read_by_user,created_at,screenshot_url").eq("user_id",currentUser.id).order("created_at",{ascending:false}).limit(10).abortSignal(sig),
       8000
     );
     if(error||!data?.length){el.style.display="none";return;}
@@ -5756,6 +5890,7 @@ async function loadFeedbackReplies() {
           <button data-del-id="${f.id}" onclick="deleteFeedback('${f.id}')" style="background:none;border:none;color:#888;cursor:pointer;font-size:18px;line-height:1;padding:6px 8px;border-radius:6px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='none'">×</button>
         </div>
         <div style="font-size:13px;color:#ccc">${f.message}</div>
+        ${f.screenshot_url?`<a href="${f.screenshot_url}" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px"><img src="${f.screenshot_url}" style="max-width:120px;max-height:80px;border-radius:6px;border:1px solid var(--border);object-fit:cover" alt="Screenshot"/></a>`:""}
         ${f.reply?`<div class="fb-reply-card"><div class="fb-reply-label">↩ Reply</div><div class="fb-reply-text">${f.reply}</div></div>`:""}
       </div>`).join("")}`;
   } catch(e){

@@ -1,8 +1,8 @@
 {
-  "name": "Movie Night",
-  "short_name": "Movie Night",
-  "description": "Find films, track what you've watched, get AI picks",
-  "start_url": "/movie-night/index.html",
+  "name": "Cinemail",
+  "short_name": "Cinemail",
+  "description": "Track films, share with friends, get AI picks - your personal cinema companion",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#0d0d1a",
   "theme_color": "#0d0d1a",
