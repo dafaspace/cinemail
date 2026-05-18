@@ -1550,6 +1550,29 @@ body {
 </style>
 </head>
 <body>
+<script>
+// ── Capacitor native bridge ────────────────────────────────────────────────────
+// Harmless in browser (window.Capacitor stays undefined); active in native app.
+(function() {
+  const isNative = !!(window.Capacitor?.isNativePlatform?.());
+  window._isNativeApp = isNative;
+  if (isNative) document.documentElement.classList.add('native-app');
+
+  window.addEventListener('load', async function() {
+    if (!isNative) return;
+    try {
+      const { StatusBar } = window.Capacitor.Plugins;
+      if (StatusBar) {
+        await StatusBar.setStyle({ style: 'DARK' });
+        await StatusBar.setBackgroundColor({ color: '#0d0d1a' });
+        await StatusBar.setOverlaysWebView({ overlay: true });
+      }
+      const { SplashScreen } = window.Capacitor.Plugins;
+      if (SplashScreen) await SplashScreen.hide();
+    } catch(e) { /* native plugins not available */ }
+  });
+})();
+</script>
 <div id="app">
 
 <!-- ── Toast ──────────────────────────────────────────────────────────── -->
@@ -2120,7 +2143,7 @@ body {
         <button class="btn-backup" onclick="backupImportCSV()" data-i18n="import_csv">↑ Import CSV</button>
         <input type="file" id="backup-import-input" accept=".csv" style="display:none">
       </div>
-      <div class="backup-row">
+      <div class="backup-row" id="drive-backup-row">
         <button class="btn-backup btn-backup-drive-action" id="btn-drive-save" onclick="backupSaveToDrive()">
           <svg viewBox="0 0 87.3 78" width="13" height="13" style="flex-shrink:0" xmlns="http://www.w3.org/2000/svg"><path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/><path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/><path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/><path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/><path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/><path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 27h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/></svg>
           <span id="btn-drive-save-lbl">Save to Drive</span>
@@ -5091,6 +5114,9 @@ async function openAccount() {
 
   // Show modal immediately with whatever we have
   document.getElementById("account-overlay").style.display="flex";
+  // In native app, Google Drive popup doesn't work - hide Drive buttons, keep CSV
+  const driveRow = document.getElementById("drive-backup-row");
+  if (driveRow) driveRow.style.display = window._isNativeApp ? "none" : "";
   const sheet = document.getElementById("account-modal-sheet");
   if (sheet) sheet.scrollTop = 0;
 
