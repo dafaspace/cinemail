@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Cinemail Privacy Policy - what data we collect, how we use it, and your rights.">
+  <meta name="theme-color" content="#0d0d1a">
+  <title>Privacy Policy - Cinemail</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d1a;
+      --text: #e8e8ee;
+      --muted: #8a8a96;
+      --accent: #f5c518;
+      --border: rgba(255,255,255,0.08);
+      --card: rgba(255,255,255,0.025);
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 56px 24px 80px;
+    }
+
+    main { width: 100%; max-width: 720px; }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      font-size: 14px;
+    }
+    .nav a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+    .nav a:hover { color: var(--text); }
+    .nav .logo {
+      color: var(--text);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .nav .logo span { color: var(--accent); }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+    .updated {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 36px;
+    }
+
+    .intro {
+      font-size: 16px;
+      color: var(--text);
+      margin-bottom: 36px;
+      padding: 16px 18px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      line-height: 1.65;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-top: 36px;
+      margin-bottom: 12px;
+      letter-spacing: -0.2px;
+    }
+
+    h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-top: 20px;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    p {
+      font-size: 15px;
+      color: var(--text);
+      margin-bottom: 12px;
+      line-height: 1.65;
+    }
+
+    ul {
+      margin-left: 22px;
+      margin-bottom: 14px;
+    }
+    li {
+      font-size: 15px;
+      color: var(--text);
+      margin-bottom: 6px;
+      line-height: 1.65;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(245,197,24,0.3);
+      transition: border-color 0.15s ease;
+    }
+    a:hover { border-color: var(--accent); }
+
+    strong { color: var(--text); font-weight: 600; }
+
+    footer {
+      margin-top: 64px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 36px 20px 60px; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+
+    <nav class="nav">
+      <a href="https://cinemail.app" class="logo"><span>CINE</span>MAIL</a>
+      <a href="https://cinemail.app">← Back to app</a>
+    </nav>
+
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: 19 May 2026</p>
+
+    <div class="intro">
+      Cinemail is built by one independent developer who cares deeply about user privacy. This policy explains, in plain language, what data the app collects, why, and what your rights are. No legalese, no dark patterns.
+    </div>
+
+    <h2>1. Who we are</h2>
+    <p>
+      Cinemail is operated by <strong>Daniel Fainberg</strong>, an independent developer based abroad, doing business as <strong>dafaspace</strong>. You can reach us anytime at <a href="mailto:hello@dafaspace.com">hello@dafaspace.com</a> or <a href="mailto:support@dafaspace.com">support@dafaspace.com</a>.
+    </p>
+
+    <h2>2. What data we collect</h2>
+
+    <h3>2.1 Account information</h3>
+    <p>When you create an account, we collect:</p>
+    <ul>
+      <li>Email address (used to sign in and contact you about your account)</li>
+      <li>Password (stored securely as a hash via Supabase Auth; we never see your plain password)</li>
+      <li>Optional display name</li>
+    </ul>
+
+    <h3>2.2 Content you create</h3>
+    <p>When you use Cinemail, we store the data you generate:</p>
+    <ul>
+      <li>Films you've added to your watchlist or marked as watched, along with ratings, notes and dates</li>
+      <li>Lists you've created and people you've shared them with</li>
+      <li>Friend connections within Cinemail</li>
+      <li>Feedback messages and optional screenshots you submit</li>
+    </ul>
+
+    <h3>2.3 Technical data</h3>
+    <p>For security and basic functioning, we may process:</p>
+    <ul>
+      <li>Anonymised request logs (IP address, user-agent string, timestamp) on our server infrastructure, kept only as long as needed to investigate abuse</li>
+      <li>App version, device type and basic diagnostics when you submit feedback</li>
+    </ul>
+
+    <h3>2.4 What we do <em>not</em> collect</h3>
+    <ul>
+      <li>No third-party analytics (no Google Analytics, no Facebook Pixel, no Mixpanel, nothing)</li>
+      <li>No advertising IDs, no tracking SDKs</li>
+      <li>No location data</li>
+      <li>No contacts, photos or files beyond what you explicitly upload</li>
+    </ul>
+
+    <h2>3. How we use your data</h2>
+    <p>We use the data above only to:</p>
+    <ul>
+      <li>Provide the core app functionality (your watchlist, AI picks, sharing with friends)</li>
+      <li>Sync your data across your devices when signed in</li>
+      <li>Respond to your feedback or support requests</li>
+      <li>Protect the service against abuse (rate-limiting, fraud prevention)</li>
+    </ul>
+    <p>We do not sell your data. We do not share it with advertisers. We do not use it to train AI models.</p>
+
+    <h2>4. Where your data is stored</h2>
+
+    <h3>4.1 Supabase</h3>
+    <p>
+      Your account, watchlist and lists are stored in <a href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase</a>, a managed PostgreSQL service. Servers are located in the EU (Frankfurt) at the time of writing. Supabase acts as our data processor under standard contractual terms.
+    </p>
+
+    <h3>4.2 Cloudflare</h3>
+    <p>
+      API requests (TMDB film data, AI features) are proxied through a <a href="https://www.cloudflare.com/privacy/" target="_blank" rel="noopener">Cloudflare Worker</a> for security and rate-limiting. Cloudflare may temporarily process request metadata at the edge.
+    </p>
+
+    <h3>4.3 Google Drive (optional)</h3>
+    <p>
+      If you enable cloud backup, Cinemail uses your Google Drive <strong>appDataFolder</strong> scope to store a backup file you own and control. We can only access files our app creates - not your photos, documents or other files. You can revoke this permission at any time in your Google Account settings.
+    </p>
+
+    <h2>5. Third-party services</h2>
+
+    <h3>5.1 TMDB</h3>
+    <p>
+      Film data, posters and crew information come from <a href="https://www.themoviedb.org" target="_blank" rel="noopener">The Movie Database (TMDB)</a>. When you search for a film, your query is forwarded to TMDB via our proxy. Cinemail uses the TMDB API but is not endorsed or certified by TMDB. See <a href="https://www.themoviedb.org/privacy-policy" target="_blank" rel="noopener">TMDB's privacy policy</a>.
+    </p>
+
+    <h3>5.2 Anthropic (AI picks)</h3>
+    <p>
+      When you ask for an AI recommendation, we send anonymised film preferences (titles, genres, ratings - not your name, email or personal identifiers) to <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener">Anthropic</a>'s Claude model via API. Anthropic does not train on customer API data by default.
+    </p>
+
+    <h3>5.3 Music links</h3>
+    <p>
+      Soundtrack buttons open external services (Spotify, Apple Music, YouTube Music). These platforms have their own privacy policies; we never share your data with them - the link opens with only the search term.
+    </p>
+
+    <h2>6. Cookies and local storage</h2>
+    <p>
+      Cinemail stores authentication tokens and a local cache of your data in your browser's IndexedDB and localStorage. This is necessary for the app to work offline and stay signed in. We do not use cookies for tracking or advertising.
+    </p>
+
+    <h2>7. Your rights</h2>
+    <p>Regardless of where you live, you have the right to:</p>
+    <ul>
+      <li><strong>Access</strong> - request a copy of all the data we hold about you</li>
+      <li><strong>Export</strong> - you can export your watchlist as CSV or JSON anytime from the app (Settings → Backup)</li>
+      <li><strong>Correct</strong> - fix any inaccurate data through the app or by emailing us</li>
+      <li><strong>Delete</strong> - delete your account and all associated data. Email <a href="mailto:hello@dafaspace.com">hello@dafaspace.com</a> with the subject line "Delete my account" and we will process it within 7 days</li>
+      <li><strong>Object / restrict</strong> - ask us to stop processing your data in any specific way</li>
+      <li><strong>Withdraw consent</strong> - revoke Google Drive access from your Google Account; revoke other consents by deleting your account</li>
+      <li><strong>Lodge a complaint</strong> - with your local data protection authority if you believe we've handled your data unlawfully</li>
+    </ul>
+
+    <h2>8. Data retention</h2>
+    <p>
+      We keep your account data for as long as your account exists. If you delete your account, all your personal data is removed from our active databases within 7 days. Anonymised backups may be retained for up to 30 days after that for disaster recovery, then permanently deleted.
+    </p>
+    <p>
+      Feedback messages may be kept indefinitely as part of our product improvement records, but we remove any personally identifying details on request.
+    </p>
+
+    <h2>9. Security</h2>
+    <p>
+      We use industry-standard security practices: HTTPS everywhere, hashed passwords, row-level security on the database (so users can only see their own data), and short-lived authentication tokens. No system is perfectly secure, but we take reasonable steps and will notify you promptly if we ever discover a breach involving your data.
+    </p>
+
+    <h2>10. Children's privacy</h2>
+    <p>
+      Cinemail is not directed at children under 13 (or under 16 in jurisdictions where that age applies under GDPR). We don't knowingly collect data from children. If you believe a child has signed up, please email us and we'll delete the account.
+    </p>
+
+    <h2>11. International transfers</h2>
+    <p>
+      If you use Cinemail from outside the EU, your data may be transferred to servers in the EU (Supabase, Frankfurt) or routed through Cloudflare's global network. We rely on Standard Contractual Clauses and the providers' compliance frameworks to safeguard those transfers.
+    </p>
+
+    <h2>12. Changes to this policy</h2>
+    <p>
+      If we make material changes to this policy, we'll notify you in the app and update the "Last updated" date above. Trivial wording changes won't trigger a notification. Continued use of Cinemail after a change means you accept the new policy.
+    </p>
+
+    <h2>13. Contact</h2>
+    <p>
+      Questions, concerns, or just want to say hi? Email <a href="mailto:hello@dafaspace.com">hello@dafaspace.com</a>. A real human (me, Daniel) reads every message.
+    </p>
+
+    <footer>
+      © 2026 dafaspace. Cinemail is built with care for the cinema-loving humans of the world 🧡
+    </footer>
+
+  </main>
+</body>
+</html>
