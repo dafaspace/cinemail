@@ -2178,6 +2178,18 @@ body {
 
       <button onclick="replayOnboarding()" data-i18n="replay_onboarding" style="width:100%;padding:9px;border-radius:9px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:14px;transition:all 0.15s" onmouseover="this.style.borderColor='var(--accent-border)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">🎬 Replay Welcome Tour</button>
 
+      <!-- Support Cinemail -->
+      <div style="margin-bottom:14px;padding:12px 14px;background:rgba(255,140,40,0.06);border:1px solid rgba(255,140,40,0.22);border-radius:10px;font-size:12px;line-height:1.55">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span style="font-size:14px">🧡</span>
+          <span style="color:var(--text);font-weight:600;font-size:12px;letter-spacing:0.3px" data-i18n="support_title">Support Cinemail</span>
+        </div>
+        <div data-i18n="support_text" data-i18n-html="1" style="color:var(--muted);margin-bottom:9px">
+          Early supporters get lifetime Pro features free when Cinemail goes paid on the App Store &amp; Google Play.
+        </div>
+        <a href="https://ko-fi.com/dafaspace" target="_blank" rel="noopener" style="display:inline-block;padding:7px 13px;border-radius:7px;background:rgba(255,140,40,0.18);border:1px solid rgba(255,140,40,0.35);color:var(--text);text-decoration:none;font-size:12px;font-weight:600;transition:all 0.15s" data-i18n="support_button">☕ Support on Ko-fi →</a>
+      </div>
+
       <!-- About / Attribution -->
       <div style="margin-top:8px;margin-bottom:18px;padding:12px 14px;background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:10px;font-size:11px;line-height:1.6;color:var(--muted)">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
@@ -2309,6 +2321,9 @@ const I18N = {
     search_ph:"Movie or series title…",
     friend_search_ph:"Search by name to add…",
     replay_onboarding:"🎬 Replay Welcome Tour",
+    support_title:"Support Cinemail",
+    support_text:"Early supporters get lifetime Pro features free when Cinemail goes paid on the App Store &amp; Google Play.",
+    support_button:"☕ Support on Ko-fi →",
     about_tmdb:"Film data, posters and crew info from <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail uses the TMDB API but is not endorsed or certified by TMDB.",
     about_author:"Made by <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
   },
@@ -2350,6 +2365,9 @@ const I18N = {
     search_ph:"Название фильма или сериала…",
     friend_search_ph:"Поиск по имени…",
     replay_onboarding:"🎬 Пройти тур заново",
+    support_title:"Поддержать Cinemail",
+    support_text:"Поддержавшие на этом этапе получат пожизненный Pro бесплатно, когда Cinemail станет платным в App Store и Google Play.",
+    support_button:"☕ Поддержать на Ko-fi →",
     about_tmdb:"Данные о фильмах, постеры и creative crew - из <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail использует TMDB API, но не сертифицирован TMDB.",
     about_author:"Сделано <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
   }
