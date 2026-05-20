@@ -2220,7 +2220,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v1.3.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v1.3.1</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -5509,13 +5509,48 @@ function _eggSpawn(emojis, count, spin) {
   setTimeout(() => layer.remove(), 3500);
 }
 function _eggPopcorn(){ _eggSpawn(["🍿"], 26); }
-function _eggConfetti(){ _eggSpawn(["🎉","🎊","✨","💛"], 30); }
-function _eggReel(){
+function _eggLayer(){
   const layer = document.createElement("div");
-  layer.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:99999;display:flex;align-items:center;justify-content:center";
-  layer.innerHTML = '<div style="font-size:90px;animation:eggspin 1.4s ease-in-out">🎞️</div>';
+  layer.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:99999;overflow:hidden";
   document.body.appendChild(layer);
-  setTimeout(() => layer.remove(), 1500);
+  return layer;
+}
+function _eggReel(){
+  const layer = _eggLayer();
+  const sides = [[-12,30],[112,30],[-12,70],[112,70],[25,-12],[75,-12],[50,112]];
+  for (let i = 0; i < 7; i++) {
+    const el = document.createElement("div");
+    el.textContent = "🎞️";
+    const [sx, sy] = sides[i % sides.length];
+    const ex = 25 + Math.random()*50, ey = 25 + Math.random()*50;
+    el.style.cssText = `position:absolute;left:${sx}vw;top:${sy}vh;font-size:${34+Math.random()*30}px;`;
+    el.animate([
+      { transform:"translate(0,0) rotate(0deg)", opacity:0 },
+      { transform:`translate(${(ex-sx)*0.7}vw,${(ey-sy)*0.7}vh) rotate(${720+Math.random()*720}deg)`, opacity:1, offset:0.65 },
+      { transform:`translate(${(ex-sx)*1.4}vw,${(ey-sy)*1.4}vh) rotate(1620deg)`, opacity:0 }
+    ], { duration: 1700, easing:"ease-out" });
+    layer.appendChild(el);
+  }
+  setTimeout(() => layer.remove(), 1900);
+}
+function _eggConfetti(){
+  const layer = _eggLayer();
+  const emojis = ["🎉","🎊","✨","💛","⭐","🎆"];
+  for (let i = 0; i < 34; i++) {
+    const el = document.createElement("div");
+    el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    const sx = 32 + Math.random()*36;
+    const peak = 20 + Math.random()*42;
+    const drift = (Math.random()-0.5)*60;
+    el.style.cssText = `position:absolute;left:${sx}vw;top:100vh;font-size:${16+Math.random()*18}px;`;
+    el.animate([
+      { transform:"translate(0,0)", opacity:1 },
+      { transform:`translate(${drift*0.5}vw,${-(100-peak)}vh)`, opacity:1, offset:0.6 },
+      { transform:`translate(${drift}vw,${-(100-peak)+16}vh)`, opacity:0 }
+    ], { duration: 1500 + Math.random()*600, easing:"cubic-bezier(.2,.8,.3,1)" });
+    layer.appendChild(el);
+  }
+  setTimeout(() => layer.remove(), 2300);
 }
 
 function renderProfileStats(watched) {
