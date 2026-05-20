@@ -897,6 +897,10 @@ body {
 }
 .acc-stat-val { font-family: 'Bebas Neue', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; font-size: 24px; color: var(--primary); }
 .acc-stat-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.hb-heart { color: var(--primary); display: inline-block; animation: heartbeat 1s ease-in-out infinite; }
+@keyframes heartbeat { 0%,100%{transform:scale(1);} 15%{transform:scale(1.3);} 30%{transform:scale(1);} 45%{transform:scale(1.2);} }
+@keyframes eggfall { to { transform: translateY(110vh) rotate(360deg); opacity: 0.85; } }
+@keyframes eggspin { 0%{transform:scale(0.2) rotate(0deg);opacity:0;} 25%{transform:scale(1.2) rotate(360deg);opacity:1;} 75%{transform:scale(1.2) rotate(1080deg);opacity:1;} 100%{transform:scale(0.4) rotate(1440deg);opacity:0;} }
 
 /* ── Inbox messaging ────────────────────────────────────────────────── */
 .inv-card {
@@ -2125,10 +2129,10 @@ body {
           <div class="acc-stat-val" style="color:#aaa" id="acc-stat-plan">0</div>
           <div class="acc-stat-lbl" data-i18n="stat_to_watch">To watch</div>
         </div>
-        <div style="text-align:center">
-          <div class="acc-stat-val" id="acc-stat-avg">0.0</div>
-          <div class="acc-stat-lbl" data-i18n="stat_avg">Avg ★</div>
-        </div>
+      </div>
+      <div id="acc-time-wrap" onclick="cycleTimeStat()" style="display:none;text-align:center;margin:-14px 0 22px;padding:13px 10px;border:1px solid var(--border);border-radius:12px;cursor:pointer;user-select:none;transition:border-color 0.15s" onmouseover="this.style.borderColor='var(--primary-border)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div class="acc-stat-val" id="acc-stat-time" style="font-size:20px">0h 0m</div>
+        <div class="acc-stat-lbl" data-i18n="stat_time" style="margin-top:3px">Watch time · tap</div>
       </div>
       <div id="acc-profile-stats" style="margin-bottom:4px"></div>
       <div class="add-label" data-i18n="display_name_lbl">Display Name</div>
@@ -2216,7 +2220,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v1.2.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v1.3.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -2311,7 +2315,7 @@ const I18N = {
     sign_in:"Sign In", sign_up:"Create Account", close:"Close", sign_out:"Sign Out",
     tab_search:"🔍 Search", tab_picks:"✨ Picks", tab_lists:"📋 Lists", tab_inbox:"📬 Inbox", tab_inbox_label:"Inbox",
     tab_watched:"✓ Watched", new_list_tab:"+ New",
-    stat_watched:"Watched", stat_to_watch:"To watch", stat_avg:"Avg ★",
+    stat_watched:"Watched", stat_to_watch:"To watch", stat_avg:"Avg ★", stat_time:"Watch time · tap",
     search_btn:"Search", find_btn:"Find",
     your_rating:"Your Rating", notes:"Notes", send_to:"Send to", msg_opt:"Message (optional)",
     display_name_lbl:"Display Name", backup_lbl:"Backup", friends_lbl:"Friends",
@@ -2357,7 +2361,7 @@ const I18N = {
     sign_in:"Войти", sign_up:"Создать аккаунт", close:"Закрыть", sign_out:"Выйти",
     tab_search:"🔍 Поиск", tab_picks:"✨ Подборки", tab_lists:"📋 Списки", tab_inbox:"📬 Входящие", tab_inbox_label:"Входящие",
     tab_watched:"✓ Просмотрено", new_list_tab:"+ Создать",
-    stat_watched:"Просмотрено", stat_to_watch:"К просмотру", stat_avg:"Ср. ★",
+    stat_watched:"Просмотрено", stat_to_watch:"К просмотру", stat_avg:"Ср. ★", stat_time:"Время просмотра · тап",
     search_btn:"Найти", find_btn:"Найти",
     your_rating:"Ваша оценка", notes:"Заметки", send_to:"Кому", msg_opt:"Сообщение (необязательно)",
     display_name_lbl:"Имя", backup_lbl:"Резервная копия", friends_lbl:"Друзья",
@@ -2403,7 +2407,7 @@ const I18N = {
     sign_in:"Увійти", sign_up:"Створити акаунт", close:"Закрити", sign_out:"Вийти",
     tab_search:"🔍 Пошук", tab_picks:"✨ Поради", tab_lists:"📋 Списки", tab_inbox:"📬 Вхідні", tab_inbox_label:"Вхідні",
     tab_watched:"✓ Переглянуто", new_list_tab:"+ Новий",
-    stat_watched:"Переглянуто", stat_to_watch:"До перегляду", stat_avg:"Сер. ★",
+    stat_watched:"Переглянуто", stat_to_watch:"До перегляду", stat_avg:"Сер. ★", stat_time:"Час перегляду · тап",
     search_btn:"Пошук", find_btn:"Знайти",
     your_rating:"Твоя оцінка", notes:"Нотатки", send_to:"Надіслати", msg_opt:"Повідомлення (необов'язково)",
     display_name_lbl:"Ім'я", backup_lbl:"Резервна копія", friends_lbl:"Друзі",
@@ -2449,7 +2453,7 @@ const I18N = {
     sign_in:"შესვლა", sign_up:"ანგარიშის შექმნა", close:"დახურვა", sign_out:"გასვლა",
     tab_search:"🔍 ძებნა", tab_picks:"✨ რჩევები", tab_lists:"📋 სიები", tab_inbox:"📬 შემოსული", tab_inbox_label:"შემოსული",
     tab_watched:"✓ ნანახი", new_list_tab:"+ ახალი",
-    stat_watched:"ნანახი", stat_to_watch:"სანახავი", stat_avg:"საშ. ★",
+    stat_watched:"ნანახი", stat_to_watch:"სანახავი", stat_avg:"საშ. ★", stat_time:"ნახვის დრო · შეხება",
     search_btn:"ძებნა", find_btn:"მოძებნა",
     your_rating:"შენი შეფასება", notes:"შენიშვნები", send_to:"გაგზავნა", msg_opt:"შეტყობინება (სურვილისამებრ)",
     display_name_lbl:"სახელი", backup_lbl:"სარეზერვო ასლი", friends_lbl:"მეგობრები",
@@ -2495,7 +2499,7 @@ const I18N = {
     sign_in:"Iniciar sesión", sign_up:"Crear cuenta", close:"Cerrar", sign_out:"Cerrar sesión",
     tab_search:"🔍 Buscar", tab_picks:"✨ Sugerencias", tab_lists:"📋 Listas", tab_inbox:"📬 Bandeja", tab_inbox_label:"Bandeja",
     tab_watched:"✓ Vistas", new_list_tab:"+ Nueva",
-    stat_watched:"Vistas", stat_to_watch:"Por ver", stat_avg:"Prom. ★",
+    stat_watched:"Vistas", stat_to_watch:"Por ver", stat_avg:"Prom. ★", stat_time:"Tiempo visto · toca",
     search_btn:"Buscar", find_btn:"Buscar",
     your_rating:"Tu valoración", notes:"Notas", send_to:"Enviar a", msg_opt:"Mensaje (opcional)",
     display_name_lbl:"Nombre", backup_lbl:"Copia de seguridad", friends_lbl:"Amigos",
@@ -2541,7 +2545,7 @@ const I18N = {
     sign_in:"Se connecter", sign_up:"Créer un compte", close:"Fermer", sign_out:"Se déconnecter",
     tab_search:"🔍 Recherche", tab_picks:"✨ Suggestions", tab_lists:"📋 Listes", tab_inbox:"📬 Boîte", tab_inbox_label:"Boîte",
     tab_watched:"✓ Vus", new_list_tab:"+ Nouvelle",
-    stat_watched:"Vus", stat_to_watch:"À voir", stat_avg:"Moy. ★",
+    stat_watched:"Vus", stat_to_watch:"À voir", stat_avg:"Moy. ★", stat_time:"Temps vu · touchez",
     search_btn:"Rechercher", find_btn:"Trouver",
     your_rating:"Votre note", notes:"Notes", send_to:"Envoyer à", msg_opt:"Message (facultatif)",
     display_name_lbl:"Nom", backup_lbl:"Sauvegarde", friends_lbl:"Amis",
@@ -2939,6 +2943,7 @@ async function loadHistoryFromDB() {
     composer: r.composer || "", director: r.director || "",
     cinematographer: r.cinematographer || "",
     actors: r.actors || "",
+    runtime: r.runtime || 0,
     date: new Date(r.created_at).toLocaleDateString("en-GB"),
     listId: r.list_id || null,
     addedBy: r.user_id || null
@@ -2952,6 +2957,7 @@ async function saveEntryToDB(entry) {
     composer: entry.composer || null, director: entry.director || null,
     cinematographer: entry.cinematographer || null,
     actors: entry.actors || null,
+    runtime: _parseRuntimeMin(entry.runtime),
     user_id: currentUser ? currentUser.id : null,
     list_id: entry.listId || null
   })});
@@ -3183,6 +3189,7 @@ async function toggleFilmInList(listId, tmdbID) {
         composer: movie.Composer || null, director: movie.Director || null,
         cinematographer: movie.Cinematographer || null,
         actors: movie.Cast || null,
+        runtime: movie.Runtime || null,
         listId: listId
       });
       watchHistory = await loadHistoryFromDB();
@@ -3328,6 +3335,7 @@ async function openDetail(id, type) {
       if (!existing.director && d.Director) patch.director = d.Director;
       if (!existing.cinematographer && d.Cinematographer) patch.cinematographer = d.Cinematographer;
       if (!existing.actors && d.Cast) patch.actors = d.Cast;
+      if (!existing.runtime && d.Runtime) patch.runtime = _parseRuntimeMin(d.Runtime);
       if (Object.keys(patch).length) { updateEntryInDB(existing.id, patch).then(async () => { watchHistory = await loadHistoryFromDB(); }).catch(() => {}); }
     }
 
@@ -3605,11 +3613,13 @@ async function confirmAdd() {
   let director = m.Director || "";
   let cinematographer = m.Cinematographer || "";
   let actors = m.Cast || "";
+  let runtime = m.Runtime || "";
   if (window._detailMovie && String(window._detailMovie.tmdbID) === tmdbID) {
     if (!composer)        composer = window._detailMovie.Composer || "";
     if (!director)        director = window._detailMovie.Director || "";
     if (!cinematographer) cinematographer = window._detailMovie.Cinematographer || "";
     if (!actors)          actors = window._detailMovie.Cast || "";
+    if (!runtime)         runtime = window._detailMovie.Runtime || "";
   }
   try {
     if (existing) {
@@ -3624,6 +3634,7 @@ async function confirmAdd() {
       if (director        && !existing.director)        fields.director = director;
       if (cinematographer && !existing.cinematographer) fields.cinematographer = cinematographer;
       if (actors          && !existing.actors)          fields.actors = actors;
+      if (runtime         && !existing.runtime)         fields.runtime = _parseRuntimeMin(runtime);
       await updateEntryInDB(existing.id, fields);
     } else {
       await saveEntryToDB({ tmdbID, title: m.Title||"", year: m.Year||"", poster: m.Poster||"",
@@ -3633,6 +3644,7 @@ async function confirmAdd() {
         composer: composer||null, director: director||null,
         cinematographer: cinematographer||null,
         actors: actors||null,
+        runtime: runtime||null,
         listId: currentAddListId });
     }
     const newHistory = await loadHistoryFromDB();
@@ -5429,12 +5441,81 @@ async function openAccount() {
 function _updateAccountStats() {
   const watched = watchHistory.filter(h => h.status === "watched");
   const plan    = watchHistory.filter(h => h.status === "plan");
-  const rated   = watched.filter(h => h.stars > 0);
-  const avg     = rated.length ? (rated.reduce((s,h)=>s+h.stars,0)/rated.length).toFixed(1) : "0.0";
   document.getElementById("acc-stat-watched").textContent = watched.length;
   document.getElementById("acc-stat-plan").textContent    = plan.length;
-  document.getElementById("acc-stat-avg").textContent     = avg;
+  _timeStatState = 0; // reset to breakdown view each time account opens
+  renderTimeStat();
   renderProfileStats(watched);
+}
+
+// ── Watch-time stat (tappable: breakdown ↔ heartbeats, + easter eggs) ──────────
+let _timeStatState = 0, _timeTapCount = 0, _eggIndex = 0;
+function _parseRuntimeMin(s) {
+  if (s == null || s === "") return null;
+  const n = parseInt(String(s).replace(/[^0-9]/g, ""), 10);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+function _totalWatchMinutes() {
+  return (watchHistory || []).filter(h => h.status === "watched")
+    .reduce((s, h) => s + (parseInt(h.runtime) || 0), 0);
+}
+function _fmtWatchBreakdown(totalMin) {
+  let m = totalMin;
+  const y  = Math.floor(m / (365*24*60)); m -= y*365*24*60;
+  const mo = Math.floor(m / (30*24*60));  m -= mo*30*24*60;
+  const d  = Math.floor(m / (24*60));     m -= d*24*60;
+  const h  = Math.floor(m / 60);          m -= h*60;
+  const parts = [];
+  if (y)  parts.push(y + "y");
+  if (mo) parts.push(mo + "mo");
+  if (d)  parts.push(d + "d");
+  if (h)  parts.push(h + "h");
+  parts.push(m + "m");
+  return parts.join(" ");
+}
+function renderTimeStat() {
+  const wrap = document.getElementById("acc-time-wrap");
+  const el = document.getElementById("acc-stat-time");
+  if (!wrap || !el) return;
+  const total = _totalWatchMinutes();
+  if (total <= 0) { wrap.style.display = "none"; return; }
+  wrap.style.display = "block";
+  if (_timeStatState === 0) {
+    el.textContent = _fmtWatchBreakdown(total);
+  } else {
+    el.innerHTML = (total * 60).toLocaleString("en-US") + ' heartbeats <span class="hb-heart">&#9829;</span>';
+  }
+}
+function cycleTimeStat() {
+  _timeTapCount++;
+  _timeStatState = _timeStatState === 0 ? 1 : 0;
+  renderTimeStat();
+  if (_timeTapCount % 5 === 0) {
+    [_eggPopcorn, _eggReel, _eggConfetti][_eggIndex % 3]();
+    _eggIndex++;
+  }
+}
+function _eggSpawn(emojis, count, spin) {
+  const layer = document.createElement("div");
+  layer.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:99999;overflow:hidden";
+  document.body.appendChild(layer);
+  for (let i = 0; i < count; i++) {
+    const s = document.createElement("div");
+    s.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    const left = Math.random()*100, size = 18+Math.random()*22, dur = 1.6+Math.random()*1.4, delay = Math.random()*0.5;
+    s.style.cssText = `position:absolute;top:-40px;left:${left}vw;font-size:${size}px;animation:eggfall ${dur}s ${delay}s ease-in forwards`;
+    layer.appendChild(s);
+  }
+  setTimeout(() => layer.remove(), 3500);
+}
+function _eggPopcorn(){ _eggSpawn(["🍿"], 26); }
+function _eggConfetti(){ _eggSpawn(["🎉","🎊","✨","💛"], 30); }
+function _eggReel(){
+  const layer = document.createElement("div");
+  layer.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:99999;display:flex;align-items:center;justify-content:center";
+  layer.innerHTML = '<div style="font-size:90px;animation:eggspin 1.4s ease-in-out">🎞️</div>';
+  document.body.appendChild(layer);
+  setTimeout(() => layer.remove(), 1500);
 }
 
 function renderProfileStats(watched) {
@@ -5547,6 +5628,7 @@ async function applyBackupData(rows) {
         composer: r.composer || "",
         cinematographer: r.cinematographer || "",
         actors: r.actors || "",
+        runtime: r.runtime || null,
         listId: r.list_id || null   // preserve list membership (works for same-account restore)
       });
     } catch(e) {
@@ -5558,7 +5640,7 @@ async function applyBackupData(rows) {
           comment: r.comment || "", status: r.status || "watched",
           mediaType: r.media_type || "movie",
           director: r.director || "", composer: r.composer || "",
-          cinematographer: r.cinematographer || "", actors: r.actors || ""
+          cinematographer: r.cinematographer || "", actors: r.actors || "", runtime: r.runtime || null
         });
       } else { throw e; }
     }
@@ -5633,6 +5715,7 @@ function _parseCSV(text) {
       composer:        obj.composer        || "",
       cinematographer: obj.cinematographer || "",
       actors:          obj.actors          || "",
+      runtime:         obj.runtime         || null,
       poster:          obj.poster          || ""   // fallback if TMDB call fails
     };
   }).filter(r => r.imdb_id && r.title);
@@ -5644,7 +5727,7 @@ function _todayStr() { return new Date().toISOString().slice(0,10); }
 const BackupLocal = {
   export(rows) {
     // Include poster URL so it works as a fallback if TMDB is unavailable on import
-    const cols = ["tmdb_id","title","year","type","status","rating","comment","director","cinematographer","composer","actors","poster","added_at"];
+    const cols = ["tmdb_id","title","year","type","status","rating","comment","director","cinematographer","composer","actors","runtime","poster","added_at"];
     const lines = [cols.join(",")];
     for (const r of rows) {
       lines.push([
@@ -5653,8 +5736,8 @@ const BackupLocal = {
         _csvEscape(r.status||"watched"),     _csvEscape(r.stars||0),
         _csvEscape(r.comment||""),           _csvEscape(r.director||""),
         _csvEscape(r.cinematographer||""),   _csvEscape(r.composer||""),
-        _csvEscape(r.actors||""),            _csvEscape(r.poster||""),
-        _csvEscape(r.created_at||"")
+        _csvEscape(r.actors||""),            _csvEscape(r.runtime||""),
+        _csvEscape(r.poster||""),            _csvEscape(r.created_at||"")
       ].join(","));
     }
     const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
@@ -5958,7 +6041,7 @@ async function backfillCrewData() {
   const btn = document.getElementById("btn-backfill-crew");
   // Find entries missing any crew field (cinematographer / composer / director)
   const targets = (watchHistory || []).filter(h =>
-    h.tmdbID && (!h.cinematographer || !h.composer || !h.director || !h.actors)
+    h.tmdbID && (!h.cinematographer || !h.composer || !h.director || !h.actors || !h.runtime)
   );
   if (!targets.length) { showToast("All films already have crew data ✓"); return; }
   if (btn) { btn.disabled = true; }
@@ -5973,6 +6056,7 @@ async function backfillCrewData() {
       if (!h.composer        && d.Composer)        patch.composer        = d.Composer;
       if (!h.director        && d.Director)        patch.director        = d.Director;
       if (!h.actors          && d.Cast)            patch.actors          = d.Cast;
+      if (!h.runtime         && d.Runtime)         patch.runtime         = _parseRuntimeMin(d.Runtime);
       if (Object.keys(patch).length) { await updateEntryInDB(h.id, patch); updated++; }
     } catch(e) { /* skip individual failures, keep going */ }
     await new Promise(r => setTimeout(r, 250)); // gentle on the TMDB proxy
