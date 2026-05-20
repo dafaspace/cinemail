@@ -2239,7 +2239,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v1.4.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v1.5.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3272,6 +3272,27 @@ function movieCardHTML(m, why) {
 }
 
 // ── Search ────────────────────────────────────────────────────────────────────
+const _DEPT_LABELS = { Directing:"Director", Acting:"Actor", Writing:"Writer", Sound:"Composer", Camera:"Cinematographer", Production:"Producer", Editing:"Editor", Art:"Production Design" };
+function _deptLabel(d) { return _DEPT_LABELS[d] || d || "Film"; }
+function personRowHTML(p) {
+  const safe = (p.name || "").replace(/'/g, "\\'");
+  const photo = p.profile_path ? `https://image.tmdb.org/t/p/w185${p.profile_path}` : "";
+  const dept = _deptLabel(p.known_for_department);
+  const knownFor = (p.known_for || []).map(k => k.title || k.name).filter(Boolean).slice(0, 2).join(", ");
+  const avatar = photo
+    ? `<div style="width:48px;height:48px;border-radius:50%;flex-shrink:0;background:var(--surface2) url('${photo}') center top/cover no-repeat"></div>`
+    : `<div style="width:48px;height:48px;border-radius:50%;flex-shrink:0;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:22px">👤</div>`;
+  return `<div class="card" style="align-items:center;cursor:pointer" onclick="openPerson('${safe}', ${p.id})">
+    ${avatar}
+    <div class="card-body" style="flex:1;min-width:0">
+      <div class="card-title">${p.name || ""}</div>
+      <div class="card-meta">${dept}${knownFor ? ` · ${knownFor}` : ""}</div>
+    </div>
+    <span style="color:var(--muted);font-size:20px;padding-right:8px">›</span>
+  </div>`;
+}
+const _SEARCH_LABEL = 'font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin:2px 0 8px;font-weight:600';
+
 async function doSearch() {
   const raw = document.getElementById("search-input").value.trim();
   if (!raw) return;
@@ -3281,17 +3302,30 @@ async function doSearch() {
     const { title, year } = parseQuery(raw);
     let q = title;
     if (hasCyrillic(q) && ANTHROPIC_KEY) q = await translateQuery(q);
-    let results = await tmdbSearchWithYear(q, year);
+    const [filmsPrimary, personRes] = await Promise.all([
+      tmdbSearchWithYear(q, year),
+      tmdbFetch(`/search/person?query=${encodeURIComponent(q)}&include_adult=false&language=en-US`).catch(() => ({ results: [] }))
+    ]);
+    let results = filmsPrimary;
     if (hasCyrillic(title) && q !== title) {
       const ruResults = await tmdbSearchWithYear(title, year);
       const seen = new Set(results.map(r => r.tmdbID));
       ruResults.forEach(r => { if (!seen.has(r.tmdbID)) results.push(r); });
     }
-    if (!results.length) {
+    // People: only when not filtering by year, top matches with a known film department
+    const people = year ? [] : (personRes.results || [])
+      .filter(p => p.known_for_department && ((p.known_for || []).length || p.profile_path) && (p.popularity || 0) >= 1)
+      .slice(0, 3);
+
+    if (!results.length && !people.length) {
       el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🤷</div><div class="empty-state-title">No Results</div><p>Try just the title without the year</p></div>`;
       return;
     }
-    el.innerHTML = `<div class="card-list">${results.map(m => movieCardHTML(m)).join("")}</div>`;
+    const peopleBlock = people.length
+      ? `<div style="${_SEARCH_LABEL}">People</div><div class="card-list" style="margin-bottom:16px">${people.map(personRowHTML).join("")}</div>`
+        + (results.length ? `<div style="${_SEARCH_LABEL}">Films &amp; Series</div>` : "")
+      : "";
+    el.innerHTML = peopleBlock + `<div class="card-list">${results.map(m => movieCardHTML(m)).join("")}</div>`;
   } catch(e) {
     el.innerHTML = `<div class="empty-state"><div class="empty-state-title">Connection Error</div><p>${e.message}</p></div>`;
   }
@@ -3533,14 +3567,20 @@ function streamingLinks(query, compact) {
 }
 function openStreaming(deepLink, webUrl) { window.location.href = deepLink; setTimeout(() => { window.open(webUrl, "_blank"); }, 600); }
 
-async function openPerson(name) {
+async function openPerson(name, personId) {
   _currentModal = { type: 'person', name };
   const el = document.getElementById("person-content");
   document.getElementById("person-overlay").style.display = "flex";
   el.innerHTML = loadingHTML(randQuote(), false);
   try {
-    const searchRes = await tmdbFetch(`/search/person?query=${encodeURIComponent(name)}&language=en-US`);
-    const person = searchRes.results?.[0];
+    let person;
+    if (personId) {
+      person = await tmdbFetch(`/person/${personId}?language=en-US`);
+      if (person && !person.name) person.name = name;
+    } else {
+      const searchRes = await tmdbFetch(`/search/person?query=${encodeURIComponent(name)}&language=en-US`);
+      person = searchRes.results?.[0];
+    }
     if (!person) {
       el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🤷</div><div class="empty-state-title">Not Found</div><p>No results for "${name}"</p></div>
         <div style="margin-top:16px"><button class="btn-modal-close w-full" onclick="navModalBack()">Close</button></div>`;
