@@ -2105,7 +2105,8 @@ body {
 <!-- Account Modal -->
 <div id="account-overlay" class="overlay" style="display:none;align-items:flex-start;overflow-y:auto;padding-top:env(safe-area-inset-top)" onclick="closeAccount()">
   <div style="padding:20px;width:100%;display:flex;justify-content:center;min-height:100%" onclick="event.stopPropagation()">
-    <div class="modal-sheet" style="max-width:360px;width:100%;height:fit-content;align-self:flex-start" id="account-modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-sheet" style="max-width:360px;width:100%;height:fit-content;align-self:flex-start;position:relative" id="account-modal-sheet" onclick="event.stopPropagation()">
+      <button onclick="closeAccount()" aria-label="Close" style="position:absolute;top:12px;right:12px;z-index:5;width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--muted);font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--accent-border)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">×</button>
       <div style="text-align:center;padding:8px 0 20px">
         <div class="avatar-wrap" onclick="toggleAvatarPicker()">
           <div class="acc-avatar" id="acc-modal-avatar" style="margin:0">U</div>
@@ -2194,7 +2195,11 @@ body {
           Early supporters get lifetime Pro features free when Cinemail goes paid on the App Store &amp; Google Play.
         </div>
         <a href="https://ko-fi.com/dafaspace" target="_blank" rel="noopener" style="display:inline-block;padding:7px 13px;border-radius:7px;background:rgba(255,140,40,0.18);border:1px solid rgba(255,140,40,0.35);color:var(--text);text-decoration:none;font-size:12px;font-weight:600;transition:all 0.15s" data-i18n="support_button">☕ Support on Ko-fi →</a>
-      </div>
+        <div style="margin-top:9px;display:flex;align-items:center;gap:7px">
+          <button onclick="copyUSDT(event)" style="display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:7px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--muted);font-size:11px;font-weight:500;cursor:pointer;transition:all 0.15s" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--accent-border)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">
+            <span style="font-size:12px">◈</span><span id="usdt-acc-label">USDT (TRC20)</span>
+          </button>
+        </div>
 
       <!-- About / Attribution -->
       <div style="margin-top:8px;margin-bottom:18px;padding:12px 14px;background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:10px;font-size:11px;line-height:1.6;color:var(--muted)">
@@ -2211,7 +2216,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v1.1.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v1.1.1</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -5474,6 +5479,17 @@ function closeAccount(){
   const ov = document.getElementById("account-overlay");
   ov.style.display="none";
   ov.scrollTop = 0;
+}
+const USDT_ADDRESS = "TJ5kerJVe92YZDpqoyEKPqix2MWMmsr5bk";
+function copyUSDT(e) {
+  if (e) e.preventDefault();
+  const lbl = document.getElementById("usdt-acc-label");
+  navigator.clipboard.writeText(USDT_ADDRESS).then(() => {
+    if (!lbl) { showToast("USDT address copied ✓"); return; }
+    const orig = lbl.textContent;
+    lbl.textContent = "Copied ✓ " + USDT_ADDRESS.slice(0,6) + "…" + USDT_ADDRESS.slice(-4);
+    setTimeout(() => { lbl.textContent = orig; }, 2500);
+  }).catch(() => { prompt("Copy USDT (TRC20) address:", USDT_ADDRESS); });
 }
 async function saveDisplayName() {
   const newName=document.getElementById("acc-name-input").value.trim();
