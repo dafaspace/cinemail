@@ -1311,9 +1311,11 @@ body {
 .ob-dot.active { background: var(--primary); width: 18px; border-radius: 3px; }
 .ob-btn-row { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 12px; }
 .ob-btn-skip {
-  background: none; border: none; color: var(--muted); font-size: 14px;
-  cursor: pointer; padding: 8px 4px; font-family: 'DM Sans', sans-serif;
+  background: none; border: 1px solid var(--border); border-radius: 9px;
+  color: var(--muted); font-size: 14px; cursor: pointer;
+  padding: 10px 22px; font-family: 'DM Sans', sans-serif; transition: all 0.15s;
 }
+.ob-btn-skip:hover { border-color: var(--primary-border); color: var(--text); }
 .ob-btn-next {
   flex: 1; padding: 14px; border-radius: 14px; border: none;
   background: var(--accent); color: var(--accent-text);
@@ -2220,7 +2222,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v1.3.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v1.3.2</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
