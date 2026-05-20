@@ -211,10 +211,11 @@ body {
   background: var(--bg);
   border-bottom: 1px solid var(--border);
   padding: 0 16px;
+  padding-top: env(safe-area-inset-top);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 52px;
+  height: calc(52px + env(safe-area-inset-top));
 }
 .topbar-logo {
   font-family: 'Bebas Neue', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
@@ -2145,6 +2146,7 @@ body {
       </div>
       <div class="backup-row">
         <button class="btn-backup" onclick="backupExportJSON()" data-i18n="export_json">↓ Export JSON</button>
+        <button class="btn-backup" id="btn-backfill-crew" onclick="backfillCrewData()" data-i18n="backfill_crew">🔄 Refresh crew data</button>
       </div>
       <div class="backup-row" id="drive-backup-row">
         <button class="btn-backup btn-backup-drive-action" id="btn-drive-save" onclick="backupSaveToDrive()">
@@ -2171,9 +2173,13 @@ body {
       </div>
 
       <div class="add-label" data-i18n="lang_label" style="margin-top:4px">Language</div>
-      <div class="lang-toggle" style="margin-bottom:20px">
-        <button class="lang-btn active" data-lang="en" onclick="setLang('en')">🇬🇧 English</button>
-        <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">🇷🇺 Русский</button>
+      <div class="lang-toggle" style="margin-bottom:20px;flex-wrap:wrap">
+        <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+        <button class="lang-btn" data-lang="uk" onclick="setLang('uk')">UA</button>
+        <button class="lang-btn" data-lang="ka" onclick="setLang('ka')">KA</button>
+        <button class="lang-btn" data-lang="es" onclick="setLang('es')">ES</button>
+        <button class="lang-btn" data-lang="fr" onclick="setLang('fr')">FR</button>
       </div>
 
       <button onclick="replayOnboarding()" data-i18n="replay_onboarding" style="width:100%;padding:9px;border-radius:9px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:14px;transition:all 0.15s" onmouseover="this.style.borderColor='var(--accent-border)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">🎬 Replay Welcome Tour</button>
@@ -2205,6 +2211,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v1.1.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -2305,6 +2312,7 @@ const I18N = {
     display_name_lbl:"Display Name", backup_lbl:"Backup", friends_lbl:"Friends",
     add_friend:"Add", save:"Save",
     export_csv:"↓ Export CSV", import_csv:"↑ Import CSV", export_json:"↓ Export JSON",
+    backfill_crew:"🔄 Refresh crew data",
     save_drive:"Save to Drive", restore_drive:"Restore",
     ob0_body:"Films · AI picks · Friends",
     ob1_title:"Find. Save.", ob1_body:"Search any title and tap + to add it to your list.",
@@ -2350,6 +2358,7 @@ const I18N = {
     display_name_lbl:"Имя", backup_lbl:"Резервная копия", friends_lbl:"Друзья",
     add_friend:"Добавить", save:"Сохранить",
     export_csv:"↓ Экспорт CSV", import_csv:"↑ Импорт CSV", export_json:"↓ Экспорт JSON",
+    backfill_crew:"🔄 Обновить данные о crew",
     save_drive:"Сохранить в Drive", restore_drive:"Восстановить",
     ob0_body:"Фильмы · AI-подборки · Друзья",
     ob1_title:"Найди. Сохрани.", ob1_body:"Ищи любой фильм и нажимай +, чтобы добавить в список.",
@@ -2375,9 +2384,196 @@ const I18N = {
     about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Политика конфиденциальности</a>",
     about_tmdb:"Данные о фильмах, постеры и creative crew - из <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail использует TMDB API, но не сертифицирован TMDB.",
     about_author:"Сделано <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
+  },
+  uk: {
+    auth_tagline:"Стеж за фільмами · Отримуй AI-поради · Ділись з друзями",
+    sign_in_title:"З поверненням", sign_up_title:"Створити акаунт",
+    email:"Пошта", password:"Пароль", display_name:"Ім'я",
+    back:"← Назад", back_to_signin:"← Назад до входу",
+    new_here:"Вперше у Cinemail?", create_acct_link:"Створити акаунт",
+    have_acct:"Вже маєш акаунт?", sign_in_link:"Увійти",
+    check_inbox_title:"Перевір пошту",
+    email_sent:"Ми надіслали посилання для підтвердження на твою пошту.<br>Натисни його, щоб активувати акаунт.",
+    check_spam:"Не отримав? Перевір папку «Спам».",
+    sign_in:"Увійти", sign_up:"Створити акаунт", close:"Закрити", sign_out:"Вийти",
+    tab_search:"🔍 Пошук", tab_picks:"✨ Поради", tab_lists:"📋 Списки", tab_inbox:"📬 Вхідні", tab_inbox_label:"Вхідні",
+    tab_watched:"✓ Переглянуто", new_list_tab:"+ Новий",
+    stat_watched:"Переглянуто", stat_to_watch:"До перегляду", stat_avg:"Сер. ★",
+    search_btn:"Пошук", find_btn:"Знайти",
+    your_rating:"Твоя оцінка", notes:"Нотатки", send_to:"Надіслати", msg_opt:"Повідомлення (необов'язково)",
+    display_name_lbl:"Ім'я", backup_lbl:"Резервна копія", friends_lbl:"Друзі",
+    add_friend:"Додати", save:"Зберегти",
+    export_csv:"↓ Експорт CSV", import_csv:"↑ Імпорт CSV", export_json:"↓ Експорт JSON",
+    backfill_crew:"🔄 Оновити дані crew",
+    save_drive:"Зберегти на Drive", restore_drive:"Відновити",
+    ob0_body:"Фільми · AI-поради · Друзі",
+    ob1_title:"Знайди. Збережи.", ob1_body:"Шукай будь-яку назву і тисни +, щоб додати до списку.",
+    ob2_title:"Переглянув. Оцінив.", ob2_body:"Познач переглянутим, постав оцінку й залиш нотатку.",
+    ob3_title:"Не знаєш, що подивитись?", ob3_body:"«Здивуй мене» обере щось на основі того, що ти вже бачив і оцінив.",
+    ob4_title:"Списки та історія", ob4_body:"Організовуй за списками. Фільми переходять у «Переглянуто» автоматично.",
+    ob5_title:"Друзі та вхідні", ob5_body:"Надсилай фільми друзям. Усе потрапляє у «Вхідні».",
+    ob6_title:"Досліджуй людей", ob6_body:"Тисни на ім'я режисера чи актора, щоб переглянути всю фільмографію.",
+    ob7_title:"Саундтреки", ob7_body:"Відкрий саундтрек у Spotify, Apple Music чи YouTube Music одним дотиком.",
+    ob8_title:"Ось і все.", ob8_body:"Статистика, улюблені режисери, копії - усе у твоєму профілі.",
+    ob_next:"Далі", ob_start:"Знайди свій перший фільм →", ob_skip:"Пропустити",
+    empty_list_title:"Твій список порожній", empty_list_sub:"Шукай фільми й додавай їх до списку", empty_list_btn:"Переглянути фільми",
+    empty_shared_sub:"Знайди фільм і тисни ≡, щоб додати сюди",
+    nothing_yet:"Поки що порожньо", mark_seen:"Познач фільми переглянутими", save_to_list:"Зберігай фільми у список",
+    surprise:"✨ Здивуй мене",
+    lang_label:"Мова",
+    search_ph:"Назва фільму чи серіалу…",
+    friend_search_ph:"Шукай за ім'ям…",
+    replay_onboarding:"🎬 Повторити знайомство",
+    support_title:"Підтримати Cinemail",
+    support_text:"Ранні прихильники отримають Pro назавжди безкоштовно, коли Cinemail стане платним в App Store та Google Play.",
+    support_button:"☕ Підтримати на Ko-fi →",
+    about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Політика конфіденційності</a>",
+    about_tmdb:"Дані про фільми, постери та crew - з <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail використовує TMDB API, але не сертифікований TMDB.",
+    about_author:"Зроблено <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
+  },
+  ka: {
+    auth_tagline:"თვალი ადევნე ფილმებს · მიიღე AI-რჩევები · გაუზიარე მეგობრებს",
+    sign_in_title:"კეთილი იყოს დაბრუნება", sign_up_title:"ანგარიშის შექმნა",
+    email:"ელფოსტა", password:"პაროლი", display_name:"სახელი",
+    back:"← უკან", back_to_signin:"← უკან შესვლაში",
+    new_here:"ახალი ხარ Cinemail-ში?", create_acct_link:"ანგარიშის შექმნა",
+    have_acct:"უკვე გაქვს ანგარიში?", sign_in_link:"შესვლა",
+    check_inbox_title:"შეამოწმე ელფოსტა",
+    email_sent:"დადასტურების ბმული გამოგზავნილია შენს ელფოსტაზე.<br>დააჭირე ანგარიშის გასააქტიურებლად.",
+    check_spam:"ვერ მიიღე? შეამოწმე სპამის საქაღალდე.",
+    sign_in:"შესვლა", sign_up:"ანგარიშის შექმნა", close:"დახურვა", sign_out:"გასვლა",
+    tab_search:"🔍 ძებნა", tab_picks:"✨ რჩევები", tab_lists:"📋 სიები", tab_inbox:"📬 შემოსული", tab_inbox_label:"შემოსული",
+    tab_watched:"✓ ნანახი", new_list_tab:"+ ახალი",
+    stat_watched:"ნანახი", stat_to_watch:"სანახავი", stat_avg:"საშ. ★",
+    search_btn:"ძებნა", find_btn:"მოძებნა",
+    your_rating:"შენი შეფასება", notes:"შენიშვნები", send_to:"გაგზავნა", msg_opt:"შეტყობინება (სურვილისამებრ)",
+    display_name_lbl:"სახელი", backup_lbl:"სარეზერვო ასლი", friends_lbl:"მეგობრები",
+    add_friend:"დამატება", save:"შენახვა",
+    export_csv:"↓ CSV ექსპორტი", import_csv:"↑ CSV იმპორტი", export_json:"↓ JSON ექსპორტი",
+    backfill_crew:"🔄 crew-მონაცემების განახლება",
+    save_drive:"Drive-ზე შენახვა", restore_drive:"აღდგენა",
+    ob0_body:"ფილმები · AI-რჩევები · მეგობრები",
+    ob1_title:"მოძებნე. შეინახე.", ob1_body:"მოძებნე ნებისმიერი ფილმი და დააჭირე +, რომ სიაში დაამატო.",
+    ob2_title:"ნანახი. შეფასებული.", ob2_body:"მონიშნე ნანახად, დატოვე შეფასება და შენიშვნა.",
+    ob3_title:"არ იცი რა უყურო?", ob3_body:"„გამაკვირვე\" შეგირჩევს რაღაცას იმის მიხედვით, რაც უკვე ნახე და შეაფასე.",
+    ob4_title:"სიები და ისტორია", ob4_body:"დაალაგე სიებად. ფილმები ავტომატურად გადადის „ნანახში\".",
+    ob5_title:"მეგობრები და შემოსული", ob5_body:"გაუგზავნე ფილმები მეგობრებს. ყველაფერი შემოსულში მოდის.",
+    ob6_title:"აღმოაჩინე ადამიანები", ob6_body:"დააჭირე რეჟისორის ან მსახიობის სახელს მთელი ფილმოგრაფიის სანახავად.",
+    ob7_title:"საუნდტრეკები", ob7_body:"გახსენი საუნდტრეკი Spotify-ზე, Apple Music-ზე ან YouTube Music-ზე ერთი შეხებით.",
+    ob8_title:"სულ ეს არის.", ob8_body:"სტატისტიკა, საყვარელი რეჟისორები, ასლები - ყველაფერი შენს პროფილშია.",
+    ob_next:"შემდეგი", ob_start:"მოძებნე შენი პირველი ფილმი →", ob_skip:"გამოტოვება",
+    empty_list_title:"შენი სია ცარიელია", empty_list_sub:"მოძებნე ფილმები და დაამატე სიაში", empty_list_btn:"ფილმების დათვალიერება",
+    empty_shared_sub:"მოძებნე ფილმი და დააჭირე ≡, რომ აქ დაამატო",
+    nothing_yet:"ჯერ აქ არაფერია", mark_seen:"მონიშნე ფილმები ნანახად", save_to_list:"შეინახე ფილმები სიაში",
+    surprise:"✨ გამაკვირვე",
+    lang_label:"ენა",
+    search_ph:"ფილმის ან სერიალის სახელი…",
+    friend_search_ph:"მოძებნე სახელით…",
+    replay_onboarding:"🎬 გაცნობის გამეორება",
+    support_title:"დაუჭირე მხარი Cinemail-ს",
+    support_text:"ადრეული მხარდამჭერები მიიღებენ Pro-ს სამუდამოდ უფასოდ, როცა Cinemail გახდება ფასიანი App Store-სა და Google Play-ში.",
+    support_button:"☕ მხარდაჭერა Ko-fi-ზე →",
+    about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>კონფიდენციალურობის პოლიტიკა</a>",
+    about_tmdb:"ფილმების მონაცემები, პოსტერები და crew - <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>-დან. Cinemail იყენებს TMDB API-ს, მაგრამ არ არის TMDB-ის მიერ სერტიფიცირებული.",
+    about_author:"შექმნა <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>-მა.",
+  },
+  es: {
+    auth_tagline:"Registra películas · Recibe sugerencias de IA · Comparte con amigos",
+    sign_in_title:"Bienvenido de nuevo", sign_up_title:"Crear cuenta",
+    email:"Correo", password:"Contraseña", display_name:"Nombre",
+    back:"← Atrás", back_to_signin:"← Volver a iniciar sesión",
+    new_here:"¿Nuevo en Cinemail?", create_acct_link:"Crear cuenta",
+    have_acct:"¿Ya tienes una cuenta?", sign_in_link:"Iniciar sesión",
+    check_inbox_title:"Revisa tu correo",
+    email_sent:"Te enviamos un enlace de confirmación a tu correo.<br>Haz clic para activar tu cuenta.",
+    check_spam:"¿No llegó? Revisa tu carpeta de spam.",
+    sign_in:"Iniciar sesión", sign_up:"Crear cuenta", close:"Cerrar", sign_out:"Cerrar sesión",
+    tab_search:"🔍 Buscar", tab_picks:"✨ Sugerencias", tab_lists:"📋 Listas", tab_inbox:"📬 Bandeja", tab_inbox_label:"Bandeja",
+    tab_watched:"✓ Vistas", new_list_tab:"+ Nueva",
+    stat_watched:"Vistas", stat_to_watch:"Por ver", stat_avg:"Prom. ★",
+    search_btn:"Buscar", find_btn:"Buscar",
+    your_rating:"Tu valoración", notes:"Notas", send_to:"Enviar a", msg_opt:"Mensaje (opcional)",
+    display_name_lbl:"Nombre", backup_lbl:"Copia de seguridad", friends_lbl:"Amigos",
+    add_friend:"Añadir", save:"Guardar",
+    export_csv:"↓ Exportar CSV", import_csv:"↑ Importar CSV", export_json:"↓ Exportar JSON",
+    backfill_crew:"🔄 Actualizar datos del equipo",
+    save_drive:"Guardar en Drive", restore_drive:"Restaurar",
+    ob0_body:"Películas · Sugerencias de IA · Amigos",
+    ob1_title:"Busca. Guarda.", ob1_body:"Busca cualquier título y toca + para añadirlo a tu lista.",
+    ob2_title:"Vista. Valorada.", ob2_body:"Márcala como vista, deja una valoración y una nota.",
+    ob3_title:"¿No sabes qué ver?", ob3_body:"«Sorpréndeme» elige algo según lo que ya has visto y valorado.",
+    ob4_title:"Listas e historial", ob4_body:"Organiza por listas. Las películas pasan a «Vistas» automáticamente.",
+    ob5_title:"Amigos y bandeja", ob5_body:"Envía películas a tus amigos. Todo llega a la bandeja.",
+    ob6_title:"Explora personas", ob6_body:"Toca el nombre de un director o actor para ver su filmografía completa.",
+    ob7_title:"Bandas sonoras", ob7_body:"Abre la banda sonora en Spotify, Apple Music o YouTube Music con un toque.",
+    ob8_title:"Eso es todo.", ob8_body:"Estadísticas, directores favoritos, copias - todo está en tu perfil.",
+    ob_next:"Siguiente", ob_start:"Encuentra tu primera película →", ob_skip:"Omitir",
+    empty_list_title:"Tu lista está vacía", empty_list_sub:"Busca películas y añádelas a tu lista", empty_list_btn:"Explorar películas",
+    empty_shared_sub:"Busca una película y toca ≡ para añadirla aquí",
+    nothing_yet:"Aún no hay nada", mark_seen:"Marca películas como vistas", save_to_list:"Guarda películas en tu lista",
+    surprise:"✨ Sorpréndeme",
+    lang_label:"Idioma",
+    search_ph:"Título de película o serie…",
+    friend_search_ph:"Busca por nombre…",
+    replay_onboarding:"🎬 Repetir introducción",
+    support_title:"Apoya a Cinemail",
+    support_text:"Quienes apoyen ahora tendrán las funciones Pro gratis de por vida cuando Cinemail sea de pago en App Store y Google Play.",
+    support_button:"☕ Apoyar en Ko-fi →",
+    about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Política de privacidad</a>",
+    about_tmdb:"Datos de películas, pósters e información del equipo de <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail usa la API de TMDB pero no está avalada ni certificada por TMDB.",
+    about_author:"Hecho por <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
+  },
+  fr: {
+    auth_tagline:"Suivez vos films · Recevez des suggestions IA · Partagez avec vos amis",
+    sign_in_title:"Bon retour", sign_up_title:"Créer un compte",
+    email:"E-mail", password:"Mot de passe", display_name:"Nom",
+    back:"← Retour", back_to_signin:"← Retour à la connexion",
+    new_here:"Nouveau sur Cinemail ?", create_acct_link:"Créer un compte",
+    have_acct:"Vous avez déjà un compte ?", sign_in_link:"Se connecter",
+    check_inbox_title:"Vérifiez votre boîte mail",
+    email_sent:"Nous avons envoyé un lien de confirmation à votre e-mail.<br>Cliquez dessus pour activer votre compte.",
+    check_spam:"Rien reçu ? Vérifiez vos spams.",
+    sign_in:"Se connecter", sign_up:"Créer un compte", close:"Fermer", sign_out:"Se déconnecter",
+    tab_search:"🔍 Recherche", tab_picks:"✨ Suggestions", tab_lists:"📋 Listes", tab_inbox:"📬 Boîte", tab_inbox_label:"Boîte",
+    tab_watched:"✓ Vus", new_list_tab:"+ Nouvelle",
+    stat_watched:"Vus", stat_to_watch:"À voir", stat_avg:"Moy. ★",
+    search_btn:"Rechercher", find_btn:"Trouver",
+    your_rating:"Votre note", notes:"Notes", send_to:"Envoyer à", msg_opt:"Message (facultatif)",
+    display_name_lbl:"Nom", backup_lbl:"Sauvegarde", friends_lbl:"Amis",
+    add_friend:"Ajouter", save:"Enregistrer",
+    export_csv:"↓ Exporter CSV", import_csv:"↑ Importer CSV", export_json:"↓ Exporter JSON",
+    backfill_crew:"🔄 Actualiser l'équipe",
+    save_drive:"Enregistrer sur Drive", restore_drive:"Restaurer",
+    ob0_body:"Films · Suggestions IA · Amis",
+    ob1_title:"Trouvez. Enregistrez.", ob1_body:"Recherchez un titre et touchez + pour l'ajouter à votre liste.",
+    ob2_title:"Vu. Noté.", ob2_body:"Marquez-le comme vu, laissez une note et un commentaire.",
+    ob3_title:"Aucune idée de quoi regarder ?", ob3_body:"« Surprenez-moi » choisit selon ce que vous avez déjà vu et noté.",
+    ob4_title:"Listes et historique", ob4_body:"Organisez par liste. Les films passent dans « Vus » automatiquement.",
+    ob5_title:"Amis et boîte", ob5_body:"Envoyez des films à vos amis. Tout arrive dans la boîte.",
+    ob6_title:"Explorez les talents", ob6_body:"Touchez le nom d'un réalisateur ou acteur pour voir sa filmographie complète.",
+    ob7_title:"Bandes originales", ob7_body:"Ouvrez la BO sur Spotify, Apple Music ou YouTube Music d'un seul toucher.",
+    ob8_title:"C'est tout.", ob8_body:"Stats, réalisateurs favoris, sauvegardes - tout est dans votre profil.",
+    ob_next:"Suivant", ob_start:"Trouvez votre premier film →", ob_skip:"Passer",
+    empty_list_title:"Votre liste est vide", empty_list_sub:"Recherchez des films et ajoutez-les à votre liste", empty_list_btn:"Parcourir les films",
+    empty_shared_sub:"Recherchez un film et touchez ≡ pour l'ajouter ici",
+    nothing_yet:"Rien pour l'instant", mark_seen:"Marquez des films comme vus", save_to_list:"Enregistrez des films dans votre liste",
+    surprise:"✨ Surprenez-moi",
+    lang_label:"Langue",
+    search_ph:"Titre de film ou de série…",
+    friend_search_ph:"Rechercher par nom…",
+    replay_onboarding:"🎬 Revoir l'introduction",
+    support_title:"Soutenir Cinemail",
+    support_text:"Les premiers soutiens obtiennent les fonctions Pro gratuites à vie lorsque Cinemail deviendra payant sur l'App Store et Google Play.",
+    support_button:"☕ Soutenir sur Ko-fi →",
+    about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Politique de confidentialité</a>",
+    about_tmdb:"Données de films, affiches et équipe via <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail utilise l'API TMDB mais n'est ni approuvé ni certifié par TMDB.",
+    about_author:"Créé par <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
   }
 };
-let _lang = localStorage.getItem('lang') || (navigator.language.startsWith('ru') ? 'ru' : 'en');
+let _lang = localStorage.getItem('lang') || (function(){
+  const n = (navigator.language || 'en').slice(0,2).toLowerCase();
+  return ['ru','uk','ka','es','fr'].includes(n) ? n : 'en';
+})();
 function t(key) { return I18N[_lang]?.[key] ?? I18N.en[key] ?? key; }
 function setLang(l) {
   _lang = l; localStorage.setItem('lang', l);
@@ -3572,9 +3768,9 @@ function toggleStatsBlock(id) {
   const body = document.getElementById("stats-body-"+id);
   const arrow = document.getElementById("stats-arrow-"+id);
   if (!body) return;
-  const open = body.style.display === "none";
-  body.style.display = open ? "block" : "none";
-  if (arrow) arrow.textContent = open ? "▲" : "▼";
+  const isHidden = getComputedStyle(body).display === "none";
+  body.style.display = isHidden ? "block" : "none";
+  if (arrow) arrow.textContent = isHidden ? "▲" : "▼";
 }
 
 // ── Picks ─────────────────────────────────────────────────────────────────────
@@ -5725,6 +5921,33 @@ async function backupExportJSON() {
     showToast(`✓ Exported ${watchlist.length} items + ${lists?.length || 0} lists as JSON`);
   } catch(e) { showToast("JSON export failed: " + e.message, true); }
   finally { if (btn) { btn.textContent = "↓ Export JSON"; btn.disabled = false; } }
+}
+
+async function backfillCrewData() {
+  const btn = document.getElementById("btn-backfill-crew");
+  // Find entries missing any crew field (cinematographer / composer / director)
+  const targets = (watchHistory || []).filter(h =>
+    h.tmdbID && (!h.cinematographer || !h.composer || !h.director)
+  );
+  if (!targets.length) { showToast("All films already have crew data ✓"); return; }
+  if (btn) { btn.disabled = true; }
+  let updated = 0, processed = 0;
+  for (const h of targets) {
+    processed++;
+    if (btn) btn.textContent = `Updating ${processed}/${targets.length}…`;
+    try {
+      const d = await tmdbDetail(h.tmdbID, h.type || "movie");
+      const patch = {};
+      if (!h.cinematographer && d.Cinematographer) patch.cinematographer = d.Cinematographer;
+      if (!h.composer        && d.Composer)        patch.composer        = d.Composer;
+      if (!h.director        && d.Director)        patch.director        = d.Director;
+      if (Object.keys(patch).length) { await updateEntryInDB(h.id, patch); updated++; }
+    } catch(e) { /* skip individual failures, keep going */ }
+    await new Promise(r => setTimeout(r, 250)); // gentle on the TMDB proxy
+  }
+  try { watchHistory = await loadHistoryFromDB(); renderHistory(); _updateAccountStats(); } catch(e) {}
+  if (btn) { btn.textContent = "🔄 Refresh crew data"; btn.disabled = false; }
+  showToast(`✓ Updated crew data for ${updated} film${updated===1?"":"s"}`);
 }
 
 async function backupImportCSV() {
