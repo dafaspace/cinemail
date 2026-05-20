@@ -2216,7 +2216,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v1.1.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v1.2.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -2938,6 +2938,7 @@ async function loadHistoryFromDB() {
     status: r.status || "watched", mediaType: r.media_type || "movie",
     composer: r.composer || "", director: r.director || "",
     cinematographer: r.cinematographer || "",
+    actors: r.actors || "",
     date: new Date(r.created_at).toLocaleDateString("en-GB"),
     listId: r.list_id || null,
     addedBy: r.user_id || null
@@ -2950,6 +2951,7 @@ async function saveEntryToDB(entry) {
     media_type: entry.mediaType || "movie",
     composer: entry.composer || null, director: entry.director || null,
     cinematographer: entry.cinematographer || null,
+    actors: entry.actors || null,
     user_id: currentUser ? currentUser.id : null,
     list_id: entry.listId || null
   })});
@@ -3180,6 +3182,7 @@ async function toggleFilmInList(listId, tmdbID) {
         mediaType: movie.type || movie.mediaType || 'movie',
         composer: movie.Composer || null, director: movie.Director || null,
         cinematographer: movie.Cinematographer || null,
+        actors: movie.Cast || null,
         listId: listId
       });
       watchHistory = await loadHistoryFromDB();
@@ -3324,6 +3327,7 @@ async function openDetail(id, type) {
       if (!existing.composer && d.Composer) patch.composer = d.Composer;
       if (!existing.director && d.Director) patch.director = d.Director;
       if (!existing.cinematographer && d.Cinematographer) patch.cinematographer = d.Cinematographer;
+      if (!existing.actors && d.Cast) patch.actors = d.Cast;
       if (Object.keys(patch).length) { updateEntryInDB(existing.id, patch).then(async () => { watchHistory = await loadHistoryFromDB(); }).catch(() => {}); }
     }
 
@@ -3600,10 +3604,12 @@ async function confirmAdd() {
   let composer = m.Composer || "";
   let director = m.Director || "";
   let cinematographer = m.Cinematographer || "";
+  let actors = m.Cast || "";
   if (window._detailMovie && String(window._detailMovie.tmdbID) === tmdbID) {
     if (!composer)        composer = window._detailMovie.Composer || "";
     if (!director)        director = window._detailMovie.Director || "";
     if (!cinematographer) cinematographer = window._detailMovie.Cinematographer || "";
+    if (!actors)          actors = window._detailMovie.Cast || "";
   }
   try {
     if (existing) {
@@ -3617,6 +3623,7 @@ async function confirmAdd() {
       if (composer        && !existing.composer)        fields.composer = composer;
       if (director        && !existing.director)        fields.director = director;
       if (cinematographer && !existing.cinematographer) fields.cinematographer = cinematographer;
+      if (actors          && !existing.actors)          fields.actors = actors;
       await updateEntryInDB(existing.id, fields);
     } else {
       await saveEntryToDB({ tmdbID, title: m.Title||"", year: m.Year||"", poster: m.Poster||"",
@@ -3625,6 +3632,7 @@ async function confirmAdd() {
         status: currentAddStatus, mediaType: m.type||m.mediaType||"movie",
         composer: composer||null, director: director||null,
         cinematographer: cinematographer||null,
+        actors: actors||null,
         listId: currentAddListId });
     }
     const newHistory = await loadHistoryFromDB();
@@ -3803,10 +3811,12 @@ function getTasteContext(watchedEntries) {
   const composers        = topNames("composer",2,3);
   const directors        = topNames("director",2,3);
   const cinematographers = topNames("cinematographer",2,3);
+  const actors           = topNames("actors",2,4);
   const lines = [];
   if (composers)        lines.push(`Favourite composers by films watched: ${composers}`);
   if (directors)        lines.push(`Favourite directors by films watched: ${directors}`);
   if (cinematographers) lines.push(`Favourite cinematographers by films watched: ${cinematographers}`);
+  if (actors)           lines.push(`Favourite actors by films watched: ${actors}`);
   return lines.join("\n");
 }
 
@@ -5465,14 +5475,16 @@ function renderProfileStats(watched) {
   const directors        = topNames('director', 1, 5);
   const cinematographers = topNames('cinematographer', 1, 5);
   const composers        = topNames('composer', 1, 5);
+  const actors           = topNames('actors', 2, 5);
 
-  if (!directors.length && !composers.length && !cinematographers.length) { el.innerHTML = ''; return; }
+  if (!directors.length && !composers.length && !cinematographers.length && !actors.length) { el.innerHTML = ''; return; }
 
   el.innerHTML = `
     <div class="add-label" style="margin-bottom:6px">Your Cinema Profile</div>
     ${barBlock('directors', '🎬', 'Top Directors', directors)}
     ${barBlock('cinematographers', '📷', 'Top Cinematographers', cinematographers)}
     ${barBlock('composers', '🎵', 'Top Composers', composers)}
+    ${barBlock('actors', '🌟', 'Top Actors', actors)}
   `;
 }
 function closeAccount(){
@@ -5534,6 +5546,7 @@ async function applyBackupData(rows) {
         director: r.director || "",
         composer: r.composer || "",
         cinematographer: r.cinematographer || "",
+        actors: r.actors || "",
         listId: r.list_id || null   // preserve list membership (works for same-account restore)
       });
     } catch(e) {
@@ -5545,7 +5558,7 @@ async function applyBackupData(rows) {
           comment: r.comment || "", status: r.status || "watched",
           mediaType: r.media_type || "movie",
           director: r.director || "", composer: r.composer || "",
-          cinematographer: r.cinematographer || ""
+          cinematographer: r.cinematographer || "", actors: r.actors || ""
         });
       } else { throw e; }
     }
@@ -5619,6 +5632,7 @@ function _parseCSV(text) {
       director:        obj.director        || "",
       composer:        obj.composer        || "",
       cinematographer: obj.cinematographer || "",
+      actors:          obj.actors          || "",
       poster:          obj.poster          || ""   // fallback if TMDB call fails
     };
   }).filter(r => r.imdb_id && r.title);
@@ -5630,7 +5644,7 @@ function _todayStr() { return new Date().toISOString().slice(0,10); }
 const BackupLocal = {
   export(rows) {
     // Include poster URL so it works as a fallback if TMDB is unavailable on import
-    const cols = ["tmdb_id","title","year","type","status","rating","comment","director","cinematographer","composer","poster","added_at"];
+    const cols = ["tmdb_id","title","year","type","status","rating","comment","director","cinematographer","composer","actors","poster","added_at"];
     const lines = [cols.join(",")];
     for (const r of rows) {
       lines.push([
@@ -5639,7 +5653,8 @@ const BackupLocal = {
         _csvEscape(r.status||"watched"),     _csvEscape(r.stars||0),
         _csvEscape(r.comment||""),           _csvEscape(r.director||""),
         _csvEscape(r.cinematographer||""),   _csvEscape(r.composer||""),
-        _csvEscape(r.poster||""),            _csvEscape(r.created_at||"")
+        _csvEscape(r.actors||""),            _csvEscape(r.poster||""),
+        _csvEscape(r.created_at||"")
       ].join(","));
     }
     const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
@@ -5943,7 +5958,7 @@ async function backfillCrewData() {
   const btn = document.getElementById("btn-backfill-crew");
   // Find entries missing any crew field (cinematographer / composer / director)
   const targets = (watchHistory || []).filter(h =>
-    h.tmdbID && (!h.cinematographer || !h.composer || !h.director)
+    h.tmdbID && (!h.cinematographer || !h.composer || !h.director || !h.actors)
   );
   if (!targets.length) { showToast("All films already have crew data ✓"); return; }
   if (btn) { btn.disabled = true; }
@@ -5957,6 +5972,7 @@ async function backfillCrewData() {
       if (!h.cinematographer && d.Cinematographer) patch.cinematographer = d.Cinematographer;
       if (!h.composer        && d.Composer)        patch.composer        = d.Composer;
       if (!h.director        && d.Director)        patch.director        = d.Director;
+      if (!h.actors          && d.Cast)            patch.actors          = d.Cast;
       if (Object.keys(patch).length) { await updateEntryInDB(h.id, patch); updated++; }
     } catch(e) { /* skip individual failures, keep going */ }
     await new Promise(r => setTimeout(r, 250)); // gentle on the TMDB proxy
