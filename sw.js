@@ -1,5 +1,5 @@
 // ── Cache version — bump this string on every deploy to force refresh ──────────
-const CACHE_VERSION = "v36";
+const CACHE_VERSION = "v37";
 const CACHE_NAME = "cinemail-" + CACHE_VERSION;
 
 // Files to cache for offline use
@@ -38,25 +38,27 @@ self.addEventListener("activate", event => {
 self.addEventListener("fetch", event => {
   const url = new URL(event.request.url);
 
-  // Never cache non-GET requests (PATCH, POST, DELETE etc.)
-  if (event.request.method !== "GET") return;
+  // ONLY handle same-origin GET requests. Never intercept cross-origin calls
+  // (Supabase API, TMDB proxy, Google Fonts, etc.) — let the browser handle them
+  // natively. Intercepting them and falling back to an uncached match returns
+  // `undefined`, which crashes the request ("Failed to convert value to 'Response'").
+  if (event.request.method !== "GET" || url.origin !== self.location.origin) return;
 
   // Always fetch HTML fresh from network (never serve stale app shell)
   if (event.request.mode === "navigate" || url.pathname.endsWith(".html")) {
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          // Update cache with fresh version
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
           return response;
         })
-        .catch(() => caches.match(event.request)) // fallback to cache if offline
+        .catch(() => caches.match(event.request).then(r => r || caches.match("./index.html")))
     );
     return;
   }
 
-  // For everything else: network-first with cache fallback
+  // Other same-origin assets: network-first, fall back to cache (never undefined)
   event.respondWith(
     fetch(event.request)
       .then(response => {
@@ -66,7 +68,7 @@ self.addEventListener("fetch", event => {
         }
         return response;
       })
-      .catch(() => caches.match(event.request))
+      .catch(() => caches.match(event.request).then(r => r || Response.error()))
   );
 });
 
