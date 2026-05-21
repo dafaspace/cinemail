@@ -428,6 +428,34 @@ body {
 }
 .badge-plan { color: #888; font-size: 11px; }
 
+/* ── Unified action buttons: bookmark / eye / share ──────────────────── */
+.act-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 11px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  line-height: 1;
+}
+.act-btn svg { flex-shrink: 0; }
+@media (hover: hover) {
+  .act-btn:hover { border-color: var(--primary-border); color: var(--text); }
+}
+.act-btn.active {
+  color: var(--primary);
+  border-color: var(--primary-border);
+  background: var(--primary-soft);
+  cursor: default;
+}
+.act-btn-ico { padding: 6px 8px; }
+
 /* ── Why strip ──────────────────────────────────────────────────────── */
 .why-strip {
   padding: 6px 12px;
@@ -1712,7 +1740,7 @@ body {
             <svg width="16" height="16" viewBox="0 0 16 16"><defs><linearGradient id="apm_ob" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f984a0"/><stop offset="100%" stop-color="#d3001a"/></linearGradient></defs><rect width="16" height="16" rx="3.5" fill="url(#apm_ob)"/><path d="M10.9 2.5 6.13 3.46a.5.5 0 0 0-.46.49v5.95c0 .14-.01.27-.1.39-.1.11-.22.15-.35.18l-.31.06c-.5.1-.91.56-.91 1.1 0 .6.5 1.1 1.1 1.1.17 0 .34-.04.5-.12.43-.2.72-.64.72-1.13V5.2l3.83-.77v3.96c0 .14-.01.28-.1.39-.1.12-.22.15-.35.18l-.31.06c-.5.1-.91.56-.91 1.1 0 .6.5 1.1 1.1 1.1.17 0 .34-.04.5-.12.43-.2.72-.64.72-1.13V3.0a.5.5 0 0 0-.6-.49z" fill="white"/></svg>
           </div>
           <div class="ob-mock-stream-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#FF0000"/><path d="M21.6 7.2s-.2-1.4-.8-2c-.8-.8-1.7-.8-2.1-.9C16.2 4 12 4 12 4s-4.2 0-6.7.3c-.4.1-1.3.1-2.1.9-.6.6-.8 2-.8 2S2 8.8 2 10.4v1.7.0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.3.8C7 18 12 18 12 18s4.2 0 6.7-.3c.4-.1 1.3-.1 2.1-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5c0-1.6-.2-3.2-.2-3.2zm-12.4 6.5V8.3l5.7 2.7-5.7 2.7z" fill="white"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#FF0000"/><path d="M21.6 7.2s-.2-1.4-.8-2c-.8-.8-1.7-.8-2.1-.9C16.2 4 12 4 12 4s-4.2 0-6.7.3c-.4.1-1.3.1-2.1.9-.6.6-.8 2-.8 2S2 8.8 2 10.4v1.8.0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.3.8C7 18 12 18 12 18s4.2 0 6.7-.3c.4-.1 1.3-.1 2.1-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5c0-1.6-.2-3.2-.2-3.2zm-12.4 6.5V8.3l5.7 2.7-5.7 2.7z" fill="white"/></svg>
           </div>
         </div>
       </div>
@@ -2241,7 +2269,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v1.7.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v1.8.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -2360,7 +2388,7 @@ const I18N = {
     empty_shared_sub:"Search for a film and tap ≡ to add it here",
     nothing_yet:"Nothing Here Yet", mark_seen:"Mark films as seen", save_to_list:"Save films to your list",
     surprise:"✨ Surprise Me",
-    act_watched:"✓ Watched", act_addlist:"≡ Add to list", act_inlist:"≡ My List",
+    act_watched:"Watched", act_addlist:"Add to list", act_inlist:"My List",
     lang_label:"Language",
     search_ph:"Movie or series title…",
     friend_search_ph:"Search by name to add…",
@@ -2409,7 +2437,7 @@ const I18N = {
     empty_shared_sub:"Найдите фильм и нажмите ≡, чтобы добавить его сюда",
     nothing_yet:"Пока пусто", mark_seen:"Отмечайте просмотренные фильмы", save_to_list:"Добавляйте фильмы в список",
     surprise:"✨ Удиви меня",
-    act_watched:"✓ Просмотрено", act_addlist:"≡ В список", act_inlist:"≡ В списке",
+    act_watched:"Просмотрено", act_addlist:"В список", act_inlist:"В списке",
     lang_label:"Язык",
     search_ph:"Название фильма или сериала…",
     friend_search_ph:"Поиск по имени…",
@@ -2458,7 +2486,7 @@ const I18N = {
     empty_shared_sub:"Знайди фільм і тисни ≡, щоб додати сюди",
     nothing_yet:"Поки що порожньо", mark_seen:"Познач фільми переглянутими", save_to_list:"Зберігай фільми у список",
     surprise:"✨ Здивуй мене",
-    act_watched:"✓ Переглянуто", act_addlist:"≡ До списку", act_inlist:"≡ У списку",
+    act_watched:"Переглянуто", act_addlist:"До списку", act_inlist:"У списку",
     lang_label:"Мова",
     search_ph:"Назва фільму чи серіалу…",
     friend_search_ph:"Шукай за ім'ям…",
@@ -2507,7 +2535,7 @@ const I18N = {
     empty_shared_sub:"მოძებნე ფილმი და დააჭირე ≡, რომ აქ დაამატო",
     nothing_yet:"ჯერ აქ არაფერია", mark_seen:"მონიშნე ფილმები ნანახად", save_to_list:"შეინახე ფილმები სიაში",
     surprise:"✨ გამაკვირვე",
-    act_watched:"✓ ნანახი", act_addlist:"≡ სიაში", act_inlist:"≡ ჩემს სიაში",
+    act_watched:"ნანახი", act_addlist:"სიაში", act_inlist:"ჩემს სიაში",
     lang_label:"ენა",
     search_ph:"ფილმის ან სერიალის სახელი…",
     friend_search_ph:"მოძებნე სახელით…",
@@ -2556,7 +2584,7 @@ const I18N = {
     empty_shared_sub:"Busca una película y toca ≡ para añadirla aquí",
     nothing_yet:"Aún no hay nada", mark_seen:"Marca películas como vistas", save_to_list:"Guarda películas en tu lista",
     surprise:"✨ Sorpréndeme",
-    act_watched:"✓ Vista", act_addlist:"≡ A la lista", act_inlist:"≡ En mi lista",
+    act_watched:"Vista", act_addlist:"A la lista", act_inlist:"En mi lista",
     lang_label:"Idioma",
     search_ph:"Título de película o serie…",
     friend_search_ph:"Busca por nombre…",
@@ -2605,7 +2633,7 @@ const I18N = {
     empty_shared_sub:"Recherchez un film et touchez ≡ pour l'ajouter ici",
     nothing_yet:"Rien pour l'instant", mark_seen:"Marquez des films comme vus", save_to_list:"Enregistrez des films dans votre liste",
     surprise:"✨ Surprenez-moi",
-    act_watched:"✓ Vu", act_addlist:"≡ À la liste", act_inlist:"≡ Dans ma liste",
+    act_watched:"Vu", act_addlist:"À la liste", act_inlist:"Dans ma liste",
     lang_label:"Langue",
     search_ph:"Titre de film ou de série…",
     friend_search_ph:"Rechercher par nom…",
@@ -3243,6 +3271,13 @@ const _movieRegistry = {};
 let _regCounter = 0;
 function regMovie(m) { const key = 'mv' + (_regCounter++); _movieRegistry[key] = m; return key; }
 
+// ── Unified action icons (bookmark / eye / share) ───────────────────────
+function _icoBookmark(filled){ return `<svg width="14" height="14" viewBox="0 0 24 24" fill="${filled?'currentColor':'none'}" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>`; }
+function _icoEye(filled){ return filled
+  ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5C5.6 5 2 12 2 12s3.6 7 10 7 10-7 10-7-3.6-7-10-7zm0 11.2A4.2 4.2 0 1 1 12 7.8a4.2 4.2 0 0 1 0 8.4z"/><circle cx="12" cy="12" r="2.1" fill="var(--bg)"/></svg>`
+  : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>`; }
+function _icoShare(){ return `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7M21 3l-9 9M10 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg>`; }
+
 function movieCardHTML(m, why) {
   const status = getEntryStatus(m.tmdbID || m.id);
   const rating = m.Rating ? ` · ★ ${m.Rating}` : "";
@@ -3251,20 +3286,20 @@ function movieCardHTML(m, why) {
   const key = regMovie(m);
   let actionBtns = "";
   if (status === "watched") {
-    actionBtns = `<span class="badge-watched">${t('act_watched')}</span>`;
+    actionBtns = `<span class="act-btn active">${_icoEye(true)} ${t('act_watched')}</span>`;
   } else if (status === "plan") {
     actionBtns = `
-      <span class="badge-plan" style="margin-bottom:2px">${t('act_inlist')}</span>
-      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">${t('act_watched')}</button>`;
+      <span class="act-btn active" style="margin-bottom:2px">${_icoBookmark(true)} ${t('act_inlist')}</span>
+      <button class="act-btn" onclick="openAdd(_movieRegistry['${key}'],'watched')">${_icoEye(false)} ${t('act_watched')}</button>`;
   } else {
     actionBtns = `
-      <button class="btn-watchlist" onclick="_maybePickList(_movieRegistry['${key}'],'plan')">${t('act_addlist')}</button>
-      <button class="btn-watched" onclick="openAdd(_movieRegistry['${key}'],'watched')">${t('act_watched')}</button>`;
+      <button class="act-btn" onclick="_maybePickList(_movieRegistry['${key}'],'plan')">${_icoBookmark(false)} ${t('act_addlist')}</button>
+      <button class="act-btn" onclick="openAdd(_movieRegistry['${key}'],'watched')">${_icoEye(false)} ${t('act_watched')}</button>`;
   }
   const topRadius = why ? "12px 12px 0 0" : "12px";
   const idVal = m.tmdbID || m.id;
   const typeVal = m.type || "movie";
-  const shareBtn = idVal ? `<button class="btn-share-card" onclick="openShare(_movieRegistry['${key}'])"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="vertical-align:middle;margin-right:4px"><path d="M7 1h4v4M11 1L5.5 6.5M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Share</button>` : "";
+  const shareBtn = idVal ? `<button class="act-btn act-btn-ico" onclick="openShare(_movieRegistry['${key}'])" title="Share">${_icoShare()}</button>` : "";
   return `
     <div>
       <div class="card" style="border-radius:${topRadius};align-items:center">
@@ -3437,12 +3472,12 @@ async function openDetail(id, type) {
 
     let actionBtns = `<button class="btn-modal-close" onclick="navModalBack()">Close</button>`;
     if (status === "watched") {
-      actionBtns += `<div class="already-badge">✓ Watched</div>`;
+      actionBtns += `<div class="already-badge" style="display:inline-flex;align-items:center;gap:5px">${_icoEye(true)} ${t('act_watched')}</div>`;
     } else {
       if (!showChecklist) {
-        actionBtns += `<button class="btn-modal-plan" onclick="_maybePickList(window._detailMovie,'plan')">≡ Add to list</button>`;
+        actionBtns += `<button class="btn-modal-plan" style="display:inline-flex;align-items:center;justify-content:center;gap:6px" onclick="_maybePickList(window._detailMovie,'plan')">${_icoBookmark(false)} ${t('act_addlist')}</button>`;
       }
-      actionBtns += `<button class="btn-modal-add-watched" onclick="openAdd(window._detailMovie,'watched')">✓ Watched</button>`;
+      actionBtns += `<button class="btn-modal-add-watched" style="display:inline-flex;align-items:center;justify-content:center;gap:6px" onclick="openAdd(window._detailMovie,'watched')">${_icoEye(false)} ${t('act_watched')}</button>`;
     }
 
     document.getElementById("detail-content").innerHTML = `
@@ -3574,7 +3609,7 @@ function streamingLinks(query, compact) {
       icon: `<svg width="16" height="16" viewBox="0 0 16 16"><defs><linearGradient id="apm2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f984a0"/><stop offset="100%" stop-color="#d3001a"/></linearGradient></defs><rect width="16" height="16" rx="3.5" fill="url(#apm2)"/><path fill-rule="evenodd" d="M10.9 2.5 6.13 3.46a.5.5 0 0 0-.46.49v5.95c0 .14-.01.27-.1.39-.1.11-.22.15-.35.18l-.31.06c-.5.1-.91.56-.91 1.1 0 .6.5 1.1 1.1 1.1.17 0 .34-.04.5-.12.43-.2.72-.64.72-1.13V5.2l3.83-.77v3.96c0 .14-.01.28-.1.39-.1.12-.22.15-.35.18l-.31.06c-.5.1-.91.56-.91 1.1 0 .6.5 1.1 1.1 1.1.17 0 .34-.04.5-.12.43-.2.72-.64.72-1.13V3.0a.5.5 0 0 0-.6-.49z" fill="white"/></svg>`,
       deep: `music://music.apple.com/search?term=${q}`, web: `https://music.apple.com/search?term=${q}` },
     { label: "YT Music",
-      icon: `<svg width="16" height="16" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#FF0000"/><path d="M21.6 7.2s-.2-1.4-.8-2c-.8-.8-1.7-.8-2.1-.9C16.2 4 12 4 12 4s-4.2 0-6.7.3c-.4.1-1.3.1-2.1.9-.6.6-.8 2-.8 2S2 8.8 2 10.4v1.7.0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.3.8C7 18 12 18 12 18s4.2 0 6.7-.3c.4-.1 1.3-.1 2.1-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5c0-1.6-.2-3.2-.2-3.2zm-12.4 6.5V8.3l5.7 2.7-5.7 2.7z" fill="white"/></svg>`,
+      icon: `<svg width="16" height="16" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#FF0000"/><path d="M21.6 7.2s-.2-1.4-.8-2c-.8-.8-1.7-.8-2.1-.9C16.2 4 12 4 12 4s-4.2 0-6.7.3c-.4.1-1.3.1-2.1.9-.6.6-.8 2-.8 2S2 8.8 2 10.4v1.8.0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.3.8C7 18 12 18 12 18s4.2 0 6.7-.3c.4-.1 1.3-.1 2.1-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5c0-1.6-.2-3.2-.2-3.2zm-12.4 6.5V8.3l5.7 2.7-5.7 2.7z" fill="white"/></svg>`,
       deep: null, web: `https://music.youtube.com/search?q=${q}` }
   ];
   if (compact) {
@@ -3649,12 +3684,12 @@ async function openPerson(name, personId) {
           const status = getEntryStatus(m.tmdbID);
           const role = r.character || r.job || "";
           let actionBtns = "";
-          if (status === "watched") actionBtns = `<span class="badge-watched" style="font-size:11px;padding:3px 8px">✓</span>`;
-          else if (status === "plan") actionBtns = `<span style="color:#aaa;font-size:13px;padding:3px 8px">≡</span>`;
+          if (status === "watched") actionBtns = `<span class="act-btn act-btn-ico active" title="${t('act_watched')}">${_icoEye(true)}</span>`;
+          else if (status === "plan") actionBtns = `<span class="act-btn act-btn-ico active" title="${t('act_inlist')}">${_icoBookmark(true)}</span>`;
           else actionBtns = `
-            <button class="btn-watchlist" style="font-size:13px;padding:4px 11px;min-width:32px" onclick="event.stopPropagation();_maybePickList(_movieRegistry['${key}'],'plan')">+</button>
-            <button class="btn-watched" style="font-size:13px;padding:4px 11px;min-width:32px" onclick="event.stopPropagation();openAdd(_movieRegistry['${key}'],'watched')">✓</button>`;
-          const shareBtn = `<button onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" title="Share" style="background:none;border:1px solid var(--accent-border);color:var(--accent-text);border-radius:6px;padding:3px 7px;cursor:pointer;transition:border-color .15s;display:inline-flex;align-items:center;justify-content:center" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--accent-border)'"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M7 1h4v4M11 1L5.5 6.5M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+            <button class="act-btn act-btn-ico" title="${t('act_addlist')}" onclick="event.stopPropagation();_maybePickList(_movieRegistry['${key}'],'plan')">${_icoBookmark(false)}</button>
+            <button class="act-btn act-btn-ico" title="${t('act_watched')}" onclick="event.stopPropagation();openAdd(_movieRegistry['${key}'],'watched')">${_icoEye(false)}</button>`;
+          const shareBtn = `<button class="act-btn act-btn-ico" onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" title="Share">${_icoShare()}</button>`;
           return `
           <div class="card" style="align-items:center">
             <div onclick="_transitionToDetail('${m.tmdbID}','${m.type}')" style="display:flex;gap:11px;flex:1;min-width:0;cursor:pointer">
@@ -3873,7 +3908,7 @@ function renderHistory() {
               <button class="hist-del" onclick="event.stopPropagation();deleteItem(${item.id})">×</button>
             </div>
             <div style="flex:1;display:flex;align-items:center;padding-top:4px">
-              <button onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" class="btn-share-card"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="vertical-align:middle;margin-right:4px"><path d="M7 1h4v4M11 1L5.5 6.5M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Share</button>
+              <button onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" class="act-btn act-btn-ico" title="Share">${_icoShare()}</button>
             </div>
           </div>
         </div>`;
