@@ -2214,16 +2214,7 @@ body {
       <div id="drive-backup-meta" style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:14px;min-height:14px"></div>
 
       <div class="add-label" data-i18n="friends_lbl" style="margin-top:4px">Friends</div>
-      <div id="friends-section" style="margin-bottom:10px;min-height:20px"></div>
-      <div style="position:relative;display:flex;gap:8px;margin-bottom:16px">
-        <input type="text" id="friend-add-input" data-i18n-ph="friend_search_ph" placeholder="Search by name to add…"
-          style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:13px;padding:8px 12px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s"
-          oninput="searchFriendUsers(this.value)"
-          onfocus="this.style.borderColor='var(--accent-border)'"
-          onblur="this.style.borderColor='var(--border)'">
-        <button onclick="sendFriendRequest()" class="btn-modal-save" data-i18n="add_friend" style="flex:none;padding:8px 16px;font-size:13px">Add</button>
-        <div id="friend-search-results" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:70px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;z-index:10;max-height:130px;overflow-y:auto"></div>
-      </div>
+      <div id="friends-section" style="margin-bottom:12px;min-height:20px"></div>
 
       <button onclick="toggleAppInvite()" id="app-invite-btn" style="width:100%;padding:9px;border-radius:9px;background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.3);color:var(--primary);font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:10px;transition:all 0.15s" data-i18n="invite_to_app">✨ Invite friends to Cinemail</button>
       <div id="app-invite-panel" style="display:none;margin-bottom:16px;padding:12px;background:rgba(245,197,24,0.05);border:1px solid rgba(245,197,24,0.18);border-radius:10px;text-align:center"></div>
@@ -2272,7 +2263,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.10.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.11.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -4294,7 +4285,7 @@ function renderFriendsSection() {
   }
 
   if (!html) {
-    html = `<div style="color:var(--muted);font-size:12px;padding:4px 0">No friends yet — search by name to add someone</div>`;
+    html = `<div style="color:var(--muted);font-size:12px;padding:4px 0">No friends yet. Use the invite link below to add the people you watch with.</div>`;
   }
   el.innerHTML = html;
   // Keep focus + caret in the filter box across re-renders
