@@ -2262,7 +2262,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v1.9.14</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.9.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3665,6 +3665,25 @@ function _syncAvatarToDB() {
   try { sbClient.from('profiles').upsert({ id: currentUser.id, avatar_emoji: emoji || null, avatar_color: color || null }).then(() => {}, () => {}); } catch(e) {}
 }
 
+// ── Other users' avatars (emoji + colour as they chose) ───────────────────────
+const _profileCache = {}; // userId -> { name, emoji, color }
+async function _fetchProfileAvatars(userIds, rerender) {
+  const missing = [...new Set((userIds || []).filter(id => id && !_profileCache[id]))];
+  if (!missing.length) { return; }
+  try {
+    const { data } = await sbClient.from('profiles').select('id,display_name,avatar_emoji,avatar_color').in('id', missing);
+    (data || []).forEach(p => { _profileCache[p.id] = { name: p.display_name || '', emoji: p.avatar_emoji || '', color: p.avatar_color || '#7c3aed' }; });
+    missing.forEach(id => { if (!_profileCache[id]) _profileCache[id] = { name: '', emoji: '', color: '#7c3aed' }; }); // mark resolved to avoid refetch loops
+    if (typeof rerender === 'function') rerender();
+  } catch(e) {}
+}
+function _avatarMarkup(userId, fallbackName, size, cls) {
+  const p = _profileCache[userId] || {};
+  const color = p.color || '#7c3aed';
+  const label = p.emoji || (p.name || fallbackName || '?').charAt(0).toUpperCase();
+  return `<div class="${cls || ''}" style="width:${size}px;height:${size}px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.5)}px;line-height:1;flex-shrink:0;color:#fff">${label}</div>`;
+}
+
 // ── Lightbox ──────────────────────────────────────────────────────────────────
 function openLightbox(url, title) {
   if (!url || url === "N/A") return;
@@ -4194,15 +4213,15 @@ function renderFriendsSection() {
   const el = document.getElementById("friends-section");
   if (!el) return;
   let html = "";
+  _fetchProfileAvatars([..._friendRequestsCache.map(f => f.user_id), ..._friendsCache.map(f => _friendInfo(f).id)], renderFriendsSection);
 
   // Pending incoming requests
   if (_friendRequestsCache.length) {
     html += `<div style="margin-bottom:8px">`;
     for (const f of _friendRequestsCache) {
       const name = f.user_name || "?";
-      const init = name[0].toUpperCase();
       html += `<div class="friend-row">
-        <div class="friend-avatar-sm">${init}</div>
+        ${_avatarMarkup(f.user_id, name, 30)}
         <div style="flex:1;font-size:13px">${name} <span style="color:var(--muted);font-size:11px">wants to be friends</span></div>
         <button onclick="respondFriendRequest('${f.id}','accepted')" style="background:var(--accent);border:none;color:#fff;border-radius:6px;padding:4px 10px;font-size:11px;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">Accept</button>
         <button onclick="respondFriendRequest('${f.id}','declined')" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#666;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;margin-left:4px">✕</button>
@@ -4215,7 +4234,6 @@ function renderFriendsSection() {
   if (_friendsCache.length) {
     for (const f of _friendsCache) {
       const { id, name, fid } = _friendInfo(f);
-      const init = name[0].toUpperCase();
       if (_friendDeleteConfirmFid === fid) {
         // Confirm row
         html += `<div class="friend-row" style="background:rgba(248,113,113,0.06);border-radius:8px;padding:8px 10px;gap:8px">
@@ -4225,7 +4243,7 @@ function renderFriendsSection() {
         </div>`;
       } else {
         html += `<div class="friend-row">
-          <div class="friend-avatar-sm">${init}</div>
+          ${_avatarMarkup(id, name, 30)}
           <div style="flex:1;font-size:13px">${name}</div>
           <button onclick="event.stopPropagation();_friendDeleteConfirmFid='${fid}';renderFriendsSection()"
             style="background:none;border:none;color:#555;font-size:18px;line-height:1;cursor:pointer;padding:6px 8px;margin:-6px -4px" title="Remove">×</button>
@@ -4350,8 +4368,8 @@ async function loadListsCache() {
       const memberIds = [...new Set((members || []).map(m => m.user_id).filter(Boolean))];
       const nameMap = {};
       if (memberIds.length) {
-        const { data: profs } = await sbClient.from('profiles').select('id,display_name').in('id', memberIds);
-        (profs || []).forEach(p => { nameMap[p.id] = p.display_name; });
+        const { data: profs } = await sbClient.from('profiles').select('id,display_name,avatar_emoji,avatar_color').in('id', memberIds);
+        (profs || []).forEach(p => { nameMap[p.id] = p.display_name; _profileCache[p.id] = { name: p.display_name || '', emoji: p.avatar_emoji || '', color: p.avatar_color || '#7c3aed' }; });
       }
       const memberMap = {}; // list_id → [{user_id, role, name}]
       (members || []).forEach(m => {
@@ -4512,9 +4530,7 @@ function renderListManageStrip() {
       const canKick = isOwner && !isMe && m.role !== 'owner';
       return `<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
         <div style="display:flex;align-items:center;gap:8px">
-          <div style="width:28px;height:28px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--muted)">
-            ${(m.name||'?')[0].toUpperCase()}
-          </div>
+          ${_avatarMarkup(m.user_id, m.name, 28)}
           <div>
             <div style="font-size:13px;color:var(--text)">${m.name}${isMe ? ' <span style="color:var(--muted);font-size:11px">(you)</span>' : ''}</div>
             <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">${m.role}</div>
@@ -4959,12 +4975,12 @@ function _renderShareFriendsList() {
     el.innerHTML = `<div style="color:var(--muted);font-size:12px;padding:4px 0">Add friends in Account to share films with them</div>`;
     return;
   }
+  _fetchProfileAvatars(_friendsCache.map(f => _friendInfo(f).id), _renderShareFriendsList);
   el.innerHTML = _friendsCache.map(f => {
     const { id, name } = _friendInfo(f);
-    const init = name[0].toUpperCase();
     const sel = currentShareToUser?.id === id;
     return `<div class="friend-pick-row${sel ? " selected" : ""}" onclick="selectFriendForShare('${id}','${name.replace(/'/g,"\\'")}')">
-      <div class="friend-avatar-sm" style="${sel ? "background:var(--accent-soft);border-color:var(--accent)" : ""}">${init}</div>
+      ${_avatarMarkup(id, name, 30)}
       <div style="flex:1;font-size:14px">${name}</div>
       ${sel ? `<span style="color:var(--accent-text);font-size:13px">✓</span>` : ""}
     </div>`;
@@ -5136,6 +5152,9 @@ function _renderChatList() {
     return latest(b.invites) - latest(a.invites);
   });
 
+  // Prefetch partner avatars (emoji + colour) so they show as the owner chose
+  _fetchProfileAvatars(partners.map(p => p.id), () => { if (!_chatViewPartnerId) _renderChatList(); });
+
   el.innerHTML = partners.map(p => {
     // Pending = received invites not locally acknowledged
     const pending = p.invites.filter(i =>
@@ -5163,13 +5182,12 @@ function _renderChatList() {
     }
 
     const count = p.invites.length;
-    const initial = (p.name || "?")[0].toUpperCase();
     const badgeHTML = hasUnread
       ? `<span style="background:var(--primary);color:#111;border-radius:8px;min-width:18px;height:18px;padding:0 4px;font-size:10px;font-weight:700;line-height:18px;text-align:center;display:inline-block;flex-shrink:0;margin-left:6px">${unreadCount}</span>`
       : "";
 
     return `<div class="inv-chat-row${hasUnread ? " inv-chat-unread" : ""}" onclick="openChat('${p.id}')">
-      <div class="inv-chat-avatar">${initial}</div>
+      ${_avatarMarkup(p.id, p.name, 40)}
       <div style="flex:1;min-width:0">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
           <div style="font-weight:600;font-size:15px">${p.name}</div>
@@ -5189,6 +5207,7 @@ function _renderChatDetail(partnerId) {
   if (!invites.length) { closeChat(); return; }
 
   const partnerName = _invPartner(invites[0]).name;
+  _fetchProfileAvatars([partnerId], () => { if (_chatViewPartnerId === partnerId) _renderChatDetail(partnerId); });
   // Newest activity first
   const sorted = [...invites].sort((a, b) =>
     new Date(b.last_msg_at || b.created_at) - new Date(a.last_msg_at || a.created_at)
@@ -5197,7 +5216,7 @@ function _renderChatDetail(partnerId) {
   el.innerHTML = `
     <div style="display:flex;align-items:center;gap:10px;padding:4px 0 14px">
       <button class="inv-chat-back" onclick="closeChat()">←</button>
-      <div class="inv-chat-avatar" style="width:32px;height:32px;font-size:16px">${partnerName[0].toUpperCase()}</div>
+      ${_avatarMarkup(_chatViewPartnerId, partnerName, 32)}
       <div style="font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:18px;letter-spacing:1px">${partnerName}</div>
     </div>
     <div class="card-list">${sorted.map(inv => _renderInvCard(inv)).join("")}</div>`;
@@ -5221,7 +5240,14 @@ function _receivedStatusHTML(inv) {
   const from = `<span style="color:var(--accent-text)">↓ from ${inv.from_name || "someone"}</span>`;
   if (inv.status === "accepted") {
     const listName = inv.list_id ? _getListName(inv.list_id) : null;
-    const addedLabel = listName ? `Added to "${listName}"` : "Added";
+    // Count distinct lists this film currently lives in (personal + shared)
+    let count = 0;
+    if (inv.tmdb_id) {
+      const fls = _filmListStatus(inv.tmdb_id);
+      count = (fls.personalPlanEntry ? 1 : 0) + Object.keys(fls.listEntries).length;
+    }
+    let addedLabel = listName ? `Added to "${listName}"` : "Added";
+    if (count >= 2) addedLabel += ` · in ${count} lists`;
     return `${from}<span style="display:inline-block;width:8px"></span><span style="color:#4ade80">${addedLabel}</span>`;
   }
   if (inv.status === "declined") {
