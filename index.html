@@ -2262,7 +2262,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.9.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.9.1</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3599,15 +3599,22 @@ function closeDetail() {
 // ── Avatar customisation ──────────────────────────────────────────────────────
 const _AVATAR_EMOJIS = ['🦊','🦝','🐉','🦁','🐯','🐺','🐱','🐰','🦉','🐸','🐼','🦄','🦋','🐙','👻','🧙','🧛','🧚','🧜','🦸','🦹','🤠','🤖','👽','🧟','🥷','🧞','🦖'];
 const _AVATAR_COLORS = [
-  '#F5C518', // gold (default)
-  '#a78bfa', // soft violet
-  '#60a5fa', // sky blue
-  '#34d399', // mint
-  '#f87171', // coral
-  '#fb923c', // amber
-  '#e879f9', // fuchsia
-  '#22d3ee', // cyan
+  '#F5C518', // brand gold (default)
+  '#EDEDF2', // brand white
+  '#3A3A4A', // brand dark grey (distinct from the #0d0d1a app background)
+  '#2E8B83', // deep teal (gold's near-complement)
+  '#C8693B', // terracotta (warm, analogous to gold)
+  '#B0455A', // wine rose
+  '#4F6BB0', // muted indigo
+  '#6E8C4A', // olive green
 ];
+// Pick readable text colour: dark ink on light/yellow backgrounds, white on dark ones
+function _avatarInk(bg) {
+  if (!bg || bg[0] !== '#' || bg.length < 7) return '#fff';
+  const r = parseInt(bg.slice(1,3),16), g = parseInt(bg.slice(3,5),16), b = parseInt(bg.slice(5,7),16);
+  const lum = (0.299*r + 0.587*g + 0.114*b);
+  return lum > 150 ? '#15151f' : '#fff';
+}
 function getAvatarPrefs() {
   return { emoji: localStorage.getItem('avEmoji')||'', color: localStorage.getItem('avColor')||'#F5C518' };
 }
@@ -3618,7 +3625,7 @@ function _applyAvatar() {
   const label = emoji || initial;
   // Account modal avatar
   const accAv = document.getElementById('acc-modal-avatar');
-  if (accAv) { accAv.textContent = label; accAv.style.background = color; accAv.style.fontSize = emoji ? '30px' : '32px'; }
+  if (accAv) { accAv.textContent = label; accAv.style.background = color; accAv.style.color = _avatarInk(color); accAv.style.fontSize = emoji ? '30px' : '32px'; }
   // Nav bar avatar
   const navAv = document.getElementById('btn-avatar');
   if (navAv) {
@@ -3626,6 +3633,7 @@ function _applyAvatar() {
     navAv.textContent = emoji || initial;
     if (badge) navAv.appendChild(badge);
     navAv.style.background = color;
+    navAv.style.color = _avatarInk(color);
     navAv.style.fontSize = emoji ? '16px' : '15px';
     navAv.style.transition = 'background 0.2s';
   }
@@ -3681,7 +3689,7 @@ function _avatarMarkup(userId, fallbackName, size, cls) {
   const p = _profileCache[userId] || {};
   const color = p.color || '#7c3aed';
   const label = p.emoji || (p.name || fallbackName || '?').charAt(0).toUpperCase();
-  return `<div class="${cls || ''}" style="width:${size}px;height:${size}px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.5)}px;line-height:1;flex-shrink:0;color:#fff">${label}</div>`;
+  return `<div class="${cls || ''}" style="width:${size}px;height:${size}px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.5)}px;line-height:1;flex-shrink:0;color:${_avatarInk(color)}">${label}</div>`;
 }
 
 // ── Lightbox ──────────────────────────────────────────────────────────────────
@@ -5822,12 +5830,18 @@ function _eggConfetti(){
   const glyphs = ["💛","✉️"];
   for (let i = 0; i < 46; i++) {
     const el = document.createElement("div");
-    const isSpark = Math.random() < 0.7; // most are simple glowing-dot particles
+    const r = Math.random();
+    const isSpark = r < 0.4;   // glowing yellow dots
+    const isCorn  = r < 0.7;   // small popcorn (replaces the old white dots)
     let rot0 = 0, rot1 = 0;
     if (isSpark) {
-      const c = Math.random() < 0.5 ? "#F5C518" : "#ffffff";
+      const c = "#F5C518";
       const d = 3 + Math.random()*5;
       el.style.cssText = `position:absolute;left:${Math.random()*100}vw;top:100vh;width:${d}px;height:${d}px;border-radius:50%;background:${c};box-shadow:0 0 ${d*2.2}px ${c}`;
+    } else if (isCorn) {
+      el.textContent = "🍿";
+      el.style.cssText = `position:absolute;left:${Math.random()*100}vw;top:100vh;font-size:${13+Math.random()*7}px`;
+      rot0 = (Math.random()-0.5)*60; rot1 = rot0 + (Math.random()-0.5)*720;
     } else {
       el.textContent = glyphs[Math.floor(Math.random()*glyphs.length)];
       el.style.cssText = `position:absolute;left:${Math.random()*100}vw;top:100vh;font-size:${14+Math.random()*12}px`;
