@@ -1737,7 +1737,7 @@ body {
             <svg width="16" height="16" viewBox="0 0 16 16"><defs><linearGradient id="apm_ob" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f984a0"/><stop offset="100%" stop-color="#d3001a"/></linearGradient></defs><rect width="16" height="16" rx="3.5" fill="url(#apm_ob)"/><path d="M10.9 2.5 6.13 3.46a.5.5 0 0 0-.46.49v5.95c0 .14-.01.27-.1.39-.1.11-.22.15-.35.18l-.31.06c-.5.1-.91.56-.91 1.1 0 .6.5 1.1 1.1 1.1.17 0 .34-.04.5-.12.43-.2.72-.64.72-1.13V5.2l3.83-.77v3.96c0 .14-.01.28-.1.39-.1.12-.22.15-.35.18l-.31.06c-.5.1-.91.56-.91 1.1 0 .6.5 1.1 1.1 1.1.17 0 .34-.04.5-.12.43-.2.72-.64.72-1.13V3.0a.5.5 0 0 0-.6-.49z" fill="white"/></svg>
           </div>
           <div class="ob-mock-stream-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#FF0000"/><path d="M21.6 7.2s-.2-1.4-.8-2c-.8-.8-1.7-.8-2.1-.9C16.2 4 12 4 12 4s-4.2 0-6.7.3c-.4.1-1.3.1-2.1.9-.6.6-.8 2-.8 2S2 8.8 2 10.4v1.9.11 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.3.8C7 18 12 18 12 18s4.2 0 6.7-.3c.4-.1 1.3-.1 2.1-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5c0-1.6-.2-3.2-.2-3.2zm-12.4 6.5V8.3l5.7 2.7-5.7 2.7z" fill="white"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#FF0000"/><path d="M21.6 7.2s-.2-1.4-.8-2c-.8-.8-1.7-.8-2.1-.9C16.2 4 12 4 12 4s-4.2 0-6.7.3c-.4.1-1.3.1-2.1.9-.6.6-.8 2-.8 2S2 8.8 2 10.4v1.9.12 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.3.8C7 18 12 18 12 18s4.2 0 6.7-.3c.4-.1 1.3-.1 2.1-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5c0-1.6-.2-3.2-.2-3.2zm-12.4 6.5V8.3l5.7 2.7-5.7 2.7z" fill="white"/></svg>
           </div>
         </div>
       </div>
@@ -1812,7 +1812,7 @@ body {
         <div class="ob-mock-stats">
           <div class="ob-mock-stat">
             <div class="ob-mock-stat-n">24</div>
-            <div class="ob-mock-stat-l">Watched</div>
+            <div class="ob-mock-stat-l" data-i18n="stat_watched">Watched</div>
           </div>
           <div class="ob-mock-stat">
             <div class="ob-mock-stat-n">12</div>
@@ -2262,7 +2262,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v1.9.11</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v1.9.12</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -2421,7 +2421,7 @@ const I18N = {
     ob0_body:"Фильмы. Музыка. Друзья.",
     ob1_title:"Найди своё кино", ob1_body:"Услышал о фильме? Просто набери в поиске. Почитай синопсис, посмотри рейтинг и найди знакомые имена в касте. Нравится? Закидывай в свой лист.",
     ob2_title:"Твои списки", ob2_body:"Не обязательно держать в голове все названия, которые давно собирался посмотреть. Открывай нужный лист, когда приходит время выбирать фильм на вечер.",
-    ob3_title:"Твои личные топы", ob3_body:"Посмотрел? Отметь как Watched, поставь оценку и запиши пару мыслей. Это покажет твой личный топ режиссёров, композиторов, операторов и актёров.",
+    ob3_title:"Твои личные топы", ob3_body:"Посмотрел? Отметь как «Просмотрено», поставь оценку и запиши пару мыслей. Это покажет твой личный топ режиссёров, композиторов, операторов и актёров.",
     ob4_title:"Саундтреки", ob4_body:"Понравилась музыка? Под каждым фильмом - прямые ссылки на саундтрек в Spotify, Apple Music и YouTube Music.",
     ob5_title:"Фильмографии", ob5_body:"Нажми на имя любого режиссёра, актёра, композитора или оператора, чтобы увидеть всю его фильмографию. Самый быстрый способ найти ту самую актрису и её другие работы.",
     ob6_title:"Делись с друзьями", ob6_body:"Отправь фильм другу - все подробности прилетят ему во Входящие. Создал крутой список? Добавь в него друзей, не жадничай.",
@@ -2471,7 +2471,7 @@ const I18N = {
     ob0_body:"Фільми. Музика. Друзі.",
     ob1_title:"Знайди своє кіно", ob1_body:"Почув про фільм? Просто шукай. Почитай синопсис, поглянь на рейтинг, знайди знайомі імена в касті. Подобається? Додавай у свій список.",
     ob2_title:"Твої списки", ob2_body:"Не обов'язково тримати в голові всі назви, які давно збирався подивитись. Відкривай потрібний список, коли час обирати фільм на вечір.",
-    ob3_title:"Твої особисті топи", ob3_body:"Подивився? Познач як Watched, постав оцінку й запиши пару думок. Це покаже твій особистий топ режисерів, композиторів, операторів і акторів.",
+    ob3_title:"Твої особисті топи", ob3_body:"Подивився? Познач як «Переглянуто», постав оцінку й запиши пару думок. Це покаже твій особистий топ режисерів, композиторів, операторів і акторів.",
     ob4_title:"Саундтреки", ob4_body:"Сподобалась музика? Під кожним фільмом - прямі посилання на саундтрек у Spotify, Apple Music і YouTube Music.",
     ob5_title:"Фільмографії", ob5_body:"Тисни на ім'я будь-якого режисера, актора, композитора чи оператора, щоб побачити всю фільмографію. Найшвидший спосіб знайти ту саму акторку та її інші роботи.",
     ob6_title:"Ділись з друзями", ob6_body:"Надішли фільм другу - усе прилетить йому у «Вхідні». Створив крутий список? Додай до нього друзів, не жадібнічай.",
@@ -2521,7 +2521,7 @@ const I18N = {
     ob0_body:"ფილმები. მუსიკა. მეგობრები.",
     ob1_title:"მოძებნე შენი ფილმი", ob1_body:"გაიგე ფილმის შესახებ? უბრალოდ მოძებნე. წაიკითხე სინოფსისი, ნახე რეიტინგი, იპოვე ნაცნობი სახელები მსახიობებში. მოგწონს? დაამატე შენს სიაში.",
     ob2_title:"შენი სიები", ob2_body:"არ არის საჭირო ყველა ფილმის დამახსოვრება, რომელიც დიდი ხანია გინდოდა გენახა. უბრალოდ გახსენი საჭირო სია, როცა საღამოს ფილმის არჩევის დროა.",
-    ob3_title:"შენი პირადი ტოპები", ob3_body:"ნახე? მონიშნე Watched-ად, დატოვე შეფასება და რამდენიმე ფიქრი. ეს გაჩვენებს შენს პირად ტოპს რეჟისორების, კომპოზიტორების, ოპერატორებისა და მსახიობების.",
+    ob3_title:"შენი პირადი ტოპები", ob3_body:"ნახე? მონიშნე „ნანახად“, დატოვე შეფასება და რამდენიმე ფიქრი. ეს გაჩვენებს შენს პირად ტოპს რეჟისორების, კომპოზიტორების, ოპერატორებისა და მსახიობების.",
     ob4_title:"საუნდტრეკები", ob4_body:"მოგწონს მუსიკა? ყველა ფილმს აქვს პირდაპირი ბმულები საუნდტრეკზე Spotify-ზე, Apple Music-სა და YouTube Music-ზე.",
     ob5_title:"ფილმოგრაფიები", ob5_body:"დააჭირე ნებისმიერი რეჟისორის, მსახიობის, კომპოზიტორის ან ოპერატორის სახელს მთელი ფილმოგრაფიის სანახავად. ყველაზე სწრაფი გზა იპოვო ის მსახიობი და მისი სხვა ნამუშევრები.",
     ob6_title:"გაუზიარე მეგობრებს", ob6_body:"გაუგზავნე ფილმი მეგობარს - ყველაფერი მის „შემოსულში“ მოვა. შექმენი მაგარი სია? დაამატე მასში მეგობრები, ნუ იძუნწებ.",
@@ -3293,16 +3293,34 @@ function _refreshDetailChecklist(tmdbID) {
   if (el) el.innerHTML = _buildListChecklistHTML(String(tmdbID));
 }
 
+const _togglingLists = new Set();
 async function toggleFilmInList(listId, tmdbID) {
+  const key = (listId || 'personal') + '|' + tmdbID;
+  if (_togglingLists.has(key)) return; // ignore rapid repeat taps while a toggle is in flight
+  _togglingLists.add(key);
   const fls = _filmListStatus(tmdbID);
   const existing = listId === null ? fls.personalPlanEntry : fls.listEntries[listId];
+  const movie = window._detailMovie;
   try {
     if (existing) {
-      await deleteEntryFromDB(existing.id);
+      // Optimistic remove — update UI instantly, then persist
       watchHistory = watchHistory.filter(h => h.id !== existing.id);
+      _refreshDetailChecklist(tmdbID); renderHistory();
+      await deleteEntryFromDB(existing.id);
     } else {
-      const movie = window._detailMovie;
-      if (!movie) return;
+      if (!movie) { _togglingLists.delete(key); return; }
+      // Optimistic add — show the checkmark instantly with a temp row, then persist
+      const temp = {
+        id: '__temp_' + Date.now(), tmdbID: String(tmdbID), title: movie.Title || '',
+        year: movie.Year || '', poster: movie.Poster || '', stars: 0, comment: '',
+        status: 'plan', mediaType: movie.type || movie.mediaType || 'movie',
+        director: movie.Director || '', composer: movie.Composer || '',
+        cinematographer: movie.Cinematographer || '', actors: movie.Cast || '',
+        runtime: _parseRuntimeMin(movie.RuntimeMin || movie.Runtime) || 0,
+        listId: listId, addedBy: currentUser?.id || null
+      };
+      watchHistory = [...watchHistory, temp];
+      _refreshDetailChecklist(tmdbID); renderHistory();
       await saveEntryToDB({
         tmdbID: String(tmdbID), title: movie.Title || '', year: movie.Year || '',
         poster: movie.Poster || '', stars: 0, comment: '', status: 'plan',
@@ -3317,7 +3335,14 @@ async function toggleFilmInList(listId, tmdbID) {
     }
     _refreshDetailChecklist(tmdbID);
     renderHistory();
-  } catch(e) { showToast('Error: ' + e.message, true); }
+  } catch(e) {
+    // Revert optimistic change to the DB truth
+    try { watchHistory = await loadHistoryFromDB(); } catch(_) {}
+    _refreshDetailChecklist(tmdbID); renderHistory();
+    showToast('Error: ' + e.message, true);
+  } finally {
+    _togglingLists.delete(key);
+  }
 }
 
 // Movie registry
@@ -3533,7 +3558,7 @@ async function openDetail(id, type) {
       }
       actionBtns += `<button class="btn-modal-add-watched" style="display:inline-flex;align-items:center;justify-content:center;gap:6px" onclick="openAdd(window._detailMovie,'watched')">${_icoEye(false)} ${t('act_watched')}</button>`;
     }
-    actionBtns += `<button onclick="openShare(window._detailMovie)" title="Share" aria-label="Share" style="flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;padding:0 15px;border-radius:10px;background:transparent;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all 0.15s" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--primary-border)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">${_icoShare()}</button>`;
+    actionBtns += `<button onclick="openShare(window._detailMovie)" class="btn-modal-plan" style="display:inline-flex;align-items:center;justify-content:center;gap:6px" aria-label="Share">${_icoShare()} ${t('act_share')}</button>`;
 
     document.getElementById("detail-content").innerHTML = `
       <div style="display:flex;gap:14px;margin-bottom:16px">
@@ -3664,7 +3689,7 @@ function streamingLinks(query, compact) {
       icon: `<svg width="16" height="16" viewBox="0 0 16 16"><defs><linearGradient id="apm2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f984a0"/><stop offset="100%" stop-color="#d3001a"/></linearGradient></defs><rect width="16" height="16" rx="3.5" fill="url(#apm2)"/><path fill-rule="evenodd" d="M10.9 2.5 6.13 3.46a.5.5 0 0 0-.46.49v5.95c0 .14-.01.27-.1.39-.1.11-.22.15-.35.18l-.31.06c-.5.1-.91.56-.91 1.1 0 .6.5 1.1 1.1 1.1.17 0 .34-.04.5-.12.43-.2.72-.64.72-1.13V5.2l3.83-.77v3.96c0 .14-.01.28-.1.39-.1.12-.22.15-.35.18l-.31.06c-.5.1-.91.56-.91 1.1 0 .6.5 1.1 1.1 1.1.17 0 .34-.04.5-.12.43-.2.72-.64.72-1.13V3.0a.5.5 0 0 0-.6-.49z" fill="white"/></svg>`,
       deep: `music://music.apple.com/search?term=${q}`, web: `https://music.apple.com/search?term=${q}` },
     { label: "YT Music",
-      icon: `<svg width="16" height="16" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#FF0000"/><path d="M21.6 7.2s-.2-1.4-.8-2c-.8-.8-1.7-.8-2.1-.9C16.2 4 12 4 12 4s-4.2 0-6.7.3c-.4.1-1.3.1-2.1.9-.6.6-.8 2-.8 2S2 8.8 2 10.4v1.9.11 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.3.8C7 18 12 18 12 18s4.2 0 6.7-.3c.4-.1 1.3-.1 2.1-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5c0-1.6-.2-3.2-.2-3.2zm-12.4 6.5V8.3l5.7 2.7-5.7 2.7z" fill="white"/></svg>`,
+      icon: `<svg width="16" height="16" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#FF0000"/><path d="M21.6 7.2s-.2-1.4-.8-2c-.8-.8-1.7-.8-2.1-.9C16.2 4 12 4 12 4s-4.2 0-6.7.3c-.4.1-1.3.1-2.1.9-.6.6-.8 2-.8 2S2 8.8 2 10.4v1.9.12 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.3.8C7 18 12 18 12 18s4.2 0 6.7-.3c.4-.1 1.3-.1 2.1-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5c0-1.6-.2-3.2-.2-3.2zm-12.4 6.5V8.3l5.7 2.7-5.7 2.7z" fill="white"/></svg>`,
       deep: null, web: `https://music.youtube.com/search?q=${q}` }
   ];
   if (compact) {
@@ -4352,6 +4377,8 @@ function renderListTabs() {
 
   const _personalName = (currentUser?.displayName || currentUser?.email?.split('@')[0] || 'My') + "'s List";
   let html = `<button class="list-tab personal ${_activeListId === 'personal' ? 'active' : ''}" onclick="switchListTab('personal')">${_personalName}</button>`;
+  // Watched right after the personal list so it's always reachable without scrolling to the end
+  html += `<button class="list-tab watched ${_activeListId === 'watched' ? 'active' : ''}" onclick="switchListTab('watched')">${t('tab_watched')}</button>`;
 
   _listsCache.forEach(l => {
     html += `<button class="list-tab ${_activeListId === l.id ? 'active' : ''}" onclick="switchListTab('${l.id}')">${l.name}</button>`;
@@ -4367,8 +4394,6 @@ function renderListTabs() {
     html += `<button class="list-tab-add" onclick="_startNewListTab()">${t('new_list_tab')}</button>`;
   }
 
-  // Watched tab — always last
-  html += `<button class="list-tab watched ${_activeListId === 'watched' ? 'active' : ''}" onclick="switchListTab('watched')">${t('tab_watched')}</button>`;
 
   row.innerHTML = html;
   if (_listTabCreating) {
