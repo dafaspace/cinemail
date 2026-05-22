@@ -1140,6 +1140,13 @@ body {
   white-space: nowrap;
   flex-shrink: 0;
 }
+.list-tab[data-listid] { touch-action: pan-x; }
+.list-tab.dragging {
+  z-index: 5;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+  cursor: grabbing;
+  transition: none;
+}
 .list-tab.active {
   background: var(--accent);
   border-color: var(--accent);
@@ -2218,6 +2225,9 @@ body {
         <div id="friend-search-results" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:70px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;z-index:10;max-height:130px;overflow-y:auto"></div>
       </div>
 
+      <button onclick="toggleAppInvite()" id="app-invite-btn" style="width:100%;padding:9px;border-radius:9px;background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.3);color:var(--primary);font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:10px;transition:all 0.15s" data-i18n="invite_to_app">✨ Invite friends to Cinemail</button>
+      <div id="app-invite-panel" style="display:none;margin-bottom:16px;padding:12px;background:rgba(245,197,24,0.05);border:1px solid rgba(245,197,24,0.18);border-radius:10px;text-align:center"></div>
+
       <div class="add-label" data-i18n="lang_label" style="margin-top:4px">Language</div>
       <div class="lang-toggle" style="margin-bottom:20px;flex-wrap:wrap">
         <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
@@ -2262,7 +2272,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.9.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.10.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -2387,6 +2397,7 @@ const I18N = {
     lang_label:"Language",
     search_ph:"Movie or series title…",
     friend_search_ph:"Search by name to add…",
+    invite_to_app:"✨ Invite friends to Cinemail",
     replay_onboarding:"🎬 Replay Welcome Tour",
     support_title:"Support Cinemail",
     support_text:"Early supporters get lifetime Pro features free when Cinemail goes paid on the App Store &amp; Google Play.",
@@ -2437,6 +2448,7 @@ const I18N = {
     lang_label:"Язык",
     search_ph:"Название фильма или сериала…",
     friend_search_ph:"Поиск по имени…",
+    invite_to_app:"✨ Пригласить друзей в Cinemail",
     replay_onboarding:"🎬 Пройти тур заново",
     support_title:"Поддержать Cinemail",
     support_text:"Поддержавшие на этом этапе получат пожизненный Pro бесплатно, когда Cinemail станет платным в App Store и Google Play.",
@@ -2487,6 +2499,7 @@ const I18N = {
     lang_label:"Мова",
     search_ph:"Назва фільму чи серіалу…",
     friend_search_ph:"Шукай за ім'ям…",
+    invite_to_app:"✨ Запросити друзів у Cinemail",
     replay_onboarding:"🎬 Повторити знайомство",
     support_title:"Підтримати Cinemail",
     support_text:"Ранні прихильники отримають Pro назавжди безкоштовно, коли Cinemail стане платним в App Store та Google Play.",
@@ -2537,6 +2550,7 @@ const I18N = {
     lang_label:"ენა",
     search_ph:"ფილმის ან სერიალის სახელი…",
     friend_search_ph:"მოძებნე სახელით…",
+    invite_to_app:"✨ მოიწვიე მეგობრები Cinemail-ში",
     replay_onboarding:"🎬 გაცნობის გამეორება",
     support_title:"დაუჭირე მხარი Cinemail-ს",
     support_text:"ადრეული მხარდამჭერები მიიღებენ Pro-ს სამუდამოდ უფასოდ, როცა Cinemail გახდება ფასიანი App Store-სა და Google Play-ში.",
@@ -2587,6 +2601,7 @@ const I18N = {
     lang_label:"Idioma",
     search_ph:"Título de película o serie…",
     friend_search_ph:"Busca por nombre…",
+    invite_to_app:"✨ Invita a amigos a Cinemail",
     replay_onboarding:"🎬 Repetir introducción",
     support_title:"Apoya a Cinemail",
     support_text:"Quienes apoyen ahora tendrán las funciones Pro gratis de por vida cuando Cinemail sea de pago en App Store y Google Play.",
@@ -2637,6 +2652,7 @@ const I18N = {
     lang_label:"Langue",
     search_ph:"Titre de film ou de série…",
     friend_search_ph:"Rechercher par nom…",
+    invite_to_app:"✨ Inviter des amis sur Cinemail",
     replay_onboarding:"🎬 Revoir l'introduction",
     support_title:"Soutenir Cinemail",
     support_text:"Les premiers soutiens obtiennent les fonctions Pro gratuites à vie lorsque Cinemail deviendra payant sur l'App Store et Google Play.",
@@ -2896,7 +2912,7 @@ async function onSignedIn(user) {
   } catch(e) {}
   initUI(); // Update again if DB name differs from metadata
   loadInboxCache(); // non-blocking — cache ready before user opens Inbox
-  loadFriendsCache(); // non-blocking
+  loadFriendsCache().then(() => checkPendingFriendInvite()); // non-blocking; then process ?friend= referral
   // Reload lists non-blocking after friends (so invite picker has fresh data)
   loadListsCache().then(() => { loadHistoryFromDB().then(h => { if(h.length) watchHistory = h; renderHistory(); }).catch(()=>{}); }).catch(()=>{});
   await checkFeedbackBadge();
@@ -4165,6 +4181,7 @@ let _friendsCache = [];         // accepted friendships
 let _friendRequestsCache = [];  // pending incoming requests
 let _friendAddTarget = null;       // { id, name } — selected user to add as friend
 let _friendDeleteConfirmFid = null; // fid pending confirm before delete
+let _friendFilter = '';             // text filter for the friends list (shown when many)
 
 // ── Lists globals ──────────────────────────────────────────────────────────────
 let _listsCache = [];          // { id, name, owner_id, role, memberCount }
@@ -4238,9 +4255,23 @@ function renderFriendsSection() {
     html += `</div>`;
   }
 
-  // Accepted friends
+  // Accepted friends — sorted alphabetically; searchable + scroll-capped when there are many
   if (_friendsCache.length) {
-    for (const f of _friendsCache) {
+    const sorted = [..._friendsCache].sort((a, b) =>
+      _friendInfo(a).name.localeCompare(_friendInfo(b).name, undefined, { sensitivity: 'base' }));
+    const many = sorted.length > 8;
+    const q = (_friendFilter || '').trim().toLowerCase();
+    const shown = q ? sorted.filter(f => _friendInfo(f).name.toLowerCase().includes(q)) : sorted;
+    if (many) {
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:11px;color:var(--muted)">${sorted.length} friends</span>
+      </div>
+      <input type="text" id="friend-filter-input" value="${(_friendFilter||'').replace(/"/g,'&quot;')}" placeholder="Filter friends…"
+        oninput="_friendFilter=this.value;renderFriendsSection()"
+        style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:13px;padding:7px 12px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:8px;box-sizing:border-box">`;
+    }
+    html += `<div${many ? ' style="max-height:248px;overflow-y:auto;margin:-2px;padding:2px"' : ''}>`;
+    for (const f of shown) {
       const { id, name, fid } = _friendInfo(f);
       if (_friendDeleteConfirmFid === fid) {
         // Confirm row
@@ -4258,12 +4289,17 @@ function renderFriendsSection() {
         </div>`;
       }
     }
+    if (!shown.length && q) html += `<div style="color:var(--muted);font-size:12px;padding:4px 0">No friends match "${q.replace(/</g,'&lt;')}"</div>`;
+    html += `</div>`;
   }
 
   if (!html) {
     html = `<div style="color:var(--muted);font-size:12px;padding:4px 0">No friends yet — search by name to add someone</div>`;
   }
   el.innerHTML = html;
+  // Keep focus + caret in the filter box across re-renders
+  const fi = document.getElementById('friend-filter-input');
+  if (fi && _friendFilter) { fi.focus(); const v = fi.value; fi.value = ''; fi.value = v; }
 }
 
 async function searchFriendUsers(q) {
@@ -4395,9 +4431,28 @@ async function loadListsCache() {
       });
     }
 
-    _listsCache = allLists;
+    _listsCache = _applyListOrder(allLists);
     renderListFilterPills();
   } catch(e) { console.error('loadListsCache:', e); }
+}
+
+// ── Custom-list ordering (per user, drag-to-reorder) ──────────────────────────
+function _listOrderKey() { return 'listOrder:' + (currentUser?.id || 'anon'); }
+function _getListOrder() {
+  try { return JSON.parse(localStorage.getItem(_listOrderKey()) || '[]'); } catch(e) { return []; }
+}
+function _saveListOrder(ids) {
+  try { localStorage.setItem(_listOrderKey(), JSON.stringify(ids)); } catch(e) {}
+}
+function _applyListOrder(lists) {
+  const order = _getListOrder();
+  if (!order.length) return lists;
+  const pos = id => { const i = order.indexOf(id); return i === -1 ? Infinity : i; };
+  // Stable sort: known order first (by saved index), unknown lists keep original order at the end
+  return [...lists].sort((a, b) => {
+    const pa = pos(a.id), pb = pos(b.id);
+    return pa === pb ? 0 : pa - pb;
+  });
 }
 
 function _getListName(listId) {
@@ -4422,7 +4477,7 @@ function renderListTabs() {
   html += `<button class="list-tab watched ${_activeListId === 'watched' ? 'active' : ''}" onclick="switchListTab('watched')">${t('tab_watched')}</button>`;
 
   _listsCache.forEach(l => {
-    html += `<button class="list-tab ${_activeListId === l.id ? 'active' : ''}" onclick="switchListTab('${l.id}')">${l.name}</button>`;
+    html += `<button class="list-tab ${_activeListId === l.id ? 'active' : ''}" data-listid="${l.id}" onclick="switchListTab('${l.id}')">${l.name}</button>`;
   });
 
   if (_listTabCreating) {
@@ -4442,7 +4497,78 @@ function renderListTabs() {
     if (inp) { inp.focus(); }
   }
 
+  _initListDrag(row);
   renderListManageStrip();
+}
+
+// ── Drag-to-reorder custom list tabs (long-press, touch + mouse) ──────────────
+let _listDragState = null;
+function _initListDrag(row) {
+  const tabs = [...row.querySelectorAll('.list-tab[data-listid]')];
+  tabs.forEach(tab => {
+    tab.addEventListener('pointerdown', e => _listDragStart(e, tab, row));
+  });
+}
+function _listDragStart(e, tab, row) {
+  if (e.button && e.button !== 0) return;
+  const startX = e.clientX, startY = e.clientY;
+  let holdTimer = setTimeout(() => beginDrag(), 320); // long-press to pick up
+  let dragging = false;
+
+  function beginDrag() {
+    dragging = true;
+    _listDragState = { tab, row };
+    tab.classList.add('dragging');
+    tab.style.opacity = '0.85';
+    tab.style.transform = 'scale(1.06)';
+    if (navigator.vibrate) { try { navigator.vibrate(12); } catch(_) {} }
+  }
+  function onMove(ev) {
+    if (!dragging) {
+      // cancel long-press if the finger moves too far first (it's a scroll, not a hold)
+      if (Math.abs(ev.clientX - startX) > 8 || Math.abs(ev.clientY - startY) > 8) {
+        clearTimeout(holdTimer); cleanup();
+      }
+      return;
+    }
+    ev.preventDefault();
+    const after = _listDragAfterElement(row, ev.clientX);
+    const addBtn = row.querySelector('.list-tab-add') || row.querySelector('#list-tab-input');
+    if (after == null) row.insertBefore(tab, addBtn || null); // park before the "+ New list" button
+    else if (after !== tab) row.insertBefore(tab, after);
+  }
+  function onUp() {
+    clearTimeout(holdTimer);
+    if (dragging) {
+      tab.classList.remove('dragging');
+      tab.style.opacity = ''; tab.style.transform = '';
+      // Persist the new order of custom lists
+      const ids = [...row.querySelectorAll('.list-tab[data-listid]')].map(t => t.dataset.listid);
+      _saveListOrder(ids);
+      _listsCache = _applyListOrder(_listsCache);
+      _listDragState = null;
+      // Swallow the click that fires right after drop so we don't switch tabs
+      tab.addEventListener('click', function sc(ev){ ev.stopImmediatePropagation(); ev.preventDefault(); tab.removeEventListener('click', sc, true); }, true);
+    }
+    cleanup();
+  }
+  function cleanup() {
+    document.removeEventListener('pointermove', onMove);
+    document.removeEventListener('pointerup', onUp);
+    document.removeEventListener('pointercancel', onUp);
+  }
+  document.addEventListener('pointermove', onMove, { passive: false });
+  document.addEventListener('pointerup', onUp);
+  document.addEventListener('pointercancel', onUp);
+}
+function _listDragAfterElement(row, x) {
+  // Return the custom tab that the dragged item should be placed *before* (or null = append)
+  const els = [...row.querySelectorAll('.list-tab[data-listid]:not(.dragging)')];
+  for (const el of els) {
+    const box = el.getBoundingClientRect();
+    if (x < box.left + box.width / 2) return el;
+  }
+  return null;
 }
 
 function switchListTab(listId) {
@@ -4671,6 +4797,105 @@ async function renameList(listId) {
   } catch(e) { showToast('Error: ' + e.message, true); }
 }
 
+// Native share sheet (WhatsApp/Telegram/Messages…) with clipboard fallback
+async function _shareOrCopy(url, title, text) {
+  if (navigator.share) {
+    try { await navigator.share({ title, text, url }); return; }
+    catch(e) { if (e && e.name === 'AbortError') return; /* fall through to copy */ }
+  }
+  try { await navigator.clipboard.writeText(url); showToast('Link copied!'); }
+  catch(e) { showToast(url); }
+}
+function _qrURL(url, size) {
+  // Match the app background (#0d0d1a) so the QR blends into the dark card
+  return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&margin=8&bgcolor=0d0d1a&color=ffffff&data=${encodeURIComponent(url)}`;
+}
+
+// ── Invite a friend to the whole app (referral that auto-connects) ────────────
+function _appInviteURL() {
+  return `${location.origin}${location.pathname}?friend=${currentUser.id}`;
+}
+function toggleAppInvite() {
+  const panel = document.getElementById('app-invite-panel');
+  if (!panel || !currentUser) return;
+  if (panel.style.display === 'block') { panel.style.display = 'none'; return; }
+  const url = _appInviteURL();
+  const myName = currentUser.displayName || currentUser.email?.split('@')[0] || 'a friend';
+  const msg = `${myName} invited you to Cinemail 🎬 — track films, get AI picks and share with friends.`;
+  panel.innerHTML = `
+    <img src="${_qrURL(url,150)}" width="150" height="150" style="border-radius:10px;margin:0 auto 8px;display:block">
+    <div style="font-size:11px;color:var(--muted);margin-bottom:10px">When they open it, you'll connect as friends in one tap.</div>
+    <div style="display:flex;gap:8px">
+      <button onclick='_shareOrCopy(${JSON.stringify(url)}, "Cinemail", ${JSON.stringify(msg)})'
+        style="flex:2;padding:9px;border-radius:8px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue','Oswald',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;font-weight:600">Share invite</button>
+      <button onclick='navigator.clipboard.writeText(${JSON.stringify(url)}).then(()=>showToast("Link copied!"))'
+        style="flex:1;padding:9px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">Copy</button>
+    </div>`;
+  panel.style.display = 'block';
+}
+
+// Capture ?friend=<id> on load, before auth, then strip it from the URL
+function _checkFriendInvite() {
+  const id = new URLSearchParams(location.search).get('friend');
+  if (id) {
+    sessionStorage.setItem('pendingFriendInvite', id);
+    history.replaceState({}, '', location.pathname);
+  }
+}
+async function checkPendingFriendInvite() {
+  const inviterId = sessionStorage.getItem('pendingFriendInvite');
+  if (!inviterId || !currentUser) return;
+  sessionStorage.removeItem('pendingFriendInvite');
+  if (inviterId === currentUser.id) return; // can't befriend yourself
+  // Already connected or a request is pending?
+  const all = [..._friendsCache, ..._friendRequestsCache];
+  if (all.some(f => f.user_id === inviterId || f.friend_id === inviterId)) return;
+  // Resolve the inviter's profile (name + avatar)
+  await _fetchProfileAvatars([inviterId]);
+  const p = _profileCache[inviterId] || {};
+  if (!p.name) { // unknown / invalid inviter id → silently ignore
+    try { const { data } = await sbClient.from('profiles').select('id').eq('id', inviterId).single(); if (!data) return; } catch(e) { return; }
+  }
+  _showFriendInviteCard(inviterId, p.name || 'Someone');
+}
+function _showFriendInviteCard(inviterId, name) {
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px)';
+  ov.innerHTML = `
+    <div style="max-width:330px;width:100%;background:#15151f;border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:26px 22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.5)">
+      <div style="margin:0 auto 14px">${_avatarMarkup(inviterId, name, 64)}</div>
+      <div style="font-size:18px;color:#fff;font-weight:700;margin-bottom:6px">${name} invited you to Cinemail 🎬</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:20px">Add ${name} as a friend to share films, lists and recommendations.</div>
+      <div style="display:flex;gap:10px">
+        <button id="fi-accept" style="flex:2;padding:12px;border-radius:10px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue','Oswald',sans-serif;font-size:15px;letter-spacing:1px;font-weight:600;cursor:pointer">Add friend</button>
+        <button id="fi-skip" style="flex:1;padding:12px;border-radius:10px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Maybe later</button>
+      </div>
+    </div>`;
+  document.body.appendChild(ov);
+  const close = () => ov.remove();
+  ov.querySelector('#fi-skip').onclick = close;
+  ov.addEventListener('click', e => { if (e.target === ov) close(); });
+  ov.querySelector('#fi-accept').onclick = async () => {
+    ov.querySelector('#fi-accept').textContent = 'Adding…';
+    await _acceptFriendInvite(inviterId, name);
+    close();
+  };
+}
+async function _acceptFriendInvite(inviterId, inviterName) {
+  try {
+    const myName = currentUser.displayName || currentUser.email?.split('@')[0] || 'someone';
+    // The inviter consented by creating the link, so connect immediately (accepted)
+    const { error } = await sbClient.from('friendships').insert({
+      user_id: currentUser.id, friend_id: inviterId,
+      user_name: myName, friend_name: inviterName, status: 'accepted'
+    });
+    if (error) throw new Error(error.message);
+    await loadFriendsCache();
+    renderFriendsSection();
+    showToast(`You're now friends with ${inviterName}!`);
+  } catch(e) { showToast('Could not add friend: ' + e.message, true); }
+}
+
 async function _loadInviteLink(listId) {
   const el = document.getElementById('invite-link-content');
   if (!el) return;
@@ -4687,14 +4912,21 @@ async function _loadInviteLink(listId) {
       token = data.token;
     }
     const url = `${location.origin}${location.pathname}?join=${token}`;
-    const qr = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&bgcolor=1a1a2e&color=ffffff&data=${encodeURIComponent(url)}`;
+    const listName = _getListName(listId);
+    const msg = `Join my "${listName}" list on Cinemail 🎬`;
     el.innerHTML = `
-      <img src="${qr}" style="border-radius:10px;margin-bottom:10px;display:block;margin-left:auto;margin-right:auto" width="160" height="160">
+      <img src="${_qrURL(url,160)}" style="border-radius:10px;margin-bottom:10px;display:block;margin-left:auto;margin-right:auto" width="160" height="160">
       <div style="font-size:10px;color:var(--muted);margin-bottom:10px">Valid for 48 hours</div>
-      <button onclick="navigator.clipboard.writeText('${url}').then(()=>showToast('Link copied!'))"
-        style="width:100%;padding:9px;border-radius:8px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer">
-        Copy Link
-      </button>`;
+      <div style="display:flex;gap:8px">
+        <button onclick='_shareOrCopy(${JSON.stringify(url)}, "Cinemail", ${JSON.stringify(msg)})'
+          style="flex:2;padding:9px;border-radius:8px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer">
+          Share
+        </button>
+        <button onclick='navigator.clipboard.writeText(${JSON.stringify(url)}).then(()=>showToast("Link copied!"))'
+          style="flex:1;padding:9px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">
+          Copy
+        </button>
+      </div>`;
   } catch(e) { if (el) el.innerHTML = `<div style="font-size:12px;color:#f87171">${e.message}</div>`; }
 }
 
@@ -6630,6 +6862,7 @@ function initUI() {
   else{ if(!_maybeShowOnboarding()) showScreen("signin"); }
   _applyI18n(); // apply stored language preference to static elements
   _checkJoinToken(); // capture ?join= before anything else
+  _checkFriendInvite(); // capture ?friend= referral before anything else
   sbClient.auth.onAuthStateChange(async(event,session)=>{
     if(event==="SIGNED_IN"&&session){
       // Distinguish a genuine sign-in (new user / first time) from a token-refresh re-fire.
