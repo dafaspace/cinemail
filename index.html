@@ -2272,7 +2272,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.10.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.10.1</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -4511,13 +4511,18 @@ function _initListDrag(row) {
 }
 function _listDragStart(e, tab, row) {
   if (e.button && e.button !== 0) return;
+  const pointerId = e.pointerId;
   const startX = e.clientX, startY = e.clientY;
-  let holdTimer = setTimeout(() => beginDrag(), 320); // long-press to pick up
+  let holdTimer = setTimeout(beginDrag, 300); // long-press to pick up
   let dragging = false;
 
   function beginDrag() {
     dragging = true;
     _listDragState = { tab, row };
+    // Claim the gesture so the scroll-container stops stealing it as a horizontal pan
+    tab.style.touchAction = 'none';
+    row.style.touchAction = 'none';
+    try { tab.setPointerCapture(pointerId); } catch(_) {}
     tab.classList.add('dragging');
     tab.style.opacity = '0.85';
     tab.style.transform = 'scale(1.06)';
@@ -4525,8 +4530,8 @@ function _listDragStart(e, tab, row) {
   }
   function onMove(ev) {
     if (!dragging) {
-      // cancel long-press if the finger moves too far first (it's a scroll, not a hold)
-      if (Math.abs(ev.clientX - startX) > 8 || Math.abs(ev.clientY - startY) > 8) {
+      // cancel long-press if the finger moves first (it's a scroll/tap, not a hold)
+      if (Math.abs(ev.clientX - startX) > 12 || Math.abs(ev.clientY - startY) > 12) {
         clearTimeout(holdTimer); cleanup();
       }
       return;
@@ -4541,7 +4546,9 @@ function _listDragStart(e, tab, row) {
     clearTimeout(holdTimer);
     if (dragging) {
       tab.classList.remove('dragging');
-      tab.style.opacity = ''; tab.style.transform = '';
+      tab.style.opacity = ''; tab.style.transform = ''; tab.style.touchAction = '';
+      row.style.touchAction = '';
+      try { tab.releasePointerCapture(pointerId); } catch(_) {}
       // Persist the new order of custom lists
       const ids = [...row.querySelectorAll('.list-tab[data-listid]')].map(t => t.dataset.listid);
       _saveListOrder(ids);
@@ -4821,7 +4828,7 @@ function toggleAppInvite() {
   if (panel.style.display === 'block') { panel.style.display = 'none'; return; }
   const url = _appInviteURL();
   const myName = currentUser.displayName || currentUser.email?.split('@')[0] || 'a friend';
-  const msg = `${myName} invited you to Cinemail 🎬 — track films, get AI picks and share with friends.`;
+  const msg = `${myName} invited you to Cinemail. Track films, get personalised picks and share with friends.`;
   panel.innerHTML = `
     <img src="${_qrURL(url,150)}" width="150" height="150" style="border-radius:10px;margin:0 auto 8px;display:block">
     <div style="font-size:11px;color:var(--muted);margin-bottom:10px">When they open it, you'll connect as friends in one tap.</div>
@@ -4838,14 +4845,15 @@ function toggleAppInvite() {
 function _checkFriendInvite() {
   const id = new URLSearchParams(location.search).get('friend');
   if (id) {
-    sessionStorage.setItem('pendingFriendInvite', id);
+    // localStorage (not session) so the referral survives the email-confirmation redirect for brand-new signups
+    localStorage.setItem('pendingFriendInvite', id);
     history.replaceState({}, '', location.pathname);
   }
 }
 async function checkPendingFriendInvite() {
-  const inviterId = sessionStorage.getItem('pendingFriendInvite');
+  const inviterId = localStorage.getItem('pendingFriendInvite');
   if (!inviterId || !currentUser) return;
-  sessionStorage.removeItem('pendingFriendInvite');
+  localStorage.removeItem('pendingFriendInvite');
   if (inviterId === currentUser.id) return; // can't befriend yourself
   // Already connected or a request is pending?
   const all = [..._friendsCache, ..._friendRequestsCache];
@@ -4863,9 +4871,10 @@ function _showFriendInviteCard(inviterId, name) {
   ov.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px)';
   ov.innerHTML = `
     <div style="max-width:330px;width:100%;background:#15151f;border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:26px 22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.5)">
+      <div style="font-family:'Bebas Neue','Oswald',-apple-system,sans-serif;font-size:24px;letter-spacing:2.5px;margin-bottom:18px"><span style="color:var(--primary)">CINE</span><span style="color:#fff">MAIL</span></div>
       <div style="margin:0 auto 14px">${_avatarMarkup(inviterId, name, 64)}</div>
-      <div style="font-size:18px;color:#fff;font-weight:700;margin-bottom:6px">${name} invited you to Cinemail 🎬</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:20px">Add ${name} as a friend to share films, lists and recommendations.</div>
+      <div style="font-size:18px;color:#fff;font-weight:700;margin-bottom:6px">${name} invited you to Cinemail</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:20px">Track films, get personalised picks and share with friends.</div>
       <div style="display:flex;gap:10px">
         <button id="fi-accept" style="flex:2;padding:12px;border-radius:10px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue','Oswald',sans-serif;font-size:15px;letter-spacing:1px;font-weight:600;cursor:pointer">Add friend</button>
         <button id="fi-skip" style="flex:1;padding:12px;border-radius:10px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Maybe later</button>
@@ -4884,16 +4893,30 @@ function _showFriendInviteCard(inviterId, name) {
 async function _acceptFriendInvite(inviterId, inviterName) {
   try {
     const myName = currentUser.displayName || currentUser.email?.split('@')[0] || 'someone';
-    // The inviter consented by creating the link, so connect immediately (accepted)
-    const { error } = await sbClient.from('friendships').insert({
-      user_id: currentUser.id, friend_id: inviterId,
-      user_name: myName, friend_name: inviterName, status: 'accepted'
-    });
-    if (error) throw new Error(error.message);
+    // Check the DB for any existing relationship in either direction (caches may be stale)
+    const { data: existing } = await sbClient.from('friendships').select('id,user_id,friend_id,status')
+      .or(`and(user_id.eq.${currentUser.id},friend_id.eq.${inviterId}),and(user_id.eq.${inviterId},friend_id.eq.${currentUser.id})`);
+    const row = (existing || [])[0];
+    if (row) {
+      if (row.status === 'accepted') { showToast(`Already friends with ${inviterName}`); return; }
+      // A pending request already exists → accept it instead of inserting a duplicate
+      const { error: upErr } = await sbClient.from('friendships').update({ status: 'accepted' }).eq('id', row.id);
+      if (upErr) throw new Error(upErr.message);
+    } else {
+      // The inviter consented by creating the link, so connect immediately (accepted)
+      const { error } = await sbClient.from('friendships').insert({
+        user_id: currentUser.id, friend_id: inviterId,
+        user_name: myName, friend_name: inviterName, status: 'accepted'
+      });
+      if (error) throw new Error(error.message);
+    }
     await loadFriendsCache();
     renderFriendsSection();
     showToast(`You're now friends with ${inviterName}!`);
-  } catch(e) { showToast('Could not add friend: ' + e.message, true); }
+  } catch(e) {
+    console.error('[friend-invite] accept failed:', e);
+    showToast('Could not add friend: ' + e.message, true);
+  }
 }
 
 async function _loadInviteLink(listId) {
@@ -4913,7 +4936,8 @@ async function _loadInviteLink(listId) {
     }
     const url = `${location.origin}${location.pathname}?join=${token}`;
     const listName = _getListName(listId);
-    const msg = `Join my "${listName}" list on Cinemail 🎬`;
+    const myName = currentUser.displayName || currentUser.email?.split('@')[0] || 'A friend';
+    const msg = `${myName} shared the "${listName}" list with you on Cinemail. Open it to see what's inside.`;
     el.innerHTML = `
       <img src="${_qrURL(url,160)}" style="border-radius:10px;margin-bottom:10px;display:block;margin-left:auto;margin-right:auto" width="160" height="160">
       <div style="font-size:10px;color:var(--muted);margin-bottom:10px">Valid for 48 hours</div>
@@ -5486,9 +5510,9 @@ function _receivedStatusHTML(inv) {
       const fls = _filmListStatus(inv.tmdb_id);
       count = (fls.personalPlanEntry ? 1 : 0) + Object.keys(fls.listEntries).length;
     }
-    let addedLabel = listName ? `Added to "${listName}"` : "Added";
-    if (count >= 2) addedLabel += ` · in ${count} lists`;
-    return `${from}<span style="display:inline-block;width:8px"></span><span style="color:#4ade80">${addedLabel}</span>`;
+    const addedLabel = listName ? `Added to "${listName}"` : "Added";
+    const listCount = count >= 2 ? `<span style="color:var(--muted)"> · in ${count} lists</span>` : "";
+    return `${from}<span style="display:inline-block;width:8px"></span><span style="color:#4ade80">${addedLabel}</span>${listCount}`;
   }
   if (inv.status === "declined") {
     return `${from}<span style="display:inline-block;width:8px"></span><span style="color:#f87171">Declined</span>`;
