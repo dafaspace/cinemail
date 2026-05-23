@@ -1,5 +1,5 @@
 // ── Cache version — bump this string on every deploy to force refresh ──────────
-const CACHE_VERSION = "v63";
+const CACHE_VERSION = "v64";
 const CACHE_NAME = "cinemail-" + CACHE_VERSION;
 
 // Files to cache for offline use
@@ -7,6 +7,7 @@ const PRECACHE = [
   "./",
   "./index.html",
   "./manifest.json",
+  "./logo.png",
 ];
 
 // ── Install: cache core files ─────────────────────────────────────────────────

@@ -604,6 +604,21 @@ body {
   color: var(--muted);
 }
 .empty-state-icon { font-size: 44px; margin-bottom: 10px; opacity: 0.6; }
+.search-logo {
+  width: 96px; height: 96px; margin: 0 auto 14px; display: block;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  filter: drop-shadow(0 5px 14px rgba(0,0,0,0.4));
+  transition: transform .12s ease; user-select: none; -webkit-user-select: none;
+}
+.search-logo:active { transform: scale(0.9); }
+@keyframes logo-pop {
+  0%   { transform: scale(1)    rotate(0deg); }
+  20%  { transform: scale(1.18) rotate(-7deg); }
+  45%  { transform: scale(0.93) rotate(5deg); }
+  70%  { transform: scale(1.06) rotate(-2deg); }
+  100% { transform: scale(1)    rotate(0deg); }
+}
+.search-logo.pop { animation: logo-pop .6s cubic-bezier(.34,1.56,.64,1); }
 .empty-state-title {
   font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 18px;
@@ -2098,9 +2113,9 @@ body {
     </div>
     <div id="search-results">
       <div class="empty-state">
-        <div class="empty-state-icon">🎬</div>
-        <div class="empty-state-title">Find Your Next Film</div>
-        <p>Type a title and press Search</p>
+        <img src="logo.png" class="search-logo pop" alt="Cinemail" draggable="false" onclick="_bounceLogo(this)">
+        <div class="empty-state-title" data-i18n="empty_search_title">Find Your Next Film</div>
+        <p data-i18n="empty_search_sub">Type a title and press Search</p>
       </div>
     </div>
   </div>
@@ -2108,7 +2123,7 @@ body {
   <!-- ── TAB: Picks ───────────────────────────────────────────────────── -->
   <div id="tab-recs" class="tab-panel" style="display:none">
     <div class="search-row">
-      <input id="rec-input" type="text" placeholder="Mood, genre, or anything…">
+      <input id="rec-input" type="text" data-i18n-ph="recs_ph" placeholder="Mood, genre, or anything…">
       <button class="btn btn-primary btn-sm" style="width:auto" id="rec-btn" onclick="loadRecs()" data-i18n="find_btn">Find</button>
     </div>
     <button onclick="surpriseMe()" data-i18n="surprise" style="width:100%;margin-top:0;margin-bottom:12px;padding:10px;border-radius:10px;background:var(--accent);border:none;color:#fff;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity=.85" onmouseout="this.style.opacity=1">✨ Surprise Me</button>
@@ -2349,7 +2364,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.11</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.12</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -2748,6 +2763,100 @@ const I18N = {
     about_author:"Créé par <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
   }
 };
+// ── Supplementary translations (lists + inbox + search/picks) ─────────────────
+// Merged into I18N so we don't have to edit each language block inline.
+const _I18N_EXTRA = {
+  en: {
+    empty_search_title:"Find Your Next Film", recs_ph:"Mood, genre, or anything…", empty_search_sub:"Type a title and press Search",
+    list_rename:"Rename", list_invite:"Invite", list_link:"Link", list_delete:"Delete", list_leave:"Leave",
+    list_members_title:"Members", list_remove:"Remove", you_label:"(you)", role_owner:"owner", role_member:"member",
+    list_invite_to:"Invite to", list_invite_link_for:"Invite link for", list_select_friend:"Select a friend:",
+    list_generating:"Generating…", list_cancel:"Cancel",
+    inv_add_to_list:"Add to List", inv_decline:"Decline", inv_from:"from", inv_to:"to",
+    inv_declined:"Declined", inv_pending:"Pending", inv_added:"Added", inv_accepted:"Accepted", inv_sent:"Sent",
+    inv_added_to:"Added to", inv_reaction:"reaction", inv_invited_you:"invited you", inv_join_list:"Join List",
+  },
+  ru: {
+    empty_search_title:"Найди свой следующий фильм", recs_ph:"Настроение, жанр, что угодно…", empty_search_sub:"Введи название и нажми Поиск",
+    list_rename:"Переименовать", list_invite:"Пригласить", list_link:"Ссылка", list_delete:"Удалить", list_leave:"Покинуть",
+    list_members_title:"Участники", list_remove:"Убрать", you_label:"(вы)", role_owner:"владелец", role_member:"участник",
+    list_invite_to:"Пригласить в", list_invite_link_for:"Ссылка-приглашение в", list_select_friend:"Выбери друга:",
+    list_generating:"Создаём…", list_cancel:"Отмена",
+    inv_add_to_list:"В список", inv_decline:"Отклонить", inv_from:"от", inv_to:"кому",
+    inv_declined:"Отклонено", inv_pending:"Ожидает", inv_added:"Добавлено", inv_accepted:"Принято", inv_sent:"Отправлено",
+    inv_added_to:"Добавлено в", inv_reaction:"реакция", inv_invited_you:"пригласил тебя", inv_join_list:"Вступить",
+  },
+  uk: {
+    empty_search_title:"Знайди свій наступний фільм", recs_ph:"Настрій, жанр, будь-що…", empty_search_sub:"Введи назву і натисни Пошук",
+    list_rename:"Перейменувати", list_invite:"Запросити", list_link:"Посилання", list_delete:"Видалити", list_leave:"Покинути",
+    list_members_title:"Учасники", list_remove:"Прибрати", you_label:"(ви)", role_owner:"власник", role_member:"учасник",
+    list_invite_to:"Запросити до", list_invite_link_for:"Посилання-запрошення до", list_select_friend:"Обери друга:",
+    list_generating:"Створюємо…", list_cancel:"Скасувати",
+    inv_add_to_list:"До списку", inv_decline:"Відхилити", inv_from:"від", inv_to:"кому",
+    inv_declined:"Відхилено", inv_pending:"Очікує", inv_added:"Додано", inv_accepted:"Прийнято", inv_sent:"Надіслано",
+    inv_added_to:"Додано до", inv_reaction:"реакція", inv_invited_you:"запросив тебе", inv_join_list:"Приєднатися",
+  },
+  ka: {
+    empty_search_title:"იპოვე შენი შემდეგი ფილმი", recs_ph:"განწყობა, ჟანრი ან ნებისმიერი…", empty_search_sub:"აკრიფე სათაური და დააჭირე ძიებას",
+    list_rename:"გადარქმევა", list_invite:"მოწვევა", list_link:"ბმული", list_delete:"წაშლა", list_leave:"დატოვება",
+    list_members_title:"წევრები", list_remove:"ამოშლა", you_label:"(შენ)", role_owner:"მფლობელი", role_member:"წევრი",
+    list_invite_to:"მოწვევა სიაში", list_invite_link_for:"მოსაწვევი ბმული", list_select_friend:"აირჩიე მეგობარი:",
+    list_generating:"იქმნება…", list_cancel:"გაუქმება",
+    inv_add_to_list:"სიაში დამატება", inv_decline:"უარყოფა", inv_from:"ვისგან", inv_to:"ვის",
+    inv_declined:"უარყოფილი", inv_pending:"მოლოდინში", inv_added:"დამატებული", inv_accepted:"მიღებული", inv_sent:"გაგზავნილი",
+    inv_added_to:"დამატებულია სიაში", inv_reaction:"რეაქცია", inv_invited_you:"მოგიწვია", inv_join_list:"გაწევრიანება",
+  },
+  es: {
+    empty_search_title:"Encuentra tu próxima película", recs_ph:"Estado de ánimo, género o lo que sea…", empty_search_sub:"Escribe un título y pulsa Buscar",
+    list_rename:"Renombrar", list_invite:"Invitar", list_link:"Enlace", list_delete:"Eliminar", list_leave:"Salir",
+    list_members_title:"Miembros", list_remove:"Quitar", you_label:"(tú)", role_owner:"propietario", role_member:"miembro",
+    list_invite_to:"Invitar a", list_invite_link_for:"Enlace de invitación a", list_select_friend:"Elige un amigo:",
+    list_generating:"Generando…", list_cancel:"Cancelar",
+    inv_add_to_list:"Añadir a lista", inv_decline:"Rechazar", inv_from:"de", inv_to:"para",
+    inv_declined:"Rechazado", inv_pending:"Pendiente", inv_added:"Añadido", inv_accepted:"Aceptado", inv_sent:"Enviado",
+    inv_added_to:"Añadido a", inv_reaction:"reacción", inv_invited_you:"te invitó", inv_join_list:"Unirse",
+  },
+  fr: {
+    empty_search_title:"Trouvez votre prochain film", recs_ph:"Humeur, genre ou autre…", empty_search_sub:"Saisissez un titre et appuyez sur Rechercher",
+    list_rename:"Renommer", list_invite:"Inviter", list_link:"Lien", list_delete:"Supprimer", list_leave:"Quitter",
+    list_members_title:"Membres", list_remove:"Retirer", you_label:"(vous)", role_owner:"propriétaire", role_member:"membre",
+    list_invite_to:"Inviter à", list_invite_link_for:"Lien d'invitation à", list_select_friend:"Choisis un ami :",
+    list_generating:"Génération…", list_cancel:"Annuler",
+    inv_add_to_list:"Ajouter à la liste", inv_decline:"Refuser", inv_from:"de", inv_to:"à",
+    inv_declined:"Refusé", inv_pending:"En attente", inv_added:"Ajouté", inv_accepted:"Accepté", inv_sent:"Envoyé",
+    inv_added_to:"Ajouté à", inv_reaction:"réaction", inv_invited_you:"vous a invité", inv_join_list:"Rejoindre",
+  },
+};
+Object.keys(_I18N_EXTRA).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_EXTRA[l]); });
+// Locale-aware plural for the "member(s)" word in member counts.
+function _membersWord(n) {
+  const forms = ({
+    en:['member','members'], es:['miembro','miembros'], fr:['membre','membres'], ka:['წევრი','წევრი'],
+    ru:['участник','участника','участников'], uk:['учасник','учасники','учасників'],
+  })[_lang] || ['member','members'];
+  if (forms.length === 2) return n === 1 ? forms[0] : forms[1];
+  const n10 = n % 10, n100 = n % 100;
+  if (n10 === 1 && n100 !== 11) return forms[0];
+  if (n10 >= 2 && n10 <= 4 && (n100 < 10 || n100 >= 20)) return forms[1];
+  return forms[2];
+}
+// Replay the logo pop animation on tap (re-trigger by forcing reflow).
+function _bounceLogo(el) {
+  el.classList.remove('pop');
+  void el.offsetWidth;
+  el.classList.add('pop');
+}
+function _listsWord(n) {
+  const forms = ({
+    en:['list','lists'], es:['lista','listas'], fr:['liste','listes'], ka:['სია','სია'],
+    ru:['список','списка','списков'], uk:['список','списки','списків'],
+  })[_lang] || ['list','lists'];
+  if (forms.length === 2) return n === 1 ? forms[0] : forms[1];
+  const n10 = n % 10, n100 = n % 100;
+  if (n10 === 1 && n100 !== 11) return forms[0];
+  if (n10 >= 2 && n10 <= 4 && (n100 < 10 || n100 >= 20)) return forms[1];
+  return forms[2];
+}
 let _lang = localStorage.getItem('lang') || (function(){
   const n = (navigator.language || 'en').slice(0,2).toLowerCase();
   return ['ru','uk','ka','es','fr'].includes(n) ? n : 'en';
@@ -4461,7 +4570,7 @@ function renderFriendsSection() {
         // Confirm row
         html += `<div class="friend-row" style="background:rgba(248,113,113,0.06);border-radius:8px;padding:8px 10px;gap:8px">
           <div style="flex:1;font-size:12px;color:#f87171">Remove <strong>${name}</strong> from friends?</div>
-          <button onclick="event.stopPropagation();deleteFriendConfirmed('${fid}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">Remove</button>
+          <button onclick="event.stopPropagation();deleteFriendConfirmed('${fid}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${t('list_remove')}</button>
           <button onclick="event.stopPropagation();_friendDeleteConfirmFid=null;renderFriendsSection()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#aaa;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer">Cancel</button>
         </div>`;
       } else {
@@ -4973,8 +5082,8 @@ function renderListManageStrip() {
   if (_listManageMode === 'confirm-delete') {
     el.innerHTML = `
       <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(248,113,113,0.06);border-radius:10px;border:1px solid rgba(248,113,113,0.15)">
-        <span style="flex:1;font-size:12px;color:#f87171">${isOwner ? 'Delete' : 'Leave'} <strong>${list.name}</strong>?</span>
-        <button onclick="confirmListDelete('${list.id}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${isOwner ? 'Delete' : 'Leave'}</button>
+        <span style="flex:1;font-size:12px;color:#f87171">${isOwner ? t('list_delete') : t('list_leave')} <strong>${list.name}</strong>?</span>
+        <button onclick="confirmListDelete('${list.id}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${isOwner ? t('list_delete') : t('list_leave')}</button>
         <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#aaa;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer">Cancel</button>
       </div>`;
     return;
@@ -4998,10 +5107,10 @@ function renderListManageStrip() {
     el.innerHTML = `
       <div style="padding:10px;background:rgba(124,58,237,0.05);border-radius:10px;border:1px solid rgba(124,58,237,0.15);margin-bottom:4px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <span style="font-size:12px;color:var(--muted)">Invite to <strong style="color:var(--text)">${list.name}</strong></span>
+          <span style="font-size:12px;color:var(--muted)">${t('list_invite_to')} <strong style="color:var(--text)">${list.name}</strong></span>
           <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;line-height:1;padding:2px 4px">×</button>
         </div>
-        ${friends.length ? `<div style="font-size:11px;color:var(--muted);margin-bottom:6px">Select a friend:</div>` + friends.map(f => {
+        ${friends.length ? `<div style="font-size:11px;color:var(--muted);margin-bottom:6px">${t('list_select_friend')}</div>` + friends.map(f => {
           const fi = _friendInfo(f);
           return `<button data-uid="${fi.id}" data-name="${fi.name.replace(/"/g,'&quot;')}" onclick="_doInviteToList('${list.id}',this)"
             style="display:block;width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;padding:8px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:4px">${fi.name}</button>`;
@@ -5019,16 +5128,16 @@ function renderListManageStrip() {
         <div style="display:flex;align-items:center;gap:8px">
           ${_avatarMarkup(m.user_id, m.name, 28)}
           <div>
-            <div style="font-size:13px;color:var(--text)">${m.name}${isMe ? ' <span style="color:var(--muted);font-size:11px">(you)</span>' : ''}</div>
-            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">${m.role}</div>
+            <div style="font-size:13px;color:var(--text)">${m.name}${isMe ? ' <span style="color:var(--muted);font-size:11px">'+t('you_label')+'</span>' : ''}</div>
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">${m.role === 'owner' ? t('role_owner') : t('role_member')}</div>
           </div>
         </div>
-        ${canKick ? `<button onclick="_kickMember('${list.id}','${m.user_id}')" style="background:none;border:1px solid rgba(248,113,113,0.3);color:#f87171;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">Remove</button>` : ''}
+        ${canKick ? `<button onclick="_kickMember('${list.id}','${m.user_id}')" style="background:none;border:1px solid rgba(248,113,113,0.3);color:#f87171;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">${t('list_remove')}</button>` : ''}
       </div>`;
     }).join('');
     el.innerHTML = `<div style="padding:10px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid var(--border)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <span style="font-size:12px;color:var(--muted)">Members · <strong style="color:var(--text)">${list.name}</strong></span>
+        <span style="font-size:12px;color:var(--muted)">${t('list_members_title')} · <strong style="color:var(--text)">${list.name}</strong></span>
         <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;padding:2px 4px">×</button>
       </div>
       ${rows || '<div style="font-size:12px;color:var(--muted);padding:4px 0">No members yet</div>'}
@@ -5039,11 +5148,11 @@ function renderListManageStrip() {
   if (_listManageMode === 'link') {
     el.innerHTML = `<div style="padding:10px;background:rgba(124,58,237,0.05);border-radius:10px;border:1px solid rgba(124,58,237,0.15)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <span style="font-size:12px;color:var(--muted)">Invite link for <strong style="color:var(--text)">${list.name}</strong></span>
+        <span style="font-size:12px;color:var(--muted)">${t('list_invite_link_for')} <strong style="color:var(--text)">${list.name}</strong></span>
         <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;padding:2px 4px">×</button>
       </div>
       <div id="invite-link-content" style="text-align:center;padding:8px 0">
-        <div style="font-size:12px;color:var(--muted)">Generating…</div>
+        <div style="font-size:12px;color:var(--muted)">${t('list_generating')}</div>
       </div>
     </div>`;
     _loadInviteLink(list.id);
@@ -5054,16 +5163,16 @@ function renderListManageStrip() {
   el.innerHTML = `
     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
       ${isOwner ? `<button onclick="_listManageMode='rename';renderListManageStrip()"
-        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:none;color:#888;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">Rename</button>` : ''}
+        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:none;color:#888;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">${t('list_rename')}</button>` : ''}
       ${isOwner ? `<button onclick="_listManageMode='invite';renderListManageStrip()"
-        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(124,58,237,0.3);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">+ Invite</button>` : ''}
+        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(124,58,237,0.3);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">+ ${t('list_invite')}</button>` : ''}
       ${isOwner ? `<button onclick="_listManageMode='link';renderListManageStrip()"
-        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(124,58,237,0.3);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" style="vertical-align:middle;margin-right:3px"><circle cx="11" cy="2.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="11" cy="11.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="3" cy="7" r="1.8" stroke="currentColor" stroke-width="1.4"/><line x1="4.7" y1="6.1" x2="9.3" y2="3.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="4.7" y1="7.9" x2="9.3" y2="10.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Link</button>` : ''}
+        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(124,58,237,0.3);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" style="vertical-align:middle;margin-right:3px"><circle cx="11" cy="2.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="11" cy="11.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="3" cy="7" r="1.8" stroke="currentColor" stroke-width="1.4"/><line x1="4.7" y1="6.1" x2="9.3" y2="3.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="4.7" y1="7.9" x2="9.3" y2="10.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>${t('list_link')}</button>` : ''}
       <button onclick="_listManageMode='confirm-delete';renderListManageStrip()"
-        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:none;color:#666;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">${isOwner ? 'Delete' : 'Leave'}</button>
+        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:none;color:#666;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">${isOwner ? t('list_delete') : t('list_leave')}</button>
       ${list.memberCount > 0 ? `<button onclick="_listManageMode='members';renderListManageStrip()"
         style="padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);background:none;color:#555;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">
-        👥 ${list.memberCount} ${list.memberCount !== 1 ? 'members' : 'member'}
+        👥 ${list.memberCount} ${_membersWord(list.memberCount)}
       </button>` : ''}
     </div>`;
 }
@@ -5082,11 +5191,11 @@ function renderListsSection() {
   let html = '';
   for (const list of _listsCache) {
     const isOwner = list.role === 'owner';
-    const sub = (list.memberCount ? `${list.memberCount} member${list.memberCount !== 1 ? 's' : ''} · ` : '') + (isOwner ? 'owner' : 'member');
+    const sub = (list.memberCount ? `${list.memberCount} ${_membersWord(list.memberCount)} · ` : '') + (isOwner ? t('role_owner') : t('role_member'));
     if (_listDeleteConfirmId === list.id) {
       html += `<div class="list-row" style="background:rgba(248,113,113,0.06);border-radius:8px;padding:8px 10px;gap:8px">
-        <div style="flex:1;font-size:12px;color:#f87171">${isOwner ? 'Delete' : 'Leave'} <strong>${list.name}</strong>?</div>
-        <button onclick="confirmListDelete('${list.id}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${isOwner ? 'Delete' : 'Leave'}</button>
+        <div style="flex:1;font-size:12px;color:#f87171">${isOwner ? t('list_delete') : t('list_leave')} <strong>${list.name}</strong>?</div>
+        <button onclick="confirmListDelete('${list.id}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${isOwner ? t('list_delete') : t('list_leave')}</button>
         <button onclick="_listDeleteConfirmId=null;renderListsSection()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#aaa;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer">Cancel</button>
       </div>`;
     } else if (_listInviteTargetId === list.id) {
@@ -5112,7 +5221,7 @@ function renderListsSection() {
           <div style="font-size:11px;color:var(--muted)">${sub}</div>
         </div>
         ${isOwner ? `<button onclick="event.stopPropagation();_listInviteTargetId='${list.id}';_listDeleteConfirmId=null;renderListsSection()"
-          style="background:none;border:1px solid rgba(124,58,237,0.3);color:var(--accent-text);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">+ Invite</button>` : ''}
+          style="background:none;border:1px solid rgba(124,58,237,0.3);color:var(--accent-text);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">+ ${t('list_invite')}</button>` : ''}
         <button onclick="event.stopPropagation();_listDeleteConfirmId='${list.id}';_listInviteTargetId=null;renderListsSection()"
           style="background:none;border:none;color:#555;font-size:18px;line-height:1;cursor:pointer;padding:6px 8px;margin:-6px -4px" title="${isOwner ? 'Delete list' : 'Leave list'}">${isOwner ? '×' : '↩'}</button>
       </div>`;
@@ -5336,7 +5445,7 @@ function _showJoinConfirm(tokenId, listId, listName) {
     <div style="font-size:13px;color:var(--muted);margin-bottom:22px">You've been invited to a shared movie list</div>
     <div style="display:flex;gap:10px">
       <button onclick="_confirmJoin('${tokenId}','${listId}','${safeName}')"
-        style="flex:1;padding:13px;border-radius:10px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:16px;cursor:pointer;letter-spacing:1px">Join List</button>
+        style="flex:1;padding:13px;border-radius:10px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:16px;cursor:pointer;letter-spacing:1px">${t('inv_join_list')}</button>
       <button onclick="document.getElementById('join-confirm-overlay').remove()"
         style="flex:1;padding:13px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--muted);font-size:14px;cursor:pointer">Decline</button>
     </div>
@@ -5786,7 +5895,7 @@ function _renderChatList() {
     let preview = "";
     if (msgs.length) {
       const lm = msgs[msgs.length - 1];
-      preview = lm.type === "reaction" ? `${lm.text} reaction` : lm.text.slice(0, 50) + (lm.text.length > 50 ? "…" : "");
+      preview = lm.type === "reaction" ? `${lm.text} ${t('inv_reaction')}` : lm.text.slice(0, 50) + (lm.text.length > 50 ? "…" : "");
     } else {
       preview = latest.title || "";
     }
@@ -5834,20 +5943,20 @@ function _renderChatDetail(partnerId) {
 
 function _sentStatusHTML(inv) {
   const to = inv.to_name
-    ? `<span style="color:var(--accent-text)">↑ to ${inv.to_name}</span><span style="display:inline-block;width:8px"></span>`
+    ? `<span style="color:var(--accent-text)">↑ ${t('inv_to')} ${inv.to_name}</span><span style="display:inline-block;width:8px"></span>`
     : "";
   if (inv.status === "accepted") {
     const listName = inv.list_id ? _getListName(inv.list_id) : null;
-    const addedLabel = listName ? `Added to "${listName}"` : "Accepted";
+    const addedLabel = listName ? `${t('inv_added_to')} "${listName}"` : t('inv_accepted');
     return `${to}<span style="color:#4ade80">${addedLabel}</span>`;
   }
-  if (inv.status === "declined") return `${to}<span style="color:#f87171">Declined</span>`;
-  if (inv.read_at) return `${to}<span style="color:#777">Pending</span>`;
-  return `${to}<span style="color:#555">📤 Sent</span>`;
+  if (inv.status === "declined") return `${to}<span style="color:#f87171">${t('inv_declined')}</span>`;
+  if (inv.read_at) return `${to}<span style="color:#777">${t('inv_pending')}</span>`;
+  return `${to}<span style="color:#555">📤 ${t('inv_sent')}</span>`;
 }
 
 function _receivedStatusHTML(inv) {
-  const from = `<span style="color:var(--accent-text)">↓ from ${inv.from_name || "someone"}</span>`;
+  const from = `<span style="color:var(--accent-text)">↓ ${t('inv_from')} ${inv.from_name || "someone"}</span>`;
   if (inv.status === "accepted") {
     const listName = inv.list_id ? _getListName(inv.list_id) : null;
     // Count distinct lists this film currently lives in (personal + shared)
@@ -5856,12 +5965,12 @@ function _receivedStatusHTML(inv) {
       const fls = _filmListStatus(inv.tmdb_id);
       count = (fls.personalPlanEntry ? 1 : 0) + Object.keys(fls.listEntries).length;
     }
-    const addedLabel = listName ? `Added to "${listName}"` : "Added";
-    const listCount = count >= 2 ? `<span style="color:var(--muted)"> · in ${count} lists</span>` : "";
+    const addedLabel = listName ? `${t('inv_added_to')} "${listName}"` : t('inv_added');
+    const listCount = count >= 2 ? `<span style="color:var(--muted)"> · ${count} ${_listsWord(count)}</span>` : "";
     return `${from}<span style="display:inline-block;width:8px"></span><span style="color:#4ade80">${addedLabel}</span>${listCount}`;
   }
   if (inv.status === "declined") {
-    return `${from}<span style="display:inline-block;width:8px"></span><span style="color:#f87171">Declined</span>`;
+    return `${from}<span style="display:inline-block;width:8px"></span><span style="color:#f87171">${t('inv_declined')}</span>`;
   }
   return from;
 }
@@ -5886,11 +5995,11 @@ function _renderListInvCard(inv) {
 
   let statusLine = '';
   if (isReceived) {
-    statusLine = `<span style="color:var(--accent-text)">↓ ${inv.from_name || 'Someone'} invited you</span>`;
+    statusLine = `<span style="color:var(--accent-text)">↓ ${inv.from_name || 'Someone'} ${t('inv_invited_you')}</span>`;
   } else {
-    if (inv.status === 'accepted') statusLine = `<span style="color:var(--accent-text)">↑ to ${inv.to_name || '?'}</span><span style="display:inline-block;width:8px"></span><span style="color:#4ade80">Accepted</span>`;
-    else if (inv.status === 'declined') statusLine = `<span style="color:var(--accent-text)">↑ to ${inv.to_name || '?'}</span><span style="display:inline-block;width:8px"></span><span style="color:#f87171">Declined</span>`;
-    else statusLine = `<span style="color:var(--accent-text)">↑ to ${inv.to_name || '?'}</span><span style="display:inline-block;width:8px"></span><span style="color:#555">📤 Sent</span>`;
+    if (inv.status === 'accepted') statusLine = `<span style="color:var(--accent-text)">↑ ${t('inv_to')} ${inv.to_name || '?'}</span><span style="display:inline-block;width:8px"></span><span style="color:#4ade80">${t('inv_accepted')}</span>`;
+    else if (inv.status === 'declined') statusLine = `<span style="color:var(--accent-text)">↑ ${t('inv_to')} ${inv.to_name || '?'}</span><span style="display:inline-block;width:8px"></span><span style="color:#f87171">${t('inv_declined')}</span>`;
+    else statusLine = `<span style="color:var(--accent-text)">↑ ${t('inv_to')} ${inv.to_name || '?'}</span><span style="display:inline-block;width:8px"></span><span style="color:#555">📤 ${t('inv_sent')}</span>`;
   }
 
   return `<div class="inv-card${isCardUnread ? ' inv-unread' : ''}" id="inv-card-${inv.id}">
@@ -5900,8 +6009,8 @@ function _renderListInvCard(inv) {
         <div style="font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;line-height:1.2">${inv.title || 'Shared List'}</div>
         <div style="font-size:11px;margin-top:3px">${statusLine}</div>
         ${isPending ? `<div style="display:flex;gap:8px;margin-top:8px;position:relative;z-index:2" onclick="event.stopPropagation()">
-          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','accepted')" style="padding:6px 14px;border-radius:6px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">Join List</button>
-          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','declined')" style="padding:6px 14px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">✕ Decline</button>
+          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','accepted')" style="padding:6px 14px;border-radius:6px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">${t('inv_join_list')}</button>
+          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','declined')" style="padding:6px 14px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">✕ ${t('inv_decline')}</button>
         </div>` : ''}
       </div>
       <button onclick="event.stopPropagation();deleteInvite('${inv.id}')" class="hist-del" style="flex-shrink:0;padding:6px 8px;align-self:flex-start;margin-top:2px">×</button>
@@ -5946,8 +6055,8 @@ function _renderInvCard(inv) {
         </div>
         ${inv.message ? `<div style="color:#aaa;font-size:12px;font-style:italic;margin-top:4px">"${inv.message}"</div>` : ""}
         ${isPending ? `<div style="display:flex;gap:8px;margin-top:8px;position:relative;z-index:2" onclick="event.stopPropagation()">
-          <button onclick="event.stopPropagation();acceptFilmInvite('${inv.id}')" style="padding:6px 14px;border-radius:6px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">+ Add to List</button>
-          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','declined')" style="padding:6px 14px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">✕ Decline</button>
+          <button onclick="event.stopPropagation();acceptFilmInvite('${inv.id}')" style="padding:6px 14px;border-radius:6px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">+ ${t('inv_add_to_list')}</button>
+          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','declined')" style="padding:6px 14px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">✕ ${t('inv_decline')}</button>
         </div>` : ""}
       </div>
     </div>
