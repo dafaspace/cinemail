@@ -2349,7 +2349,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.10</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.11</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -2972,6 +2972,14 @@ async function onSignedIn(user) {
   });
   document.getElementById("main-app").style.display = "block";
   initUI(); // Show correct initial right away
+  // Hydrate from offline cache immediately so the list shows even without a
+  // connection (and instantly, before the network round-trip completes).
+  try {
+    const cachedLists = _cacheLoadLists();
+    if (cachedLists.length) { _listsCache = cachedLists; renderListFilterPills(); renderListTabs(); }
+    const cachedHist = _cacheLoadHistory();
+    if (cachedHist.length) { watchHistory = cachedHist; renderHistory(); }
+  } catch(e) {}
   try { await loadListsCache(); } catch(e) { console.warn('[lists]', e); }
   // Protected history load: don't wipe existing cache with empty result on transient failures
   try {
@@ -3213,6 +3221,25 @@ async function sbFetch(path, opts = {}) {
   return text ? JSON.parse(text) : [];
 }
 
+// ── Offline read cache (localStorage, per user) ───────────────────────────────
+// Step 1 of offline support: keep a local copy of the list + lists so the app
+// shows real data when opened without a connection. Writes still need network.
+function _cacheKey(kind) { return 'cm_cache_' + kind + ':' + (currentUser?.id || 'anon'); }
+function _cacheSaveHistory(arr) {
+  try { localStorage.setItem(_cacheKey('hist'), JSON.stringify(arr || [])); } catch(e) {}
+}
+function _cacheLoadHistory() {
+  try { const v = JSON.parse(localStorage.getItem(_cacheKey('hist')) || '[]'); return Array.isArray(v) ? v : []; }
+  catch(e) { return []; }
+}
+function _cacheSaveLists(arr) {
+  try { localStorage.setItem(_cacheKey('lists'), JSON.stringify(arr || [])); } catch(e) {}
+}
+function _cacheLoadLists() {
+  try { const v = JSON.parse(localStorage.getItem(_cacheKey('lists')) || '[]'); return Array.isArray(v) ? v : []; }
+  catch(e) { return []; }
+}
+
 async function loadHistoryFromDB() {
   const uid = currentUser?.id;
   const sharedIds = (_listsCache || []).map(l => l.id).filter(Boolean);
@@ -3222,7 +3249,7 @@ async function loadHistoryFromDB() {
   }
   const rows = await sbFetch(query);
   if (!Array.isArray(rows)) return watchHistory;
-  return rows.map(r => ({
+  const mapped = rows.map(r => ({
     id: r.id, tmdbID: r.imdb_id, title: r.title, year: r.year,
     poster: r.poster, stars: r.stars || 0, comment: r.comment || "",
     status: r.status || "watched", mediaType: r.media_type || "movie",
@@ -3235,6 +3262,8 @@ async function loadHistoryFromDB() {
     addedBy: r.user_id || null,
     sortOrder: r.sort_order ?? null
   }));
+  _cacheSaveHistory(mapped);
+  return mapped;
 }
 async function saveEntryToDB(entry) {
   await sbFetch("watchlist", { method: "POST", prefer: "return=representation", body: JSON.stringify({
@@ -4587,6 +4616,7 @@ async function loadListsCache() {
     }
 
     _listsCache = _applyListOrder(allLists);
+    _cacheSaveLists(_listsCache);
     renderListFilterPills();
   } catch(e) { console.error('loadListsCache:', e); }
 }
