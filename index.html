@@ -1572,9 +1572,9 @@ body {
   font-size:10px; color:var(--muted);
   text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;
 }
-.avatar-emoji-grid { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
+.avatar-emoji-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; margin-bottom:12px; }
 .avatar-emoji-btn {
-  width:34px; height:34px; border-radius:8px;
+  width:100%; aspect-ratio:1; border-radius:8px;
   border:1.5px solid transparent;
   background:rgba(255,255,255,0.04);
   font-size:19px; cursor:pointer;
@@ -2311,7 +2311,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.2</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3178,9 +3178,9 @@ async function sbFetch(path, opts = {}) {
 async function loadHistoryFromDB() {
   const uid = currentUser?.id;
   const sharedIds = (_listsCache || []).map(l => l.id).filter(Boolean);
-  let query = "watchlist?order=created_at.desc";
+  let query = "watchlist?order=sort_order.asc.nullslast,created_at.desc";
   if (uid && sharedIds.length) {
-    query = `watchlist?or=(user_id.eq.${uid},list_id.in.(${sharedIds.join(',')}))&order=created_at.desc`;
+    query = `watchlist?or=(user_id.eq.${uid},list_id.in.(${sharedIds.join(',')}))&order=sort_order.asc.nullslast,created_at.desc`;
   }
   const rows = await sbFetch(query);
   if (!Array.isArray(rows)) return watchHistory;
@@ -3194,7 +3194,8 @@ async function loadHistoryFromDB() {
     runtime: r.runtime || 0,
     date: new Date(r.created_at).toLocaleDateString("en-GB"),
     listId: r.list_id || null,
-    addedBy: r.user_id || null
+    addedBy: r.user_id || null,
+    sortOrder: r.sort_order ?? null
   }));
 }
 async function saveEntryToDB(entry) {
@@ -4088,8 +4089,15 @@ function renderHistory() {
     el.innerHTML = emptyMsg;
     return;
   }
-  // Apply saved movie order for plan lists
-  if (!isWatchedTab) filtered = _applyMovieOrder(filtered, _activeListId);
+  // Apply sort_order from DB (already sorted by query; this ensures in-memory order matches)
+  if (!isWatchedTab) {
+    filtered = [...filtered].sort((a, b) => {
+      if (a.sortOrder === null && b.sortOrder === null) return 0;
+      if (a.sortOrder === null) return 1;
+      if (b.sortOrder === null) return -1;
+      return a.sortOrder - b.sortOrder;
+    });
+  }
 
   const watched = watchHistory.filter(h => h.status === "watched");
   const plan = watchHistory.filter(h => h.status === "plan");
@@ -4498,9 +4506,9 @@ async function loadListsCache() {
   if (!currentUser) return;
   const uid = currentUser.id;
   try {
-    const { data: owned } = await sbClient.from('lists').select('id,name,owner_id,created_at').eq('owner_id', uid);
+    const { data: owned } = await sbClient.from('lists').select('id,name,owner_id,created_at,sort_order').eq('owner_id', uid);
     const { data: memberships } = await sbClient.from('list_members')
-      .select('list_id,role,lists(id,name,owner_id,created_at)')
+      .select('list_id,role,lists(id,name,owner_id,created_at,sort_order)')
       .eq('user_id', uid);
 
     const memberLists = (memberships || [])
@@ -4563,16 +4571,27 @@ function _getListOrder() {
 }
 function _saveListOrder(ids) {
   try { localStorage.setItem(_listOrderKey(), JSON.stringify(ids)); } catch(e) {}
+  // Persist to DB for cross-device sync
+  const validIds = ids.filter(Boolean);
+  if (sbClient && validIds.length) {
+    sbClient.rpc('update_list_order', { list_ids: validIds, orders: validIds.map((_, i) => i) })
+      .catch(e => console.error('[list-order]', e));
+  }
 }
 function _applyListOrder(lists) {
+  // Prefer DB sort_order (syncs across devices)
+  const hasSortOrder = lists.some(l => l.sort_order !== null && l.sort_order !== undefined);
+  if (hasSortOrder) {
+    return [...lists].sort((a, b) => {
+      const sa = a.sort_order ?? Infinity, sb = b.sort_order ?? Infinity;
+      return sa - sb;
+    });
+  }
+  // Fallback to localStorage for users who haven't reordered yet via new system
   const order = _getListOrder();
   if (!order.length) return lists;
   const pos = id => { const i = order.indexOf(id); return i === -1 ? Infinity : i; };
-  // Stable sort: known order first (by saved index), unknown lists keep original order at the end
-  return [...lists].sort((a, b) => {
-    const pa = pos(a.id), pb = pos(b.id);
-    return pa === pb ? 0 : pa - pb;
-  });
+  return [...lists].sort((a, b) => pos(a.id) - pos(b.id));
 }
 
 function _getListName(listId) {
@@ -4680,6 +4699,11 @@ function _listDragStart(e, tab, row) {
       try { tab.releasePointerCapture(pointerId); } catch(_) {}
       const ids = [...row.querySelectorAll('.list-tab[data-listid]')].map(t => t.dataset.listid);
       _saveListOrder(ids);
+      // Update sort_order in memory so _applyListOrder uses DB path immediately
+      ids.forEach((id, i) => {
+        const l = _listsCache.find(l => l.id === id);
+        if (l) l.sort_order = i;
+      });
       _listsCache = _applyListOrder(_listsCache);
       _listDragState = null;
       tab.addEventListener('click', function sc(ev){ ev.stopImmediatePropagation(); ev.preventDefault(); tab.removeEventListener('click', sc, true); }, true);
@@ -4765,22 +4789,24 @@ function _movieDragStart(e, card) {
     card.classList.remove('movie-dragging');
     try { e.target.releasePointerCapture(pointerId); } catch(_) {}
 
-    // Reorder in DOM and persist
+    // Reorder in DOM
     if (insertBeforeCard) container.insertBefore(card, insertBeforeCard);
     else container.appendChild(card);
 
-    const ids = [...container.querySelectorAll('.hist-card[data-movie-id]')].map(c => c.dataset.movieId);
-    _saveMovieOrder(_activeListId, ids);
+    const rawIds = [...container.querySelectorAll('.hist-card[data-movie-id]')].map(c => c.dataset.movieId);
+    const numIds = rawIds.map(Number);
 
-    // Reorder watchHistory in memory to match
-    const order = ids.map(Number);
-    watchHistory.sort((a, b) => {
-      const ia = order.indexOf(a.id), ib = order.indexOf(b.id);
-      if (ia === -1 && ib === -1) return 0;
-      if (ia === -1) return 1;
-      if (ib === -1) return -1;
-      return ia - ib;
+    // Update sortOrder in memory immediately
+    numIds.forEach((id, i) => {
+      const item = watchHistory.find(h => h.id === id);
+      if (item) item.sortOrder = i;
     });
+
+    // Persist to DB (syncs across devices)
+    if (sbClient && numIds.length) {
+      sbClient.rpc('update_movie_order', { movie_ids: numIds, orders: numIds.map((_, i) => i) })
+        .catch(e => console.error('[movie-order]', e));
+    }
 
     cleanup();
   }
