@@ -2244,7 +2244,7 @@ body {
       <div class="sheet-label" id="add-modal-label">ADD TO HISTORY</div>
       <div class="sheet-title" id="add-movie-title"></div>
       <div id="add-stars-section">
-        <div class="add-label">Your Rating</div>
+        <div class="add-label" data-i18n="your_rating">Your Rating</div>
         <div class="stars-row" id="stars-row">
           <span class="star" onclick="setStar(1)">★</span>
           <span class="star" onclick="setStar(2)">★</span>
@@ -2252,12 +2252,12 @@ body {
           <span class="star" onclick="setStar(4)">★</span>
           <span class="star" onclick="setStar(5)">★</span>
         </div>
-        <div class="add-label">Notes</div>
-        <textarea id="add-note" placeholder="What did you think?" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+        <div class="add-label" data-i18n="notes">Notes</div>
+        <textarea id="add-note" data-i18n-ph="note_ph" placeholder="What did you think?" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       </div>
       <div style="display:flex;gap:9px">
-        <button class="btn-modal-close" onclick="closeAdd()">Cancel</button>
-        <button class="btn-modal-save" id="add-confirm-btn" onclick="confirmAdd()">Save</button>
+        <button class="btn-modal-close" onclick="closeAdd()" data-i18n="cancel">Cancel</button>
+        <button class="btn-modal-save" id="add-confirm-btn" onclick="confirmAdd()" data-i18n="save">Save</button>
       </div>
     </div>
   </div>
@@ -2267,9 +2267,9 @@ body {
 <div id="edit-overlay" class="overlay" style="display:none" onclick="closeEdit()">
   <div style="padding:20px;width:100%;display:flex;justify-content:center" onclick="event.stopPropagation()">
     <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="sheet-label" style="color:var(--primary)">EDIT REVIEW</div>
+      <div class="sheet-label" style="color:var(--primary)" data-i18n="edit_modal_title">EDIT REVIEW</div>
       <div class="sheet-title" id="edit-movie-title"></div>
-      <div class="add-label">Rating</div>
+      <div class="add-label" data-i18n="your_rating">Rating</div>
       <div class="stars-row" id="edit-stars-row">
         <span class="star" id="edit-star-1" onclick="setEditStar(1)">★</span>
         <span class="star" id="edit-star-2" onclick="setEditStar(2)">★</span>
@@ -2277,11 +2277,11 @@ body {
         <span class="star" id="edit-star-4" onclick="setEditStar(4)">★</span>
         <span class="star" id="edit-star-5" onclick="setEditStar(5)">★</span>
       </div>
-      <div class="add-label">Notes</div>
-      <textarea id="edit-note" placeholder="What did you think?" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      <div class="add-label" data-i18n="notes">Notes</div>
+      <textarea id="edit-note" data-i18n-ph="note_ph" placeholder="What did you think?" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       <div style="display:flex;gap:9px">
-        <button class="btn-modal-close" onclick="closeEdit()">Cancel</button>
-        <button class="btn-modal-save" id="edit-confirm-btn" onclick="confirmEdit()">Save</button>
+        <button class="btn-modal-close" onclick="closeEdit()" data-i18n="cancel">Cancel</button>
+        <button class="btn-modal-save" id="edit-confirm-btn" onclick="confirmEdit()" data-i18n="save">Save</button>
       </div>
     </div>
   </div>
@@ -2291,15 +2291,15 @@ body {
 <div id="share-overlay" class="overlay" style="display:none" onclick="closeShare()">
   <div style="padding:20px;width:100%;display:flex;justify-content:center" onclick="event.stopPropagation()">
     <div class="modal-sheet" style="border-color:var(--accent-border)" onclick="event.stopPropagation()">
-      <div class="sheet-label" style="color:var(--accent-text)">RECOMMEND A FILM</div>
+      <div class="sheet-label" style="color:var(--accent-text)" data-i18n="share_modal_title">RECOMMEND A FILM</div>
       <div class="sheet-title" id="share-movie-title"></div>
-      <div class="add-label">Send to</div>
+      <div class="add-label" data-i18n="send_to">Send to</div>
       <div id="share-friends-list" style="margin-bottom:12px;max-height:170px;overflow-y:auto"></div>
-      <div class="add-label">Message (optional)</div>
-      <textarea id="share-message" placeholder="Why you'd love this…" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:55px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--accent-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      <div class="add-label" data-i18n="msg_opt">Message (optional)</div>
+      <textarea id="share-message" data-i18n-ph="share_msg_ph" placeholder="Why you'd love this…" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:55px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--accent-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       <div style="display:flex;gap:9px">
-        <button class="btn-modal-close" onclick="closeShare()">Cancel</button>
-        <button id="share-confirm-btn" onclick="confirmShare()" style="flex:2;padding:10px;border-radius:9px;background:var(--accent);border:none;color:#fff;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer">Send</button>
+        <button class="btn-modal-close" onclick="closeShare()" data-i18n="cancel">Cancel</button>
+        <button id="share-confirm-btn" onclick="confirmShare()" style="flex:2;padding:10px;border-radius:9px;background:var(--accent);border:none;color:#fff;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer" data-i18n="send_btn">Send</button>
       </div>
     </div>
   </div>
@@ -2414,7 +2414,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.15</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.16</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -2433,9 +2433,9 @@ body {
   <div style="padding:20px;width:100%;display:flex;justify-content:center" onclick="event.stopPropagation()">
     <div class="modal-sheet" style="max-width:360px" onclick="event.stopPropagation()">
       <div class="modal-handle"></div>
-      <div style="font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:19px;letter-spacing:0.5px;margin-bottom:14px;color:var(--text)">Add to List</div>
+      <div style="font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:19px;letter-spacing:0.5px;margin-bottom:14px;color:var(--text)" data-i18n="list_picker_title">Add to List</div>
       <div id="list-picker-options"></div>
-      <button class="btn-modal-close" onclick="closeListPicker()" style="margin-top:4px">Cancel</button>
+      <button class="btn-modal-close" onclick="closeListPicker()" style="margin-top:4px" data-i18n="cancel">Cancel</button>
     </div>
   </div>
 </div>
@@ -2472,7 +2472,7 @@ body {
         </div>
 
         <div style="display:flex;gap:9px;margin-bottom:14px">
-          <button class="btn-modal-close" onclick="closeFeedback()">Cancel</button>
+          <button class="btn-modal-close" onclick="closeFeedback()" data-i18n="cancel">Cancel</button>
           <button class="btn-modal-save" id="fb-submit-btn" onclick="submitFeedback()">SEND</button>
         </div>
       </div>
@@ -2829,6 +2829,14 @@ const _I18N_EXTRA = {
     reset_title:"Set New Password", reset_newpass:"New Password", reset_confirm:"Confirm Password", reset_update:"Update Password",
     reset_email_sent:"We sent a password reset link to", reset_done:"Password updated",
     err_enter_email:"Please enter your email.", err_pass_short:"Password must be at least 6 characters.", err_pass_match:"Passwords don't match.",
+    cancel:"Cancel", accept:"Accept", copy:"Copy", share_invite:"Share invite",
+    friend_wants:"wants to be friends", no_members:"No members yet",
+    no_lists:"No lists yet. Create one to share with friends.",
+    no_friends_share:"No friends yet - use Share link to invite anyone",
+    select_friend_invite:"Select a friend to invite:", add_friends_first:"Add friends first to invite them",
+    invite_valid_48:"Valid for 48 hours", invite_connect_hint:"When they open it, you'll connect as friends in one tap.",
+    join_list_q:"Join the list", join_invited_sub:"You've been invited to a shared movie list",
+    list_picker_title:"Add to List", filter_friends:"Filter friends…", searching:"Searching…", not_found:"Not found", friends_empty:"No friends yet. Use the invite link below to add the people you watch with.", friend_remove_suffix:"— remove from friends?", friends_no_match:"No friends match", edit_modal_title:"EDIT REVIEW", share_modal_title:"RECOMMEND A FILM", send_btn:"Send", note_ph:"What did you think?", share_msg_ph:"Why you'd love this…", add_modal_seen:"MARK AS SEEN", add_modal_list:"ADD TO LIST",
   },
   ru: {
     empty_search_title:"Найди свой следующий фильм", recs_ph:"Настроение, жанр, что угодно…", empty_search_sub:"Введи название и нажми Поиск",
@@ -2843,6 +2851,14 @@ const _I18N_EXTRA = {
     reset_title:"Новый пароль", reset_newpass:"Новый пароль", reset_confirm:"Повтори пароль", reset_update:"Обновить пароль",
     reset_email_sent:"Мы отправили ссылку для сброса пароля на", reset_done:"Пароль обновлён",
     err_enter_email:"Введи email.", err_pass_short:"Пароль минимум 6 символов.", err_pass_match:"Пароли не совпадают.",
+    cancel:"Отмена", accept:"Принять", copy:"Копировать", share_invite:"Поделиться",
+    friend_wants:"хочет добавить в друзья", no_members:"Пока нет участников",
+    no_lists:"Пока нет списков. Создай, чтобы делиться с друзьями.",
+    no_friends_share:"Друзей пока нет - поделись ссылкой, чтобы пригласить",
+    select_friend_invite:"Выбери друга для приглашения:", add_friends_first:"Сначала добавь друзей, чтобы приглашать",
+    invite_valid_48:"Действует 48 часов", invite_connect_hint:"Когда откроют - вы добавитесь в друзья одним касанием.",
+    join_list_q:"Вступить в список", join_invited_sub:"Тебя пригласили в общий список фильмов",
+    list_picker_title:"В список", filter_friends:"Фильтр друзей…", searching:"Поиск…", not_found:"Не найдено", friends_empty:"Друзей пока нет. Используй ссылку-приглашение ниже, чтобы добавить тех, с кем смотришь.", friend_remove_suffix:"— убрать из друзей?", friends_no_match:"Нет друзей по запросу", edit_modal_title:"РЕДАКТИРОВАТЬ ОТЗЫВ", share_modal_title:"ПОСОВЕТОВАТЬ ФИЛЬМ", send_btn:"Отправить", note_ph:"Что думаешь?", share_msg_ph:"Почему тебе это понравится…", add_modal_seen:"ОТМЕТИТЬ ПРОСМОТРЕННЫМ", add_modal_list:"ДОБАВИТЬ В СПИСОК",
   },
   uk: {
     empty_search_title:"Знайди свій наступний фільм", recs_ph:"Настрій, жанр, будь-що…", empty_search_sub:"Введи назву і натисни Пошук",
@@ -2857,6 +2873,14 @@ const _I18N_EXTRA = {
     reset_title:"Новий пароль", reset_newpass:"Новий пароль", reset_confirm:"Повтори пароль", reset_update:"Оновити пароль",
     reset_email_sent:"Ми надіслали посилання для скидання пароля на", reset_done:"Пароль оновлено",
     err_enter_email:"Введи email.", err_pass_short:"Пароль щонайменше 6 символів.", err_pass_match:"Паролі не збігаються.",
+    cancel:"Скасувати", accept:"Прийняти", copy:"Копіювати", share_invite:"Поділитися",
+    friend_wants:"хоче додати в друзі", no_members:"Поки немає учасників",
+    no_lists:"Поки немає списків. Створи, щоб ділитися з друзями.",
+    no_friends_share:"Друзів поки немає - поділись посиланням, щоб запросити",
+    select_friend_invite:"Обери друга для запрошення:", add_friends_first:"Спершу додай друзів, щоб запрошувати",
+    invite_valid_48:"Дійсне 48 годин", invite_connect_hint:"Коли відкриють - ви додастеся в друзі одним дотиком.",
+    join_list_q:"Приєднатися до списку", join_invited_sub:"Тебе запросили до спільного списку фільмів",
+    list_picker_title:"До списку", filter_friends:"Фільтр друзів…", searching:"Пошук…", not_found:"Не знайдено", friends_empty:"Друзів поки немає. Скористайся посиланням нижче, щоб додати тих, з ким дивишся.", friend_remove_suffix:"— прибрати з друзів?", friends_no_match:"Немає друзів за запитом", edit_modal_title:"РЕДАГУВАТИ ВІДГУК", share_modal_title:"ПОРАДИТИ ФІЛЬМ", send_btn:"Надіслати", note_ph:"Що думаєш?", share_msg_ph:"Чому тобі це сподобається…", add_modal_seen:"ПОЗНАЧИТИ ПЕРЕГЛЯНУТИМ", add_modal_list:"ДОДАТИ ДО СПИСКУ",
   },
   ka: {
     empty_search_title:"იპოვე შენი შემდეგი ფილმი", recs_ph:"განწყობა, ჟანრი ან ნებისმიერი…", empty_search_sub:"აკრიფე სათაური და დააჭირე ძიებას",
@@ -2871,6 +2895,14 @@ const _I18N_EXTRA = {
     reset_title:"ახალი პაროლი", reset_newpass:"ახალი პაროლი", reset_confirm:"გაიმეორე პაროლი", reset_update:"პაროლის განახლება",
     reset_email_sent:"პაროლის აღდგენის ბმული გავაგზავნეთ მისამართზე", reset_done:"პაროლი განახლდა",
     err_enter_email:"შეიყვანე email.", err_pass_short:"პაროლი მინიმუმ 6 სიმბოლო.", err_pass_match:"პაროლები არ ემთხვევა.",
+    cancel:"გაუქმება", accept:"მიღება", copy:"კოპირება", share_invite:"გაზიარება",
+    friend_wants:"უნდა დაგიმეგობრდეს", no_members:"ჯერ წევრები არ არის",
+    no_lists:"ჯერ სიები არ არის. შექმენი მეგობრებთან გასაზიარებლად.",
+    no_friends_share:"ჯერ მეგობრები არ არის - გააზიარე ბმული მოსაწვევად",
+    select_friend_invite:"აირჩიე მოსაწვევი მეგობარი:", add_friends_first:"ჯერ დაამატე მეგობრები მოსაწვევად",
+    invite_valid_48:"მოქმედებს 48 საათი", invite_connect_hint:"გახსნისას ერთი შეხებით დაუმეგობრდებით.",
+    join_list_q:"სიაში გაწევრიანება", join_invited_sub:"მოგიწვიეს საერთო ფილმების სიაში",
+    list_picker_title:"სიაში დამატება", filter_friends:"გაფილტრე მეგობრები…", searching:"ძიება…", not_found:"ვერ მოიძებნა", friends_empty:"ჯერ მეგობრები არ არის. გამოიყენე ქვემოთ მოცემული ბმული, რომ დაამატო ისინი, ვისთანაც უყურებ.", friend_remove_suffix:"— ამოშალო მეგობრებიდან?", friends_no_match:"ვერ მოიძებნა მეგობარი", edit_modal_title:"შეფასების რედაქტირება", share_modal_title:"ფილმის რეკომენდაცია", send_btn:"გაგზავნა", note_ph:"რას ფიქრობ?", share_msg_ph:"რატომ მოგეწონება…", add_modal_seen:"მონიშნე ნანახად", add_modal_list:"სიაში დამატება",
   },
   es: {
     empty_search_title:"Encuentra tu próxima película", recs_ph:"Estado de ánimo, género o lo que sea…", empty_search_sub:"Escribe un título y pulsa Buscar",
@@ -2885,6 +2917,14 @@ const _I18N_EXTRA = {
     reset_title:"Nueva contraseña", reset_newpass:"Nueva contraseña", reset_confirm:"Confirmar contraseña", reset_update:"Actualizar contraseña",
     reset_email_sent:"Enviamos un enlace para restablecer tu contraseña a", reset_done:"Contraseña actualizada",
     err_enter_email:"Introduce tu email.", err_pass_short:"La contraseña debe tener al menos 6 caracteres.", err_pass_match:"Las contraseñas no coinciden.",
+    cancel:"Cancelar", accept:"Aceptar", copy:"Copiar", share_invite:"Compartir",
+    friend_wants:"quiere ser tu amigo", no_members:"Aún no hay miembros",
+    no_lists:"Aún no hay listas. Crea una para compartir con amigos.",
+    no_friends_share:"Aún no tienes amigos - comparte el enlace para invitar",
+    select_friend_invite:"Elige un amigo para invitar:", add_friends_first:"Añade amigos primero para invitarlos",
+    invite_valid_48:"Válido 48 horas", invite_connect_hint:"Cuando lo abran, os conectaréis como amigos al instante.",
+    join_list_q:"Unirse a la lista", join_invited_sub:"Te han invitado a una lista compartida de películas",
+    list_picker_title:"Añadir a lista", filter_friends:"Filtrar amigos…", searching:"Buscando…", not_found:"No encontrado", friends_empty:"Aún no tienes amigos. Usa el enlace de invitación de abajo para añadir a quienes ves películas.", friend_remove_suffix:"— ¿quitar de amigos?", friends_no_match:"Sin coincidencias", edit_modal_title:"EDITAR RESEÑA", share_modal_title:"RECOMENDAR UNA PELÍCULA", send_btn:"Enviar", note_ph:"¿Qué te pareció?", share_msg_ph:"Por qué te encantará…", add_modal_seen:"MARCAR COMO VISTA", add_modal_list:"AÑADIR A LISTA",
   },
   fr: {
     empty_search_title:"Trouvez votre prochain film", recs_ph:"Humeur, genre ou autre…", empty_search_sub:"Saisissez un titre et appuyez sur Rechercher",
@@ -2899,6 +2939,14 @@ const _I18N_EXTRA = {
     reset_title:"Nouveau mot de passe", reset_newpass:"Nouveau mot de passe", reset_confirm:"Confirmer le mot de passe", reset_update:"Mettre à jour le mot de passe",
     reset_email_sent:"Nous avons envoyé un lien de réinitialisation à", reset_done:"Mot de passe mis à jour",
     err_enter_email:"Saisis ton email.", err_pass_short:"Le mot de passe doit comporter au moins 6 caractères.", err_pass_match:"Les mots de passe ne correspondent pas.",
+    cancel:"Annuler", accept:"Accepter", copy:"Copier", share_invite:"Partager",
+    friend_wants:"veut devenir ami", no_members:"Aucun membre pour l'instant",
+    no_lists:"Aucune liste. Créez-en une à partager avec des amis.",
+    no_friends_share:"Pas encore d'amis - partage le lien pour inviter",
+    select_friend_invite:"Choisis un ami à inviter :", add_friends_first:"Ajoute d'abord des amis pour les inviter",
+    invite_valid_48:"Valable 48 heures", invite_connect_hint:"À l'ouverture, vous deviendrez amis en un clic.",
+    join_list_q:"Rejoindre la liste", join_invited_sub:"Tu es invité à une liste de films partagée",
+    list_picker_title:"Ajouter à la liste", filter_friends:"Filtrer les amis…", searching:"Recherche…", not_found:"Introuvable", friends_empty:"Pas encore d'amis. Utilise le lien d'invitation ci-dessous pour ajouter tes compagnons de visionnage.", friend_remove_suffix:"— retirer des amis ?", friends_no_match:"Aucun ami trouvé", edit_modal_title:"MODIFIER L'AVIS", share_modal_title:"RECOMMANDER UN FILM", send_btn:"Envoyer", note_ph:"Qu'en as-tu pensé ?", share_msg_ph:"Pourquoi tu vas adorer…", add_modal_seen:"MARQUER COMME VU", add_modal_list:"AJOUTER À LA LISTE",
   },
 };
 Object.keys(_I18N_EXTRA).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_EXTRA[l]); });
@@ -2925,6 +2973,17 @@ function _listsWord(n) {
     en:['list','lists'], es:['lista','listas'], fr:['liste','listes'], ka:['სია','სია'],
     ru:['список','списка','списков'], uk:['список','списки','списків'],
   })[_lang] || ['list','lists'];
+  if (forms.length === 2) return n === 1 ? forms[0] : forms[1];
+  const n10 = n % 10, n100 = n % 100;
+  if (n10 === 1 && n100 !== 11) return forms[0];
+  if (n10 >= 2 && n10 <= 4 && (n100 < 10 || n100 >= 20)) return forms[1];
+  return forms[2];
+}
+function _friendsWord(n) {
+  const forms = ({
+    en:['friend','friends'], es:['amigo','amigos'], fr:['ami','amis'], ka:['მეგობარი','მეგობარი'],
+    ru:['друг','друга','друзей'], uk:['друг','друзі','друзів'],
+  })[_lang] || ['friend','friends'];
   if (forms.length === 2) return n === 1 ? forms[0] : forms[1];
   const n10 = n % 10, n100 = n % 100;
   if (n10 === 1 && n100 !== 11) return forms[0];
@@ -4260,7 +4319,7 @@ function openAdd(movie, status, listId) {
   currentAddListId = listId || null;
   document.getElementById("add-movie-title").textContent = `${movie.Title} (${movie.Year})`;
   const listLabel = currentAddListId ? ` → ${_getListName(currentAddListId)}` : '';
-  document.getElementById("add-modal-label").textContent = status === "plan" ? `ADD TO LIST${listLabel}` : "MARK AS SEEN";
+  document.getElementById("add-modal-label").textContent = status === "plan" ? `${t('add_modal_list')}${listLabel}` : t('add_modal_seen');
   document.getElementById("add-stars-section").style.display = status === "plan" ? "none" : "block";
   document.getElementById("add-note").value = "";
   renderStars(0);
@@ -4663,8 +4722,8 @@ function renderFriendsSection() {
       const name = f.user_name || "?";
       html += `<div class="friend-row">
         ${_avatarMarkup(f.user_id, name, 30)}
-        <div style="flex:1;font-size:13px">${name} <span style="color:var(--muted);font-size:11px">wants to be friends</span></div>
-        <button onclick="respondFriendRequest('${f.id}','accepted')" style="background:var(--accent);border:none;color:#fff;border-radius:6px;padding:4px 10px;font-size:11px;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">Accept</button>
+        <div style="flex:1;font-size:13px">${name} <span style="color:var(--muted);font-size:11px">${t('friend_wants')}</span></div>
+        <button onclick="respondFriendRequest('${f.id}','accepted')" style="background:var(--accent);border:none;color:#fff;border-radius:6px;padding:4px 10px;font-size:11px;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${t('accept')}</button>
         <button onclick="respondFriendRequest('${f.id}','declined')" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#666;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;margin-left:4px">✕</button>
       </div>`;
     }
@@ -4680,9 +4739,9 @@ function renderFriendsSection() {
     const shown = q ? sorted.filter(f => _friendInfo(f).name.toLowerCase().includes(q)) : sorted;
     if (many) {
       html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <span style="font-size:11px;color:var(--muted)">${sorted.length} friends</span>
+        <span style="font-size:11px;color:var(--muted)">${sorted.length} ${_friendsWord(sorted.length)}</span>
       </div>
-      <input type="text" id="friend-filter-input" value="${(_friendFilter||'').replace(/"/g,'&quot;')}" placeholder="Filter friends…"
+      <input type="text" id="friend-filter-input" value="${(_friendFilter||'').replace(/"/g,'&quot;')}" placeholder="${t('filter_friends')}"
         oninput="_friendFilter=this.value;renderFriendsSection()"
         style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:13px;padding:7px 12px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:8px;box-sizing:border-box">`;
     }
@@ -4692,25 +4751,25 @@ function renderFriendsSection() {
       if (_friendDeleteConfirmFid === fid) {
         // Confirm row
         html += `<div class="friend-row" style="background:rgba(248,113,113,0.06);border-radius:8px;padding:8px 10px;gap:8px">
-          <div style="flex:1;font-size:12px;color:#f87171">Remove <strong>${name}</strong> from friends?</div>
+          <div style="flex:1;font-size:12px;color:#f87171"><strong>${name}</strong> ${t('friend_remove_suffix')}</div>
           <button onclick="event.stopPropagation();deleteFriendConfirmed('${fid}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${t('list_remove')}</button>
-          <button onclick="event.stopPropagation();_friendDeleteConfirmFid=null;renderFriendsSection()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#aaa;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer">Cancel</button>
+          <button onclick="event.stopPropagation();_friendDeleteConfirmFid=null;renderFriendsSection()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#aaa;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer">${t('cancel')}</button>
         </div>`;
       } else {
         html += `<div class="friend-row">
           ${_avatarMarkup(id, name, 30)}
           <div style="flex:1;font-size:13px">${name}</div>
           <button onclick="event.stopPropagation();_friendDeleteConfirmFid='${fid}';renderFriendsSection()"
-            style="background:none;border:none;color:#555;font-size:18px;line-height:1;cursor:pointer;padding:6px 8px;margin:-6px -4px" title="Remove">×</button>
+            style="background:none;border:none;color:#555;font-size:18px;line-height:1;cursor:pointer;padding:6px 8px;margin:-6px -4px" title="${t('list_remove')}">×</button>
         </div>`;
       }
     }
-    if (!shown.length && q) html += `<div style="color:var(--muted);font-size:12px;padding:4px 0">No friends match "${q.replace(/</g,'&lt;')}"</div>`;
+    if (!shown.length && q) html += `<div style="color:var(--muted);font-size:12px;padding:4px 0">${t('friends_no_match')} "${q.replace(/</g,'&lt;')}"</div>`;
     html += `</div>`;
   }
 
   if (!html) {
-    html = `<div style="color:var(--muted);font-size:12px;padding:4px 0">No friends yet. Use the invite link below to add the people you watch with.</div>`;
+    html = `<div style="color:var(--muted);font-size:12px;padding:4px 0">${t('friends_empty')}</div>`;
   }
   el.innerHTML = html;
   // Keep focus + caret in the filter box across re-renders
@@ -5207,7 +5266,7 @@ function renderListManageStrip() {
       <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(248,113,113,0.06);border-radius:10px;border:1px solid rgba(248,113,113,0.15)">
         <span style="flex:1;font-size:12px;color:#f87171">${isOwner ? t('list_delete') : t('list_leave')} <strong>${list.name}</strong>?</span>
         <button onclick="confirmListDelete('${list.id}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${isOwner ? t('list_delete') : t('list_leave')}</button>
-        <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#aaa;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer">Cancel</button>
+        <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#aaa;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer">${t('cancel')}</button>
       </div>`;
     return;
   }
@@ -5218,7 +5277,7 @@ function renderListManageStrip() {
         <input id="list-rename-input" type="text" value="${list.name.replace(/"/g,'&quot;')}"
           style="flex:1;padding:7px 12px;border-radius:9px;border:1px solid var(--accent-border);background:rgba(124,58,237,0.08);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none"
           onkeydown="if(event.key==='Enter')renameList('${list.id}');if(event.key==='Escape'){_listManageMode=null;renderListManageStrip();}">
-        <button onclick="renameList('${list.id}')" style="padding:7px 14px;border-radius:9px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Save</button>
+        <button onclick="renameList('${list.id}')" style="padding:7px 14px;border-radius:9px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">${t('save')}</button>
         <button onclick="_listManageMode=null;renderListManageStrip()" style="padding:7px 10px;border-radius:9px;background:none;border:1px solid var(--border);color:#666;font-size:13px;cursor:pointer">✕</button>
       </div>`;
     setTimeout(() => { const i = document.getElementById('list-rename-input'); if(i){i.focus();i.select();} }, 50);
@@ -5237,7 +5296,7 @@ function renderListManageStrip() {
           const fi = _friendInfo(f);
           return `<button data-uid="${fi.id}" data-name="${fi.name.replace(/"/g,'&quot;')}" onclick="_doInviteToList('${list.id}',this)"
             style="display:block;width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;padding:8px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:4px">${fi.name}</button>`;
-        }).join('') : '<div style="font-size:12px;color:var(--muted);padding:4px 0">No friends yet — use Share Link to invite anyone</div>'}
+        }).join('') : `<div style="font-size:12px;color:var(--muted);padding:4px 0">${t('no_friends_share')}</div>`}
       </div>`;
     return;
   }
@@ -5263,7 +5322,7 @@ function renderListManageStrip() {
         <span style="font-size:12px;color:var(--muted)">${t('list_members_title')} · <strong style="color:var(--text)">${list.name}</strong></span>
         <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;padding:2px 4px">×</button>
       </div>
-      ${rows || '<div style="font-size:12px;color:var(--muted);padding:4px 0">No members yet</div>'}
+      ${rows || `<div style="font-size:12px;color:var(--muted);padding:4px 0">${t('no_members')}</div>`}
     </div>`;
     return;
   }
@@ -5308,7 +5367,7 @@ function renderListsSection() {
   const el = document.getElementById('lists-section');
   if (!el) return;
   if (!_listsCache.length) {
-    el.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:4px 0 8px">No lists yet. Create one to share with friends.</div>';
+    el.innerHTML = `<div style="color:var(--muted);font-size:12px;padding:4px 0 8px">${t('no_lists')}</div>`;
     return;
   }
   let html = '';
@@ -5319,7 +5378,7 @@ function renderListsSection() {
       html += `<div class="list-row" style="background:rgba(248,113,113,0.06);border-radius:8px;padding:8px 10px;gap:8px">
         <div style="flex:1;font-size:12px;color:#f87171">${isOwner ? t('list_delete') : t('list_leave')} <strong>${list.name}</strong>?</div>
         <button onclick="confirmListDelete('${list.id}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${isOwner ? t('list_delete') : t('list_leave')}</button>
-        <button onclick="_listDeleteConfirmId=null;renderListsSection()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#aaa;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer">Cancel</button>
+        <button onclick="_listDeleteConfirmId=null;renderListsSection()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#aaa;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer">${t('cancel')}</button>
       </div>`;
     } else if (_listInviteTargetId === list.id) {
       const avail = _friendsCache;
@@ -5328,14 +5387,14 @@ function renderListsSection() {
           <span style="font-size:13px;font-weight:600;flex:1">${list.name}</span>
           <button onclick="event.stopPropagation();_listInviteTargetId=null;renderListsSection()" style="background:none;border:none;color:#555;font-size:18px;line-height:1;cursor:pointer;padding:4px 6px">×</button>
         </div>
-        <div style="font-size:11px;color:var(--muted)">Select a friend to invite:</div>
+        <div style="font-size:11px;color:var(--muted)">${t('select_friend_invite')}</div>
         ${avail.length ? avail.map(f => {
           const fi = _friendInfo(f);
           const nm = fi.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
           const ln = list.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
           return `<button onclick="event.stopPropagation();inviteToList('${list.id}','${fi.id}','${nm}','${ln}')"
             style="width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;padding:7px 10px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:4px">${fi.name}</button>`;
-        }).join('') : '<div style="font-size:12px;color:var(--muted)">Add friends first to invite them</div>'}
+        }).join('') : `<div style="font-size:12px;color:var(--muted)">${t('add_friends_first')}</div>`}
       </div>`;
     } else {
       html += `<div class="list-row">
@@ -5418,12 +5477,12 @@ async function toggleAppInvite() {
   const msg = `${myName} invited you to Cinemail. Track films, get personalised picks and share with friends.`;
   panel.innerHTML = `
     <img src="${_qrURL(url,150)}" width="150" height="150" style="border-radius:10px;margin:0 auto 8px;display:block">
-    <div style="font-size:11px;color:var(--muted);margin-bottom:10px">When they open it, you'll connect as friends in one tap.</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:10px">${t('invite_connect_hint')}</div>
     <div style="display:flex;gap:8px">
       <button onclick='_shareOrCopy(${JSON.stringify(url)}, "Cinemail", ${JSON.stringify(msg)})'
-        style="flex:2;padding:9px;border-radius:8px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue','Oswald',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;font-weight:600">Share invite</button>
+        style="flex:2;padding:9px;border-radius:8px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue','Oswald',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;font-weight:600">${t('share_invite')}</button>
       <button onclick='navigator.clipboard.writeText(${JSON.stringify(url)}).then(()=>showToast("Link copied!"))'
-        style="flex:1;padding:9px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">Copy</button>
+        style="flex:1;padding:9px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">${t('copy')}</button>
     </div>`;
   panel.style.display = 'block';
 }
@@ -5493,16 +5552,12 @@ async function _loadInviteLink(listId) {
     const msg = `${myName} shared the "${listName}" list with you on Cinemail. Open it to see what's inside.`;
     el.innerHTML = `
       <img src="${_qrURL(url,160)}" style="border-radius:10px;margin-bottom:10px;display:block;margin-left:auto;margin-right:auto" width="160" height="160">
-      <div style="font-size:10px;color:var(--muted);margin-bottom:10px">Valid for 48 hours</div>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:10px">${t('invite_valid_48')}</div>
       <div style="display:flex;gap:8px">
         <button onclick='_shareOrCopy(${JSON.stringify(url)}, "Cinemail", ${JSON.stringify(msg)})'
-          style="flex:2;padding:9px;border-radius:8px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer">
-          Share
-        </button>
+          style="flex:2;padding:9px;border-radius:8px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer">${t('share_invite')}</button>
         <button onclick='navigator.clipboard.writeText(${JSON.stringify(url)}).then(()=>showToast("Link copied!"))'
-          style="flex:1;padding:9px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">
-          Copy
-        </button>
+          style="flex:1;padding:9px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">${t('copy')}</button>
       </div>`;
   } catch(e) { if (el) el.innerHTML = `<div style="font-size:12px;color:#f87171">${e.message}</div>`; }
 }
@@ -5539,13 +5594,13 @@ function _showJoinConfirm(tokenId, listId, listName) {
   const safeName = listName.replace(/'/g,"\\'");
   ov.innerHTML = `<div style="background:var(--surface2);border-radius:18px;padding:26px 22px;max-width:320px;width:100%;text-align:center">
     <div style="font-size:36px;margin-bottom:12px">📋</div>
-    <div style="font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:22px;margin-bottom:6px">Join "${listName}"?</div>
-    <div style="font-size:13px;color:var(--muted);margin-bottom:22px">You've been invited to a shared movie list</div>
+    <div style="font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:22px;margin-bottom:6px">${t('join_list_q')} "${listName}"?</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:22px">${t('join_invited_sub')}</div>
     <div style="display:flex;gap:10px">
       <button onclick="_confirmJoin('${tokenId}','${listId}','${safeName}')"
         style="flex:1;padding:13px;border-radius:10px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:16px;cursor:pointer;letter-spacing:1px">${t('inv_join_list')}</button>
       <button onclick="document.getElementById('join-confirm-overlay').remove()"
-        style="flex:1;padding:13px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--muted);font-size:14px;cursor:pointer">Decline</button>
+        style="flex:1;padding:13px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--muted);font-size:14px;cursor:pointer">${t('inv_decline')}</button>
     </div>
   </div>`;
   document.body.appendChild(ov);
