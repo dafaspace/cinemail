@@ -2263,12 +2263,15 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.11.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.12.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" data-i18n="close" onclick="closeAccount()">Close</button>
         <button class="btn-modal-close" data-i18n="sign_out" onclick="closeAccount();signOut();" style="color:#f87171;border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.05)">Sign Out</button>
+      </div>
+      <div style="margin-top:10px;text-align:center">
+        <button onclick="confirmDeleteAccount()" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;opacity:0.6;font-family:'DM Sans',sans-serif" data-i18n="delete_account">Delete account</button>
       </div>
     </div>
   </div>
@@ -2389,6 +2392,7 @@ const I18N = {
     search_ph:"Movie or series title…",
     friend_search_ph:"Search by name to add…",
     invite_to_app:"✨ Invite friends to Cinemail",
+    delete_account:"Delete account",
     replay_onboarding:"🎬 Replay Welcome Tour",
     support_title:"Support Cinemail",
     support_text:"Early supporters get lifetime Pro features free when Cinemail goes paid on the App Store &amp; Google Play.",
@@ -2440,6 +2444,7 @@ const I18N = {
     search_ph:"Название фильма или сериала…",
     friend_search_ph:"Поиск по имени…",
     invite_to_app:"✨ Пригласить друзей в Cinemail",
+    delete_account:"Удалить аккаунт",
     replay_onboarding:"🎬 Пройти тур заново",
     support_title:"Поддержать Cinemail",
     support_text:"Поддержавшие на этом этапе получат пожизненный Pro бесплатно, когда Cinemail станет платным в App Store и Google Play.",
@@ -2491,6 +2496,7 @@ const I18N = {
     search_ph:"Назва фільму чи серіалу…",
     friend_search_ph:"Шукай за ім'ям…",
     invite_to_app:"✨ Запросити друзів у Cinemail",
+    delete_account:"Видалити акаунт",
     replay_onboarding:"🎬 Повторити знайомство",
     support_title:"Підтримати Cinemail",
     support_text:"Ранні прихильники отримають Pro назавжди безкоштовно, коли Cinemail стане платним в App Store та Google Play.",
@@ -2542,6 +2548,7 @@ const I18N = {
     search_ph:"ფილმის ან სერიალის სახელი…",
     friend_search_ph:"მოძებნე სახელით…",
     invite_to_app:"✨ მოიწვიე მეგობრები Cinemail-ში",
+    delete_account:"ანგარიშის წაშლა",
     replay_onboarding:"🎬 გაცნობის გამეორება",
     support_title:"დაუჭირე მხარი Cinemail-ს",
     support_text:"ადრეული მხარდამჭერები მიიღებენ Pro-ს სამუდამოდ უფასოდ, როცა Cinemail გახდება ფასიანი App Store-სა და Google Play-ში.",
@@ -2593,6 +2600,7 @@ const I18N = {
     search_ph:"Título de película o serie…",
     friend_search_ph:"Busca por nombre…",
     invite_to_app:"✨ Invita a amigos a Cinemail",
+    delete_account:"Eliminar cuenta",
     replay_onboarding:"🎬 Repetir introducción",
     support_title:"Apoya a Cinemail",
     support_text:"Quienes apoyen ahora tendrán las funciones Pro gratis de por vida cuando Cinemail sea de pago en App Store y Google Play.",
@@ -2644,6 +2652,7 @@ const I18N = {
     search_ph:"Titre de film ou de série…",
     friend_search_ph:"Rechercher par nom…",
     invite_to_app:"✨ Inviter des amis sur Cinemail",
+    delete_account:"Supprimer le compte",
     replay_onboarding:"🎬 Revoir l'introduction",
     support_title:"Soutenir Cinemail",
     support_text:"Les premiers soutiens obtiennent les fonctions Pro gratuites à vie lorsque Cinemail deviendra payant sur l'App Store et Google Play.",
@@ -2923,6 +2932,61 @@ async function signOut() {
   showScreen("signin");
   document.getElementById("signin-email").value = "";
   document.getElementById("signin-password").value = "";
+}
+
+// ── Delete account ────────────────────────────────────────────────────────────
+function confirmDeleteAccount() {
+  closeAccount();
+  const overlay = document.createElement('div');
+  overlay.id = 'delete-account-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
+  overlay.innerHTML = `
+    <div style="background:#1a1a2a;border-radius:16px;padding:28px 24px;max-width:320px;width:100%;text-align:center">
+      <div style="font-size:22px;margin-bottom:12px">⚠️</div>
+      <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:10px">Delete account?</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:22px">This will permanently delete your watch history, all lists, friends and account data. This cannot be undone.</div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <button onclick="deleteAccount()" style="background:#f87171;border:none;color:#fff;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;padding:12px;border-radius:10px;cursor:pointer">Delete my account</button>
+        <button onclick="document.getElementById('delete-account-overlay').remove();openAccount();" style="background:none;border:1px solid rgba(255,255,255,0.12);color:var(--muted);font-size:14px;font-family:'DM Sans',sans-serif;padding:11px;border-radius:10px;cursor:pointer">Cancel</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+async function deleteAccount() {
+  const overlay = document.getElementById('delete-account-overlay');
+  const btn = overlay.querySelector('button');
+  btn.textContent = 'Deleting...';
+  btn.disabled = true;
+  try {
+    const uid = currentUser.id;
+    // Delete user data from DB (RLS allows users to delete their own rows)
+    await sbClient.from('movies').delete().eq('user_id', uid);
+    await sbClient.from('lists').delete().eq('user_id', uid);
+    await sbClient.from('friendships').delete().or(`user_id.eq.${uid},friend_id.eq.${uid}`);
+    await sbClient.from('profiles').delete().eq('id', uid);
+    // Delete auth user via edge function or RPC
+    const { error } = await sbClient.rpc('delete_user');
+    if (error) throw error;
+    // Sign out and reset
+    await sbClient.auth.signOut();
+    currentUser = null;
+    watchHistory = [];
+    _inboxCache = { received: [], sent: [] };
+    _inboxCacheLoaded = false;
+    overlay.remove();
+    document.getElementById("main-app").style.display = "none";
+    showScreen("signin");
+    document.getElementById("signin-email").value = "";
+    document.getElementById("signin-password").value = "";
+    showToast('Account deleted.');
+  } catch(e) {
+    console.error('[delete-account]', e);
+    btn.textContent = 'Delete my account';
+    btn.disabled = false;
+    showToast('Could not delete account. Please try again.');
+  }
 }
 
 // ── Quotes ────────────────────────────────────────────────────────────────────
