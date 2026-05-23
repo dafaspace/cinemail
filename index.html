@@ -1145,6 +1145,7 @@ body {
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .list-tab.tab-dragging {
   opacity: 0.3;
@@ -2338,7 +2339,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.4</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.5</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -4672,7 +4673,7 @@ let _listDragState = null;
 function _initListDrag(row) {
   const tabs = [...row.querySelectorAll('.list-tab[data-listid]')];
   tabs.forEach(tab => {
-    tab.addEventListener('pointerdown', e => _listDragStart(e, tab, row));
+    tab.addEventListener('pointerdown', e => { e.preventDefault(); _listDragStart(e, tab, row); });
   });
 }
 function _listDragStart(e, tab, row) {
@@ -4829,9 +4830,14 @@ function _movieDragStart(e, card) {
     updateInsertPoint(y);
   }
 
+  let done = false;
   function onUp() {
-    clone.remove();
-    indicator.remove();
+    if (done) return;
+    done = true;
+    cleanup(); // remove listeners first to prevent any re-entry
+
+    try { clone.remove(); } catch(_) {}
+    try { indicator.remove(); } catch(_) {}
     card.classList.remove('movie-dragging');
     try { e.target.releasePointerCapture(pointerId); } catch(_) {}
 
@@ -4851,10 +4857,8 @@ function _movieDragStart(e, card) {
     // Persist to DB (syncs across devices)
     if (sbClient && numIds.length) {
       sbClient.rpc('update_movie_order', { movie_ids: numIds, orders: numIds.map((_, i) => i) })
-        .catch(e => console.error('[movie-order]', e));
+        .catch(err => console.error('[movie-order]', err));
     }
-
-    cleanup();
   }
 
   function cleanup() {
