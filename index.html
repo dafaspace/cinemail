@@ -1140,6 +1140,9 @@ body {
   transition: all 0.15s;
   white-space: nowrap;
   flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .tab-drag-handle {
   touch-action: none;
@@ -1147,10 +1150,11 @@ body {
   -webkit-user-select: none;
   -webkit-touch-callout: none;
   cursor: grab;
-  opacity: 0.45;
-  font-size: 10px;
-  margin-right: 2px;
-  padding: 2px 1px;
+  opacity: 0.5;
+  font-size: 12px;
+  margin-right: 1px;
+  padding: 6px 5px;
+  margin: -6px 1px -6px -8px;
   line-height: 1;
 }
 .list-tab.tab-dragging {
@@ -2345,7 +2349,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.7</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.9</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -4650,7 +4654,7 @@ function renderListTabs() {
   html += `<button class="list-tab watched ${_activeListId === 'watched' ? 'active' : ''}" onclick="switchListTab('watched')">${t('tab_watched')}</button>`;
 
   _listsCache.forEach(l => {
-    html += `<button class="list-tab ${_activeListId === l.id ? 'active' : ''}" data-listid="${l.id}" onclick="switchListTab('${l.id}')"><span class="tab-drag-handle" onpointerdown="event.stopPropagation();event.preventDefault();_listDragStart(event,this.closest('.list-tab'),this.closest('.list-tabs-row'))">⠿</span>${l.name}</button>`;
+    html += `<button class="list-tab ${_activeListId === l.id ? 'active' : ''}" data-listid="${l.id}" onclick="if(event.target.closest('.tab-drag-handle'))return;switchListTab('${l.id}')"><span class="tab-drag-handle" onpointerdown="event.stopPropagation();event.preventDefault();_listDragStart(event,this.closest('.list-tab'),this.closest('.list-tabs-row'))">⠿</span>${l.name}</button>`;
   });
 
   if (_listTabCreating) {
@@ -4679,7 +4683,7 @@ let _listDragState = null;
 function _initListDrag(row) {
   const tabs = [...row.querySelectorAll('.list-tab[data-listid]')];
   tabs.forEach(tab => {
-    // drag is initiated from .tab-drag-handle inside the tab (see renderListTabs HTML)
+    tab.addEventListener('contextmenu', e => e.preventDefault());
   });
 }
 function _listDragStart(e, tab, row) {
@@ -4732,6 +4736,7 @@ function _listDragStart(e, tab, row) {
   }
 
   function onMove(ev) {
+    ev.preventDefault();
     // Start drag after 6px movement - avoids accidental drags from taps on handle
     if (!dragging) {
       if (Math.abs(ev.clientX - startX) > 6) beginDrag();
@@ -4865,7 +4870,7 @@ function _movieDragStart(e, card) {
     document.removeEventListener('pointercancel', onUp);
   }
 
-  document.addEventListener('pointermove', onMove, { passive: true });
+  document.addEventListener('pointermove', onMove, { passive: false });
   document.addEventListener('pointerup', onUp);
   document.addEventListener('pointercancel', onUp);
 }
