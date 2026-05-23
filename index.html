@@ -498,7 +498,8 @@ body {
   border-radius: var(--radius);
   padding: 11px;
   display: flex;
-  gap: 11px;
+  flex-direction: column;
+  gap: 0;
   cursor: pointer;
   transition: background 0.15s;
 }
@@ -1151,13 +1152,25 @@ body {
 .movie-drag-handle {
   touch-action: none;
   cursor: grab;
-  color: var(--muted);
-  font-size: 16px;
-  padding: 6px 4px 6px 8px;
-  opacity: 0.45;
-  line-height: 1;
+  display: flex;
+  justify-content: center;
+  padding: 5px 0 2px;
+  width: 100%;
   user-select: none;
   -webkit-user-select: none;
+}
+.movie-drag-dots {
+  display: grid;
+  grid-template-columns: repeat(5, 4px);
+  grid-template-rows: repeat(2, 4px);
+  gap: 3px;
+}
+.movie-drag-dots span {
+  width: 4px; height: 4px;
+  background: var(--muted);
+  border-radius: 50%;
+  opacity: 0.35;
+  display: block;
 }
 .hist-card.movie-dragging {
   opacity: 0.35;
@@ -2298,7 +2311,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.1</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -4125,25 +4138,27 @@ function renderHistory() {
         const key = regMovie({ tmdbID: item.tmdbID, Title: item.title, Year: item.year, Poster: item.poster, type: item.mediaType||"movie" });
         return `
         <div class="hist-card ${item.status==='plan'?'plan':''}" data-movie-id="${item.id}" onclick="${item.tmdbID?`openDetail('${item.tmdbID}','${item.mediaType||"movie"}')`:''}">
-          <div class="hist-poster">${item.poster&&item.poster!=="N/A"?`<img src="${item.poster}" alt="" class="poster-zoomable" onclick="event.stopPropagation();openLightbox('${item.poster}','${(item.title||'').replace(/'/g,"\\'")}${item.year?' ('+item.year+')':''}')" onerror="this.parentNode.innerHTML='🎬'"`+`>`:"🎬"}</div>
-          <div style="flex:1;min-width:0">
-            <div class="hist-title">${item.title}</div>
-            <div class="hist-meta">${item.year} · ${item.date}</div>
-            ${item.status==="watched"
-              ? `<div style="display:flex;gap:2px;margin-top:3px">${starsHTML(item.stars)}</div>`
-              : ''}
-            ${item.comment?`<div class="hist-note">"${item.comment}" <span style="color:var(--muted);font-style:normal;font-size:10px">— ${item.date}</span></div>`:""}
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;margin-left:8px">
-            <div style="display:flex;gap:6px;align-items:center">
-              ${item.status==="watched"?`<button class="hist-del" onclick="event.stopPropagation();openEdit(${item.id})">✎</button>`:""}
-              <button class="hist-del" onclick="event.stopPropagation();deleteItem(${item.id})">×</button>
+          <div style="display:flex;gap:11px;width:100%">
+            <div class="hist-poster">${item.poster&&item.poster!=="N/A"?`<img src="${item.poster}" alt="" class="poster-zoomable" onclick="event.stopPropagation();openLightbox('${item.poster}','${(item.title||'').replace(/'/g,"\\'")}${item.year?' ('+item.year+')':''}')" onerror="this.parentNode.innerHTML='🎬'"`+`>`:"🎬"}</div>
+            <div style="flex:1;min-width:0">
+              <div class="hist-title">${item.title}</div>
+              <div class="hist-meta">${item.year} · ${item.date}</div>
+              ${item.status==="watched"
+                ? `<div style="display:flex;gap:2px;margin-top:3px">${starsHTML(item.stars)}</div>`
+                : ''}
+              ${item.comment?`<div class="hist-note">"${item.comment}" <span style="color:var(--muted);font-style:normal;font-size:10px">— ${item.date}</span></div>`:""}
             </div>
-            <div style="flex:1;display:flex;align-items:center;padding-top:4px">
-              <button onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" class="act-btn act-btn-ico" title="Share">${_icoShare()}</button>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;margin-left:8px">
+              <div style="display:flex;gap:6px;align-items:center">
+                ${item.status==="watched"?`<button class="hist-del" onclick="event.stopPropagation();openEdit(${item.id})">✎</button>`:""}
+                <button class="hist-del" onclick="event.stopPropagation();deleteItem(${item.id})">×</button>
+              </div>
+              <div style="flex:1;display:flex;align-items:center;padding-top:4px">
+                <button onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" class="act-btn act-btn-ico" title="Share">${_icoShare()}</button>
+              </div>
             </div>
           </div>
-          ${!isWatchedTab ? `<div class="movie-drag-handle" onpointerdown="event.stopPropagation();_movieDragStart(event,this.closest('.hist-card'))">⠿</div>` : ''}
+          ${!isWatchedTab ? `<div class="movie-drag-handle" onpointerdown="event.stopPropagation();_movieDragStart(event,this.closest('.hist-card'))"><div class="movie-drag-dots">${'<span></span>'.repeat(10)}</div></div>` : ''}
         </div>`;
       }).join("")}
     </div>`;
