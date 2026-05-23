@@ -1140,7 +1140,7 @@ body {
   white-space: nowrap;
   flex-shrink: 0;
 }
-.list-tab[data-listid] { touch-action: pan-x; }
+.list-tab[data-listid] { touch-action: none; }
 .list-tab.dragging {
   z-index: 5;
   box-shadow: 0 6px 18px rgba(0,0,0,0.45);
@@ -2263,7 +2263,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.12.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.12.2</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3668,7 +3668,7 @@ function closeDetail() {
 }
 
 // ── Avatar customisation ──────────────────────────────────────────────────────
-const _AVATAR_EMOJIS = ['🦊','🦝','🐉','🦁','🐯','🐺','🐱','🐰','🦉','🐸','🐼','🦄','🦋','🐙','👻','🧙','🧛','🧚','🧜','🦸','🦹','🤠','🤖','👽','🧟','🥷','🧞','🦖'];
+const _AVATAR_EMOJIS = ['🦊','🦝','🐉','🦁','🐯','🐺','🐱','🐰','🦉','🐸','🐼','🦄','🦋','🐙','👻','🧙','🧛','🧚','🧜','🦸','🦹','🤠','🤖','👽','🧟','🥷','🧞','🦖','🦔','🥸','👸','🧝','💃','🧑‍🎤','🫅'];
 const _AVATAR_COLORS = [
   '#F5C518', // brand gold (default)
   '#EDEDF2', // brand white
@@ -6218,7 +6218,7 @@ function renderProfileStats(watched) {
   const directors        = topNames('director', 1, 5);
   const cinematographers = topNames('cinematographer', 1, 5);
   const composers        = topNames('composer', 1, 5);
-  const actors           = topNames('actors', 2, 5);
+  const actors           = topNames('actors', 1, 5);
 
   if (!directors.length && !composers.length && !cinematographers.length && !actors.length) { el.innerHTML = ''; return; }
 
