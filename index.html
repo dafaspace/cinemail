@@ -2349,7 +2349,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.9</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.10</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -4660,8 +4660,9 @@ function renderListTabs() {
   if (_listTabCreating) {
     html += `<input id="list-tab-input" type="text" placeholder="List name…"
       style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:rgba(124,58,237,0.1);color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;width:110px;flex-shrink:0"
-      onkeydown="if(event.key==='Enter')_confirmNewListTab();if(event.key==='Escape')_cancelNewListTab()"
-      onblur="_cancelNewListTab()">
+      enterkeyhint="done"
+      onkeydown="if(event.key==='Enter'){event.preventDefault();_confirmNewListTab()}if(event.key==='Escape')_cancelNewListTab()"
+      onblur="_blurNewListTab()">
     <button onclick="_confirmNewListTab()" style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px;flex-shrink:0">Create</button>`;
   } else {
     html += `<button class="list-tab-add" onclick="_startNewListTab()">${t('new_list_tab')}</button>`;
@@ -4896,11 +4897,28 @@ function _cancelNewListTab() {
   }, 150);
 }
 
+// Called on input blur. On iOS the keyboard "Done" key dismisses the keyboard
+// (firing blur) but does NOT reliably fire an Enter keydown - so we confirm on
+// blur when there's a name, instead of cancelling. Small delay lets a tap on the
+// Create button register first.
+function _blurNewListTab() {
+  setTimeout(() => {
+    if (!_listTabCreating || _listTabSaving) return;
+    const inp = document.getElementById('list-tab-input');
+    const name = (inp?.value || '').trim();
+    if (name) _confirmNewListTab();
+    else { _listTabCreating = false; renderListTabs(); }
+  }, 150);
+}
+
+let _listTabSaving = false;
 async function _confirmNewListTab() {
+  if (_listTabSaving) return;
   const inp = document.getElementById('list-tab-input');
   const name = (inp?.value || '').trim();
   _listTabCreating = false;
   if (!name) { renderListTabs(); return; }
+  _listTabSaving = true;
   try {
     const { data, error } = await sbClient.from('lists').insert({ name, owner_id: currentUser.id }).select().single();
     if (error) throw new Error(error.message);
@@ -4909,6 +4927,7 @@ async function _confirmNewListTab() {
     switchListTab(data.id);
     showToast(`"${name}" created`);
   } catch(e) { showToast('Error: ' + e.message, true); renderListTabs(); }
+  finally { _listTabSaving = false; }
 }
 
 let _listManageMode = null; // null | 'invite' | 'confirm-delete'
