@@ -1141,11 +1141,17 @@ body {
   white-space: nowrap;
   flex-shrink: 0;
 }
-.list-tab[data-listid] {
+.tab-drag-handle {
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
+  cursor: grab;
+  opacity: 0.45;
+  font-size: 10px;
+  margin-right: 2px;
+  padding: 2px 1px;
+  line-height: 1;
 }
 .list-tab.tab-dragging {
   opacity: 0.3;
@@ -2339,7 +2345,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.6</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.7</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -4644,7 +4650,7 @@ function renderListTabs() {
   html += `<button class="list-tab watched ${_activeListId === 'watched' ? 'active' : ''}" onclick="switchListTab('watched')">${t('tab_watched')}</button>`;
 
   _listsCache.forEach(l => {
-    html += `<button class="list-tab ${_activeListId === l.id ? 'active' : ''}" data-listid="${l.id}" onclick="switchListTab('${l.id}')">${l.name}</button>`;
+    html += `<button class="list-tab ${_activeListId === l.id ? 'active' : ''}" data-listid="${l.id}" onclick="switchListTab('${l.id}')"><span class="tab-drag-handle" onpointerdown="event.stopPropagation();event.preventDefault();_listDragStart(event,this.closest('.list-tab'),this.closest('.list-tabs-row'))">⠿</span>${l.name}</button>`;
   });
 
   if (_listTabCreating) {
@@ -4673,25 +4679,22 @@ let _listDragState = null;
 function _initListDrag(row) {
   const tabs = [...row.querySelectorAll('.list-tab[data-listid]')];
   tabs.forEach(tab => {
-    tab.addEventListener('contextmenu', e => e.preventDefault());
-    tab.addEventListener('pointerdown', e => { e.preventDefault(); _listDragStart(e, tab, row); });
+    // drag is initiated from .tab-drag-handle inside the tab (see renderListTabs HTML)
   });
 }
 function _listDragStart(e, tab, row) {
   if (e.button && e.button !== 0) return;
   const pointerId = e.pointerId;
-  const startX = e.clientX, startY = e.clientY;
+  const startX = e.clientX;
   let dragging = false;
-  let done = false; // guard against double-fire of onUp
-
-  try { tab.setPointerCapture(pointerId); } catch(_) {}
-
-  const holdTimer = setTimeout(beginDrag, 320);
-
-  // --- state created in beginDrag ---
+  let done = false;
   let clone, indicator, insertBeforeTab;
 
+  // Capture pointer on the handle so we keep receiving events even if finger moves off
+  try { e.target.setPointerCapture(pointerId); } catch(_) {}
+
   function beginDrag() {
+    if (dragging) return;
     dragging = true;
     _listDragState = { tab, row };
     tab.classList.add('tab-dragging');
@@ -4699,7 +4702,8 @@ function _listDragStart(e, tab, row) {
     const rect = tab.getBoundingClientRect();
     clone = document.createElement('div');
     clone.className = 'list-tab-clone';
-    clone.textContent = tab.textContent;
+    // Clone text without the drag handle character
+    clone.textContent = tab.textContent.replace('⠿', '').trim();
     clone.style.cssText = `top:${rect.top}px;left:${rect.left}px;width:${rect.width}px`;
     document.body.appendChild(clone);
 
@@ -4728,10 +4732,9 @@ function _listDragStart(e, tab, row) {
   }
 
   function onMove(ev) {
+    // Start drag after 6px movement - avoids accidental drags from taps on handle
     if (!dragging) {
-      if (Math.abs(ev.clientX - startX) > 10 || Math.abs(ev.clientY - startY) > 10) {
-        clearTimeout(holdTimer); cleanup();
-      }
+      if (Math.abs(ev.clientX - startX) > 6) beginDrag();
       return;
     }
     clone.style.left = (ev.clientX - clone.offsetWidth / 2) + 'px';
@@ -4741,30 +4744,24 @@ function _listDragStart(e, tab, row) {
   function onUp() {
     if (done) return;
     done = true;
-    clearTimeout(holdTimer);
     cleanup();
 
     if (clone) clone.remove();
     if (indicator) indicator.remove();
     tab.classList.remove('tab-dragging');
-    try { tab.releasePointerCapture(pointerId); } catch(_) {}
+    try { e.target.releasePointerCapture(pointerId); } catch(_) {}
 
     if (!dragging) return;
 
-    // Place tab at drop position
     const addBtn = row.querySelector('.list-tab-add') || row.querySelector('#list-tab-input');
     if (insertBeforeTab) row.insertBefore(tab, insertBeforeTab);
     else row.insertBefore(tab, addBtn || null);
 
-    // Persist
     const ids = [...row.querySelectorAll('.list-tab[data-listid]')].map(t => t.dataset.listid);
     _saveListOrder(ids);
     ids.forEach((id, i) => { const l = _listsCache.find(l => l.id === id); if (l) l.sort_order = i; });
     _listsCache = _applyListOrder(_listsCache);
     _listDragState = null;
-
-    // Swallow the post-drop click
-    tab.addEventListener('click', function sc(ev){ ev.stopImmediatePropagation(); ev.preventDefault(); tab.removeEventListener('click', sc, true); }, true);
   }
 
   function cleanup() {
