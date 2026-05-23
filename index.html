@@ -2263,14 +2263,14 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.12.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.12.1</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" data-i18n="close" onclick="closeAccount()">Close</button>
         <button class="btn-modal-close" data-i18n="sign_out" onclick="closeAccount();signOut();" style="color:#f87171;border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.05)">Sign Out</button>
       </div>
-      <div style="margin-top:10px;text-align:center">
+      <div style="margin-top:24px;text-align:center">
         <button onclick="confirmDeleteAccount()" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;opacity:0.6;font-family:'DM Sans',sans-serif" data-i18n="delete_account">Delete account</button>
       </div>
     </div>
@@ -4568,16 +4568,20 @@ function _listDragStart(e, tab, row) {
   if (e.button && e.button !== 0) return;
   const pointerId = e.pointerId;
   const startX = e.clientX, startY = e.clientY;
-  let holdTimer = setTimeout(beginDrag, 300); // long-press to pick up
   let dragging = false;
+
+  // Block browser pan gesture IMMEDIATELY at pointerdown - this is the key fix.
+  // If we wait until beginDrag (300ms later) the browser already claims the gesture
+  // as a horizontal pan and fires pointercancel, killing the drag before it starts.
+  tab.style.touchAction = 'none';
+  row.style.touchAction = 'none';
+  try { tab.setPointerCapture(pointerId); } catch(_) {}
+
+  let holdTimer = setTimeout(beginDrag, 300);
 
   function beginDrag() {
     dragging = true;
     _listDragState = { tab, row };
-    // Claim the gesture so the scroll-container stops stealing it as a horizontal pan
-    tab.style.touchAction = 'none';
-    row.style.touchAction = 'none';
-    try { tab.setPointerCapture(pointerId); } catch(_) {}
     tab.classList.add('dragging');
     tab.style.opacity = '0.85';
     tab.style.transform = 'scale(1.06)';
@@ -4585,31 +4589,34 @@ function _listDragStart(e, tab, row) {
   }
   function onMove(ev) {
     if (!dragging) {
-      // cancel long-press if the finger moves first (it's a scroll/tap, not a hold)
+      // If finger moves before hold timer fires - it's a scroll or tap, cancel drag attempt
       if (Math.abs(ev.clientX - startX) > 12 || Math.abs(ev.clientY - startY) > 12) {
-        clearTimeout(holdTimer); cleanup();
+        clearTimeout(holdTimer);
+        tab.style.touchAction = '';
+        row.style.touchAction = '';
+        try { tab.releasePointerCapture(pointerId); } catch(_) {}
+        cleanup();
       }
       return;
     }
     ev.preventDefault();
     const after = _listDragAfterElement(row, ev.clientX);
     const addBtn = row.querySelector('.list-tab-add') || row.querySelector('#list-tab-input');
-    if (after == null) row.insertBefore(tab, addBtn || null); // park before the "+ New list" button
+    if (after == null) row.insertBefore(tab, addBtn || null);
     else if (after !== tab) row.insertBefore(tab, after);
   }
   function onUp() {
     clearTimeout(holdTimer);
+    tab.style.touchAction = '';
+    row.style.touchAction = '';
     if (dragging) {
       tab.classList.remove('dragging');
-      tab.style.opacity = ''; tab.style.transform = ''; tab.style.touchAction = '';
-      row.style.touchAction = '';
+      tab.style.opacity = ''; tab.style.transform = '';
       try { tab.releasePointerCapture(pointerId); } catch(_) {}
-      // Persist the new order of custom lists
       const ids = [...row.querySelectorAll('.list-tab[data-listid]')].map(t => t.dataset.listid);
       _saveListOrder(ids);
       _listsCache = _applyListOrder(_listsCache);
       _listDragState = null;
-      // Swallow the click that fires right after drop so we don't switch tabs
       tab.addEventListener('click', function sc(ev){ ev.stopImmediatePropagation(); ev.preventDefault(); tab.removeEventListener('click', sc, true); }, true);
     }
     cleanup();
