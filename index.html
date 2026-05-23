@@ -2014,6 +2014,9 @@ body {
       <div style="margin-top:4px">
         <button class="btn btn-primary" id="signin-btn" onclick="doSignIn()" data-i18n="sign_in">Sign In</button>
       </div>
+      <div style="text-align:center;margin-top:14px">
+        <a onclick="showScreen('forgot')" data-i18n="forgot_link" style="font-size:12px;color:var(--muted);cursor:pointer;text-decoration:none">Forgot password?</a>
+      </div>
     </div>
     <div class="auth-footer">
       <span data-i18n="new_here">New to Cinemail?</span> <a onclick="showScreen('signup')" data-i18n="create_acct_link">Create account</a>
@@ -2067,6 +2070,53 @@ body {
         Didn't get it? Check your spam folder.
       </div>
       <button class="btn btn-ghost w-full" data-i18n="back_to_signin" onclick="showScreen('signin')">← Back to Sign In</button>
+    </div>
+  </div>
+</div>
+
+<!-- Forgot Password -->
+<div id="screen-forgot" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;overflow-y:auto">
+  <div class="auth-wrap">
+    <img src="icon.png" alt="Cinemail" style="width:80px;height:80px;border-radius:19px;margin:0 auto 14px;display:block;filter:drop-shadow(0 0 24px rgba(245,197,24,0.18))">
+    <div class="auth-logo"><span>CINE</span>MAIL</div>
+    <div class="auth-tagline" data-i18n="auth_tagline">Track films · Get AI picks · Share with friends</div>
+    <div class="auth-card">
+      <button onclick="showScreen('signin')" data-i18n="back" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:16px;padding:0;display:flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif">← Back</button>
+      <h2 data-i18n="forgot_title">Reset Password</h2>
+      <div id="forgot-error" class="error-msg"></div>
+      <p data-i18n="forgot_sub" style="color:var(--muted);font-size:13px;line-height:1.6;margin:0 0 16px">Enter your email - we'll send a reset link.</p>
+      <div class="form-group">
+        <label data-i18n="email">Email</label>
+        <input type="email" id="forgot-email" placeholder="you@example.com" autocomplete="email"
+          onkeydown="if(event.key==='Enter')doForgotPassword()">
+      </div>
+      <div style="margin-top:4px">
+        <button class="btn btn-primary" id="forgot-btn" onclick="doForgotPassword()" data-i18n="forgot_send">Send reset link</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Set New Password (after clicking the reset link) -->
+<div id="screen-reset" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;overflow-y:auto">
+  <div class="auth-wrap">
+    <img src="icon.png" alt="Cinemail" style="width:80px;height:80px;border-radius:19px;margin:0 auto 14px;display:block;filter:drop-shadow(0 0 24px rgba(245,197,24,0.18))">
+    <div class="auth-logo"><span>CINE</span>MAIL</div>
+    <div class="auth-card">
+      <h2 data-i18n="reset_title">Set New Password</h2>
+      <div id="reset-error" class="error-msg"></div>
+      <div class="form-group">
+        <label data-i18n="reset_newpass">New Password</label>
+        <input type="password" id="reset-password" placeholder="Min. 6 characters" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label data-i18n="reset_confirm">Confirm Password</label>
+        <input type="password" id="reset-password2" placeholder="••••••••" autocomplete="new-password"
+          onkeydown="if(event.key==='Enter')doResetPassword()">
+      </div>
+      <div style="margin-top:4px">
+        <button class="btn btn-primary" id="reset-btn" onclick="doResetPassword()" data-i18n="reset_update">Update Password</button>
+      </div>
     </div>
   </div>
 </div>
@@ -2364,7 +2414,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.14</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.15</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -2775,6 +2825,10 @@ const _I18N_EXTRA = {
     inv_add_to_list:"Add to List", inv_decline:"Decline", inv_from:"from", inv_to:"to",
     inv_declined:"Declined", inv_pending:"Pending", inv_added:"Added", inv_accepted:"Accepted", inv_sent:"Sent",
     inv_added_to:"Added to", inv_reaction:"reaction", inv_invited_you:"invited you", inv_join_list:"Join List",
+    forgot_link:"Forgot password?", forgot_title:"Reset Password", forgot_sub:"Enter your email - we'll send a reset link.", forgot_send:"Send reset link",
+    reset_title:"Set New Password", reset_newpass:"New Password", reset_confirm:"Confirm Password", reset_update:"Update Password",
+    reset_email_sent:"We sent a password reset link to", reset_done:"Password updated",
+    err_enter_email:"Please enter your email.", err_pass_short:"Password must be at least 6 characters.", err_pass_match:"Passwords don't match.",
   },
   ru: {
     empty_search_title:"Найди свой следующий фильм", recs_ph:"Настроение, жанр, что угодно…", empty_search_sub:"Введи название и нажми Поиск",
@@ -2785,6 +2839,10 @@ const _I18N_EXTRA = {
     inv_add_to_list:"В список", inv_decline:"Отклонить", inv_from:"от", inv_to:"кому",
     inv_declined:"Отклонено", inv_pending:"Ожидает", inv_added:"Добавлено", inv_accepted:"Принято", inv_sent:"Отправлено",
     inv_added_to:"Добавлено в", inv_reaction:"реакция", inv_invited_you:"пригласил тебя", inv_join_list:"Вступить",
+    forgot_link:"Забыли пароль?", forgot_title:"Сброс пароля", forgot_sub:"Введи email - пришлём ссылку для сброса.", forgot_send:"Отправить ссылку",
+    reset_title:"Новый пароль", reset_newpass:"Новый пароль", reset_confirm:"Повтори пароль", reset_update:"Обновить пароль",
+    reset_email_sent:"Мы отправили ссылку для сброса пароля на", reset_done:"Пароль обновлён",
+    err_enter_email:"Введи email.", err_pass_short:"Пароль минимум 6 символов.", err_pass_match:"Пароли не совпадают.",
   },
   uk: {
     empty_search_title:"Знайди свій наступний фільм", recs_ph:"Настрій, жанр, будь-що…", empty_search_sub:"Введи назву і натисни Пошук",
@@ -2795,6 +2853,10 @@ const _I18N_EXTRA = {
     inv_add_to_list:"До списку", inv_decline:"Відхилити", inv_from:"від", inv_to:"кому",
     inv_declined:"Відхилено", inv_pending:"Очікує", inv_added:"Додано", inv_accepted:"Прийнято", inv_sent:"Надіслано",
     inv_added_to:"Додано до", inv_reaction:"реакція", inv_invited_you:"запросив тебе", inv_join_list:"Приєднатися",
+    forgot_link:"Забули пароль?", forgot_title:"Скидання пароля", forgot_sub:"Введи email - надішлемо посилання для скидання.", forgot_send:"Надіслати посилання",
+    reset_title:"Новий пароль", reset_newpass:"Новий пароль", reset_confirm:"Повтори пароль", reset_update:"Оновити пароль",
+    reset_email_sent:"Ми надіслали посилання для скидання пароля на", reset_done:"Пароль оновлено",
+    err_enter_email:"Введи email.", err_pass_short:"Пароль щонайменше 6 символів.", err_pass_match:"Паролі не збігаються.",
   },
   ka: {
     empty_search_title:"იპოვე შენი შემდეგი ფილმი", recs_ph:"განწყობა, ჟანრი ან ნებისმიერი…", empty_search_sub:"აკრიფე სათაური და დააჭირე ძიებას",
@@ -2805,6 +2867,10 @@ const _I18N_EXTRA = {
     inv_add_to_list:"სიაში დამატება", inv_decline:"უარყოფა", inv_from:"ვისგან", inv_to:"ვის",
     inv_declined:"უარყოფილი", inv_pending:"მოლოდინში", inv_added:"დამატებული", inv_accepted:"მიღებული", inv_sent:"გაგზავნილი",
     inv_added_to:"დამატებულია სიაში", inv_reaction:"რეაქცია", inv_invited_you:"მოგიწვია", inv_join_list:"გაწევრიანება",
+    forgot_link:"დაგავიწყდათ პაროლი?", forgot_title:"პაროლის აღდგენა", forgot_sub:"შეიყვანე email - გამოგიგზავნით აღდგენის ბმულს.", forgot_send:"ბმულის გაგზავნა",
+    reset_title:"ახალი პაროლი", reset_newpass:"ახალი პაროლი", reset_confirm:"გაიმეორე პაროლი", reset_update:"პაროლის განახლება",
+    reset_email_sent:"პაროლის აღდგენის ბმული გავაგზავნეთ მისამართზე", reset_done:"პაროლი განახლდა",
+    err_enter_email:"შეიყვანე email.", err_pass_short:"პაროლი მინიმუმ 6 სიმბოლო.", err_pass_match:"პაროლები არ ემთხვევა.",
   },
   es: {
     empty_search_title:"Encuentra tu próxima película", recs_ph:"Estado de ánimo, género o lo que sea…", empty_search_sub:"Escribe un título y pulsa Buscar",
@@ -2815,6 +2881,10 @@ const _I18N_EXTRA = {
     inv_add_to_list:"Añadir a lista", inv_decline:"Rechazar", inv_from:"de", inv_to:"para",
     inv_declined:"Rechazado", inv_pending:"Pendiente", inv_added:"Añadido", inv_accepted:"Aceptado", inv_sent:"Enviado",
     inv_added_to:"Añadido a", inv_reaction:"reacción", inv_invited_you:"te invitó", inv_join_list:"Unirse",
+    forgot_link:"¿Olvidaste tu contraseña?", forgot_title:"Restablecer contraseña", forgot_sub:"Escribe tu email y te enviaremos un enlace.", forgot_send:"Enviar enlace",
+    reset_title:"Nueva contraseña", reset_newpass:"Nueva contraseña", reset_confirm:"Confirmar contraseña", reset_update:"Actualizar contraseña",
+    reset_email_sent:"Enviamos un enlace para restablecer tu contraseña a", reset_done:"Contraseña actualizada",
+    err_enter_email:"Introduce tu email.", err_pass_short:"La contraseña debe tener al menos 6 caracteres.", err_pass_match:"Las contraseñas no coinciden.",
   },
   fr: {
     empty_search_title:"Trouvez votre prochain film", recs_ph:"Humeur, genre ou autre…", empty_search_sub:"Saisissez un titre et appuyez sur Rechercher",
@@ -2825,6 +2895,10 @@ const _I18N_EXTRA = {
     inv_add_to_list:"Ajouter à la liste", inv_decline:"Refuser", inv_from:"de", inv_to:"à",
     inv_declined:"Refusé", inv_pending:"En attente", inv_added:"Ajouté", inv_accepted:"Accepté", inv_sent:"Envoyé",
     inv_added_to:"Ajouté à", inv_reaction:"réaction", inv_invited_you:"vous a invité", inv_join_list:"Rejoindre",
+    forgot_link:"Mot de passe oublié ?", forgot_title:"Réinitialiser le mot de passe", forgot_sub:"Saisis ton email - nous t'enverrons un lien.", forgot_send:"Envoyer le lien",
+    reset_title:"Nouveau mot de passe", reset_newpass:"Nouveau mot de passe", reset_confirm:"Confirmer le mot de passe", reset_update:"Mettre à jour le mot de passe",
+    reset_email_sent:"Nous avons envoyé un lien de réinitialisation à", reset_done:"Mot de passe mis à jour",
+    err_enter_email:"Saisis ton email.", err_pass_short:"Le mot de passe doit comporter au moins 6 caractères.", err_pass_match:"Les mots de passe ne correspondent pas.",
   },
 };
 Object.keys(_I18N_EXTRA).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_EXTRA[l]); });
@@ -2993,7 +3067,7 @@ function _maybeShowOnboarding() {
 }
 
 function showScreen(name) {
-  ["signin","signup","check-email"].forEach(s => {
+  ["signin","signup","check-email","forgot","reset"].forEach(s => {
     const el = document.getElementById("screen-"+s);
     if (el) el.style.display = s === name ? "block" : "none";
   });
@@ -3020,6 +3094,50 @@ async function doSignIn() {
 function showSignInError(msg) {
   const el = document.getElementById("signin-error");
   el.textContent = msg; el.classList.add("show");
+}
+
+function showForgotError(msg) {
+  const el = document.getElementById("forgot-error");
+  el.textContent = msg; el.classList.add("show");
+}
+async function doForgotPassword() {
+  const email = document.getElementById("forgot-email").value.trim();
+  document.getElementById("forgot-error").classList.remove("show");
+  if (!email) { showForgotError(t('err_enter_email') || "Please enter your email."); return; }
+  const btn = document.getElementById("forgot-btn");
+  const label = btn.textContent;
+  btn.textContent = "…"; btn.disabled = true;
+  try {
+    // No redirectTo → Supabase uses the project Site URL (already wired for signup
+    // confirmation), so the reset link lands back on the app with token_hash.
+    const { error } = await sbClient.auth.resetPasswordForEmail(email);
+    if (error) throw error;
+    document.getElementById("check-email-msg").innerHTML =
+      `${t('reset_email_sent')}<br><strong style="color:var(--text)">${email}</strong>`;
+    showScreen("check-email");
+  } catch(e) { showForgotError(e.message); }
+  finally { btn.textContent = label; btn.disabled = false; }
+}
+
+function showResetError(msg) {
+  const el = document.getElementById("reset-error");
+  el.textContent = msg; el.classList.add("show");
+}
+async function doResetPassword() {
+  const p1 = document.getElementById("reset-password").value;
+  const p2 = document.getElementById("reset-password2").value;
+  document.getElementById("reset-error").classList.remove("show");
+  if (p1.length < 6) { showResetError(t('err_pass_short') || "Password must be at least 6 characters."); return; }
+  if (p1 !== p2) { showResetError(t('err_pass_match') || "Passwords don't match."); return; }
+  const btn = document.getElementById("reset-btn");
+  const label = btn.textContent;
+  btn.textContent = "…"; btn.disabled = true;
+  try {
+    const { data, error } = await sbClient.auth.updateUser({ password: p1 });
+    if (error) throw error;
+    showToast("✅ " + t('reset_done'));
+    await onSignedIn(data.user); // recovery session is active → log them straight in
+  } catch(e) { showResetError(e.message); btn.textContent = label; btn.disabled = false; }
 }
 
 async function findUniqueName(baseName) {
@@ -7315,6 +7433,7 @@ function initUI() {
     sbClient=window.supabase.createClient(SB_URL,SB_KEY);
     const {data,error}=await sbClient.auth.verifyOtp({token_hash:tokenHash,type});
     if(error){showScreen("signin");showSignInError("Confirmation failed: "+error.message);return;}
+    if(type==="recovery"){ showScreen("reset"); _applyI18n(); return; } // password reset → set new password
     if(data.user){await onSignedIn(data.user);return;}
   }
   sbClient=window.supabase.createClient(SB_URL,SB_KEY);
