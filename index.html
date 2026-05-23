@@ -2364,7 +2364,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.13</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.14</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3049,7 +3049,12 @@ async function doSignUp() {
       showSignUpError(`"${name}" is taken — your name will be "${uniqueName}". Press Create Account again to confirm.`);
       btn.textContent = "Create Account"; btn.disabled = false; return;
     }
-    const { data, error } = await sbClient.auth.signUp({ email, password, options: { data: { display_name: uniqueName } } });
+    // Carry the inviter id into the account's server-side metadata so the friend
+    // connection survives the email-confirmation hop (different browser/device).
+    const _pendingInvite = localStorage.getItem('pendingFriendInvite');
+    const _signUpData = { display_name: uniqueName };
+    if (_pendingInvite) _signUpData.invited_by = _pendingInvite;
+    const { data, error } = await sbClient.auth.signUp({ email, password, options: { data: _signUpData } });
     if (error) throw error;
     if (data.user) { try { await sbClient.from("profiles").upsert({ id: data.user.id, display_name: uniqueName }); } catch(e2) {} }
     document.getElementById("check-email-msg").innerHTML =
@@ -5315,71 +5320,37 @@ function _checkFriendInvite() {
   }
 }
 async function checkPendingFriendInvite() {
-  const inviterId = localStorage.getItem('pendingFriendInvite');
-  if (!inviterId || !currentUser) return;
+  if (!currentUser) return;
+  // Inviter id can arrive two ways:
+  //  - signup metadata `invited_by` (survives the email-confirmation hop across
+  //    any device/browser — set in doSignUp)
+  //  - localStorage (an existing user opened the link in this same browser)
+  const inviterId = currentUser.user_metadata?.invited_by || localStorage.getItem('pendingFriendInvite');
+  if (!inviterId) return;
   localStorage.removeItem('pendingFriendInvite');
-  if (inviterId === currentUser.id) return; // can't befriend yourself
-  // Already connected or a request is pending?
-  const all = [..._friendsCache, ..._friendRequestsCache];
-  if (all.some(f => f.user_id === inviterId || f.friend_id === inviterId)) return;
-  // Resolve the inviter's profile (name + avatar)
-  await _fetchProfileAvatars([inviterId]);
-  const p = _profileCache[inviterId] || {};
-  if (!p.name) { // unknown / invalid inviter id → silently ignore
-    try { const { data } = await sbClient.from('profiles').select('id').eq('id', inviterId).single(); if (!data) return; } catch(e) { return; }
+  if (inviterId === currentUser.id) {            // can't befriend yourself
+    await _clearInviteMeta();
+    return;
   }
-  _showFriendInviteCard(inviterId, p.name || 'Someone');
-}
-function _showFriendInviteCard(inviterId, name) {
-  const ov = document.createElement('div');
-  ov.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px)';
-  ov.innerHTML = `
-    <div style="max-width:330px;width:100%;background:#15151f;border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:26px 22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.5)">
-      <div style="font-family:'Bebas Neue','Oswald',-apple-system,sans-serif;font-size:24px;letter-spacing:2.5px;margin-bottom:18px"><span style="color:var(--primary)">CINE</span><span style="color:#fff">MAIL</span></div>
-      <div style="margin:0 auto 14px">${_avatarMarkup(inviterId, name, 64)}</div>
-      <div style="font-size:18px;color:#fff;font-weight:700;margin-bottom:6px">${name} invited you to Cinemail</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:20px">Track films, get personalised picks and share with friends.</div>
-      <div style="display:flex;gap:10px">
-        <button id="fi-accept" style="flex:2;padding:12px;border-radius:10px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue','Oswald',sans-serif;font-size:15px;letter-spacing:1px;font-weight:600;cursor:pointer">Add friend</button>
-        <button id="fi-skip" style="flex:1;padding:12px;border-radius:10px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Maybe later</button>
-      </div>
-    </div>`;
-  document.body.appendChild(ov);
-  const close = () => ov.remove();
-  ov.querySelector('#fi-skip').onclick = close;
-  ov.addEventListener('click', e => { if (e.target === ov) close(); });
-  ov.querySelector('#fi-accept').onclick = async () => {
-    ov.querySelector('#fi-accept').textContent = 'Adding…';
-    await _acceptFriendInvite(inviterId, name);
-    close();
-  };
-}
-async function _acceptFriendInvite(inviterId, inviterName) {
   try {
-    const myName = currentUser.displayName || currentUser.email?.split('@')[0] || 'someone';
-    // Check the DB for any existing relationship in either direction (caches may be stale)
-    const { data: existing } = await sbClient.from('friendships').select('id,user_id,friend_id,status')
-      .or(`and(user_id.eq.${currentUser.id},friend_id.eq.${inviterId}),and(user_id.eq.${inviterId},friend_id.eq.${currentUser.id})`);
-    const row = (existing || [])[0];
-    if (row) {
-      if (row.status === 'accepted') { showToast(`Already friends with ${inviterName}`); return; }
-      // A pending request already exists → accept it instead of inserting a duplicate
-      const { error: upErr } = await sbClient.from('friendships').update({ status: 'accepted' }).eq('id', row.id);
-      if (upErr) throw new Error(upErr.message);
-    } else {
-      // The inviter consented by creating the link, so connect immediately (accepted)
-      const { error } = await sbClient.from('friendships').insert({
-        user_id: currentUser.id, friend_id: inviterId,
-        user_name: myName, friend_name: inviterName, status: 'accepted'
-      });
-      if (error) throw new Error(error.message);
+    // Server-side, idempotent: creates a pending request (inviter → me) only if no
+    // relationship exists yet. Survives missed popups — it shows in the badge.
+    const { data, error } = await sbClient.rpc('create_invite_request', { inviter: inviterId });
+    if (error) { console.warn('[invite] rpc:', error.message); return; }
+    await _clearInviteMeta();
+    if (data === 'created') {
+      await loadFriendsCache();   // refresh avatar badge + requests list
+      showToast('New friend request - check your account');
     }
-    await loadFriendsCache();
-    renderFriendsSection();
-    showToast(`You're now friends with ${inviterName}!`);
-  } catch(e) {
-    console.error('[friend-invite] accept failed:', e);
-    showToast('Could not add friend: ' + e.message, true);
+  } catch(e) { console.warn('[invite]', e.message); }
+}
+// Clear the one-time signup flag so the invite isn't reprocessed on later logins.
+async function _clearInviteMeta() {
+  if (currentUser?.user_metadata?.invited_by) {
+    try {
+      await sbClient.auth.updateUser({ data: { invited_by: null } });
+      if (currentUser.user_metadata) currentUser.user_metadata.invited_by = null;
+    } catch(e) {}
   }
 }
 
