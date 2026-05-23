@@ -1188,15 +1188,15 @@ body {
 }
 .movie-drag-dots {
   display: grid;
-  grid-template-columns: repeat(5, 4px);
-  grid-template-rows: repeat(2, 4px);
-  gap: 3px;
+  grid-template-columns: repeat(5, 3px);
+  grid-template-rows: repeat(2, 3px);
+  gap: 2.5px;
 }
 .movie-drag-dots span {
-  width: 4px; height: 4px;
+  width: 3px; height: 3px;
   background: var(--muted);
   border-radius: 50%;
-  opacity: 0.35;
+  opacity: 0.32;
   display: block;
 }
 .hist-card.movie-dragging {
@@ -2338,7 +2338,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.3</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.4</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -4680,49 +4680,40 @@ function _listDragStart(e, tab, row) {
   const pointerId = e.pointerId;
   const startX = e.clientX, startY = e.clientY;
   let dragging = false;
-  let clone = null;
-  let indicator = null;
-  let insertBeforeTab = null; // null = append before addBtn
+  let done = false; // guard against double-fire of onUp
 
-  // Block browser pan IMMEDIATELY so it can't steal the gesture
   try { tab.setPointerCapture(pointerId); } catch(_) {}
 
   const holdTimer = setTimeout(beginDrag, 320);
 
+  // --- state created in beginDrag ---
+  let clone, indicator, insertBeforeTab;
+
   function beginDrag() {
     dragging = true;
     _listDragState = { tab, row };
-
-    // Make original tab ghost
     tab.classList.add('tab-dragging');
 
-    // Floating clone
     const rect = tab.getBoundingClientRect();
     clone = document.createElement('div');
     clone.className = 'list-tab-clone';
     clone.textContent = tab.textContent;
-    clone.style.top  = rect.top  + 'px';
-    clone.style.left = rect.left + 'px';
-    clone.style.width = rect.width + 'px';
+    clone.style.cssText = `top:${rect.top}px;left:${rect.left}px;width:${rect.width}px`;
     document.body.appendChild(clone);
 
-    // Drop indicator
     indicator = document.createElement('div');
     indicator.className = 'list-tab-drop-indicator';
-    row.insertBefore(indicator, tab);
+    insertBeforeTab = null;
 
     if (navigator.vibrate) { try { navigator.vibrate(14); } catch(_) {} }
-  }
-
-  function getOtherTabs() {
-    return [...row.querySelectorAll('.list-tab[data-listid]:not(.tab-dragging)')];
+    updateDropPosition(e.clientX);
   }
 
   function updateDropPosition(clientX) {
-    const others = getOtherTabs();
+    const others = [...row.querySelectorAll('.list-tab[data-listid]:not(.tab-dragging)')];
+    const addBtn = row.querySelector('.list-tab-add') || row.querySelector('#list-tab-input');
     indicator.remove();
     insertBeforeTab = null;
-    const addBtn = row.querySelector('.list-tab-add') || row.querySelector('#list-tab-input');
     for (const other of others) {
       const r = other.getBoundingClientRect();
       if (clientX < r.left + r.width / 2) {
@@ -4741,36 +4732,37 @@ function _listDragStart(e, tab, row) {
       }
       return;
     }
-    clone.style.left = (ev.clientX - (clone.offsetWidth / 2)) + 'px';
+    clone.style.left = (ev.clientX - clone.offsetWidth / 2) + 'px';
     updateDropPosition(ev.clientX);
   }
 
   function onUp() {
+    if (done) return;
+    done = true;
     clearTimeout(holdTimer);
+    cleanup();
+
     if (clone) clone.remove();
     if (indicator) indicator.remove();
     tab.classList.remove('tab-dragging');
     try { tab.releasePointerCapture(pointerId); } catch(_) {}
 
-    if (dragging) {
-      // Insert tab at drop position
-      const addBtn = row.querySelector('.list-tab-add') || row.querySelector('#list-tab-input');
-      if (insertBeforeTab) row.insertBefore(tab, insertBeforeTab);
-      else row.insertBefore(tab, addBtn || null);
+    if (!dragging) return;
 
-      // Persist order
-      const ids = [...row.querySelectorAll('.list-tab[data-listid]')].map(t => t.dataset.listid);
-      _saveListOrder(ids);
-      ids.forEach((id, i) => {
-        const l = _listsCache.find(l => l.id === id);
-        if (l) l.sort_order = i;
-      });
-      _listsCache = _applyListOrder(_listsCache);
-      _listDragState = null;
-      // Swallow the post-drop click so tab doesn't switch
-      tab.addEventListener('click', function sc(ev){ ev.stopImmediatePropagation(); ev.preventDefault(); tab.removeEventListener('click', sc, true); }, true);
-    }
-    cleanup();
+    // Place tab at drop position
+    const addBtn = row.querySelector('.list-tab-add') || row.querySelector('#list-tab-input');
+    if (insertBeforeTab) row.insertBefore(tab, insertBeforeTab);
+    else row.insertBefore(tab, addBtn || null);
+
+    // Persist
+    const ids = [...row.querySelectorAll('.list-tab[data-listid]')].map(t => t.dataset.listid);
+    _saveListOrder(ids);
+    ids.forEach((id, i) => { const l = _listsCache.find(l => l.id === id); if (l) l.sort_order = i; });
+    _listsCache = _applyListOrder(_listsCache);
+    _listDragState = null;
+
+    // Swallow the post-drop click
+    tab.addEventListener('click', function sc(ev){ ev.stopImmediatePropagation(); ev.preventDefault(); tab.removeEventListener('click', sc, true); }, true);
   }
 
   function cleanup() {
