@@ -2364,7 +2364,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.12</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.13</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -5277,12 +5277,21 @@ function _qrURL(url, size) {
 function _appInviteURL() {
   return `${location.origin}${location.pathname}?friend=${currentUser.id}`;
 }
-function toggleAppInvite() {
+// Re-read the display name straight from the profile so shared text always shows
+// the real, current name (never a stale/sticky cached value).
+async function _freshDisplayName() {
+  try {
+    const { data } = await sbClient.from('profiles').select('display_name').eq('id', currentUser.id).single();
+    if (data?.display_name) currentUser.displayName = data.display_name;
+  } catch(e) {}
+  return currentUser.displayName || currentUser.email?.split('@')[0] || 'A friend';
+}
+async function toggleAppInvite() {
   const panel = document.getElementById('app-invite-panel');
   if (!panel || !currentUser) return;
   if (panel.style.display === 'block') { panel.style.display = 'none'; return; }
   const url = _appInviteURL();
-  const myName = currentUser.displayName || currentUser.email?.split('@')[0] || 'a friend';
+  const myName = await _freshDisplayName();
   const msg = `${myName} invited you to Cinemail. Track films, get personalised picks and share with friends.`;
   panel.innerHTML = `
     <img src="${_qrURL(url,150)}" width="150" height="150" style="border-radius:10px;margin:0 auto 8px;display:block">
@@ -5391,7 +5400,7 @@ async function _loadInviteLink(listId) {
     }
     const url = `${location.origin}${location.pathname}?join=${token}`;
     const listName = _getListName(listId);
-    const myName = currentUser.displayName || currentUser.email?.split('@')[0] || 'A friend';
+    const myName = await _freshDisplayName();
     const msg = `${myName} shared the "${listName}" list with you on Cinemail. Open it to see what's inside.`;
     el.innerHTML = `
       <img src="${_qrURL(url,160)}" style="border-radius:10px;margin-bottom:10px;display:block;margin-left:auto;margin-right:auto" width="160" height="160">
