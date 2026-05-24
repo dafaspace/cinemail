@@ -2413,7 +2413,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.19</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.20</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -2989,6 +2989,17 @@ function _friendsWord(n) {
     en:['friend','friends'], es:['amigo','amigos'], fr:['ami','amis'], ka:['მეგობარი','მეგობარი'],
     ru:['друг','друга','друзей'], uk:['друг','друзі','друзів'],
   })[_lang] || ['friend','friends'];
+  if (forms.length === 2) return n === 1 ? forms[0] : forms[1];
+  const n10 = n % 10, n100 = n % 100;
+  if (n10 === 1 && n100 !== 11) return forms[0];
+  if (n10 >= 2 && n10 <= 4 && (n100 < 10 || n100 >= 20)) return forms[1];
+  return forms[2];
+}
+function _filmsWord(n) {
+  const forms = ({
+    en:['film','films'], es:['película','películas'], fr:['film','films'], ka:['ფილმი','ფილმი'],
+    ru:['фильм','фильма','фильмов'], uk:['фільм','фільми','фільмів'],
+  })[_lang] || ['film','films'];
   if (forms.length === 2) return n === 1 ? forms[0] : forms[1];
   const n10 = n % 10, n100 = n % 100;
   if (n10 === 1 && n100 !== 11) return forms[0];
@@ -6087,7 +6098,7 @@ function _renderChatList() {
       <div style="flex:1;min-width:0">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
           <div style="font-weight:600;font-size:15px">${p.name}</div>
-          <div style="font-size:11px;color:var(--muted);white-space:nowrap">${count} film${count !== 1 ? "s" : ""}</div>
+          <div style="font-size:11px;color:var(--muted);white-space:nowrap">${count} ${_filmsWord(count)}</div>
         </div>
         <div style="font-size:12px;color:${hasUnread ? "var(--text)" : "var(--muted)"};margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(preview)}</div>
       </div>
