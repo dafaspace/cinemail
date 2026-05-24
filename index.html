@@ -82,8 +82,9 @@ body {
 .auth-tagline {
   color: var(--muted);
   font-size: 13px;
-  margin-bottom: 36px;
+  margin-bottom: 32px;
   text-align: center;
+  line-height: 1.7;
 }
 
 .auth-card {
@@ -1948,7 +1949,7 @@ body {
     <!-- Slide 8: Surprise Me / AI Picks -->
     <div class="ob-slide">
       <div class="ob-mock">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;letter-spacing:0.3px;text-transform:uppercase">✨ AI picks for you</div>
+        <div data-i18n="ob8_picks" style="font-size:11px;color:var(--muted);margin-bottom:10px;letter-spacing:0.3px;text-transform:uppercase">✨ Personal picks for you</div>
         <button class="ob-mock-surprise" data-i18n="surprise">✨ Surprise Me</button>
       </div>
       <div class="ob-arr">
@@ -1998,7 +1999,6 @@ body {
   <div class="auth-wrap">
     <img src="icon.png" alt="Cinemail" style="width:80px;height:80px;border-radius:19px;margin:0 auto 14px;display:block;filter:drop-shadow(0 0 24px rgba(245,197,24,0.18))">
     <div class="auth-logo"><span>CINE</span>MAIL</div>
-    <div class="auth-tagline" data-i18n="auth_tagline">Track films · Get AI picks · Share with friends</div>
     <div class="auth-card">
       <h2 data-i18n="sign_in_title">Welcome Back</h2>
       <div id="signin-error" class="error-msg"></div>
@@ -2018,8 +2018,8 @@ body {
         <a onclick="showScreen('forgot')" data-i18n="forgot_link" style="font-size:12px;color:var(--muted);cursor:pointer;text-decoration:none">Forgot password?</a>
       </div>
     </div>
-    <div class="auth-footer">
-      <span data-i18n="new_here">New to Cinemail?</span> <a onclick="showScreen('signup')" data-i18n="create_acct_link">Create account</a>
+    <div class="auth-footer" style="margin-top:20px;font-size:14px">
+      <span data-i18n="new_here">New to Cinemail?</span> <a onclick="showScreen('signup')" data-i18n="create_acct_link" style="font-weight:700;font-size:15px">Create account</a>
     </div>
   </div>
 </div>
@@ -2029,7 +2029,7 @@ body {
   <div class="auth-wrap">
     <img src="icon.png" alt="Cinemail" style="width:80px;height:80px;border-radius:19px;margin:0 auto 14px;display:block;filter:drop-shadow(0 0 24px rgba(245,197,24,0.18))">
     <div class="auth-logo"><span>CINE</span>MAIL</div>
-    <div class="auth-tagline" data-i18n="auth_tagline">Track films · Get AI picks · Share with friends</div>
+    <div class="auth-tagline" data-i18n="auth_tagline" data-i18n-html="1">Track films.<br>Get personal picks.<br>Share with friends.</div>
     <div class="auth-card">
       <button onclick="showScreen('signin')" data-i18n="back" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:16px;padding:0;display:flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif">← Back</button>
       <h2 data-i18n="sign_up_title">Create Account</h2>
@@ -2079,7 +2079,6 @@ body {
   <div class="auth-wrap">
     <img src="icon.png" alt="Cinemail" style="width:80px;height:80px;border-radius:19px;margin:0 auto 14px;display:block;filter:drop-shadow(0 0 24px rgba(245,197,24,0.18))">
     <div class="auth-logo"><span>CINE</span>MAIL</div>
-    <div class="auth-tagline" data-i18n="auth_tagline">Track films · Get AI picks · Share with friends</div>
     <div class="auth-card">
       <button onclick="showScreen('signin')" data-i18n="back" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:16px;padding:0;display:flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif">← Back</button>
       <h2 data-i18n="forgot_title">Reset Password</h2>
@@ -2414,7 +2413,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.16</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.17</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -2501,7 +2500,7 @@ let currentUser = null;
 // ── i18n ──────────────────────────────────────────────────────────────────────
 const I18N = {
   en: {
-    auth_tagline:"Track films · Get AI picks · Share with friends",
+    auth_tagline:"Track films.<br>Get personal picks.<br>Share with friends.",
     sign_in_title:"Welcome Back", sign_up_title:"Create Account",
     email:"Email", password:"Password", display_name:"Display Name",
     back:"← Back", back_to_signin:"← Back to Sign In",
@@ -2553,7 +2552,7 @@ const I18N = {
     about_author:"Made by <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
   },
   ru: {
-    auth_tagline:"Фильмы · AI подборки · Друзья",
+    auth_tagline:"Веди списки фильмов.<br>Получай персональные подборки.<br>Делись с друзьями.",
     sign_in_title:"С возвращением", sign_up_title:"Регистрация",
     email:"Эл. почта", password:"Пароль", display_name:"Имя",
     back:"← Назад", back_to_signin:"← Вернуться ко входу",
@@ -2605,7 +2604,7 @@ const I18N = {
     about_author:"Сделано <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
   },
   uk: {
-    auth_tagline:"Стеж за фільмами · Отримуй AI-поради · Ділись з друзями",
+    auth_tagline:"Веди списки фільмів.<br>Отримуй персональні добірки.<br>Ділись з друзями.",
     sign_in_title:"З поверненням", sign_up_title:"Створити акаунт",
     email:"Пошта", password:"Пароль", display_name:"Ім'я",
     back:"← Назад", back_to_signin:"← Назад до входу",
@@ -2657,7 +2656,7 @@ const I18N = {
     about_author:"Зроблено <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
   },
   ka: {
-    auth_tagline:"თვალი ადევნე ფილმებს · მიიღე AI-რჩევები · გაუზიარე მეგობრებს",
+    auth_tagline:"თვალი ადევნე ფილმებს.<br>მიიღე პერსონალური რჩევები.<br>გაუზიარე მეგობრებს.",
     sign_in_title:"კეთილი იყოს დაბრუნება", sign_up_title:"ანგარიშის შექმნა",
     email:"ელფოსტა", password:"პაროლი", display_name:"სახელი",
     back:"← უკან", back_to_signin:"← უკან შესვლაში",
@@ -2709,7 +2708,7 @@ const I18N = {
     about_author:"შექმნა <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>-მა.",
   },
   es: {
-    auth_tagline:"Registra películas · Recibe sugerencias de IA · Comparte con amigos",
+    auth_tagline:"Registra tus películas.<br>Recibe recomendaciones personales.<br>Comparte con amigos.",
     sign_in_title:"Bienvenido de nuevo", sign_up_title:"Crear cuenta",
     email:"Correo", password:"Contraseña", display_name:"Nombre",
     back:"← Atrás", back_to_signin:"← Volver a iniciar sesión",
@@ -2761,7 +2760,7 @@ const I18N = {
     about_author:"Hecho por <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
   },
   fr: {
-    auth_tagline:"Suivez vos films · Recevez des suggestions IA · Partagez avec vos amis",
+    auth_tagline:"Suis tes films.<br>Reçois des sélections personnelles.<br>Partage avec tes amis.",
     sign_in_title:"Bon retour", sign_up_title:"Créer un compte",
     email:"E-mail", password:"Mot de passe", display_name:"Nom",
     back:"← Retour", back_to_signin:"← Retour à la connexion",
@@ -2836,7 +2835,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Select a friend to invite:", add_friends_first:"Add friends first to invite them",
     invite_valid_48:"Valid for 48 hours", invite_connect_hint:"When they open it, you'll connect as friends in one tap.",
     join_list_q:"Join the list", join_invited_sub:"You've been invited to a shared movie list",
-    list_picker_title:"Add to List", filter_friends:"Filter friends…", searching:"Searching…", not_found:"Not found", friends_empty:"No friends yet. Use the invite link below to add the people you watch with.", friend_remove_suffix:"— remove from friends?", friends_no_match:"No friends match", edit_modal_title:"EDIT REVIEW", share_modal_title:"RECOMMEND A FILM", send_btn:"Send", note_ph:"What did you think?", share_msg_ph:"Why you'd love this…", add_modal_seen:"MARK AS SEEN", add_modal_list:"ADD TO LIST",
+    list_picker_title:"Add to List", filter_friends:"Filter friends…", searching:"Searching…", not_found:"Not found", friends_empty:"No friends yet. Use the invite link below to add the people you watch with.", friend_remove_suffix:"— remove from friends?", friends_no_match:"No friends match", edit_modal_title:"EDIT REVIEW", share_modal_title:"RECOMMEND A FILM", send_btn:"Send", note_ph:"What did you think?", share_msg_ph:"Why you'd love this…", add_modal_seen:"MARK AS SEEN", add_modal_list:"ADD TO LIST", ob8_picks:"✨ Personal picks for you", err_bad_login:"Wrong email or password.", signin_create_cta:"New here? Create an account",
   },
   ru: {
     empty_search_title:"Найди свой следующий фильм", recs_ph:"Настроение, жанр, что угодно…", empty_search_sub:"Введи название и нажми Поиск",
@@ -2858,7 +2857,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Выбери друга для приглашения:", add_friends_first:"Сначала добавь друзей, чтобы приглашать",
     invite_valid_48:"Действует 48 часов", invite_connect_hint:"Когда откроют - вы добавитесь в друзья одним касанием.",
     join_list_q:"Вступить в список", join_invited_sub:"Тебя пригласили в общий список фильмов",
-    list_picker_title:"В список", filter_friends:"Фильтр друзей…", searching:"Поиск…", not_found:"Не найдено", friends_empty:"Друзей пока нет. Используй ссылку-приглашение ниже, чтобы добавить тех, с кем смотришь.", friend_remove_suffix:"— убрать из друзей?", friends_no_match:"Нет друзей по запросу", edit_modal_title:"РЕДАКТИРОВАТЬ ОТЗЫВ", share_modal_title:"ПОСОВЕТОВАТЬ ФИЛЬМ", send_btn:"Отправить", note_ph:"Что думаешь?", share_msg_ph:"Почему тебе это понравится…", add_modal_seen:"ОТМЕТИТЬ ПРОСМОТРЕННЫМ", add_modal_list:"ДОБАВИТЬ В СПИСОК",
+    list_picker_title:"В список", filter_friends:"Фильтр друзей…", searching:"Поиск…", not_found:"Не найдено", friends_empty:"Друзей пока нет. Используй ссылку-приглашение ниже, чтобы добавить тех, с кем смотришь.", friend_remove_suffix:"— убрать из друзей?", friends_no_match:"Нет друзей по запросу", edit_modal_title:"РЕДАКТИРОВАТЬ ОТЗЫВ", share_modal_title:"ПОСОВЕТОВАТЬ ФИЛЬМ", send_btn:"Отправить", note_ph:"Что думаешь?", share_msg_ph:"Почему тебе это понравится…", add_modal_seen:"ОТМЕТИТЬ ПРОСМОТРЕННЫМ", add_modal_list:"ДОБАВИТЬ В СПИСОК", ob8_picks:"✨ Персональные подборки для тебя", err_bad_login:"Неверный email или пароль.", signin_create_cta:"Впервые здесь? Создать аккаунт",
   },
   uk: {
     empty_search_title:"Знайди свій наступний фільм", recs_ph:"Настрій, жанр, будь-що…", empty_search_sub:"Введи назву і натисни Пошук",
@@ -2880,7 +2879,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Обери друга для запрошення:", add_friends_first:"Спершу додай друзів, щоб запрошувати",
     invite_valid_48:"Дійсне 48 годин", invite_connect_hint:"Коли відкриють - ви додастеся в друзі одним дотиком.",
     join_list_q:"Приєднатися до списку", join_invited_sub:"Тебе запросили до спільного списку фільмів",
-    list_picker_title:"До списку", filter_friends:"Фільтр друзів…", searching:"Пошук…", not_found:"Не знайдено", friends_empty:"Друзів поки немає. Скористайся посиланням нижче, щоб додати тих, з ким дивишся.", friend_remove_suffix:"— прибрати з друзів?", friends_no_match:"Немає друзів за запитом", edit_modal_title:"РЕДАГУВАТИ ВІДГУК", share_modal_title:"ПОРАДИТИ ФІЛЬМ", send_btn:"Надіслати", note_ph:"Що думаєш?", share_msg_ph:"Чому тобі це сподобається…", add_modal_seen:"ПОЗНАЧИТИ ПЕРЕГЛЯНУТИМ", add_modal_list:"ДОДАТИ ДО СПИСКУ",
+    list_picker_title:"До списку", filter_friends:"Фільтр друзів…", searching:"Пошук…", not_found:"Не знайдено", friends_empty:"Друзів поки немає. Скористайся посиланням нижче, щоб додати тих, з ким дивишся.", friend_remove_suffix:"— прибрати з друзів?", friends_no_match:"Немає друзів за запитом", edit_modal_title:"РЕДАГУВАТИ ВІДГУК", share_modal_title:"ПОРАДИТИ ФІЛЬМ", send_btn:"Надіслати", note_ph:"Що думаєш?", share_msg_ph:"Чому тобі це сподобається…", add_modal_seen:"ПОЗНАЧИТИ ПЕРЕГЛЯНУТИМ", add_modal_list:"ДОДАТИ ДО СПИСКУ", ob8_picks:"✨ Персональні добірки для тебе", err_bad_login:"Невірний email або пароль.", signin_create_cta:"Вперше тут? Створити акаунт",
   },
   ka: {
     empty_search_title:"იპოვე შენი შემდეგი ფილმი", recs_ph:"განწყობა, ჟანრი ან ნებისმიერი…", empty_search_sub:"აკრიფე სათაური და დააჭირე ძიებას",
@@ -2902,7 +2901,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"აირჩიე მოსაწვევი მეგობარი:", add_friends_first:"ჯერ დაამატე მეგობრები მოსაწვევად",
     invite_valid_48:"მოქმედებს 48 საათი", invite_connect_hint:"გახსნისას ერთი შეხებით დაუმეგობრდებით.",
     join_list_q:"სიაში გაწევრიანება", join_invited_sub:"მოგიწვიეს საერთო ფილმების სიაში",
-    list_picker_title:"სიაში დამატება", filter_friends:"გაფილტრე მეგობრები…", searching:"ძიება…", not_found:"ვერ მოიძებნა", friends_empty:"ჯერ მეგობრები არ არის. გამოიყენე ქვემოთ მოცემული ბმული, რომ დაამატო ისინი, ვისთანაც უყურებ.", friend_remove_suffix:"— ამოშალო მეგობრებიდან?", friends_no_match:"ვერ მოიძებნა მეგობარი", edit_modal_title:"შეფასების რედაქტირება", share_modal_title:"ფილმის რეკომენდაცია", send_btn:"გაგზავნა", note_ph:"რას ფიქრობ?", share_msg_ph:"რატომ მოგეწონება…", add_modal_seen:"მონიშნე ნანახად", add_modal_list:"სიაში დამატება",
+    list_picker_title:"სიაში დამატება", filter_friends:"გაფილტრე მეგობრები…", searching:"ძიება…", not_found:"ვერ მოიძებნა", friends_empty:"ჯერ მეგობრები არ არის. გამოიყენე ქვემოთ მოცემული ბმული, რომ დაამატო ისინი, ვისთანაც უყურებ.", friend_remove_suffix:"— ამოშალო მეგობრებიდან?", friends_no_match:"ვერ მოიძებნა მეგობარი", edit_modal_title:"შეფასების რედაქტირება", share_modal_title:"ფილმის რეკომენდაცია", send_btn:"გაგზავნა", note_ph:"რას ფიქრობ?", share_msg_ph:"რატომ მოგეწონება…", add_modal_seen:"მონიშნე ნანახად", add_modal_list:"სიაში დამატება", ob8_picks:"✨ პერსონალური რჩევები შენთვის", err_bad_login:"არასწორი email ან პაროლი.", signin_create_cta:"ახალი ხარ? შექმენი ანგარიში",
   },
   es: {
     empty_search_title:"Encuentra tu próxima película", recs_ph:"Estado de ánimo, género o lo que sea…", empty_search_sub:"Escribe un título y pulsa Buscar",
@@ -2924,7 +2923,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Elige un amigo para invitar:", add_friends_first:"Añade amigos primero para invitarlos",
     invite_valid_48:"Válido 48 horas", invite_connect_hint:"Cuando lo abran, os conectaréis como amigos al instante.",
     join_list_q:"Unirse a la lista", join_invited_sub:"Te han invitado a una lista compartida de películas",
-    list_picker_title:"Añadir a lista", filter_friends:"Filtrar amigos…", searching:"Buscando…", not_found:"No encontrado", friends_empty:"Aún no tienes amigos. Usa el enlace de invitación de abajo para añadir a quienes ves películas.", friend_remove_suffix:"— ¿quitar de amigos?", friends_no_match:"Sin coincidencias", edit_modal_title:"EDITAR RESEÑA", share_modal_title:"RECOMENDAR UNA PELÍCULA", send_btn:"Enviar", note_ph:"¿Qué te pareció?", share_msg_ph:"Por qué te encantará…", add_modal_seen:"MARCAR COMO VISTA", add_modal_list:"AÑADIR A LISTA",
+    list_picker_title:"Añadir a lista", filter_friends:"Filtrar amigos…", searching:"Buscando…", not_found:"No encontrado", friends_empty:"Aún no tienes amigos. Usa el enlace de invitación de abajo para añadir a quienes ves películas.", friend_remove_suffix:"— ¿quitar de amigos?", friends_no_match:"Sin coincidencias", edit_modal_title:"EDITAR RESEÑA", share_modal_title:"RECOMENDAR UNA PELÍCULA", send_btn:"Enviar", note_ph:"¿Qué te pareció?", share_msg_ph:"Por qué te encantará…", add_modal_seen:"MARCAR COMO VISTA", add_modal_list:"AÑADIR A LISTA", ob8_picks:"✨ Selección personal para ti", err_bad_login:"Email o contraseña incorrectos.", signin_create_cta:"¿Eres nuevo? Crea una cuenta",
   },
   fr: {
     empty_search_title:"Trouvez votre prochain film", recs_ph:"Humeur, genre ou autre…", empty_search_sub:"Saisissez un titre et appuyez sur Rechercher",
@@ -2946,7 +2945,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Choisis un ami à inviter :", add_friends_first:"Ajoute d'abord des amis pour les inviter",
     invite_valid_48:"Valable 48 heures", invite_connect_hint:"À l'ouverture, vous deviendrez amis en un clic.",
     join_list_q:"Rejoindre la liste", join_invited_sub:"Tu es invité à une liste de films partagée",
-    list_picker_title:"Ajouter à la liste", filter_friends:"Filtrer les amis…", searching:"Recherche…", not_found:"Introuvable", friends_empty:"Pas encore d'amis. Utilise le lien d'invitation ci-dessous pour ajouter tes compagnons de visionnage.", friend_remove_suffix:"— retirer des amis ?", friends_no_match:"Aucun ami trouvé", edit_modal_title:"MODIFIER L'AVIS", share_modal_title:"RECOMMANDER UN FILM", send_btn:"Envoyer", note_ph:"Qu'en as-tu pensé ?", share_msg_ph:"Pourquoi tu vas adorer…", add_modal_seen:"MARQUER COMME VU", add_modal_list:"AJOUTER À LA LISTE",
+    list_picker_title:"Ajouter à la liste", filter_friends:"Filtrer les amis…", searching:"Recherche…", not_found:"Introuvable", friends_empty:"Pas encore d'amis. Utilise le lien d'invitation ci-dessous pour ajouter tes compagnons de visionnage.", friend_remove_suffix:"— retirer des amis ?", friends_no_match:"Aucun ami trouvé", edit_modal_title:"MODIFIER L'AVIS", share_modal_title:"RECOMMANDER UN FILM", send_btn:"Envoyer", note_ph:"Qu'en as-tu pensé ?", share_msg_ph:"Pourquoi tu vas adorer…", add_modal_seen:"MARQUER COMME VU", add_modal_list:"AJOUTER À LA LISTE", ob8_picks:"✨ Sélections personnelles pour toi", err_bad_login:"Email ou mot de passe incorrect.", signin_create_cta:"Nouveau ? Crée un compte",
   },
 };
 Object.keys(_I18N_EXTRA).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_EXTRA[l]); });
@@ -3096,8 +3095,10 @@ function _obFinish() {
   localStorage.setItem('onboarded', '1');
   const el = document.getElementById('screen-onboarding');
   if (el) { el.style.opacity = '0'; el.style.transition = 'opacity 0.3s'; setTimeout(() => { el.style.display = 'none'; el.style.opacity = '1'; }, 300); }
-  // If user is already signed in (replay from account), just hide onboarding — don't redirect to sign-in
-  if (!currentUser) showScreen('signin');
+  // If user is already signed in (replay from account), just hide onboarding.
+  // Otherwise a brand-new visitor just saw the tour → send them to Create Account,
+  // not the returning-user Sign In form (avoids typing signup data into the login).
+  if (!currentUser) showScreen('signup');
 }
 
 function replayOnboarding() {
@@ -3146,9 +3147,26 @@ async function doSignIn() {
     if (error) throw error;
     await onSignedIn(data.user);
   } catch(e) {
-    showSignInError(e.message);
-    btn.textContent = "Sign In"; btn.disabled = false;
+    const m = (e && e.message) || "";
+    if (/invalid login|credentials|invalid_grant/i.test(m)) {
+      // Likely a new user who typed signup data into the login form. Offer a clear
+      // path to Create Account, carrying what they already typed.
+      const el = document.getElementById("signin-error");
+      el.innerHTML = `${t('err_bad_login')} <a onclick="_signinToSignup()" style="color:var(--primary);font-weight:700;cursor:pointer;text-decoration:underline">${t('signin_create_cta')}</a>`;
+      el.classList.add("show");
+    } else {
+      showSignInError(m);
+    }
+    btn.textContent = t('sign_in'); btn.disabled = false;
   }
+}
+function _signinToSignup() {
+  const em = (document.getElementById("signin-email").value || "").trim();
+  const pw = document.getElementById("signin-password").value || "";
+  if (em) document.getElementById("signup-email").value = em;
+  if (pw) document.getElementById("signup-password").value = pw;
+  showScreen("signup");
+  const n = document.getElementById("signup-name"); if (n) n.focus();
 }
 function showSignInError(msg) {
   const el = document.getElementById("signin-error");
@@ -3469,7 +3487,7 @@ function handleRateLimitHit(data) {
   const resetStr = formatReset(data.reset_at);
   const seen = localStorage.getItem("seenLimitExplainer") === "1";
   if (!seen) { showLimitExplainer(data, resetStr); localStorage.setItem("seenLimitExplainer", "1"); }
-  else showToast(`AI limit reached (${data.limit||20}/day) — resets ${resetStr} 🌙`);
+  else showToast(`Daily picks limit reached (${data.limit||20}/day) — resets ${resetStr} 🌙`);
 }
 
 function showLimitExplainer(data, resetStr) {
@@ -3479,10 +3497,10 @@ function showLimitExplainer(data, resetStr) {
   ov.innerHTML = `
     <div style="padding:20px;width:100%;display:flex;justify-content:center" onclick="event.stopPropagation()">
       <div class="modal-sheet" style="max-width:340px">
-        <div class="sheet-label" style="color:var(--primary)">DAILY AI LIMIT REACHED</div>
-        <div class="sheet-title">You've used all ${data.limit||20} AI picks for today</div>
-        <div style="color:#bbb;font-size:13px;line-height:1.6;margin-bottom:14px">Resets ${resetStr}. Search and watchlist still work — only AI picks are paused.</div>
-        <div style="color:#666;font-size:12px;line-height:1.6;margin-bottom:18px;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--border)">I'm building this solo and each AI pick costs real money. The daily cap keeps the app free and sustainable — thanks for understanding.</div>
+        <div class="sheet-label" style="color:var(--primary)">DAILY PICKS LIMIT REACHED</div>
+        <div class="sheet-title">You've used all ${data.limit||20} personal picks for today</div>
+        <div style="color:#bbb;font-size:13px;line-height:1.6;margin-bottom:14px">Resets ${resetStr}. Search and watchlist still work — only personal picks are paused.</div>
+        <div style="color:#666;font-size:12px;line-height:1.6;margin-bottom:18px;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--border)">I'm building this solo and each personal pick costs real money. The daily cap keeps the app free and sustainable — thanks for understanding.</div>
         <button class="btn-modal-save" style="width:100%" onclick="this.closest('.overlay').remove()">Got It</button>
       </div>
     </div>`;
@@ -3495,7 +3513,7 @@ function updateAICounter(remaining, limit) {
   const el = document.getElementById("ai-counter");
   if (!el) return;
   if (remaining === null || limit === null) { el.textContent = ""; return; }
-  el.textContent = `${remaining}/${limit} AI picks left today`;
+  el.textContent = `${remaining}/${limit} personal picks left today`;
   el.style.color = remaining <= 3 ? "#f87171" : "var(--muted)";
 }
 
