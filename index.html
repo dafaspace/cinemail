@@ -1192,6 +1192,7 @@ body {
   box-shadow: 0 6px 20px rgba(0,0,0,0.5);
   transform: scale(1.06);
   transition: none;
+  opacity: 0.55; /* translucent so the purple drop indicator shows through */
 }
 /* While dragging a tab, dim the other pills so the purple drop indicator stands out */
 .list-tabs-row.tabs-dragging .list-tab { opacity: 0.3; transition: opacity 0.12s; }
@@ -2416,7 +2417,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.21</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.22</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -5119,6 +5120,13 @@ function _listDragStart(e, tab, row) {
 
     if (!dragging) return;
 
+    // Swallow the click the browser fires right after pointerup, so it doesn't
+    // hit the tab's onclick → switchListTab() → re-render and break the reorder.
+    // This is why a non-active tab previously failed to drag.
+    const swallow = (ce) => { ce.stopPropagation(); ce.preventDefault(); };
+    row.addEventListener('click', swallow, { capture: true });
+    setTimeout(() => { try { row.removeEventListener('click', swallow, true); } catch(_) {} }, 450);
+
     const addBtn = row.querySelector('.list-tab-add') || row.querySelector('#list-tab-input');
     if (insertBeforeTab) row.insertBefore(tab, insertBeforeTab);
     else row.insertBefore(tab, addBtn || null);
@@ -5136,7 +5144,7 @@ function _listDragStart(e, tab, row) {
     document.removeEventListener('pointercancel', onUp);
     row.classList.remove('tabs-dragging');
   }
-  document.addEventListener('pointermove', onMove, { passive: true });
+  document.addEventListener('pointermove', onMove, { passive: false });
   document.addEventListener('pointerup', onUp);
   document.addEventListener('pointercancel', onUp);
 }
