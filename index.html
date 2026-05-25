@@ -469,6 +469,13 @@ body {
   font-style: italic;
   line-height: 1.5;
 }
+.why-brand {
+  font-family: 'Bebas Neue', 'Oswald', -apple-system, sans-serif;
+  font-style: normal;
+  color: var(--primary);
+  letter-spacing: 0.5px;
+  margin-right: 3px;
+}
 
 /* ── Filter pills ───────────────────────────────────────────────────── */
 .filter-row { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
@@ -2417,7 +2424,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.22</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.23</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3009,6 +3016,13 @@ function _filmsWord(n) {
   if (n10 === 1 && n100 !== 11) return forms[0];
   if (n10 >= 2 && n10 <= 4 && (n100 < 10 || n100 >= 20)) return forms[1];
   return forms[2];
+}
+// Instruction appended to recommendation prompts: localise the "why" text to the
+// current UI language, informal & warm, no em dashes / emoji, keep titles original.
+function _recLangRule() {
+  const names = { en:'English', ru:'Russian', uk:'Ukrainian', ka:'Georgian', es:'Spanish', fr:'French' };
+  const lang = names[_lang] || 'English';
+  return `\n\nWrite every "why" value in ${lang}, speaking to the user directly, informally and warmly (use the informal "you" where the language distinguishes it). Do NOT use em dashes or any emoji in "why". Keep each "title" in its original language - do not translate titles.`;
 }
 let _lang = localStorage.getItem('lang') || (function(){
   const n = (navigator.language || 'en').slice(0,2).toLowerCase();
@@ -3884,6 +3898,8 @@ function _icoEye(filled){ return filled
 function _icoShare(){ return `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7M21 3l-9 9M10 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg>`; }
 
 function movieCardHTML(m, why) {
+  // Safety net: strip em/en dashes from AI "why" text (prompt also forbids them)
+  if (why) why = String(why).replace(/\s*[—–]\s*/g, ' - ').trim();
   const status = getEntryStatus(m.tmdbID || m.id);
   const rating = m.Rating ? ` · ★ ${m.Rating}` : "";
   const genre = m.Genre ? ` · ${m.Genre.split(",")[0]}` : "";
@@ -3921,7 +3937,7 @@ function movieCardHTML(m, why) {
           ${shareBtn}
         </div>
       </div>
-      ${why ? `<div class="why-strip">💡 ${why}</div>` : ""}
+      ${why ? `<div class="why-strip"><span class="why-brand">Cinemail</span> ${why}</div>` : ""}
     </div>`;
 }
 
@@ -4626,9 +4642,9 @@ async function surpriseMe() {
     const angles = ["Focus on films from non-English speaking countries.","Focus on films from the 1970s or 1980s.","Focus on documentary or animated films.","Focus on recent films from the last 3 years.","Focus on cult classics or underrated gems.","Focus on films from Asia or Latin America.","Include at least one silent era or black-and-white film.","Focus on films with female directors.","Mix decades: one classic, one from 90s-2000s, one recent."];
     const angle = angles[Math.floor(Math.random()*angles.length)];
     let prompt = "";
-    if (mode==="random") prompt = `Pick 3 great films or shows completely at random — pure instinct, no context. ${angle} Make them wildly different in genre, era, country.${recentlyShown?"\nDO NOT repeat: "+recentlyShown:""}${tasteCtx?"\n"+tasteCtx:""}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why it's a must-watch"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
-    else if (mode==="seasonal") { const ctx=getSeasonalContext(); prompt = `Suggest 3 films perfectly suited for right now: ${ctx}. Match the mood of the moment. ${angle}${recentlyShown?"\nDO NOT repeat: "+recentlyShown:""}${watched?"\nAlready watched — skip: "+watched:""}${tasteCtx?"\n"+tasteCtx:""}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why it fits tonight"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`; }
-    else prompt = `Suggest 3 films based on taste. ${angle} Vary genre, era, country.${watched?"\nWatch history: "+watched:" No history — use acclaimed films."}${planned?"\nDO NOT suggest from watchlist: "+planned:""}${recentlyShown?"\nDO NOT repeat recently shown: "+recentlyShown:""}${watched?"\nDO NOT suggest already watched: "+watched:""}${tasteCtx?"\n"+tasteCtx:""}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why they'd love it"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
+    if (mode==="random") prompt = `Pick 3 great films or shows completely at random — pure instinct, no context. ${angle} Make them wildly different in genre, era, country.${recentlyShown?"\nDO NOT repeat: "+recentlyShown:""}${tasteCtx?"\n"+tasteCtx:""}${_recLangRule()}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why it's a must-watch"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
+    else if (mode==="seasonal") { const ctx=getSeasonalContext(); prompt = `Suggest 3 films perfectly suited for right now: ${ctx}. Match the mood of the moment. ${angle}${recentlyShown?"\nDO NOT repeat: "+recentlyShown:""}${watched?"\nAlready watched — skip: "+watched:""}${tasteCtx?"\n"+tasteCtx:""}${_recLangRule()}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why it fits tonight"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`; }
+    else prompt = `Suggest 3 films based on taste. ${angle} Vary genre, era, country.${watched?"\nWatch history: "+watched:" No history — use acclaimed films."}${planned?"\nDO NOT suggest from watchlist: "+planned:""}${recentlyShown?"\nDO NOT repeat recently shown: "+recentlyShown:""}${watched?"\nDO NOT suggest already watched: "+watched:""}${tasteCtx?"\n"+tasteCtx:""}${_recLangRule()}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why they'd love it"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
     let suggestions;
     try { suggestions = await proxyFetchWithRetry({ model:"claude-haiku-4-5-20251001", max_tokens:700, messages:[{role:"user",content:prompt}] }); }
     catch(e) { if (e.message==="rate_limited") { el.innerHTML=""; return; } throw e; }
@@ -4665,7 +4681,7 @@ async function loadRecs() {
       const watched = watchedEntries.slice(-12).map(m=>`${m.title} (${m.year})${m.stars?" "+m.stars+"★":""}${m.comment?` — "${m.comment}"`:""}"`).join("\n");
       const planned = watchHistory.filter(h=>h.status==="plan").slice(-6).map(m=>m.title).join(", ");
       const tasteCtx = getTasteContext(watchedEntries);
-      const prompt = `You are a film expert helping pick what to watch tonight.\n\n${watched?`Already watched — DO NOT suggest any of these:\n${watched}`:"No watch history yet."}${planned?`\nAlready on watchlist — DO NOT suggest any of these: ${planned}`:""}${tasteCtx?`\n${tasteCtx}`:""}\n\nUser request: "${q||"Surprise me with something great"}"\n\nBased on their taste and request, suggest exactly 5 films or TV shows.\nCRITICAL: None of your suggestions may appear in the watched or watchlist above.\n- Interpret the request broadly.\n- Vary genres/eras unless the request is specific.\n- For each, write one sentence explaining WHY it fits their taste or request specifically.\n\nReply ONLY with a JSON array, no other text:\n[{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
+      const prompt = `You are a film expert helping pick what to watch tonight.\n\n${watched?`Already watched — DO NOT suggest any of these:\n${watched}`:"No watch history yet."}${planned?`\nAlready on watchlist — DO NOT suggest any of these: ${planned}`:""}${tasteCtx?`\n${tasteCtx}`:""}\n\nUser request: "${q||"Surprise me with something great"}"\n\nBased on their taste and request, suggest exactly 5 films or TV shows.\nCRITICAL: None of your suggestions may appear in the watched or watchlist above.\n- Interpret the request broadly.\n- Vary genres/eras unless the request is specific.\n- For each, write one sentence explaining WHY it fits their taste or request specifically.${_recLangRule()}\n\nReply ONLY with a JSON array, no other text:\n[{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
       try { suggestions = await proxyFetchWithRetry({ model:"claude-haiku-4-5-20251001", max_tokens:1000, messages:[{role:"user",content:prompt}] }); }
       catch(e) { if (e.message==="rate_limited") { el.innerHTML=""; btn.disabled=false; btn.textContent=t('find_btn'); return; } throw e; }
     } else {
