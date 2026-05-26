@@ -1752,6 +1752,8 @@ body {
         <button class="lang-btn" data-lang="ka" onclick="setLang('ka')">KA</button>
         <button class="lang-btn" data-lang="es" onclick="setLang('es')">ES</button>
         <button class="lang-btn" data-lang="fr" onclick="setLang('fr')">FR</button>
+        <button class="lang-btn" data-lang="de" onclick="setLang('de')">DE</button>
+        <button class="lang-btn" data-lang="it" onclick="setLang('it')">IT</button>
       </div>
     </div>
 
@@ -2430,6 +2432,8 @@ body {
         <button class="lang-btn" data-lang="ka" onclick="setLang('ka')">KA</button>
         <button class="lang-btn" data-lang="es" onclick="setLang('es')">ES</button>
         <button class="lang-btn" data-lang="fr" onclick="setLang('fr')">FR</button>
+        <button class="lang-btn" data-lang="de" onclick="setLang('de')">DE</button>
+        <button class="lang-btn" data-lang="it" onclick="setLang('it')">IT</button>
       </div>
 
       <button onclick="replayOnboarding()" data-i18n="replay_onboarding" style="width:100%;padding:9px;border-radius:9px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:14px;transition:all 0.15s" onmouseover="this.style.borderColor='var(--accent-border)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">🎬 Replay Welcome Tour</button>
@@ -2466,7 +2470,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.14.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.15.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -2863,6 +2867,110 @@ const I18N = {
     about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Politique de confidentialité</a>",
     about_tmdb:"Données de films, affiches et équipe via <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail utilise l'API TMDB mais n'est ni approuvé ni certifié par TMDB.",
     about_author:"Créé par <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
+  },
+  de: {
+    auth_tagline:"Verfolge deine Filme.<br>Erhalte persönliche Empfehlungen.<br>Teile mit Freunden.",
+    sign_in_title:"Willkommen zurück", sign_up_title:"Konto erstellen",
+    email:"E-Mail", password:"Passwort", display_name:"Name",
+    back:"← Zurück", back_to_signin:"← Zurück zur Anmeldung",
+    new_here:"Neu bei Cinemail?", create_acct_link:"Konto erstellen",
+    have_acct:"Hast du schon ein Konto?", sign_in_link:"Anmelden",
+    check_inbox_title:"Prüfe dein Postfach",
+    email_sent:"Wir haben einen Bestätigungslink an deine E-Mail gesendet.<br>Klicke darauf, um dein Konto zu aktivieren.",
+    check_spam:"Nichts erhalten? Schau in deinem Spam-Ordner nach.",
+    sign_in:"Anmelden", sign_up:"Konto erstellen", close:"Schließen", sign_out:"Abmelden",
+    tab_search:"🔍 Suche", tab_picks:"✨ Tipps", tab_lists:"📋 Listen", tab_inbox:"📬 Postfach", tab_inbox_label:"Postfach",
+    tab_watched:"✓ Gesehen", new_list_tab:"+ Neu",
+    stat_watched:"Gesehen", stat_to_watch:"Geplant", stat_avg:"Ø ★", stat_time:"Sehzeit · tippen",
+    cp_title:"Dein Kinoprofil", cp_dir:"Top-Regisseure", cp_cine:"Top-Kameraleute", cp_comp:"Top-Komponisten", cp_act:"Top-Schauspieler",
+    search_btn:"Suchen", find_btn:"Finden",
+    search_people:"Personen", search_films:"Filme & Serien",
+    your_rating:"Deine Bewertung", notes:"Notizen", send_to:"Senden an", msg_opt:"Nachricht (optional)",
+    display_name_lbl:"Name", backup_lbl:"Backup", friends_lbl:"Freunde",
+    add_friend:"Hinzufügen", save:"Speichern",
+    export_csv:"↓ CSV exportieren", import_csv:"↑ CSV importieren", export_json:"↓ JSON exportieren",
+    backfill_crew:"🔄 Crew-Daten aktualisieren",
+    save_drive:"Auf Drive speichern", restore_drive:"Wiederherstellen",
+    ob0_body:"Filme. Musik. Freunde.",
+    ob1_title:"Finde deinen Film", ob1_body:"Von einem Film gehört? Such ihn einfach. Lies die Handlung, sieh dir die Bewertung an, entdecke bekannte Namen in der Besetzung. Gefällt er dir? Pack ihn in deine Liste.",
+    ob2_title:"Deine Listen", ob2_body:"Du musst dir nicht jeden \"den sollten wir mal sehen\"-Film merken. Öffne die richtige Liste, wenn es Zeit ist, etwas für heute Abend auszuwählen.",
+    ob3_title:"Bewerten & entdecken", ob3_body:"Gesehen? Markiere ihn als Gesehen, gib eine Bewertung und ein paar Gedanken ab. So entdeckst du deine persönlichen Top-Regisseure, Komponisten, Kameraleute und Schauspieler.",
+    ob4_title:"Soundtracks", ob4_body:"Die Musik geliebt? Jeder Film hat direkte Links zu seinem Soundtrack auf Spotify, Apple Music und YouTube Music.",
+    ob5_title:"Entdecke Filmemacher", ob5_body:"Tippe auf einen Regisseur, Schauspieler, Komponisten oder Kameramann, um seine komplette Filmografie zu sehen. Der schnellste Weg, \"diese eine Schauspielerin\" und ihre anderen Filme zu finden.",
+    ob6_title:"Teile mit Freunden", ob6_body:"Schick einem Freund einen Film - er landet direkt in seinem Postfach. Eine Liste erstellt, die alle sehen sollten? Füge deine Freunde hinzu. Sei nicht geizig.",
+    ob7_title:"Sicher & deins", ob7_body:"Deine Listen und Kritiken verschwinden nie. Dein Profil sichert ein Backup auf Google Drive und als CSV - dazu all deine Statistiken.",
+    ob8_title:"Überrasch mich", ob8_body:"Keine Ahnung, was du sehen sollst? Tippe auf Überrasch mich. Je mehr Filme in deiner Gesehen-Liste, desto besser die Überraschungen.",
+    ob9_title:"Film ab!", ob9_body:"Alles bereit. Worauf warten wir? Der Film schaut sich nicht von allein!",
+    ob_next:"Weiter", ob_start:"Finde deinen ersten Film", ob_skip:"Überspringen",
+    empty_list_title:"Deine Liste ist leer", empty_list_sub:"Such nach Filmen und füge sie deiner Liste hinzu", empty_list_btn:"Filme durchstöbern",
+    empty_shared_sub:"Such einen Film und tippe auf ≡, um ihn hier hinzuzufügen",
+    nothing_yet:"Noch nichts hier", mark_seen:"Markiere Filme als gesehen", save_to_list:"Speichere Filme in deiner Liste",
+    surprise:"✨ Überrasch mich",
+    act_watched:"Gesehen", act_addlist:"Zur Liste", act_inlist:"Meine Liste", act_share:"Teilen",
+    lang_label:"Sprache",
+    search_ph:"Film- oder Serientitel…",
+    friend_search_ph:"Nach Namen suchen…",
+    invite_to_app:"✨ Lade Freunde zu Cinemail ein",
+    delete_account:"Konto löschen",
+    replay_onboarding:"🎬 Tour erneut ansehen",
+    support_title:"Cinemail unterstützen",
+    support_text:"Frühe Unterstützer erhalten lebenslang kostenlose Pro-Funktionen, wenn Cinemail im App Store &amp; bei Google Play kostenpflichtig wird.",
+    support_button:"☕ Auf Ko-fi unterstützen →",
+    about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Datenschutzerklärung</a>",
+    about_tmdb:"Filmdaten, Poster und Crew-Infos von <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail nutzt die TMDB-API, ist aber nicht von TMDB unterstützt oder zertifiziert.",
+    about_author:"Erstellt von <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
+  },
+  it: {
+    auth_tagline:"Tieni traccia dei tuoi film.<br>Ricevi consigli personali.<br>Condividi con gli amici.",
+    sign_in_title:"Bentornato", sign_up_title:"Crea un account",
+    email:"E-mail", password:"Password", display_name:"Nome",
+    back:"← Indietro", back_to_signin:"← Torna all'accesso",
+    new_here:"Nuovo su Cinemail?", create_acct_link:"Crea un account",
+    have_acct:"Hai già un account?", sign_in_link:"Accedi",
+    check_inbox_title:"Controlla la tua casella",
+    email_sent:"Abbiamo inviato un link di conferma alla tua e-mail.<br>Cliccaci sopra per attivare il tuo account.",
+    check_spam:"Non l'hai ricevuto? Controlla la cartella spam.",
+    sign_in:"Accedi", sign_up:"Crea un account", close:"Chiudi", sign_out:"Esci",
+    tab_search:"🔍 Cerca", tab_picks:"✨ Consigli", tab_lists:"📋 Liste", tab_inbox:"📬 Posta", tab_inbox_label:"Posta",
+    tab_watched:"✓ Visti", new_list_tab:"+ Nuova",
+    stat_watched:"Visti", stat_to_watch:"Da vedere", stat_avg:"Media ★", stat_time:"Tempo visione · tocca",
+    cp_title:"Il tuo profilo cinema", cp_dir:"Top registi", cp_cine:"Top direttori della fotografia", cp_comp:"Top compositori", cp_act:"Top attori",
+    search_btn:"Cerca", find_btn:"Trova",
+    search_people:"Persone", search_films:"Film e serie",
+    your_rating:"Il tuo voto", notes:"Note", send_to:"Invia a", msg_opt:"Messaggio (facoltativo)",
+    display_name_lbl:"Nome", backup_lbl:"Backup", friends_lbl:"Amici",
+    add_friend:"Aggiungi", save:"Salva",
+    export_csv:"↓ Esporta CSV", import_csv:"↑ Importa CSV", export_json:"↓ Esporta JSON",
+    backfill_crew:"🔄 Aggiorna dati troupe",
+    save_drive:"Salva su Drive", restore_drive:"Ripristina",
+    ob0_body:"Film. Musica. Amici.",
+    ob1_title:"Trova il tuo film", ob1_body:"Hai sentito parlare di un film? Cercalo. Leggi la trama, controlla il voto, riconosci nomi noti nel cast. Ti piace? Mettilo nella tua lista.",
+    ob2_title:"Le tue liste", ob2_body:"Non c'è bisogno di ricordare ogni film che \"dovremmo vedere\". Apri la lista giusta quando è ora di scegliere cosa guardare stasera.",
+    ob3_title:"Vota e scopri", ob3_body:"Visto? Segnalo come Visto, lascia un voto e qualche pensiero. Rivela i tuoi registi, compositori, direttori della fotografia e attori preferiti.",
+    ob4_title:"Colonne sonore", ob4_body:"Hai amato la musica? Ogni film ha link diretti alla sua colonna sonora su Spotify, Apple Music e YouTube Music.",
+    ob5_title:"Esplora gli artisti", ob5_body:"Tocca un regista, attore, compositore o direttore della fotografia per vedere la sua filmografia completa. Il modo più veloce per ritrovare \"quell'attrice\" e i suoi altri film.",
+    ob6_title:"Condividi con gli amici", ob6_body:"Manda un film a un amico - arriva dritto nella sua posta. Hai creato una lista che tutti dovrebbero vedere? Aggiungi i tuoi amici. Non essere avaro.",
+    ob7_title:"Al sicuro e tuo", ob7_body:"Le tue liste e recensioni non spariscono mai. Il tuo profilo conserva un backup su Google Drive e in CSV - oltre a tutte le tue statistiche.",
+    ob8_title:"Sorprendimi", ob8_body:"Nessuna idea su cosa guardare? Tocca Sorprendimi. Più film hai nella lista Visti, migliori sono le sorprese.",
+    ob9_title:"Si gira!", ob9_body:"Tutto pronto. Cosa aspettiamo? Il film non si guarda da solo!",
+    ob_next:"Avanti", ob_start:"Trova il tuo primo film", ob_skip:"Salta",
+    empty_list_title:"La tua lista è vuota", empty_list_sub:"Cerca film e aggiungili alla tua lista", empty_list_btn:"Sfoglia i film",
+    empty_shared_sub:"Cerca un film e tocca ≡ per aggiungerlo qui",
+    nothing_yet:"Ancora niente qui", mark_seen:"Segna i film come visti", save_to_list:"Salva film nella tua lista",
+    surprise:"✨ Sorprendimi",
+    act_watched:"Visto", act_addlist:"Alla lista", act_inlist:"La mia lista", act_share:"Condividi",
+    lang_label:"Lingua",
+    search_ph:"Titolo di film o serie…",
+    friend_search_ph:"Cerca per nome…",
+    invite_to_app:"✨ Invita amici su Cinemail",
+    delete_account:"Elimina account",
+    replay_onboarding:"🎬 Rivedi l'introduzione",
+    support_title:"Sostieni Cinemail",
+    support_text:"I primi sostenitori ottengono le funzioni Pro gratis a vita quando Cinemail diventerà a pagamento su App Store e Google Play.",
+    support_button:"☕ Sostieni su Ko-fi →",
+    about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Informativa sulla privacy</a>",
+    about_tmdb:"Dati dei film, locandine e info sulla troupe da <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail usa l'API di TMDB ma non è approvato né certificato da TMDB.",
+    about_author:"Creato da <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
   }
 };
 // ── Supplementary translations (lists + inbox + search/picks) ─────────────────
@@ -3012,12 +3120,61 @@ const _I18N_EXTRA = {
     loading_lbl:"Chargement…", err_no_results_title:"Aucun résultat", err_no_results_sub:"Essaie juste le titre, sans l'année", err_connection:"Erreur de connexion", err_generic:"Erreur", err_not_found_title:"Introuvable", err_no_results_for:"Aucun résultat pour", err_took_long_title:"Trop long", err_took_long_sub:"Réessaie dans un instant", recs_none_title:"Aucune sélection", recs_none_sub:"Essaie une autre idée", recs_unavail_title:"Sélections indisponibles", recs_unavail_sub:"Réessaie plus tard", inbox_empty_title:"Pas encore de discussions", inbox_empty_sub:"Partage un film depuis la recherche ou ta liste pour démarrer une conversation",
     continue_as_guest:"Continuer sans compte", guest_label:"Invité", guest_banner:"Mode invité", guest_join_btn:"Rejoindre Cinemail", guest_save_sub:"Sauvegarde des films, reçois des sélections personnelles et partage avec des amis - gratuit pour toujours.", guest_join_free:"Rejoindre gratuitement", guest_maybe_later:"Plus tard", guest_already_acct:"Tu as deja un compte ?",
   },
+  de: {
+    empty_search_title:"Finde deinen nächsten Film", recs_ph:"Stimmung, Genre, alles…", empty_search_sub:"Gib einen Titel ein und drücke Suchen",
+    list_rename:"Umbenennen", list_invite:"Einladen", list_link:"Link", list_delete:"Löschen", list_leave:"Verlassen",
+    list_members_title:"Mitglieder", list_remove:"Entfernen", you_label:"(du)", role_owner:"Besitzer", role_member:"Mitglied",
+    list_invite_to:"Einladen zu", list_invite_link_for:"Einladungslink für", list_select_friend:"Wähle einen Freund:",
+    list_generating:"Wird erstellt…", list_cancel:"Abbrechen",
+    inv_add_to_list:"Zur Liste", inv_decline:"Ablehnen", inv_from:"von", inv_to:"an",
+    inv_declined:"Abgelehnt", inv_pending:"Ausstehend", inv_added:"Hinzugefügt", inv_accepted:"Angenommen", inv_sent:"Gesendet",
+    inv_added_to:"Hinzugefügt zu", inv_reaction:"Reaktion", inv_invited_you:"hat dich eingeladen", inv_join_list:"Liste beitreten",
+    forgot_link:"Passwort vergessen?", forgot_title:"Passwort zurücksetzen", forgot_sub:"Gib deine E-Mail ein - wir senden dir einen Link.", forgot_send:"Link senden",
+    reset_title:"Neues Passwort festlegen", reset_newpass:"Neues Passwort", reset_confirm:"Passwort bestätigen", reset_update:"Passwort aktualisieren",
+    reset_email_sent:"Wir haben einen Link zum Zurücksetzen gesendet an", reset_done:"Passwort aktualisiert",
+    err_enter_email:"Bitte gib deine E-Mail ein.", err_pass_short:"Das Passwort muss mindestens 6 Zeichen haben.", err_pass_match:"Die Passwörter stimmen nicht überein.",
+    cancel:"Abbrechen", accept:"Annehmen", copy:"Kopieren", share_invite:"Einladung teilen",
+    friend_wants:"möchte mit dir befreundet sein", no_members:"Noch keine Mitglieder",
+    no_lists:"Noch keine Listen. Erstelle eine, um sie mit Freunden zu teilen.",
+    no_friends_share:"Noch keine Freunde - nutze den Teilen-Link zum Einladen",
+    select_friend_invite:"Wähle einen Freund zum Einladen:", add_friends_first:"Füge erst Freunde hinzu, um sie einzuladen",
+    invite_valid_48:"48 Stunden gültig", invite_connect_hint:"Wenn sie ihn öffnen, werdet ihr mit einem Tipp Freunde.",
+    join_list_q:"Der Liste beitreten", join_invited_sub:"Du wurdest zu einer geteilten Filmliste eingeladen",
+    list_picker_title:"Zur Liste", filter_friends:"Freunde filtern…", searching:"Suche…", not_found:"Nicht gefunden", friends_empty:"Noch keine Freunde. Nutze den Einladungslink unten, um die Leute hinzuzufügen, mit denen du schaust.", friend_remove_suffix:"— aus Freunden entfernen?", friends_no_match:"Keine passenden Freunde", edit_modal_title:"BEWERTUNG BEARBEITEN", share_modal_title:"FILM EMPFEHLEN", send_btn:"Senden", note_ph:"Wie fandest du ihn?", share_msg_ph:"Warum du ihn lieben wirst…", add_modal_seen:"ALS GESEHEN MARKIEREN", add_modal_list:"ZUR LISTE HINZUFÜGEN", ob8_picks:"✨ Persönliche Tipps für dich", err_bad_login:"Falsche E-Mail oder Passwort.", signin_create_cta:"Neu hier? Konto erstellen", recs_empty_title:"Persönliche Tipps", recs_empty_sub:"Gib eine Idee ein oder lass es leer und tippe auf Finden", recs_thinking:"Denke nach…", recs_still_thinking:"Denke noch nach, einen Moment…", based_on_label:"Basierend auf gesehenen Filmen", recs_hint_empty:"Füge gesehene Filme für persönliche Tipps hinzu", picks_left_today:"persönliche Tipps heute übrig", picks_random:"Zufällige Tipps", picks_tonight:"Tipps für heute Abend", picks_for_you:"Tipps für dich", where_to_watch:"Wo zu sehen", watch_attrib:"Streaming-Daten von JustWatch",
+    loading_lbl:"Lädt…", err_no_results_title:"Keine Ergebnisse", err_no_results_sub:"Versuch nur den Titel, ohne Jahr", err_connection:"Verbindungsfehler", err_generic:"Fehler", err_not_found_title:"Nicht gefunden", err_no_results_for:"Keine Ergebnisse für", err_took_long_title:"Hat zu lange gedauert", err_took_long_sub:"Versuch es gleich nochmal", recs_none_title:"Keine Tipps gefunden", recs_none_sub:"Versuch eine andere Idee", recs_unavail_title:"Tipps nicht verfügbar", recs_unavail_sub:"Bitte versuch es später", inbox_empty_title:"Noch keine Chats", inbox_empty_sub:"Teile einen Film aus der Suche oder deiner Liste, um ein Gespräch zu starten",
+    continue_as_guest:"Als Gast fortfahren", guest_label:"Gast", guest_banner:"Du bist als Gast unterwegs", guest_join_btn:"Cinemail beitreten", guest_save_sub:"Speichere Filme, erhalte persönliche Tipps und teile mit Freunden - für immer kostenlos.", guest_join_free:"Kostenlos beitreten", guest_maybe_later:"Vielleicht später", guest_already_acct:"Hast du schon ein Konto?",
+  },
+  it: {
+    empty_search_title:"Trova il tuo prossimo film", recs_ph:"Umore, genere o qualsiasi cosa…", empty_search_sub:"Scrivi un titolo e premi Cerca",
+    list_rename:"Rinomina", list_invite:"Invita", list_link:"Link", list_delete:"Elimina", list_leave:"Esci",
+    list_members_title:"Membri", list_remove:"Rimuovi", you_label:"(tu)", role_owner:"proprietario", role_member:"membro",
+    list_invite_to:"Invita a", list_invite_link_for:"Link d'invito per", list_select_friend:"Scegli un amico:",
+    list_generating:"Generazione…", list_cancel:"Annulla",
+    inv_add_to_list:"Alla lista", inv_decline:"Rifiuta", inv_from:"da", inv_to:"a",
+    inv_declined:"Rifiutato", inv_pending:"In attesa", inv_added:"Aggiunto", inv_accepted:"Accettato", inv_sent:"Inviato",
+    inv_added_to:"Aggiunto a", inv_reaction:"reazione", inv_invited_you:"ti ha invitato", inv_join_list:"Unisciti alla lista",
+    forgot_link:"Password dimenticata?", forgot_title:"Reimposta password", forgot_sub:"Inserisci la tua email - ti invieremo un link.", forgot_send:"Invia link",
+    reset_title:"Imposta nuova password", reset_newpass:"Nuova password", reset_confirm:"Conferma password", reset_update:"Aggiorna password",
+    reset_email_sent:"Abbiamo inviato un link per reimpostare la password a", reset_done:"Password aggiornata",
+    err_enter_email:"Inserisci la tua email.", err_pass_short:"La password deve avere almeno 6 caratteri.", err_pass_match:"Le password non coincidono.",
+    cancel:"Annulla", accept:"Accetta", copy:"Copia", share_invite:"Condividi invito",
+    friend_wants:"vuole essere tuo amico", no_members:"Ancora nessun membro",
+    no_lists:"Ancora nessuna lista. Creane una da condividere con gli amici.",
+    no_friends_share:"Ancora nessun amico - usa il link Condividi per invitare",
+    select_friend_invite:"Scegli un amico da invitare:", add_friends_first:"Aggiungi prima degli amici per invitarli",
+    invite_valid_48:"Valido per 48 ore", invite_connect_hint:"Quando lo aprono, diventerete amici con un tocco.",
+    join_list_q:"Unisciti alla lista", join_invited_sub:"Sei stato invitato a una lista di film condivisa",
+    list_picker_title:"Alla lista", filter_friends:"Filtra amici…", searching:"Ricerca…", not_found:"Non trovato", friends_empty:"Ancora nessun amico. Usa il link d'invito qui sotto per aggiungere le persone con cui guardi i film.", friend_remove_suffix:"— rimuovere dagli amici?", friends_no_match:"Nessun amico corrisponde", edit_modal_title:"MODIFICA RECENSIONE", share_modal_title:"CONSIGLIA UN FILM", send_btn:"Invia", note_ph:"Cosa ne pensi?", share_msg_ph:"Perché ti piacerà…", add_modal_seen:"SEGNA COME VISTO", add_modal_list:"AGGIUNGI ALLA LISTA", ob8_picks:"✨ Consigli personali per te", err_bad_login:"Email o password errati.", signin_create_cta:"Nuovo qui? Crea un account", recs_empty_title:"Consigli personali", recs_empty_sub:"Inserisci un'idea o lascia vuoto e tocca Trova", recs_thinking:"Sto pensando…", recs_still_thinking:"Sto ancora pensando, un attimo…", based_on_label:"In base ai film visti", recs_hint_empty:"Aggiungi film visti per consigli personali", picks_left_today:"consigli personali rimasti oggi", picks_random:"Consigli casuali", picks_tonight:"Per stasera", picks_for_you:"Per te", where_to_watch:"Dove vederlo", watch_attrib:"Dati streaming da JustWatch",
+    loading_lbl:"Caricamento…", err_no_results_title:"Nessun risultato", err_no_results_sub:"Prova solo il titolo, senza l'anno", err_connection:"Errore di connessione", err_generic:"Errore", err_not_found_title:"Non trovato", err_no_results_for:"Nessun risultato per", err_took_long_title:"Ha impiegato troppo", err_took_long_sub:"Riprova tra un attimo", recs_none_title:"Nessun consiglio trovato", recs_none_sub:"Prova un'altra idea", recs_unavail_title:"Consigli non disponibili", recs_unavail_sub:"Riprova più tardi", inbox_empty_title:"Ancora nessuna chat", inbox_empty_sub:"Condividi un film dalla ricerca o dalla tua lista per iniziare una conversazione",
+    continue_as_guest:"Continua come ospite", guest_label:"Ospite", guest_banner:"Stai navigando come ospite", guest_join_btn:"Unisciti a Cinemail", guest_save_sub:"Salva film, ricevi consigli personali e condividi con gli amici - gratis per sempre.", guest_join_free:"Unisciti gratis", guest_maybe_later:"Forse più tardi", guest_already_acct:"Hai già un account?",
+  },
 };
 Object.keys(_I18N_EXTRA).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_EXTRA[l]); });
 // Locale-aware plural for the "member(s)" word in member counts.
 function _membersWord(n) {
   const forms = ({
     en:['member','members'], es:['miembro','miembros'], fr:['membre','membres'], ka:['წევრი','წევრი'],
+    de:['Mitglied','Mitglieder'], it:['membro','membri'],
     ru:['участник','участника','участников'], uk:['учасник','учасники','учасників'],
   })[_lang] || ['member','members'];
   if (forms.length === 2) return n === 1 ? forms[0] : forms[1];
@@ -3035,6 +3192,7 @@ function _bounceLogo(el) {
 function _listsWord(n) {
   const forms = ({
     en:['list','lists'], es:['lista','listas'], fr:['liste','listes'], ka:['სია','სია'],
+    de:['Liste','Listen'], it:['lista','liste'],
     ru:['список','списка','списков'], uk:['список','списки','списків'],
   })[_lang] || ['list','lists'];
   if (forms.length === 2) return n === 1 ? forms[0] : forms[1];
@@ -3046,6 +3204,7 @@ function _listsWord(n) {
 function _friendsWord(n) {
   const forms = ({
     en:['friend','friends'], es:['amigo','amigos'], fr:['ami','amis'], ka:['მეგობარი','მეგობარი'],
+    de:['Freund','Freunde'], it:['amico','amici'],
     ru:['друг','друга','друзей'], uk:['друг','друзі','друзів'],
   })[_lang] || ['friend','friends'];
   if (forms.length === 2) return n === 1 ? forms[0] : forms[1];
@@ -3057,6 +3216,7 @@ function _friendsWord(n) {
 function _filmsWord(n) {
   const forms = ({
     en:['film','films'], es:['película','películas'], fr:['film','films'], ka:['ფილმი','ფილმი'],
+    de:['Film','Filme'], it:['film','film'],
     ru:['фильм','фильма','фильмов'], uk:['фільм','фільми','фільмів'],
   })[_lang] || ['film','films'];
   if (forms.length === 2) return n === 1 ? forms[0] : forms[1];
@@ -3196,13 +3356,13 @@ function _requirePro(feature) {
 // Instruction appended to recommendation prompts: localise the "why" text to the
 // current UI language, informal & warm, no em dashes / emoji, keep titles original.
 function _recLangRule() {
-  const names = { en:'English', ru:'Russian', uk:'Ukrainian', ka:'Georgian', es:'Spanish', fr:'French' };
+  const names = { en:'English', ru:'Russian', uk:'Ukrainian', ka:'Georgian', es:'Spanish', fr:'French', de:'German', it:'Italian' };
   const lang = names[_lang] || 'English';
   return `\n\nWrite every "why" value in ${lang}, speaking to the user directly, informally and warmly (use the informal "you" where the language distinguishes it). Do NOT use em dashes or any emoji in "why". Keep each "title" in its original language - do not translate titles.`;
 }
 let _lang = localStorage.getItem('lang') || (function(){
   const n = (navigator.language || 'en').slice(0,2).toLowerCase();
-  return ['ru','uk','ka','es','fr'].includes(n) ? n : 'en';
+  return ['ru','uk','ka','es','fr','de','it'].includes(n) ? n : 'en';
 })();
 function t(key) { return I18N[_lang]?.[key] ?? I18N.en[key] ?? key; }
 function setLang(l) {
@@ -3626,6 +3786,7 @@ async function deleteAccount() {
 
 // ── Quotes ────────────────────────────────────────────────────────────────────
 const QUOTES = [
+  // ── Originals (kept) ──
   { text: "I'll be back.", source: "The Terminator (1984)" },
   { text: "You can't handle the truth!", source: "A Few Good Men (1992)" },
   { text: "May the Force be with you.", source: "Star Wars (1977)" },
@@ -3640,6 +3801,55 @@ const QUOTES = [
   { text: "I am your father.", source: "The Empire Strikes Back (1980)" },
   { text: "Here's looking at you, kid.", source: "Casablanca (1942)" },
   { text: "Get busy living, or get busy dying.", source: "The Shawshank Redemption (1994)" },
+  // ── Classic Hollywood ──
+  { text: "Rosebud.", source: "Citizen Kane (1941)" },
+  { text: "I'm ready for my close-up, Mr. DeMille.", source: "Sunset Boulevard (1950)" },
+  { text: "Frankly, my dear, I don't give a damn.", source: "Gone with the Wind (1939)" },
+  { text: "I coulda been a contender.", source: "On the Waterfront (1954)" },
+  { text: "Nobody's perfect.", source: "Some Like It Hot (1959)" },
+  { text: "Stella! Hey, Stella!", source: "A Streetcar Named Desire (1951)" },
+  { text: "What we've got here is failure to communicate.", source: "Cool Hand Luke (1967)" },
+  { text: "I'm walking here! I'm walking here!", source: "Midnight Cowboy (1969)" },
+  // ── European arthouse ──
+  { text: "I want knowledge, not faith.", source: "The Seventh Seal (1957)" },
+  { text: "Happiness consists of being able to tell the truth without hurting anyone.", source: "8½ (1963)" },
+  { text: "Je veux devenir immortel, et puis mourir.", source: "À bout de souffle (1960)" },
+  { text: "Les temps sont durs pour les rêveurs.", source: "Le Fabuleux Destin d'Amélie Poulain (2001)" },
+  { text: "Jusqu'ici tout va bien.", source: "La Haine (1995)" },
+  { text: "Ho visto cose che voi umani non potete immaginare.", source: "La Dolce Vita (1960)" },
+  // ── Tarkovsky / Eastern Europe ──
+  { text: "Let everything that's been planned come true. Let them believe.", source: "Stalker (1979)" },
+  { text: "We don't want to conquer space at all. We want to expand Earth endlessly.", source: "Solaris (1972)" },
+  // ── Kubrick ──
+  { text: "I'm sorry, Dave. I'm afraid I can't do that.", source: "2001: A Space Odyssey (1968)" },
+  { text: "Open the pod bay doors, HAL.", source: "2001: A Space Odyssey (1968)" },
+  { text: "Gentlemen, you can't fight in here! This is the War Room!", source: "Dr. Strangelove (1964)" },
+  // ── New Hollywood ──
+  { text: "I'm gonna make him an offer he can't refuse.", source: "The Godfather (1972)" },
+  { text: "Leave the gun. Take the cannoli.", source: "The Godfather (1972)" },
+  { text: "I love the smell of napalm in the morning.", source: "Apocalypse Now (1979)" },
+  { text: "The horror... the horror.", source: "Apocalypse Now (1979)" },
+  { text: "Attica! Attica!", source: "Dog Day Afternoon (1975)" },
+  // ── Contemplative / modern auteur ──
+  { text: "I was not afraid of dying. I was afraid I had not lived.", source: "The Tree of Life (2011)" },
+  { text: "All those moments will be lost in time, like tears in rain.", source: "Blade Runner (1982)" },
+  { text: "I drink your milkshake!", source: "There Will Be Blood (2007)" },
+  { text: "You met me at a very strange time in my life.", source: "Fight Club (1999)" },
+  // ── Lynch ──
+  { text: "It is happening again.", source: "Twin Peaks (1991)" },
+  { text: "This whole world's wild at heart and weird on top.", source: "Wild at Heart (1990)" },
+  // ── Coens ──
+  { text: "The Dude abides.", source: "The Big Lebowski (1998)" },
+  { text: "Well, that's just, like, your opinion, man.", source: "The Big Lebowski (1998)" },
+  // ── Asian cinema ──
+  { text: "He remembers those vanished years, as though looking through a dusty window pane.", source: "In the Mood for Love (2000)" },
+  { text: "You know what kind of plan never fails? No plan.", source: "Parasite (2019)" },
+  { text: "Even though I'm no better than a beast, don't I have the right to live?", source: "Oldboy (2003)" },
+  { text: "The future is now, old man.", source: "Drive (2011)" },
+  // ── On cinema itself ──
+  { text: "A film is a ribbon of dreams.", source: "Orson Welles" },
+  { text: "Cinema is a matter of what's in the frame and what's out.", source: "Martin Scorsese" },
+  { text: "The cinema is truth twenty-four times per second.", source: "Jean-Luc Godard" },
 ];
 const randQuote = () => QUOTES[Math.floor(Math.random() * QUOTES.length)];
 
@@ -3828,7 +4038,7 @@ async function updateEntryInDB(id, fields) {
 // TMDB locale for the current UI language → localized (theatrical) titles, plots,
 // genres. Crew job names stay English in TMDB regardless, so role filters still work.
 function _tmdbLang() {
-  return ({ en:'en-US', ru:'ru-RU', uk:'uk-UA', ka:'ka-GE', es:'es-ES', fr:'fr-FR' })[_lang] || 'en-US';
+  return ({ en:'en-US', ru:'ru-RU', uk:'uk-UA', ka:'ka-GE', es:'es-ES', fr:'fr-FR', de:'de-DE', it:'it-IT' })[_lang] || 'en-US';
 }
 // ── "Where to watch" (TMDB watch/providers, JustWatch data) ───────────────────
 // Country for streaming availability: user override → device locale region → UI lang.
@@ -3837,7 +4047,7 @@ function _watchRegion() {
   if (stored) return stored;
   const loc = (navigator.language || '').split('-')[1];
   if (loc) return loc.toUpperCase();
-  return ({ en:'US', ru:'RU', uk:'UA', ka:'GE', es:'ES', fr:'FR' })[_lang] || 'US';
+  return ({ en:'US', ru:'RU', uk:'UA', ka:'GE', es:'ES', fr:'FR', de:'DE', it:'IT' })[_lang] || 'US';
 }
 function _setWatchRegion(code) {
   try { localStorage.setItem('cm_watch_region', code); } catch(e) {}
