@@ -2424,7 +2424,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.25</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.13.26</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3655,6 +3655,11 @@ async function updateEntryInDB(id, fields) {
 }
 
 // ── TMDB ──────────────────────────────────────────────────────────────────────
+// TMDB locale for the current UI language → localized (theatrical) titles, plots,
+// genres. Crew job names stay English in TMDB regardless, so role filters still work.
+function _tmdbLang() {
+  return ({ en:'en-US', ru:'ru-RU', uk:'uk-UA', ka:'ka-GE', es:'es-ES', fr:'fr-FR' })[_lang] || 'en-US';
+}
 async function tmdbFetch(path) {
   const { data: { session } } = await sbClient.auth.getSession();
   const headers = { "accept": "application/json" };
@@ -3674,7 +3679,7 @@ async function translateQuery(q) {
 }
 async function tmdbSearch(q) {
   const [enRes, multiRes] = await Promise.all([
-    tmdbFetch(`/search/multi?query=${encodeURIComponent(q)}&include_adult=false&language=en-US`),
+    tmdbFetch(`/search/multi?query=${encodeURIComponent(q)}&include_adult=false&language=${_tmdbLang()}`),
     tmdbFetch(`/search/multi?query=${encodeURIComponent(q)}&include_adult=false`)
   ]);
   const all = [...(enRes.results||[]), ...(multiRes.results||[])];
@@ -3692,13 +3697,13 @@ async function tmdbSearch(q) {
 }
 async function tmdbDetail(id, type) {
   type = type || "movie";
-  let detail = await tmdbFetch(`/${type}/${id}?language=en-US`);
+  let detail = await tmdbFetch(`/${type}/${id}?language=${_tmdbLang()}`);
   if (!detail.title && !detail.name) {
     const alt = type === "movie" ? "tv" : "movie";
-    const altDetail = await tmdbFetch(`/${alt}/${id}?language=en-US`);
+    const altDetail = await tmdbFetch(`/${alt}/${id}?language=${_tmdbLang()}`);
     if (altDetail.title || altDetail.name) { detail = altDetail; type = alt; }
   }
-  const credits = await tmdbFetch(`/${type}/${id}/credits?language=en-US`);
+  const credits = await tmdbFetch(`/${type}/${id}/credits?language=${_tmdbLang()}`);
   const director = credits.crew?.filter(c => c.job === "Director").map(c => c.name).join(", ") || "";
   const cast = credits.cast?.slice(0,6).map(c => c.name).join(", ") || "";
   const writers = credits.crew?.filter(c => ["Screenplay","Writer","Story"].includes(c.job)).slice(0,3).map(c => c.name).join(", ") || "";
@@ -3726,8 +3731,8 @@ async function tmdbDetail(id, type) {
 async function tmdbSearchWithYear(title, year) {
   if (!title && year) {
     const [movies, tv] = await Promise.all([
-      tmdbFetch(`/discover/movie?sort_by=popularity.desc&primary_release_year=${year}&language=en-US`),
-      tmdbFetch(`/discover/tv?sort_by=popularity.desc&first_air_date_year=${year}&language=en-US`)
+      tmdbFetch(`/discover/movie?sort_by=popularity.desc&primary_release_year=${year}&language=${_tmdbLang()}`),
+      tmdbFetch(`/discover/tv?sort_by=popularity.desc&first_air_date_year=${year}&language=${_tmdbLang()}`)
     ]);
     const all = [...(movies.results||[]).map(r=>({...r,media_type:"movie"})), ...(tv.results||[]).map(r=>({...r,media_type:"tv"}))]
       .sort((a,b)=>b.popularity-a.popularity).slice(0,12);
@@ -4017,7 +4022,7 @@ async function doSearch() {
       const seenP = new Set(), merged = [];
       for (const pq of pqs) {
         try {
-          const r = await tmdbFetch(`/search/person?query=${encodeURIComponent(pq)}&include_adult=false&language=en-US`);
+          const r = await tmdbFetch(`/search/person?query=${encodeURIComponent(pq)}&include_adult=false&language=${_tmdbLang()}`);
           (r.results || []).forEach(p => { if (p.id && !seenP.has(p.id)) { seenP.add(p.id); merged.push(p); } });
         } catch(e) {}
       }
@@ -4319,10 +4324,10 @@ async function openPerson(name, personId) {
   try {
     let person;
     if (personId) {
-      person = await tmdbFetch(`/person/${personId}?language=en-US`);
+      person = await tmdbFetch(`/person/${personId}?language=${_tmdbLang()}`);
       if (person && !person.name) person.name = name;
     } else {
-      const searchRes = await tmdbFetch(`/search/person?query=${encodeURIComponent(name)}&language=en-US`);
+      const searchRes = await tmdbFetch(`/search/person?query=${encodeURIComponent(name)}&language=${_tmdbLang()}`);
       person = searchRes.results?.[0];
     }
     if (!person) {
@@ -4330,7 +4335,7 @@ async function openPerson(name, personId) {
         <div style="margin-top:16px"><button class="btn-modal-close w-full" onclick="navModalBack()">${t('close')}</button></div>`;
       return;
     }
-    const credits = await tmdbFetch(`/person/${person.id}/combined_credits?language=en-US`);
+    const credits = await tmdbFetch(`/person/${person.id}/combined_credits?language=${_tmdbLang()}`);
     const photo = person.profile_path ? `https://image.tmdb.org/t/p/w300${person.profile_path}` : "";
     const allWorks = [...(credits.cast || []), ...(credits.crew || [])];
     const seen = new Set();
@@ -6961,10 +6966,10 @@ async function _enrichFromTMDB(rows, onProgress) {
       const type = r.media_type === "tv" ? "tv" : "movie";
       const alt  = type === "tv" ? "movie" : "tv";
       try {
-        let detail = await tmdbFetch(`/${type}/${r.imdb_id}?language=en-US`);
+        let detail = await tmdbFetch(`/${type}/${r.imdb_id}?language=${_tmdbLang()}`);
         // Try alternate type if primary returned not-found
         if (detail?.status_code === 34 || !detail || detail.success === false) {
-          detail = await tmdbFetch(`/${alt}/${r.imdb_id}?language=en-US`);
+          detail = await tmdbFetch(`/${alt}/${r.imdb_id}?language=${_tmdbLang()}`);
           if (detail && !detail.status_code) r.media_type = alt;
         }
         if (detail && !detail.status_code) {
