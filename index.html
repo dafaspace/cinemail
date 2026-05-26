@@ -370,7 +370,8 @@ body {
 .card-hint { color: #444; font-size: 11px; margin-top: 5px; }
 
 /* ── Card action buttons ────────────────────────────────────────────── */
-.card-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; margin-left: 6px; }
+.card-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; margin-left: 6px; width: 122px; }
+.card-actions .act-btn { width: 100%; overflow: hidden; text-overflow: ellipsis; }
 
 .btn-watchlist, .btn-watched {
   height: 24px;
@@ -766,7 +767,8 @@ body {
 .tagline { color: var(--muted); font-size: 12px; margin-top: 3px; font-style: italic; }
 
 /* ── Action buttons in detail ───────────────────────────────────────── */
-.modal-actions { display: flex; gap: 9px; margin-top: 18px; flex-wrap: wrap; }
+.modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 18px; align-items: stretch; }
+.modal-actions > *:last-child:nth-child(odd) { grid-column: 1 / -1; }
 .btn-modal-close {
   flex: 1; min-width: 80px; padding: 10px;
   border-radius: 9px; background: rgba(255,255,255,0.05);
@@ -1457,11 +1459,12 @@ body {
   transition: background 0.3s, width 0.3s; cursor: pointer;
 }
 .ob-dot.active { background: var(--primary); width: 18px; border-radius: 3px; }
-.ob-btn-row { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 12px; }
+.ob-btn-row { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 424px; gap: 12px; }
 .ob-btn-skip {
   background: none; border: 1px solid var(--border); border-radius: 9px;
   color: var(--muted); font-size: 14px; cursor: pointer;
-  padding: 10px 22px; font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+  width: 112px; flex-shrink: 0; padding: 10px 0; text-align: center;
+  font-family: 'DM Sans', sans-serif; transition: all 0.15s;
 }
 .ob-btn-skip:hover { border-color: var(--primary-border); color: var(--text); }
 .ob-btn-next {
@@ -2484,7 +2487,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.16.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.16.1</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
