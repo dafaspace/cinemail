@@ -2231,6 +2231,10 @@ body {
       <button class="btn btn-primary btn-sm" style="width:auto" id="rec-btn" onclick="loadRecs()" data-i18n="find_btn">Find</button>
     </div>
     <button onclick="surpriseMe()" data-i18n="surprise" style="width:100%;margin-top:0;margin-bottom:12px;padding:10px;border-radius:10px;background:var(--accent);border:none;color:#fff;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity=.85" onmouseout="this.style.opacity=1">✨ Surprise Me</button>
+    <div id="picks-hint" style="display:none;margin-bottom:12px;padding:11px 13px;background:rgba(245,197,24,0.07);border:1px solid rgba(245,197,24,0.22);border-radius:10px;font-size:12px;line-height:1.5;color:var(--text)">
+      <div data-i18n="picks_random_hint" style="margin-bottom:9px;color:#cfcfcf">Without watched films, picks are random. Mark 5-10 films as Watched and they become personal to your taste.</div>
+      <button onclick="dismissPicksHint()" data-i18n="picks_hint_got" style="padding:5px 14px;border-radius:8px;background:rgba(245,197,24,0.15);border:1px solid rgba(245,197,24,0.3);color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Got it</button>
+    </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
       <div id="rec-history-hint" style="color:#444;font-size:11px"></div>
       <div id="ai-counter" style="color:var(--muted);font-size:11px"></div>
@@ -2373,6 +2377,15 @@ body {
         <div style="font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:24px;letter-spacing:0.5px;color:var(--text)" id="acc-name-display">User</div>
         <div style="font-size:13px;color:#aaa;margin-top:2px" id="acc-email-display"></div>
       </div>
+
+      <!-- Guest card (shown only in guest mode) -->
+      <div id="acc-guest-card" style="display:none;text-align:center;padding:0 0 8px">
+        <p style="color:var(--muted);font-size:13px;line-height:1.55;margin-bottom:18px" data-i18n="guest_save_sub">Save films, get personal picks and share with friends - free forever.</p>
+        <button onclick="closeAccount();showGuestConvertModal()" data-i18n="guest_join_btn" style="width:100%;padding:12px;border-radius:10px;background:var(--accent);border:none;color:#fff;font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:8px">Join Cinemail</button>
+      </div>
+
+      <!-- Member-only block: stats, name, backup, friends (hidden for guests) -->
+      <div id="acc-member-block">
       <div class="acc-stats">
         <div style="text-align:center">
           <div class="acc-stat-val" id="acc-stat-watched">0</div>
@@ -2423,6 +2436,7 @@ body {
 
       <button onclick="toggleAppInvite()" id="app-invite-btn" style="width:100%;padding:9px;border-radius:9px;background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.3);color:var(--primary);font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:10px;transition:all 0.15s" data-i18n="invite_to_app">✨ Invite friends to Cinemail</button>
       <div id="app-invite-panel" style="display:none;margin-bottom:16px;padding:12px;background:rgba(245,197,24,0.05);border:1px solid rgba(245,197,24,0.18);border-radius:10px;text-align:center"></div>
+      </div><!-- /acc-member-block -->
 
       <div class="add-label" data-i18n="lang_label" style="margin-top:4px">Language</div>
       <div class="lang-toggle" style="margin-bottom:20px;flex-wrap:wrap">
@@ -2470,14 +2484,14 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.15.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.16.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" data-i18n="close" onclick="closeAccount()">Close</button>
-        <button class="btn-modal-close" data-i18n="sign_out" onclick="closeAccount();signOut();" style="color:#f87171;border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.05)">Sign Out</button>
+        <button class="btn-modal-close" id="acc-signout-btn" data-i18n="sign_out" onclick="closeAccount();signOut();" style="color:#f87171;border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.05)">Sign Out</button>
       </div>
-      <div style="margin-top:24px;text-align:center">
+      <div style="margin-top:24px;text-align:center" id="acc-delete-row">
         <button onclick="confirmDeleteAccount()" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;opacity:0.6;font-family:'DM Sans',sans-serif" data-i18n="delete_account">Delete account</button>
       </div>
     </div>
@@ -3170,6 +3184,18 @@ const _I18N_EXTRA = {
   },
 };
 Object.keys(_I18N_EXTRA).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_EXTRA[l]); });
+// One-time Picks hint (shown once when entering Picks with no watched films)
+const _I18N_PICKS_HINT = {
+  en:{ picks_random_hint:"Without watched films, picks are random. Mark 5-10 films as Watched and they become personal to your taste.", picks_hint_got:"Got it" },
+  ru:{ picks_random_hint:"Без просмотренных фильмов подборки случайные. Отметь 5-10 фильмов как просмотренные - и они станут персональными под твой вкус.", picks_hint_got:"Понятно" },
+  uk:{ picks_random_hint:"Без переглянутих фільмів добірки випадкові. Познач 5-10 фільмів як переглянуті - і вони стануть персональними під твій смак.", picks_hint_got:"Зрозуміло" },
+  ka:{ picks_random_hint:"ნანახი ფილმების გარეშე რჩევები შემთხვევითია. მონიშნე 5-10 ფილმი როგორც ნანახი - და ისინი შენს გემოვნებაზე მოირგება.", picks_hint_got:"გასაგებია" },
+  es:{ picks_random_hint:"Sin películas vistas, las selecciones son aleatorias. Marca 5-10 películas como Vistas y se vuelven personales a tu gusto.", picks_hint_got:"Entendido" },
+  fr:{ picks_random_hint:"Sans films vus, les sélections sont aléatoires. Marque 5-10 films comme Vus et elles deviennent personnelles selon tes goûts.", picks_hint_got:"Compris" },
+  de:{ picks_random_hint:"Ohne gesehene Filme sind die Tipps zufällig. Markiere 5-10 Filme als Gesehen und sie werden auf deinen Geschmack zugeschnitten.", picks_hint_got:"Verstanden" },
+  it:{ picks_random_hint:"Senza film visti, i consigli sono casuali. Segna 5-10 film come Visti e diventeranno personali in base ai tuoi gusti.", picks_hint_got:"Capito" },
+};
+Object.keys(_I18N_PICKS_HINT).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_PICKS_HINT[l]); });
 // Locale-aware plural for the "member(s)" word in member counts.
 function _membersWord(n) {
   const forms = ({
@@ -4199,7 +4225,22 @@ function switchTab(name) {
     document.getElementById("rec-history-hint").textContent = watched.length > 0
       ? `${t('based_on_label')}: ${watched.length}`
       : t('recs_hint_empty');
+    _maybeShowPicksHint(watched.length);
   }
+}
+
+// One-time hint: explain that Picks are random without watched films.
+// Shown once, only when the user has no watched films yet.
+function _maybeShowPicksHint(watchedCount) {
+  const el = document.getElementById('picks-hint');
+  if (!el) return;
+  const seen = localStorage.getItem('cm_picks_hint_seen') === '1';
+  el.style.display = (!seen && watchedCount === 0) ? 'block' : 'none';
+}
+function dismissPicksHint() {
+  try { localStorage.setItem('cm_picks_hint_seen', '1'); } catch(e) {}
+  const el = document.getElementById('picks-hint');
+  if (el) el.style.display = 'none';
 }
 
 // ── UI helpers ────────────────────────────────────────────────────────────────
@@ -7063,11 +7104,35 @@ async function openAccount() {
 
   // Show modal immediately with whatever we have
   document.getElementById("account-overlay").style.display="flex";
+  const sheet = document.getElementById("account-modal-sheet");
+  if (sheet) sheet.scrollTop = 0;
+
+  // Toggle account vs guest view
+  const guest = isGuestUser();
+  const guestCard   = document.getElementById("acc-guest-card");
+  const memberBlock = document.getElementById("acc-member-block");
+  const signoutBtn  = document.getElementById("acc-signout-btn");
+  const deleteRow   = document.getElementById("acc-delete-row");
+  const emailEl     = document.getElementById("acc-email-display");
+  const editBadge   = document.querySelector("#account-modal-sheet .avatar-edit-badge");
+  if (guestCard)   guestCard.style.display   = guest ? "block" : "none";
+  if (memberBlock) memberBlock.style.display = guest ? "none" : "block";
+  if (signoutBtn)  signoutBtn.style.display  = guest ? "none" : "";
+  if (deleteRow)   deleteRow.style.display   = guest ? "none" : "";
+  if (editBadge)   editBadge.style.display   = guest ? "none" : "";
+
+  if (guest) {
+    // Guests have no profile, email, stats, friends or backups - just show the card + language
+    document.getElementById("acc-name-display").textContent = t('guest_label') || 'Guest';
+    if (emailEl) emailEl.textContent = "";
+    const av = document.getElementById("acc-modal-avatar");
+    if (av) av.textContent = (t('guest_label') || 'G').charAt(0).toUpperCase();
+    return;
+  }
+
   // In native app, Google Drive popup doesn't work - hide Drive buttons, keep CSV
   const driveRow = document.getElementById("drive-backup-row");
   if (driveRow) driveRow.style.display = window._isNativeApp ? "none" : "";
-  const sheet = document.getElementById("account-modal-sheet");
-  if (sheet) sheet.scrollTop = 0;
 
   // Always re-fetch display name from DB to avoid stale cache
   try {
