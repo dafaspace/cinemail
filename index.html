@@ -767,8 +767,35 @@ body {
 .tagline { color: var(--muted); font-size: 12px; margin-top: 3px; font-style: italic; }
 
 /* ── Action buttons in detail ───────────────────────────────────────── */
-.modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 18px; align-items: stretch; }
-.modal-actions > *:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.modal-actions { display: flex; flex-direction: column; gap: 9px; margin-top: 18px; }
+.btn-modal-primary {
+  width: 100%; padding: 13px; border-radius: 11px;
+  background: var(--accent); border: none; color: #fff;
+  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 16px; letter-spacing: 1px; cursor: pointer; transition: opacity 0.15s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-modal-primary:hover { opacity: 0.9; }
+.btn-modal-secondary {
+  width: 100%; padding: 11px; border-radius: 11px;
+  background: transparent; border: 1px solid var(--border); color: var(--muted);
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+}
+.btn-modal-secondary:hover { border-color: var(--accent-border); color: var(--text); }
+.detail-status-line {
+  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+  padding: 10px 12px; margin-top: 4px; border-radius: 10px;
+  background: var(--primary-soft); border: 1px solid var(--primary-border);
+  color: var(--primary); font-size: 13px;
+}
+/* Inline "tap to confirm" delete in list rows */
+.hist-del-armed {
+  color: #f87171 !important; background: rgba(248,113,113,0.12);
+  border: 1px solid rgba(248,113,113,0.45); border-radius: 7px;
+  font-size: 11px !important; font-weight: 600; letter-spacing: 0.3px;
+  padding: 4px 9px !important; line-height: 1; font-family: 'DM Sans', sans-serif;
+}
 .btn-modal-close {
   flex: 1; min-width: 80px; padding: 10px;
   border-radius: 9px; background: rgba(255,255,255,0.05);
@@ -2487,7 +2514,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.16.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.17.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3199,6 +3226,9 @@ const _I18N_PICKS_HINT = {
   it:{ picks_random_hint:"Senza film visti, i consigli sono casuali. Segna 5-10 film come Visti e diventeranno personali in base ai tuoi gusti.", picks_hint_got:"Capito" },
 };
 Object.keys(_I18N_PICKS_HINT).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_PICKS_HINT[l]); });
+// Inline delete confirmation label
+const _I18N_DEL = { en:"Delete?", ru:"Удалить?", uk:"Видалити?", ka:"წავშალო?", es:"¿Eliminar?", fr:"Supprimer ?", de:"Löschen?", it:"Eliminare?" };
+Object.keys(_I18N_DEL).forEach(l => { if (I18N[l]) I18N[l].confirm_delete = _I18N_DEL[l]; });
 // Locale-aware plural for the "member(s)" word in member counts.
 function _membersWord(n) {
   const forms = ({
@@ -4394,6 +4424,7 @@ function _icoEye(filled){ return filled
   ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5C5.6 5 2 12 2 12s3.6 7 10 7 10-7 10-7-3.6-7-10-7zm0 11.2A4.2 4.2 0 1 1 12 7.8a4.2 4.2 0 0 1 0 8.4z"/><circle cx="12" cy="12" r="2.1" fill="var(--bg)"/></svg>`
   : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>`; }
 function _icoShare(){ return `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7M21 3l-9 9M10 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg>`; }
+function _icoPencil(){ return `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>`; }
 
 function movieCardHTML(m, why) {
   // Safety net: strip em/en dashes from AI "why" text (prompt also forbids them)
@@ -4583,22 +4614,26 @@ async function openDetail(id, type) {
     const _fls = _filmListStatus(String(id));
     const _hasLists = _listsCache.length > 0;
     const _inAnyList = _fls.personalPlanEntry || Object.keys(_fls.listEntries).length > 0;
-    const showChecklist = _hasLists || _inAnyList;
+    // Checklist is the single UI for lists - shown for plannable films, hidden once watched
+    const showChecklist = (status !== "watched");
 
     const checklistSection = showChecklist
       ? `<div class="list-check-section"><div id="detail-list-checklist">${_buildListChecklistHTML(String(id))}</div></div>`
       : '';
 
-    let actionBtns = `<button class="btn-modal-close" onclick="navModalBack()">${t('close')}</button>`;
+    // Watched films show a status strip (date + rating) instead of a checklist
+    const watchedStatusLine = (status === "watched")
+      ? `<div class="detail-status-line">${_icoEye(true)} <span>${t('act_watched')}</span>${existing && existing.date ? `<span style="color:var(--muted)">· ${existing.date}</span>` : ""}${existing && existing.stars ? `<span style="display:inline-flex;gap:1px">${starsHTML(existing.stars)}</span>` : ""}</div>`
+      : "";
+
+    // One primary action by state (Watched / Edit), Share secondary. Close is handled by the × and tap-outside.
+    let actionBtns = "";
     if (status === "watched") {
-      actionBtns += `<div class="already-badge" style="display:inline-flex;align-items:center;gap:5px">${_icoEye(true)} ${t('act_watched')}</div>`;
+      actionBtns += `<button class="btn-modal-primary" onclick="${existing ? `openEdit(${existing.id})` : `openAdd(window._detailMovie,'watched')`}">${_icoPencil()} ${t('edit_modal_title')}</button>`;
     } else {
-      if (!showChecklist) {
-        actionBtns += `<button class="btn-modal-plan" style="display:inline-flex;align-items:center;justify-content:center;gap:6px" onclick="_maybePickList(window._detailMovie,'plan')">${_icoBookmark(false)} ${t('act_addlist')}</button>`;
-      }
-      actionBtns += `<button class="btn-modal-add-watched" style="display:inline-flex;align-items:center;justify-content:center;gap:6px" onclick="openAdd(window._detailMovie,'watched')">${_icoEye(false)} ${t('act_watched')}</button>`;
+      actionBtns += `<button class="btn-modal-primary" onclick="openAdd(window._detailMovie,'watched')">${_icoEye(false)} ${t('act_watched')}</button>`;
     }
-    actionBtns += `<button onclick="openShare(window._detailMovie)" class="btn-modal-plan" style="display:inline-flex;align-items:center;justify-content:center;gap:6px" aria-label="Share">${_icoShare()} ${t('act_share')}</button>`;
+    actionBtns += `<button class="btn-modal-secondary" onclick="openShare(window._detailMovie)">${_icoShare()} ${t('act_share')}</button>`;
 
     document.getElementById("detail-content").innerHTML = `
       <div style="display:flex;gap:14px;margin-bottom:16px">
@@ -4616,6 +4651,7 @@ async function openDetail(id, type) {
       ${crew}${tvInfo}
       ${d.Country ? `<div style="margin-bottom:14px"><div class="crew-label">Country / Language</div><div class="crew-val">${d.Country} · ${d.Language}</div></div>` : ""}
       <div id="where-to-watch">${_whereToWatchInner(d.WatchAll || {})}</div>
+      ${watchedStatusLine}
       ${checklistSection}
       <div class="modal-actions">${actionBtns}</div>`;
     window._detailMovie = d;
@@ -4968,6 +5004,21 @@ async function deleteItem(id) {
   try { await deleteEntryFromDB(id); watchHistory = watchHistory.filter(h => h.id !== id); renderHistory(); }
   catch(e) { alert("Could not delete: " + e.message); }
 }
+// Inline "tap to confirm" delete: first tap arms (× → "Delete?"), second tap within 3s deletes.
+let _delArmId = null, _delArmEl = null, _delArmTimer = null;
+function _armDelete(id, btn) {
+  if (_delArmId === id) { _clearDelArm(); deleteItem(id); return; } // second tap → confirm
+  _clearDelArm(); // disarm any previously armed button
+  _delArmId = id; _delArmEl = btn;
+  btn.classList.add('hist-del-armed');
+  btn.textContent = t('confirm_delete');
+  _delArmTimer = setTimeout(_clearDelArm, 3000);
+}
+function _clearDelArm() {
+  if (_delArmTimer) { clearTimeout(_delArmTimer); _delArmTimer = null; }
+  if (_delArmEl) { try { _delArmEl.classList.remove('hist-del-armed'); _delArmEl.textContent = '×'; } catch(e) {} }
+  _delArmId = null; _delArmEl = null;
+}
 
 // ── History ───────────────────────────────────────────────────────────────────
 function renderHistory() {
@@ -5069,13 +5120,13 @@ function renderHistory() {
                 : ''}
               ${item.comment?`<div class="hist-note">"${item.comment}" <span style="color:var(--muted);font-style:normal;font-size:10px">— ${item.date}</span></div>`:""}
             </div>
-            <div style="display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;margin-left:8px">
+            <div style="display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;flex-shrink:0;margin-left:8px;align-self:stretch;gap:8px">
+              <button class="hist-del" data-del-id="${item.id}" onclick="event.stopPropagation();_armDelete(${item.id}, this)" title="${t('list_delete')}">×</button>
               <div style="display:flex;gap:6px;align-items:center">
-                ${item.status==="watched"?`<button class="hist-del" onclick="event.stopPropagation();openEdit(${item.id})">✎</button>`:""}
-                <button class="hist-del" onclick="event.stopPropagation();deleteItem(${item.id})">×</button>
-              </div>
-              <div style="flex:1;display:flex;align-items:center;padding-top:4px">
-                <button onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" class="act-btn act-btn-ico" title="Share">${_icoShare()}</button>
+                ${item.status==="watched"
+                  ? `<button class="act-btn act-btn-ico" onclick="event.stopPropagation();openEdit(${item.id})" title="${t('edit_modal_title')}">${_icoPencil()}</button>`
+                  : `<button class="act-btn act-btn-ico" onclick="event.stopPropagation();openAdd(_movieRegistry['${key}'],'watched')" title="${t('act_watched')}">${_icoEye(false)}</button>`}
+                <button class="act-btn act-btn-ico" onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" title="${t('act_share')}">${_icoShare()}</button>
               </div>
             </div>
           </div>
