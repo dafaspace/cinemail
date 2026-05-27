@@ -2517,7 +2517,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.17.4</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.17.5</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3043,7 +3043,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Select a friend to invite:", add_friends_first:"Add friends first to invite them",
     invite_valid_48:"Valid for 48 hours", invite_connect_hint:"When they open it, you'll connect as friends in one tap.",
     join_list_q:"Join the list", join_invited_sub:"You've been invited to a shared movie list",
-    list_picker_title:"Add to List", filter_friends:"Filter friends…", searching:"Searching…", not_found:"Not found", friends_empty:"No friends yet. Use the invite link below to add the people you watch with.", friend_remove_suffix:"— remove from friends?", friends_no_match:"No friends match", edit_modal_title:"EDIT REVIEW", share_modal_title:"RECOMMEND A FILM", send_btn:"Send", note_ph:"What did you think?", share_msg_ph:"Why you'd love this…", add_modal_seen:"MARK AS SEEN", add_modal_list:"ADD TO LIST", ob8_picks:"✨ Personal picks for you", err_bad_login:"Wrong email or password.", signin_create_cta:"New here? Create an account", recs_empty_title:"Get Personal Picks", recs_empty_sub:"Enter a prompt, or leave it blank and tap Find", recs_thinking:"Thinking…", recs_still_thinking:"Still thinking, hang tight…", based_on_label:"Based on watched films", recs_hint_empty:"Add watched films for personalised picks", picks_left_today:"personal picks left today", picks_random:"Random Picks", picks_tonight:"Picks For Tonight", picks_for_you:"Picks For You", where_to_watch:"Where to watch", watch_attrib:"Streaming data by JustWatch",
+    list_picker_title:"Add to List", filter_friends:"Filter friends…", searching:"Searching…", not_found:"Not found", friends_empty:"No friends yet. Use the invite link below to add the people you watch with.", friend_remove_suffix:"— remove from friends?", friends_no_match:"No friends match", edit_modal_title:"EDIT REVIEW", share_modal_title:"RECOMMEND A FILM", send_btn:"Send", note_ph:"What did you think?", share_msg_ph:"Why you'd love this…", add_modal_seen:"MARK AS WATCHED", add_modal_list:"ADD TO LIST", ob8_picks:"✨ Personal picks for you", err_bad_login:"Wrong email or password.", signin_create_cta:"New here? Create an account", recs_empty_title:"Get Personal Picks", recs_empty_sub:"Enter a prompt, or leave it blank and tap Find", recs_thinking:"Thinking…", recs_still_thinking:"Still thinking, hang tight…", based_on_label:"Based on watched films", recs_hint_empty:"Add watched films for personalised picks", picks_left_today:"personal picks left today", picks_random:"Random Picks", picks_tonight:"Picks For Tonight", picks_for_you:"Picks For You", where_to_watch:"Where to watch", watch_attrib:"Streaming data by JustWatch",
     loading_lbl:"Loading…", err_no_results_title:"No Results", err_no_results_sub:"Try just the title without the year", err_connection:"Connection Error", err_generic:"Error", err_not_found_title:"Not Found", err_no_results_for:"No results for", err_took_long_title:"Took Too Long", err_took_long_sub:"Try again in a moment", recs_none_title:"No Picks Found", recs_none_sub:"Try a different prompt", recs_unavail_title:"Picks Unavailable", recs_unavail_sub:"Please try again later", inbox_empty_title:"No Chats Yet", inbox_empty_sub:"Share a film from search results or your list to start a conversation",
     continue_as_guest:"Continue as guest", guest_label:"Guest", guest_banner:"You're browsing as guest", guest_join_btn:"Join Cinemail", guest_save_sub:"Save films, get personal picks and share with friends - free forever.", guest_join_free:"Join free", guest_maybe_later:"Maybe later", guest_already_acct:"Already have an account?",
   },
@@ -3235,6 +3235,9 @@ Object.keys(_I18N_DEL).forEach(l => { if (I18N[l]) I18N[l].confirm_delete = _I18
 // Checklist section header in the detail card
 const _I18N_LISTS_HDR = { en:"Add to lists", ru:"Добавить в списки", uk:"Додати до списків", ka:"სიებში დამატება", es:"Añadir a listas", fr:"Ajouter aux listes", de:"Zu Listen hinzufügen", it:"Aggiungi alle liste" };
 Object.keys(_I18N_LISTS_HDR).forEach(l => { if (I18N[l]) I18N[l].lists_header = _I18N_LISTS_HDR[l]; });
+// Imperative "mark as watched" - detail primary button + mini-eye tooltips (sentence case; button CSS uppercases)
+const _I18N_MARK_W = { en:"Mark as watched", ru:"Отметить просмотренным", uk:"Позначити переглянутим", ka:"მონიშნე ნანახად", es:"Marcar como vista", fr:"Marquer comme vu", de:"Als gesehen markieren", it:"Segna come visto" };
+Object.keys(_I18N_MARK_W).forEach(l => { if (I18N[l]) I18N[l].mark_watched = _I18N_MARK_W[l]; });
 // Locale-aware plural for the "member(s)" word in member counts.
 function _membersWord(n) {
   const forms = ({
@@ -4637,7 +4640,7 @@ async function openDetail(id, type) {
     if (status === "watched") {
       actionBtns += `<button class="btn-modal-primary" onclick="${existing ? `openEdit(${existing.id})` : `openAdd(window._detailMovie,'watched')`}"><span class="bm-ico bm-ico-y">${_icoPencil()}</span> ${t('edit_modal_title')}</button>`;
     } else {
-      actionBtns += `<button class="btn-modal-primary" onclick="openAdd(window._detailMovie,'watched')"><span class="bm-ico bm-ico-y">${_icoEye(false)}</span> ${t('add_modal_seen')}</button>`;
+      actionBtns += `<button class="btn-modal-primary" onclick="openAdd(window._detailMovie,'watched')"><span class="bm-ico bm-ico-y">${_icoEye(false)}</span> ${t('mark_watched')}</button>`;
     }
     actionBtns += `<button class="btn-modal-secondary" onclick="openShare(window._detailMovie)"><span class="bm-ico bm-ico-p">${_icoShare()}</span> ${t('act_share')}</button>`;
 
@@ -4884,7 +4887,7 @@ async function openPerson(name, personId) {
           else if (status === "plan") actionBtns = `<span class="act-btn act-btn-ico active" title="${t('act_inlist')}">${_icoBookmark(true)}</span>`;
           else actionBtns = `
             <button class="act-btn act-btn-ico" title="${t('act_addlist')}" onclick="event.stopPropagation();_maybePickList(_movieRegistry['${key}'],'plan')">${_icoBookmark(false)}</button>
-            <button class="act-btn act-btn-ico" title="${t('act_watched')}" onclick="event.stopPropagation();openAdd(_movieRegistry['${key}'],'watched')">${_icoEye(false)}</button>`;
+            <button class="act-btn act-btn-ico" title="${t('mark_watched')}" onclick="event.stopPropagation();openAdd(_movieRegistry['${key}'],'watched')">${_icoEye(false)}</button>`;
           const shareBtn = `<button class="act-btn act-btn-ico" onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" title="Share">${_icoShare()}</button>`;
           return `
           <div class="card" style="align-items:center">
@@ -5133,7 +5136,7 @@ function renderHistory() {
             <div style="position:absolute;right:0;bottom:0;display:flex;gap:6px;align-items:center">
               ${item.status==="watched"
                 ? `<button class="act-btn act-btn-ico" onclick="event.stopPropagation();openEdit(${item.id})" title="${t('edit_modal_title')}">${_icoPencil()}</button>`
-                : `<button class="act-btn act-btn-ico" onclick="event.stopPropagation();openAdd(_movieRegistry['${key}'],'watched')" title="${t('act_watched')}">${_icoEye(false)}</button>`}
+                : `<button class="act-btn act-btn-ico" onclick="event.stopPropagation();openAdd(_movieRegistry['${key}'],'watched')" title="${t('mark_watched')}">${_icoEye(false)}</button>`}
               <button class="act-btn act-btn-ico" onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" title="${t('act_share')}">${_icoShare()}</button>
             </div>
           </div>
