@@ -2519,7 +2519,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.17.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.17.2</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -5128,17 +5128,17 @@ function renderHistory() {
                 : ''}
               ${item.comment?`<div class="hist-note">"${item.comment}" <span style="color:var(--muted);font-style:normal;font-size:10px">— ${item.date}</span></div>`:""}
             </div>
-            <div style="display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;flex-shrink:0;margin-left:8px;align-self:stretch;gap:8px">
-              <button class="hist-del" data-del-id="${item.id}" onclick="event.stopPropagation();_armDelete(${item.id}, this)" title="${t('list_delete')}">×</button>
-              <div style="display:flex;gap:6px;align-items:center">
-                ${item.status==="watched"
-                  ? `<button class="act-btn act-btn-ico" onclick="event.stopPropagation();openEdit(${item.id})" title="${t('edit_modal_title')}">${_icoPencil()}</button>`
-                  : `<button class="act-btn act-btn-ico" onclick="event.stopPropagation();openAdd(_movieRegistry['${key}'],'watched')" title="${t('act_watched')}">${_icoEye(false)}</button>`}
-                <button class="act-btn act-btn-ico" onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" title="${t('act_share')}">${_icoShare()}</button>
-              </div>
+            <button class="hist-del" data-del-id="${item.id}" onclick="event.stopPropagation();_armDelete(${item.id}, this)" title="${t('list_delete')}" style="align-self:flex-start;flex-shrink:0;margin-left:8px">×</button>
+          </div>
+          <div style="position:relative;display:flex;justify-content:center;align-items:center;margin-top:8px;min-height:28px">
+            ${!isWatchedTab ? `<div class="movie-drag-handle" onpointerdown="event.stopPropagation();_movieDragStart(event,this.closest('.hist-card'))"><div class="movie-drag-dots">${'<span></span>'.repeat(10)}</div></div>` : ''}
+            <div style="position:absolute;right:0;bottom:0;display:flex;gap:6px;align-items:center">
+              ${item.status==="watched"
+                ? `<button class="act-btn act-btn-ico" onclick="event.stopPropagation();openEdit(${item.id})" title="${t('edit_modal_title')}">${_icoPencil()}</button>`
+                : `<button class="act-btn act-btn-ico" onclick="event.stopPropagation();openAdd(_movieRegistry['${key}'],'watched')" title="${t('act_watched')}">${_icoEye(false)}</button>`}
+              <button class="act-btn act-btn-ico" onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" title="${t('act_share')}">${_icoShare()}</button>
             </div>
           </div>
-          ${!isWatchedTab ? `<div class="movie-drag-handle" onpointerdown="event.stopPropagation();_movieDragStart(event,this.closest('.hist-card'))"><div class="movie-drag-dots">${'<span></span>'.repeat(10)}</div></div>` : ''}
         </div>`;
       }).join("")}
     </div>`;
