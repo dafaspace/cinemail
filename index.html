@@ -370,8 +370,7 @@ body {
 .card-hint { color: #444; font-size: 11px; margin-top: 5px; }
 
 /* ── Card action buttons ────────────────────────────────────────────── */
-.card-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; margin-left: 6px; width: 122px; }
-.card-actions .act-btn { width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.card-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; margin-left: 6px; align-items: flex-end; }
 
 .btn-watchlist, .btn-watched {
   height: 24px;
@@ -795,6 +794,26 @@ body {
   font-size: 11px !important; font-weight: 600; letter-spacing: 0.3px;
   padding: 4px 9px !important; line-height: 1; font-family: 'DM Sans', sans-serif;
 }
+/* One-time coach bubble (first-run hint pointing at the action icons) */
+.coach-bubble {
+  position: fixed; z-index: 9500; max-width: 220px;
+  background: var(--accent); color: #fff;
+  padding: 12px 14px; border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+  font-size: 13px; animation: coach-in 0.2s ease;
+}
+.coach-row { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
+.coach-row svg { flex-shrink: 0; }
+.coach-got {
+  margin-top: 2px; width: 100%; padding: 7px; border-radius: 8px;
+  background: rgba(255,255,255,0.18); border: none; color: #fff;
+  font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif;
+}
+.coach-arrow {
+  position: absolute; right: -6px; top: 50%; transform: translateY(-50%) rotate(45deg);
+  width: 12px; height: 12px; background: var(--accent);
+}
+@keyframes coach-in { from { opacity: 0; transform: translateX(6px); } to { opacity: 1; transform: none; } }
 .btn-modal-close {
   flex: 1; min-width: 80px; padding: 10px;
   border-radius: 9px; background: rgba(255,255,255,0.05);
@@ -2517,7 +2536,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.17.6</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.18.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -4285,6 +4304,42 @@ function dismissPicksHint() {
   if (el) el.style.display = 'none';
 }
 
+// One-time coach bubble: on the very first search, point at the action icons of
+// the first result and explain them (icon + label legend). Shown once.
+function _maybeShowSearchCoach() {
+  if (localStorage.getItem('cm_search_coach_seen') === '1') return;
+  setTimeout(() => {
+    const target = document.querySelector('#search-results .card-actions');
+    if (!target) return;
+    const r = target.getBoundingClientRect();
+    if (!r.width) return;
+    const bub = document.createElement('div');
+    bub.className = 'coach-bubble';
+    bub.innerHTML =
+      `<div class="coach-row">${_icoBookmark(false)}<span>${t('act_addlist')}</span></div>` +
+      `<div class="coach-row">${_icoEye(false)}<span>${t('mark_watched')}</span></div>` +
+      `<div class="coach-row">${_icoShare()}<span>${t('act_share')}</span></div>` +
+      `<button class="coach-got">${t('picks_hint_got')}</button>` +
+      `<span class="coach-arrow"></span>`;
+    document.body.appendChild(bub);
+    const bw = bub.offsetWidth, bh = bub.offsetHeight;
+    let left = r.left - bw - 14;
+    if (left < 8) left = 8;
+    let top = Math.max(8, Math.min(r.top + r.height / 2 - bh / 2, window.innerHeight - bh - 8));
+    bub.style.left = left + 'px';
+    bub.style.top = top + 'px';
+    const dismiss = () => {
+      try { localStorage.setItem('cm_search_coach_seen', '1'); } catch(e) {}
+      try { bub.remove(); } catch(e) {}
+      document.removeEventListener('click', outside, true);
+    };
+    const outside = () => dismiss();
+    bub.querySelector('.coach-got').addEventListener('click', e => { e.stopPropagation(); dismiss(); });
+    setTimeout(() => document.addEventListener('click', outside, true), 80);
+    setTimeout(dismiss, 12000);
+  }, 280);
+}
+
 // ── UI helpers ────────────────────────────────────────────────────────────────
 function posterHTML(src, title, w=56, h=80, lightbox=false) {
   const s = `width:${w}px;height:${h}px;flex-shrink:0;border-radius:8px;overflow:hidden;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:22px`;
@@ -4445,20 +4500,20 @@ function movieCardHTML(m, why) {
   const key = regMovie(m);
   let actionBtns = "";
   if (status === "watched") {
-    actionBtns = `<span class="act-btn active">${_icoEye(true)} ${t('act_watched')}</span>`;
+    actionBtns = `<span class="act-btn act-btn-ico active" title="${t('act_watched')}">${_icoEye(true)}</span>`;
   } else if (status === "plan") {
     actionBtns = `
-      <span class="act-btn active" style="margin-bottom:2px">${_icoBookmark(true)} ${t('act_inlist')}</span>
-      <button class="act-btn" onclick="openAdd(_movieRegistry['${key}'],'watched')">${_icoEye(false)} ${t('act_watched')}</button>`;
+      <span class="act-btn act-btn-ico active" title="${t('act_inlist')}">${_icoBookmark(true)}</span>
+      <button class="act-btn act-btn-ico" onclick="openAdd(_movieRegistry['${key}'],'watched')" title="${t('mark_watched')}">${_icoEye(false)}</button>`;
   } else {
     actionBtns = `
-      <button class="act-btn" onclick="_maybePickList(_movieRegistry['${key}'],'plan')">${_icoBookmark(false)} ${t('act_addlist')}</button>
-      <button class="act-btn" onclick="openAdd(_movieRegistry['${key}'],'watched')">${_icoEye(false)} ${t('act_watched')}</button>`;
+      <button class="act-btn act-btn-ico" onclick="_maybePickList(_movieRegistry['${key}'],'plan')" title="${t('act_addlist')}">${_icoBookmark(false)}</button>
+      <button class="act-btn act-btn-ico" onclick="openAdd(_movieRegistry['${key}'],'watched')" title="${t('mark_watched')}">${_icoEye(false)}</button>`;
   }
   const topRadius = why ? "12px 12px 0 0" : "12px";
   const idVal = m.tmdbID || m.id;
   const typeVal = m.type || "movie";
-  const shareBtn = idVal ? `<button class="act-btn" onclick="openShare(_movieRegistry['${key}'])">${_icoShare()} ${t('act_share')}</button>` : "";
+  const shareBtn = idVal ? `<button class="act-btn act-btn-ico" onclick="openShare(_movieRegistry['${key}'])" title="${t('act_share')}">${_icoShare()}</button>` : "";
   return `
     <div>
       <div class="card" style="border-radius:${topRadius};align-items:center">
@@ -4547,6 +4602,7 @@ async function doSearch() {
         + (results.length ? `<div style="${_SEARCH_LABEL}">${t('search_films')}</div>` : "")
       : "";
     el.innerHTML = peopleBlock + `<div class="card-list">${results.map(m => movieCardHTML(m)).join("")}</div>`;
+    if (results.length) _maybeShowSearchCoach();
   } catch(e) {
     el.innerHTML = `<div class="empty-state"><div class="empty-state-title">${t('err_connection')}</div><p>${e.message}</p></div>`;
   }
