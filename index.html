@@ -768,21 +768,22 @@ body {
 
 /* ── Action buttons in detail ───────────────────────────────────────── */
 .modal-actions { display: flex; flex-direction: column; gap: 9px; margin-top: 18px; }
-.btn-modal-primary {
+/* Detail action buttons: both ghost, same size/typography. Brand-yellow outline
+   for the main action (Watched/Edit), brand-purple for Share. Priority = order. */
+.btn-modal-primary, .btn-modal-secondary {
   width: 100%; padding: 13px; border-radius: 11px;
-  background: var(--accent); border: none; color: #fff;
   font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
-  font-size: 16px; letter-spacing: 1px; cursor: pointer; transition: opacity 0.15s;
+  font-size: 16px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.15s;
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
 }
-.btn-modal-primary:hover { opacity: 0.9; }
-.btn-modal-secondary {
-  width: 100%; padding: 11px; border-radius: 11px;
-  background: transparent; border: 1px solid var(--border); color: var(--muted);
-  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s;
-  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+.btn-modal-primary {
+  background: var(--primary-soft); border: 1px solid var(--primary-border); color: var(--primary);
 }
-.btn-modal-secondary:hover { border-color: var(--accent-border); color: var(--text); }
+.btn-modal-primary:hover { background: rgba(245,197,24,0.16); border-color: var(--primary); }
+.btn-modal-secondary {
+  background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent-text);
+}
+.btn-modal-secondary:hover { background: rgba(124,58,237,0.18); border-color: var(--accent); }
 .detail-status-line {
   display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
   padding: 10px 12px; margin-top: 4px; border-radius: 10px;
@@ -1148,11 +1149,15 @@ body {
 
 /* ── Lists checklist (in detail card) ──────────────────────────────── */
 .list-check-section { margin-bottom: 12px; }
+.list-check-header {
+  font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--muted); margin: 2px 2px 8px; font-weight: 600;
+}
 .list-check-row {
   display: flex; align-items: center; gap: 10px;
-  padding: 8px 12px; border-radius: 9px; cursor: pointer;
+  padding: 6px 12px; border-radius: 9px; cursor: pointer;
   transition: background 0.15s; border: 1px solid transparent;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 @media (hover: hover) { .list-check-row:hover { background: rgba(255,255,255,0.05); } }
 .list-check-row.checked {
@@ -2514,7 +2519,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.17.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.17.1</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3229,6 +3234,9 @@ Object.keys(_I18N_PICKS_HINT).forEach(l => { if (I18N[l]) Object.assign(I18N[l],
 // Inline delete confirmation label
 const _I18N_DEL = { en:"Delete?", ru:"Удалить?", uk:"Видалити?", ka:"წავშალო?", es:"¿Eliminar?", fr:"Supprimer ?", de:"Löschen?", it:"Eliminare?" };
 Object.keys(_I18N_DEL).forEach(l => { if (I18N[l]) I18N[l].confirm_delete = _I18N_DEL[l]; });
+// Checklist section header in the detail card
+const _I18N_LISTS_HDR = { en:"Add to lists", ru:"Добавить в списки", uk:"Додати до списків", ka:"სიებში დამატება", es:"Añadir a listas", fr:"Ajouter aux listes", de:"Zu Listen hinzufügen", it:"Aggiungi alle liste" };
+Object.keys(_I18N_LISTS_HDR).forEach(l => { if (I18N[l]) I18N[l].lists_header = _I18N_LISTS_HDR[l]; });
 // Locale-aware plural for the "member(s)" word in member counts.
 function _membersWord(n) {
   const forms = ({
@@ -4618,7 +4626,7 @@ async function openDetail(id, type) {
     const showChecklist = (status !== "watched");
 
     const checklistSection = showChecklist
-      ? `<div class="list-check-section"><div id="detail-list-checklist">${_buildListChecklistHTML(String(id))}</div></div>`
+      ? `<div class="list-check-section"><div class="list-check-header">${t('lists_header')}</div><div id="detail-list-checklist">${_buildListChecklistHTML(String(id))}</div></div>`
       : '';
 
     // Watched films show a status strip (date + rating) instead of a checklist
