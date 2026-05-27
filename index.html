@@ -772,18 +772,16 @@ body {
    for the main action (Watched/Edit), brand-purple for Share. Priority = order. */
 .btn-modal-primary, .btn-modal-secondary {
   width: 100%; padding: 13px; border-radius: 11px;
+  background: transparent; color: var(--text); border: 1px solid var(--border);
   font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 16px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.15s;
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
 }
-.btn-modal-primary {
-  background: transparent; border: 1px solid var(--primary-border); color: var(--primary);
-}
-.btn-modal-primary:hover { background: var(--primary-soft); border-color: var(--primary); }
-.btn-modal-secondary {
-  background: transparent; border: 1px solid var(--accent-border); color: var(--accent-text);
-}
-.btn-modal-secondary:hover { background: var(--accent-soft); border-color: var(--accent); }
+.btn-modal-primary:hover { border-color: var(--primary-border); background: var(--primary-soft); }
+.btn-modal-secondary:hover { border-color: var(--accent-border); background: var(--accent-soft); }
+.bm-ico { display: inline-flex; align-items: center; }
+.bm-ico-y { color: var(--primary); }
+.bm-ico-p { color: var(--accent-text); }
 .detail-status-line {
   display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
   padding: 10px 12px; margin-top: 4px; border-radius: 10px;
@@ -2519,7 +2517,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.17.3</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.17.4</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -4637,11 +4635,11 @@ async function openDetail(id, type) {
     // One primary action by state (Watched / Edit), Share secondary. Close is handled by the × and tap-outside.
     let actionBtns = "";
     if (status === "watched") {
-      actionBtns += `<button class="btn-modal-primary" onclick="${existing ? `openEdit(${existing.id})` : `openAdd(window._detailMovie,'watched')`}">${_icoPencil()} ${t('edit_modal_title')}</button>`;
+      actionBtns += `<button class="btn-modal-primary" onclick="${existing ? `openEdit(${existing.id})` : `openAdd(window._detailMovie,'watched')`}"><span class="bm-ico bm-ico-y">${_icoPencil()}</span> ${t('edit_modal_title')}</button>`;
     } else {
-      actionBtns += `<button class="btn-modal-primary" onclick="openAdd(window._detailMovie,'watched')">${_icoEye(false)} ${t('act_watched')}</button>`;
+      actionBtns += `<button class="btn-modal-primary" onclick="openAdd(window._detailMovie,'watched')"><span class="bm-ico bm-ico-y">${_icoEye(false)}</span> ${t('add_modal_seen')}</button>`;
     }
-    actionBtns += `<button class="btn-modal-secondary" onclick="openShare(window._detailMovie)">${_icoShare()} ${t('act_share')}</button>`;
+    actionBtns += `<button class="btn-modal-secondary" onclick="openShare(window._detailMovie)"><span class="bm-ico bm-ico-p">${_icoShare()}</span> ${t('act_share')}</button>`;
 
     document.getElementById("detail-content").innerHTML = `
       <div style="display:flex;gap:14px;margin-bottom:16px">
