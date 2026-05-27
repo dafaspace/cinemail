@@ -797,7 +797,9 @@ body {
 /* One-time coach bubble (first-run hint pointing at the action icons) */
 .coach-bubble {
   position: fixed; z-index: 9500; max-width: 220px;
-  background: var(--accent); color: #fff;
+  background: rgba(124,58,237,0.8); color: #fff;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border: 1px solid rgba(167,139,250,0.4);
   padding: 12px 14px; border-radius: 12px;
   box-shadow: 0 8px 28px rgba(0,0,0,0.45);
   font-size: 13px; animation: coach-in 0.2s ease;
@@ -811,7 +813,7 @@ body {
 }
 .coach-arrow {
   position: absolute; right: -6px; top: 50%; transform: translateY(-50%) rotate(45deg);
-  width: 12px; height: 12px; background: var(--accent);
+  width: 12px; height: 12px; background: rgba(124,58,237,0.8);
 }
 @keyframes coach-in { from { opacity: 0; transform: translateX(6px); } to { opacity: 1; transform: none; } }
 .btn-modal-close {
@@ -2536,7 +2538,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.18.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.18.2</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
