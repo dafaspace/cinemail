@@ -797,23 +797,27 @@ body {
 /* One-time coach bubble (first-run hint pointing at the action icons) */
 .coach-bubble {
   position: fixed; z-index: 9500; max-width: 220px;
-  background: rgba(124,58,237,0.8); color: #fff;
-  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-  border: 1px solid rgba(167,139,250,0.4);
+  background: rgba(14,8,28,0.92); color: #fff;
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(167,139,250,0.85);
   padding: 12px 14px; border-radius: 12px;
-  box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(167,139,250,0.1);
   font-size: 13px; animation: coach-in 0.2s ease;
 }
 .coach-row { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
 .coach-row svg { flex-shrink: 0; }
 .coach-got {
   margin-top: 2px; width: 100%; padding: 7px; border-radius: 8px;
-  background: rgba(255,255,255,0.18); border: none; color: #fff;
+  background: transparent; border: 1px solid rgba(167,139,250,0.6); color: rgba(167,139,250,1);
   font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: background 0.15s;
 }
+.coach-got:hover { background: rgba(167,139,250,0.12); }
 .coach-arrow {
-  position: absolute; right: -6px; top: 50%; transform: translateY(-50%) rotate(45deg);
-  width: 12px; height: 12px; background: rgba(124,58,237,0.8);
+  position: absolute; right: -10px;
+  width: 10px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+  transform: translateY(-50%);
 }
 @keyframes coach-in { from { opacity: 0; transform: translateX(6px); } to { opacity: 1; transform: none; } }
 .btn-modal-close {
@@ -2267,7 +2271,7 @@ body {
     <div class="search-row">
       <input id="search-input" type="text" data-i18n-ph="search_ph" placeholder="Movie or series title…"
         onkeydown="if(event.key==='Enter')doSearch()">
-      <button class="btn btn-primary btn-sm" style="width:auto" onclick="doSearch()" data-i18n="search_btn">Search</button>
+      <button class="btn btn-primary btn-sm" style="width:auto;min-width:104px" onclick="doSearch()" data-i18n="search_btn">Search</button>
     </div>
     <div id="search-results">
       <div class="empty-state">
@@ -2282,9 +2286,9 @@ body {
   <div id="tab-recs" class="tab-panel" style="display:none">
     <div class="search-row">
       <input id="rec-input" type="text" data-i18n-ph="recs_ph" placeholder="Mood, genre, or anything…">
-      <button class="btn btn-primary btn-sm" style="width:auto" id="rec-btn" onclick="loadRecs()" data-i18n="find_btn">Find</button>
+      <button class="btn btn-primary btn-sm" style="width:auto;min-width:104px" id="rec-btn" onclick="loadRecs()" data-i18n="find_btn">Find</button>
     </div>
-    <button onclick="surpriseMe()" data-i18n="surprise" style="width:100%;margin-top:0;margin-bottom:12px;padding:10px;border-radius:10px;background:var(--accent);border:none;color:#fff;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:14px;letter-spacing:1px;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity=.85" onmouseout="this.style.opacity=1">✨ Surprise Me</button>
+    <button onclick="surpriseMe()" data-i18n="surprise" style="width:100%;margin-top:0;margin-bottom:12px;padding:11px;border-radius:11px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.5);color:#c4b5fd;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:1.5px;cursor:pointer;transition:all .18s;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)" onmouseover="this.style.background='rgba(124,58,237,0.22)';this.style.borderColor='rgba(124,58,237,0.85)';this.style.boxShadow='0 4px 18px rgba(124,58,237,0.28)';this.style.color='#ddd6fe'" onmouseout="this.style.background='rgba(124,58,237,0.12)';this.style.borderColor='rgba(124,58,237,0.5)';this.style.boxShadow='none';this.style.color='#c4b5fd'">✨ Surprise Me</button>
     <div id="picks-hint" style="display:none;margin-bottom:12px;padding:11px 13px;background:rgba(245,197,24,0.07);border:1px solid rgba(245,197,24,0.22);border-radius:10px;font-size:12px;line-height:1.5;color:var(--text)">
       <div data-i18n="picks_random_hint" style="margin-bottom:9px;color:#cfcfcf">Without watched films, picks are random. Mark 5-10 films as Watched and they become personal to your taste.</div>
       <button onclick="dismissPicksHint()" data-i18n="picks_hint_got" style="padding:5px 14px;border-radius:8px;background:rgba(245,197,24,0.15);border:1px solid rgba(245,197,24,0.3);color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Got it</button>
@@ -2420,7 +2424,7 @@ body {
 <!-- Account Modal -->
 <div id="account-overlay" class="overlay" style="display:none;align-items:flex-start;overflow-y:auto;padding-top:env(safe-area-inset-top)" onclick="closeAccount()">
   <div style="padding:20px;width:100%;display:flex;justify-content:center;min-height:100%" onclick="event.stopPropagation()">
-    <div class="modal-sheet" style="max-width:360px;width:100%;height:fit-content;align-self:flex-start;position:relative" id="account-modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-sheet" style="max-width:360px;width:100%;max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 40px);overflow-y:auto;-webkit-overflow-scrolling:touch;align-self:flex-start;position:relative" id="account-modal-sheet" onclick="event.stopPropagation()">
       <button onclick="closeAccount()" aria-label="Close" style="position:absolute;top:12px;right:12px;z-index:5;width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--muted);font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--accent-border)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">×</button>
       <div style="text-align:center;padding:8px 0 20px">
         <div class="avatar-wrap" onclick="toggleAvatarPicker()">
@@ -2538,7 +2542,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.18.2</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.18.3</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -4334,7 +4338,8 @@ function _maybeShowSearchCoach() {
       const br = btn.getBoundingClientRect();
       const arrow = document.createElement('span');
       arrow.className = 'coach-arrow';
-      arrow.style.top = Math.max(8, Math.min(br.top + br.height / 2 - top, bh - 8)) + 'px';
+      arrow.style.top = Math.max(10, Math.min(br.top + br.height / 2 - top, bh - 10)) + 'px';
+      arrow.innerHTML = '<svg width="8" height="14" viewBox="0 0 8 14" xmlns="http://www.w3.org/2000/svg"><polygon points="0,0 8,7 0,14" fill="rgba(167,139,250,0.9)"/></svg>';
       bub.appendChild(arrow);
     });
     const dismiss = () => {
@@ -5296,7 +5301,7 @@ async function loadRecs() {
   const q = document.getElementById("rec-input").value.trim();
   const btn = document.getElementById("rec-btn");
   const el = document.getElementById("rec-results");
-  btn.disabled=true; btn.textContent=t('recs_thinking');
+  btn.disabled=true; // label stays "Find" — loading is shown in the results area below
   el.innerHTML=loadingHTML(randQuote(),true,true);
   const slowTimer = startSlowLoadingIndicator();
   try {
@@ -5306,7 +5311,14 @@ async function loadRecs() {
       const watched = watchedEntries.slice(-12).map(m=>`${m.title} (${m.year})${m.stars?" "+m.stars+"★":""}${m.comment?` — "${m.comment}"`:""}"`).join("\n");
       const planned = watchHistory.filter(h=>h.status==="plan").slice(-6).map(m=>m.title).join(", ");
       const tasteCtx = getTasteContext(watchedEntries);
-      const prompt = `You are a film expert helping pick what to watch tonight.\n\n${watched?`Already watched — DO NOT suggest any of these:\n${watched}`:"No watch history yet."}${planned?`\nAlready on watchlist — DO NOT suggest any of these: ${planned}`:""}${tasteCtx?`\n${tasteCtx}`:""}\n\nUser request: "${q||"Surprise me with something great"}"\n\nBased on their taste and request, suggest exactly 5 films or TV shows.\nCRITICAL: None of your suggestions may appear in the watched or watchlist above.\n- Interpret the request broadly.\n- Vary genres/eras unless the request is specific.\n- For each, write one sentence explaining WHY it fits their taste or request specifically.${_recLangRule()}\n\nReply ONLY with a JSON array, no other text:\n[{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
+      const hasQ = !!q;
+      const requestBlock = hasQ
+        ? `THE REQUEST (this is the PRIMARY filter): "${q}"\n\nEvery suggestion MUST clearly satisfy this request. If the request names a specific person, title, franchise, place, year, or era, stay precise and literal — do NOT drift to only loosely-related films. Broaden interpretation only when the request is a vague mood or theme.`
+        : `No specific request — surprise them with excellent films matched to their taste below.`;
+      const whyRule = hasQ
+        ? `Each "why" MUST first state how the film satisfies the request "${q}" (name the explicit connection), then it may add how it fits their taste.`
+        : `Each "why" explains in one sentence why it fits their taste.`;
+      const prompt = `You are a film expert helping someone find what to watch.\n\n${requestBlock}\n\n${watched?`The person has watched these (use ONLY as a secondary tie-breaker for tone/quality — and DO NOT suggest any of them):\n${watched}`:"No watch history yet."}${planned?`\nOn their watchlist — DO NOT suggest: ${planned}`:""}${tasteCtx?`\n${tasteCtx}`:""}\n\nSuggest exactly 5 films or TV shows.\nRules:\n- CRITICAL: none may appear in the watched or watchlist lists above.\n- ${whyRule}\n- Vary genres/eras only when the request does not imply a specific style.${_recLangRule()}\n\nReply ONLY with a JSON array, no other text:\n[{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
       try { suggestions = await proxyFetchWithRetry({ model:"claude-haiku-4-5-20251001", max_tokens:1000, messages:[{role:"user",content:prompt}] }); }
       catch(e) { if (e.message==="rate_limited") { el.innerHTML=""; btn.disabled=false; btn.textContent=t('find_btn'); return; } throw e; }
     } else {
@@ -8048,7 +8060,9 @@ function openFeedback() {
   setFbType("other");
   clearFbScreenshot();
   const el=document.getElementById("fb-replies");
-  if(el){el.style.display="block";el.innerHTML=`<div style="color:var(--muted);font-size:12px;padding:8px 0">Loading history…</div>`;}
+  // Keep history area collapsed while loading — no placeholder, so the modal
+  // opens at its final base height and doesn't jump when history resolves empty.
+  if(el){el.style.display="none";el.innerHTML="";}
   const _fbov=document.getElementById("feedback-overlay");
   _fbov.style.display="flex";
   void _fbov.offsetHeight; // force reflow — fixes iOS Safari "overlay doesn't paint until next interaction"
@@ -8208,6 +8222,19 @@ async function loadFeedbackReplies() {
     </div>`;
   }
 }
+
+// ── Native (Capacitor) tweaks — only run inside the iOS/Android app wrapper ──
+// No-op on the website (window.Capacitor is undefined there).
+function _initNativeTweaks() {
+  try {
+    const C = window.Capacitor;
+    if (!C || typeof C.isNativePlatform !== "function" || !C.isNativePlatform()) return;
+    const Kb = C.Plugins && C.Plugins.Keyboard;
+    // Hide the iOS keyboard accessory bar (the ‹ › arrows + Done checkmark).
+    if (Kb && Kb.setAccessoryBarVisible) Kb.setAccessoryBarVisible({ isVisible: false });
+  } catch (e) {}
+}
+_initNativeTweaks();
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 function initUI() {
