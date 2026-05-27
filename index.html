@@ -1200,10 +1200,10 @@ body {
   -webkit-touch-callout: none;
 }
 .tab-drag-handle {
-  touch-action: none;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
+  pointer-events: none;
   cursor: grab;
   opacity: 0.5;
   font-size: 12px;
@@ -2517,7 +2517,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.17.5</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.17.6</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -5590,7 +5590,7 @@ function renderListTabs() {
   html += `<button class="list-tab watched ${_activeListId === 'watched' ? 'active' : ''}" onclick="switchListTab('watched')">${t('tab_watched')}</button>`;
 
   _listsCache.forEach(l => {
-    html += `<button class="list-tab ${_activeListId === l.id ? 'active' : ''}" data-listid="${l.id}" onclick="if(event.target.closest('.tab-drag-handle'))return;switchListTab('${l.id}')"><span class="tab-drag-handle" onpointerdown="event.stopPropagation();event.preventDefault();_listDragStart(event,this.closest('.list-tab'),this.closest('.list-tabs-row'))">⠿</span>${l.name}</button>`;
+    html += `<button class="list-tab ${_activeListId === l.id ? 'active' : ''}" data-listid="${l.id}" onpointerdown="_listTabPointerDown(event,this,this.closest('.list-tabs-row'))" onclick="switchListTab('${l.id}')"><span class="tab-drag-handle">⠿</span>${l.name}</button>`;
   });
 
   if (_listTabCreating) {
@@ -5623,20 +5623,32 @@ function _initListDrag(row) {
     tab.addEventListener('contextmenu', e => e.preventDefault());
   });
 }
-function _listDragStart(e, tab, row) {
+// Entry point from the whole pill. Touch → long-press to drag (so a quick swipe
+// still scrolls the tabs row). Mouse → movement-threshold drag (no scroll conflict).
+function _listTabPointerDown(e, tab, row) {
+  if (e.button && e.button !== 0) return;
+  _listDragStart(e, tab, row, e.pointerType === 'touch');
+}
+function _listDragStart(e, tab, row, longPress) {
   if (e.button && e.button !== 0) return;
   const pointerId = e.pointerId;
-  const startX = e.clientX;
+  const startX = e.clientX, startY = e.clientY;
   let dragging = false;
   let done = false;
   let clone, indicator, insertBeforeTab;
+  let lpTimer = null;
+  const captureEl = e.target;
 
-  // Capture pointer on the handle so we keep receiving events even if finger moves off
-  try { e.target.setPointerCapture(pointerId); } catch(_) {}
+  // Touch: arm a long-press timer. If the finger moves first (scroll intent) we cancel it.
+  if (longPress) {
+    lpTimer = setTimeout(() => { lpTimer = null; if (!done) beginDrag(); }, 300);
+  }
 
   function beginDrag() {
     if (dragging) return;
     dragging = true;
+    // Capture pointer only once dragging starts, so native scroll stays possible before that
+    try { captureEl.setPointerCapture(pointerId); } catch(_) {}
     _listDragState = { tab, row };
     tab.classList.add('tab-dragging');
     row.classList.add('tabs-dragging');
@@ -5674,12 +5686,19 @@ function _listDragStart(e, tab, row) {
   }
 
   function onMove(ev) {
-    ev.preventDefault();
-    // Start drag after 6px movement - avoids accidental drags from taps on handle
     if (!dragging) {
-      if (Math.abs(ev.clientX - startX) > 6) beginDrag();
+      const dx = Math.abs(ev.clientX - startX), dy = Math.abs(ev.clientY - startY);
+      if (longPress) {
+        // Before the long-press fires: any real movement means "scroll the row",
+        // so abandon the drag intent and let the browser scroll natively.
+        if (lpTimer && (dx > 10 || dy > 10)) { clearTimeout(lpTimer); lpTimer = null; done = true; cleanup(); }
+        return; // do NOT preventDefault → native scroll stays alive
+      }
+      // Mouse: start drag after 6px of movement
+      if (dx > 6) beginDrag();
       return;
     }
+    ev.preventDefault();
     clone.style.left = (ev.clientX - clone.offsetWidth / 2) + 'px';
     updateDropPosition(ev.clientX);
   }
@@ -5687,6 +5706,7 @@ function _listDragStart(e, tab, row) {
   function onUp() {
     if (done) return;
     done = true;
+    if (lpTimer) { clearTimeout(lpTimer); lpTimer = null; }
     cleanup();
 
     if (clone) clone.remove();
