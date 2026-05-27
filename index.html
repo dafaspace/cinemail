@@ -2536,7 +2536,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.18.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.18.1</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -4319,8 +4319,7 @@ function _maybeShowSearchCoach() {
       `<div class="coach-row">${_icoBookmark(false)}<span>${t('act_addlist')}</span></div>` +
       `<div class="coach-row">${_icoEye(false)}<span>${t('mark_watched')}</span></div>` +
       `<div class="coach-row">${_icoShare()}<span>${t('act_share')}</span></div>` +
-      `<button class="coach-got">${t('picks_hint_got')}</button>` +
-      `<span class="coach-arrow"></span>`;
+      `<button class="coach-got">${t('picks_hint_got')}</button>`;
     document.body.appendChild(bub);
     const bw = bub.offsetWidth, bh = bub.offsetHeight;
     let left = r.left - bw - 14;
@@ -4328,6 +4327,14 @@ function _maybeShowSearchCoach() {
     let top = Math.max(8, Math.min(r.top + r.height / 2 - bh / 2, window.innerHeight - bh - 8));
     bub.style.left = left + 'px';
     bub.style.top = top + 'px';
+    // One beak per action button, each aligned to that button's vertical center
+    target.querySelectorAll('.act-btn-ico').forEach(btn => {
+      const br = btn.getBoundingClientRect();
+      const arrow = document.createElement('span');
+      arrow.className = 'coach-arrow';
+      arrow.style.top = Math.max(8, Math.min(br.top + br.height / 2 - top, bh - 8)) + 'px';
+      bub.appendChild(arrow);
+    });
     const dismiss = () => {
       try { localStorage.setItem('cm_search_coach_seen', '1'); } catch(e) {}
       try { bub.remove(); } catch(e) {}
