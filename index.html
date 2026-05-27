@@ -777,13 +777,13 @@ body {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
 }
 .btn-modal-primary {
-  background: var(--primary-soft); border: 1px solid var(--primary-border); color: var(--primary);
+  background: transparent; border: 1px solid var(--primary-border); color: var(--primary);
 }
-.btn-modal-primary:hover { background: rgba(245,197,24,0.16); border-color: var(--primary); }
+.btn-modal-primary:hover { background: var(--primary-soft); border-color: var(--primary); }
 .btn-modal-secondary {
-  background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent-text);
+  background: transparent; border: 1px solid var(--accent-border); color: var(--accent-text);
 }
-.btn-modal-secondary:hover { background: rgba(124,58,237,0.18); border-color: var(--accent); }
+.btn-modal-secondary:hover { background: var(--accent-soft); border-color: var(--accent); }
 .detail-status-line {
   display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
   padding: 10px 12px; margin-top: 4px; border-radius: 10px;
@@ -2519,7 +2519,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.17.2</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.17.3</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
