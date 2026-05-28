@@ -2469,12 +2469,12 @@ body {
       </div>
       <div class="add-label" data-i18n="backup_lbl" style="margin-top:4px">Backup</div>
       <div class="backup-row">
-        <button class="btn-backup" onclick="backupExportCSV()" data-i18n="export_csv">↓ Export CSV</button>
-        <button class="btn-backup" onclick="backupImportCSV()" data-i18n="import_csv">↑ Import CSV</button>
+        <button class="btn-backup" onclick="backupExportCSV()" title="Export as CSV">↓ CSV</button>
+        <button class="btn-backup" onclick="backupImportCSV()" title="Import CSV">↑ CSV</button>
+        <button class="btn-backup" onclick="backupExportJSON()" title="Export as JSON">↓ JSON</button>
         <input type="file" id="backup-import-input" accept=".csv" style="display:none">
       </div>
-      <div class="backup-row">
-        <button class="btn-backup" onclick="backupExportJSON()" data-i18n="export_json">↓ Export JSON</button>
+      <div class="backup-row" id="btn-backfill-crew-row" style="display:none">
         <button class="btn-backup" id="btn-backfill-crew" onclick="backfillCrewData()" data-i18n="backfill_crew">🔄 Refresh crew data</button>
       </div>
       <div class="backup-row" id="drive-backup-row">
@@ -7307,15 +7307,32 @@ async function openAccount() {
   document.getElementById("acc-email-display").textContent = currentUser.email || "";
   document.getElementById("acc-name-input").value = name;
 
-  // Always re-fetch history to get fresh data
-  try { watchHistory = await loadHistoryFromDB(); } catch(e) {}
-
+  // Render IMMEDIATELY from current cache — no layout jump while history fetches.
   _updateAccountStats();
   refreshDriveMeta();
   renderListsSection();
   renderFriendsSection();
-  // Always refresh friends from the DB so the list can't be stale from a failed login-time load
+  _updateBackfillCrewVisibility();
+
+  // Refresh in background and re-render only after fresh data arrives.
+  loadHistoryFromDB().then(fresh => {
+    watchHistory = fresh;
+    _updateAccountStats();
+    _updateBackfillCrewVisibility();
+  }).catch(()=>{});
+  // Same pattern for friends — never stall the modal on a slow request.
   loadFriendsCache().then(renderFriendsSection).catch(()=>{});
+}
+
+// Show the "Refresh crew data" row only for users with old entries missing crew fields.
+// Once they're filled (or for new accounts), the row stays hidden.
+function _updateBackfillCrewVisibility() {
+  const row = document.getElementById('btn-backfill-crew-row');
+  if (!row) return;
+  const needs = (watchHistory || []).some(h =>
+    h.tmdbID && (!h.cinematographer || !h.composer || !h.director || !h.actors || !h.runtime)
+  );
+  row.style.display = needs ? 'flex' : 'none';
 }
 
 function _updateAccountStats() {
@@ -8018,6 +8035,7 @@ async function backfillCrewData() {
   }
   try { watchHistory = await loadHistoryFromDB(); renderHistory(); _updateAccountStats(); } catch(e) {}
   if (btn) { btn.textContent = "🔄 Refresh crew data"; btn.disabled = false; }
+  _updateBackfillCrewVisibility(); // auto-hide the row if nothing else needs fixing
   showToast(`✓ Updated crew data for ${updated} film${updated===1?"":"s"}`);
 }
 
