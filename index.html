@@ -4111,7 +4111,7 @@ async function loadHistoryFromDB() {
   return mapped;
 }
 async function saveEntryToDB(entry) {
-  await sbFetch("watchlist", { method: "POST", prefer: "return=representation", body: JSON.stringify({
+  const payload = {
     imdb_id: entry.tmdbID, title: entry.title, year: entry.year, poster: entry.poster,
     stars: entry.stars, comment: entry.comment, status: entry.status,
     media_type: entry.mediaType || "movie",
@@ -4121,7 +4121,10 @@ async function saveEntryToDB(entry) {
     runtime: _parseRuntimeMin(entry.runtime),
     user_id: currentUser ? currentUser.id : null,
     list_id: entry.listId || null
-  })});
+  };
+  // Optional: preserve original add date on backup restore (otherwise Supabase defaults to NOW())
+  if (entry.addedAt) payload.created_at = entry.addedAt;
+  await sbFetch("watchlist", { method: "POST", prefer: "return=representation", body: JSON.stringify(payload) });
 }
 async function deleteEntryFromDB(id) { await sbFetch(`watchlist?id=eq.${id}`, { method: "DELETE" }); }
 async function updateEntryInDB(id, fields) {
@@ -7602,7 +7605,8 @@ async function applyBackupData(rows) {
         cinematographer: r.cinematographer || "",
         actors: r.actors || "",
         runtime: r.runtime || null,
-        listId: r.list_id || null   // preserve list membership (works for same-account restore)
+        listId: r.list_id || null,    // preserve list membership (works for same-account restore)
+        addedAt: r.added_at || null   // preserve original add date — true round-trip
       });
     } catch(e) {
       // FK violation: list no longer exists — retry without list_id
@@ -7613,7 +7617,8 @@ async function applyBackupData(rows) {
           comment: r.comment || "", status: r.status || "watched",
           mediaType: r.media_type || "movie",
           director: r.director || "", composer: r.composer || "",
-          cinematographer: r.cinematographer || "", actors: r.actors || "", runtime: r.runtime || null
+          cinematographer: r.cinematographer || "", actors: r.actors || "", runtime: r.runtime || null,
+          addedAt: r.added_at || null
         });
       } else { throw e; }
     }
@@ -7657,25 +7662,40 @@ async function _enrichFromTMDB(rows, onProgress) {
 // CSV helpers
 function _csvEscape(v) { return `"${String(v||"").replace(/"/g,'""')}"`; }
 
-function _parseCSVLine(line) {
-  const result = []; let cur = "", inQ = false;
-  for (let i = 0; i < line.length; i++) {
-    if (line[i] === '"') { if (inQ && line[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
-    else if (line[i] === ',' && !inQ) { result.push(cur); cur = ""; }
-    else cur += line[i];
-  }
-  result.push(cur);
-  return result;
-}
-
+// RFC 4180-compatible CSV parser. Critically: handles fields with embedded newlines
+// (a quoted comment that spans multiple visible lines), embedded commas, and ""-escaped
+// quotes. The previous line-based parser broke any record whose comment had a \n in it.
 function _parseCSV(text) {
-  const lines = text.trim().split(/\r?\n/);
-  if (lines.length < 2) return [];
-  const headers = _parseCSVLine(lines[0]).map(h => h.replace(/^"|"$/g,"").trim());
-  return lines.slice(1).map(line => {
-    const vals = _parseCSVLine(line);
+  const rows = [];
+  let row = [], field = "", inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQ) {
+      if (c === '"') {
+        if (text[i+1] === '"') { field += '"'; i++; }    // "" → literal "
+        else inQ = false;
+      } else field += c;
+    } else {
+      if (c === '"') inQ = true;
+      else if (c === ',') { row.push(field); field = ""; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text[i+1] === '\n') i++;        // CRLF: skip \n
+        row.push(field); field = "";
+        if (row.some(v => v.length)) rows.push(row);
+        row = [];
+      } else field += c;
+    }
+  }
+  if (field.length || row.length) {
+    row.push(field);
+    if (row.some(v => v.length)) rows.push(row);
+  }
+  if (rows.length < 2) return [];
+  const headers = rows[0].map(h => h.trim());
+  return rows.slice(1).map(vals => {
     const obj = {};
-    headers.forEach((h, i) => obj[h] = (vals[i]||"").replace(/^"|"$/g,"").trim());
+    headers.forEach((h, i) => obj[h] = (vals[i] || "").trim());
+    const rt = parseInt(obj.runtime, 10);
     return {
       imdb_id:         obj.tmdb_id         || "",
       title:           obj.title           || "",
@@ -7688,8 +7708,9 @@ function _parseCSV(text) {
       composer:        obj.composer        || "",
       cinematographer: obj.cinematographer || "",
       actors:          obj.actors          || "",
-      runtime:         obj.runtime         || null,
-      poster:          obj.poster          || ""   // fallback if TMDB call fails
+      runtime:         Number.isFinite(rt) && rt > 0 ? rt : null,
+      poster:          obj.poster          || "",   // fallback if TMDB call fails
+      added_at:        obj.added_at        || ""   // preserved on round-trip
     };
   }).filter(r => r.imdb_id && r.title);
 }
