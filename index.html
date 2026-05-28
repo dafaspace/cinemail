@@ -7585,13 +7585,39 @@ async function getBackupData() {
 
 // Core: merge-import enriched rows into Supabase (skip existing by tmdb_id+status)
 async function applyBackupData(rows) {
-  if (!currentUser || !rows.length) return { added: 0, skipped: 0 };
-  const existing = await sbFetch("watchlist?select=imdb_id,status");
-  const existingKeys = new Set((existing || []).map(r => `${r.imdb_id}|${r.status}`));
-  let added = 0, skipped = 0;
+  if (!currentUser || !rows.length) return { added: 0, updated: 0, skipped: 0 };
+  const existing = await sbFetch("watchlist?select=id,imdb_id,status");
+  // Map tmdb_id → existing row (prefer same-status match if multiple statuses exist for same film)
+  const byKey = new Map();          // "imdb_id|status" → row
+  const byImdb = new Map();         // "imdb_id" → row (fallback for status change)
+  (existing || []).forEach(r => {
+    byKey.set(`${r.imdb_id}|${r.status}`, r);
+    if (!byImdb.has(r.imdb_id)) byImdb.set(r.imdb_id, r);
+  });
+  let added = 0, updated = 0, skipped = 0;
   for (const r of rows) {
     if (!r.imdb_id || !r.title) { skipped++; continue; }
-    if (existingKeys.has(`${r.imdb_id}|${r.status}`)) { skipped++; continue; }
+    // Match: same imdb_id+status first, else any row with that imdb_id (lets user change status via CSV)
+    const match = byKey.get(`${r.imdb_id}|${r.status}`) || byImdb.get(r.imdb_id);
+    if (match) {
+      // UPDATE the mutable fields with whatever's in the CSV. This is what makes the round-trip
+      // actually round-trip: edit in Excel, re-import, changes land.
+      const patch = {
+        stars:    parseInt(r.stars) || 0,
+        comment:  r.comment || "",
+        status:   r.status || "watched",
+        runtime:  _parseRuntimeMin(r.runtime),
+      };
+      if (r.director)        patch.director        = r.director;
+      if (r.composer)        patch.composer        = r.composer;
+      if (r.cinematographer) patch.cinematographer = r.cinematographer;
+      if (r.actors)          patch.actors          = r.actors;
+      if (r.added_at)        patch.created_at      = r.added_at;
+      try { await updateEntryInDB(match.id, patch); updated++; }
+      catch(e) { skipped++; }
+      continue;
+    }
+    // INSERT new
     try {
       await saveEntryToDB({
         tmdbID: r.imdb_id, title: r.title, year: r.year,
@@ -7624,7 +7650,7 @@ async function applyBackupData(rows) {
     }
     added++;
   }
-  return { added, skipped };
+  return { added, updated, skipped };
 }
 
 // Enrich rows with fresh data from TMDB (poster, canonical title/year)
@@ -8074,16 +8100,17 @@ async function backupImportCSV() {
 
     // Step 2: save to Supabase
     setLabel("Saving…");
-    const { added, skipped } = await applyBackupData(enriched);
+    const { added, updated, skipped } = await applyBackupData(enriched);
 
     watchHistory = await loadHistoryFromDB();
     renderHistory();
     closeAccount();
 
-    const msg = added > 0
-      ? `✓ Imported ${added} item${added!==1?"s":""}${skipped ? `, ${skipped} already existed` : ""}`
-      : `Nothing new — ${skipped} item${skipped!==1?"s":""} already in your list`;
-    showToast(msg);
+    const parts = [];
+    if (added)   parts.push(`✓ ${added} new`);
+    if (updated) parts.push(`↻ ${updated} updated`);
+    if (skipped) parts.push(`${skipped} skipped`);
+    showToast(parts.length ? parts.join(" · ") : "No valid rows found");
   } catch(e) {
     if (e.message !== "No file selected") showToast("Import failed: " + e.message, true);
   } finally {
