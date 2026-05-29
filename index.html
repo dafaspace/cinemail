@@ -5102,6 +5102,16 @@ function _clearDelArm() {
   if (_delArmEl) { try { _delArmEl.classList.remove('hist-del-armed'); _delArmEl.textContent = '×'; } catch(e) {} }
   _delArmId = null; _delArmEl = null;
 }
+// Same two-tap "arm then confirm" guard as history items, but for inbox chats —
+// a single stray tap on × must not nuke a whole conversation.
+function _armDeleteInvite(id, btn) {
+  if (_delArmId === id) { _clearDelArm(); deleteInvite(id); return; } // second tap → confirm
+  _clearDelArm();
+  _delArmId = id; _delArmEl = btn;
+  btn.classList.add('hist-del-armed');
+  btn.textContent = t('confirm_delete');
+  _delArmTimer = setTimeout(_clearDelArm, 3000);
+}
 
 // ── History ───────────────────────────────────────────────────────────────────
 function renderHistory() {
@@ -6892,7 +6902,7 @@ function _renderListInvCard(inv) {
           <button onclick="event.stopPropagation();respondInviteById('${inv.id}','declined')" style="padding:6px 14px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">✕ ${t('inv_decline')}</button>
         </div>` : ''}
       </div>
-      <button onclick="event.stopPropagation();deleteInvite('${inv.id}')" class="hist-del" style="flex-shrink:0;padding:6px 8px;align-self:flex-start;margin-top:2px">×</button>
+      <button onclick="event.stopPropagation();_armDeleteInvite('${inv.id}', this)" class="hist-del" style="flex-shrink:0;padding:6px 8px;align-self:flex-start;margin-top:2px">×</button>
     </div>
   </div>`;
 }
@@ -6930,7 +6940,7 @@ function _renderInvCard(inv) {
             </div>
             <div style="font-size:10px;color:var(--muted);margin-top:2px">${_fmtDT(inv.last_msg_at || inv.created_at)}</div>
           </div>
-          <button onclick="event.stopPropagation();deleteInvite('${inv.id}')" class="hist-del" style="flex-shrink:0;padding:6px 8px;margin-top:2px">×</button>
+          <button onclick="event.stopPropagation();_armDeleteInvite('${inv.id}', this)" class="hist-del" style="flex-shrink:0;padding:6px 8px;margin-top:2px">×</button>
         </div>
         ${inv.message ? `<div style="color:#aaa;font-size:12px;font-style:italic;margin-top:4px">"${inv.message}"</div>` : ""}
         ${isPending ? `<div style="display:flex;gap:8px;margin-top:8px;position:relative;z-index:2" onclick="event.stopPropagation()">
