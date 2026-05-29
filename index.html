@@ -2469,10 +2469,10 @@ body {
       </div>
       <div class="add-label" data-i18n="backup_lbl" style="margin-top:4px">Backup</div>
       <div class="backup-row">
-        <button class="btn-backup" onclick="backupExportCSV()" title="Export as CSV">↓ CSV</button>
-        <button class="btn-backup" onclick="backupImportCSV()" title="Import CSV">↑ CSV</button>
-        <button class="btn-backup" onclick="backupExportJSON()" title="Export as JSON">↓ JSON</button>
-        <input type="file" id="backup-import-input" accept=".csv" style="display:none">
+        <button class="btn-backup" onclick="backupExportXLSX()" title="Export as Excel (.xlsx) — opens in Numbers/Sheets/Excel">↓ Excel</button>
+        <button class="btn-backup" onclick="backupImportXLSX()" title="Import an Excel/Sheets/Numbers file (.xlsx) or legacy .csv">↑ Excel</button>
+        <button class="btn-backup" onclick="backupExportJSON()" title="Export as JSON (full structured backup)">↓ JSON</button>
+        <input type="file" id="backup-import-input" accept=".xlsx,.csv" style="display:none">
       </div>
       <div class="backup-row" id="btn-backfill-crew-row" style="display:none">
         <button class="btn-backup" id="btn-backfill-crew" onclick="backfillCrewData()" data-i18n="backfill_crew">🔄 Refresh crew data</button>
@@ -8115,6 +8115,133 @@ async function backupImportCSV() {
     if (e.message !== "No file selected") showToast("Import failed: " + e.message, true);
   } finally {
     if (importBtn) { importBtn.textContent = "↑ Import CSV"; importBtn.disabled = false; }
+  }
+}
+
+// ── XLSX (Excel/Numbers/Sheets) backup ────────────────────────────────────────
+// Why XLSX, not CSV: on macOS, double-clicking a .csv opens it in Numbers, which
+// silently saves changes back as .numbers (its proprietary format) - the re-import
+// then fails. XLSX is the format every spreadsheet app *both* opens and saves to
+// without conversion. Numbers/Sheets/Excel/LibreOffice all behave correctly.
+// We lazy-load SheetJS only on the first export/import to avoid weighing the
+// regular app load with ~200KB of library.
+let _xlsxLoading = null;
+async function _loadXLSX() {
+  if (window.XLSX) return;
+  if (!_xlsxLoading) {
+    _xlsxLoading = new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.20.3/xlsx.full.min.js';
+      s.onload = res;
+      s.onerror = () => rej(new Error('Spreadsheet library failed to load - check connection'));
+      document.head.appendChild(s);
+    });
+  }
+  await _xlsxLoading;
+}
+
+async function backupExportXLSX() {
+  const btn = event?.currentTarget;
+  if (btn) { btn.disabled = true; }
+  try {
+    await _loadXLSX();
+    const rows = await getBackupData();
+    if (!rows.length) { showToast("Nothing to export yet"); return; }
+    const headers = ["tmdb_id","title","year","type","status","rating","comment","director","cinematographer","composer","actors","runtime","poster","added_at"];
+    const aoa = [headers];
+    for (const r of rows) {
+      aoa.push([
+        r.imdb_id, r.title, r.year, r.media_type || "movie",
+        r.status || "watched", r.stars || 0, r.comment || "",
+        r.director || "", r.cinematographer || "", r.composer || "",
+        r.actors || "", r.runtime || "", r.poster || "", r.created_at || ""
+      ]);
+    }
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    // Reasonable initial column widths so the file opens looking sensible.
+    ws['!cols'] = [{wch:12},{wch:34},{wch:6},{wch:7},{wch:9},{wch:7},{wch:42},{wch:24},{wch:24},{wch:24},{wch:34},{wch:9},{wch:42},{wch:22}];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Cinemail");
+    const data = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `cinemail-backup-${_todayStr()}.xlsx`;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+    showToast(`✓ Exported ${rows.length} items`);
+  } catch(e) { showToast("Export failed: " + e.message, true); }
+  finally { if (btn) { btn.disabled = false; } }
+}
+
+async function backupImportXLSX() {
+  const importBtn = document.querySelector('.btn-backup[onclick="backupImportXLSX()"]');
+  const setLabel = (txt) => { if (importBtn) { importBtn.textContent = txt; importBtn.disabled = true; } };
+  try {
+    // Let the user pick either an .xlsx or a legacy .csv.
+    const file = await new Promise((res, rej) => {
+      const inp = document.getElementById("backup-import-input");
+      inp.accept = ".xlsx,.csv";
+      const handler = (e) => {
+        inp.removeEventListener("change", handler);
+        const f = e.target.files[0];
+        inp.value = "";
+        if (!f) return rej(new Error("No file selected"));
+        res(f);
+      };
+      inp.addEventListener("change", handler);
+      inp.click();
+    });
+
+    let rows;
+    if (/\.csv$/i.test(file.name)) {
+      // Legacy CSV path - parse via the same RFC 4180 reader the old button used.
+      const text = await file.text();
+      rows = _parseCSV(text);
+    } else {
+      await _loadXLSX();
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const records = XLSX.utils.sheet_to_json(ws, { defval: "", raw: false });
+      rows = records.map(obj => {
+        const rt = parseInt(obj.runtime, 10);
+        return {
+          imdb_id: String(obj.tmdb_id || "").trim(),
+          title: String(obj.title || "").trim(),
+          year: String(obj.year || "").trim(),
+          media_type: String(obj.type || "movie").trim(),
+          status: String(obj.status || "watched").trim(),
+          stars: parseInt(obj.rating) || 0,
+          comment: String(obj.comment || ""),
+          director: String(obj.director || ""),
+          composer: String(obj.composer || ""),
+          cinematographer: String(obj.cinematographer || ""),
+          actors: String(obj.actors || ""),
+          runtime: Number.isFinite(rt) && rt > 0 ? rt : null,
+          poster: String(obj.poster || ""),
+          added_at: String(obj.added_at || "")
+        };
+      }).filter(r => r.imdb_id && r.title);
+    }
+
+    if (!rows.length) { showToast("No valid entries in file", true); return; }
+    setLabel(`Fetching 1/${rows.length}…`);
+    const enriched = await _enrichFromTMDB(rows, (done, total) => setLabel(`Fetching ${done}/${total}…`));
+    setLabel("Saving…");
+    const { added, updated, skipped } = await applyBackupData(enriched);
+    watchHistory = await loadHistoryFromDB();
+    renderHistory();
+    closeAccount();
+    const parts = [];
+    if (added)   parts.push(`✓ ${added} new`);
+    if (updated) parts.push(`↻ ${updated} updated`);
+    if (skipped) parts.push(`${skipped} unchanged`);
+    showToast(parts.join(" · ") || "Nothing changed");
+  } catch(e) {
+    if (e.message !== "No file selected") showToast("Import failed: " + e.message, true);
+  } finally {
+    if (importBtn) { importBtn.textContent = "↑ Excel"; importBtn.disabled = false; }
   }
 }
 
