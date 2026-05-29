@@ -8126,16 +8126,29 @@ async function backupImportCSV() {
 // We lazy-load SheetJS only on the first export/import to avoid weighing the
 // regular app load with ~200KB of library.
 let _xlsxLoading = null;
+function _loadScript(src) {
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = res;
+    s.onerror = () => rej(new Error('script load failed: ' + src));
+    document.head.appendChild(s);
+  });
+}
 async function _loadXLSX() {
   if (window.XLSX) return;
   if (!_xlsxLoading) {
-    _xlsxLoading = new Promise((res, rej) => {
-      const s = document.createElement('script');
-      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.20.3/xlsx.full.min.js';
-      s.onload = res;
-      s.onerror = () => rej(new Error('Spreadsheet library failed to load - check connection'));
-      document.head.appendChild(s);
-    });
+    // Local copy first (bundled with the app — works offline and in the native
+    // WKWebView). Fall back to the official SheetJS CDN only if the local file
+    // is somehow missing. Reset on failure so a later call can retry.
+    _xlsxLoading = (async () => {
+      try {
+        await _loadScript('./xlsx.full.min.js');
+      } catch {
+        await _loadScript('https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js');
+      }
+      if (!window.XLSX) throw new Error('Spreadsheet library failed to load');
+    })().catch(err => { _xlsxLoading = null; throw err; });
   }
   await _xlsxLoading;
 }
