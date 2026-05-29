@@ -8047,12 +8047,9 @@ async function backupExportJSON() {
     };
 
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = `cinemail-backup-${_todayStr()}.json`;
-    document.body.appendChild(a); a.click();
-    document.body.removeChild(a); URL.revokeObjectURL(url);
-    showToast(`✓ Exported ${watchlist.length} items + ${lists?.length || 0} lists as JSON`);
+    const shared = await _saveOrShareBlob(blob, `cinemail-backup-${_todayStr()}.json`, "application/json");
+    showToast(shared ? `✓ ${watchlist.length} items + ${lists?.length || 0} lists - choose where to save`
+                     : `✓ Exported ${watchlist.length} items + ${lists?.length || 0} lists as JSON`);
   } catch(e) { showToast("JSON export failed: " + e.message, true); }
   finally { if (btn) { btn.textContent = "↓ Export JSON"; btn.disabled = false; } }
 }
@@ -8126,6 +8123,43 @@ async function backupImportCSV() {
 // We lazy-load SheetJS only on the first export/import to avoid weighing the
 // regular app load with ~200KB of library.
 let _xlsxLoading = null;
+// Save a generated file. On the web this is a normal browser download.
+// In the native app the <a download> blob trick silently does nothing, so we
+// write the file to disk via Filesystem and hand it to the system share sheet
+// (AirDrop, Files, iCloud Drive, Mail, Telegram, etc.). Returns true if the
+// native share path ran, false if it fell through to the web download.
+async function _saveOrShareBlob(blob, filename, mimeType) {
+  const C = window.Capacitor;
+  const isNative = !!(C && C.isNativePlatform && C.isNativePlatform());
+  if (isNative && C.Plugins?.Filesystem && C.Plugins?.Share) {
+    const base64 = await new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onloadend = () => res(String(r.result).split(',')[1]);
+      r.onerror = rej;
+      r.readAsDataURL(blob);
+    });
+    // Cache dir is fine — it's a throwaway export the user is about to share out.
+    const written = await C.Plugins.Filesystem.writeFile({
+      path: filename, data: base64, directory: 'CACHE'
+    });
+    const uri = written?.uri || written?.path;
+    await C.Plugins.Share.share({
+      title: 'Cinemail backup',
+      text: filename,
+      url: uri,
+      dialogTitle: 'Save or send your Cinemail backup'
+    });
+    return true;
+  }
+  // Web download path.
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  return false;
+}
+
 function _loadScript(src) {
   return new Promise((res, rej) => {
     const s = document.createElement('script');
@@ -8177,12 +8211,10 @@ async function backupExportXLSX() {
     XLSX.utils.book_append_sheet(wb, ws, "Cinemail");
     const data = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `cinemail-backup-${_todayStr()}.xlsx`;
-    document.body.appendChild(a); a.click();
-    document.body.removeChild(a); URL.revokeObjectURL(url);
-    showToast(`✓ Exported ${rows.length} items`);
+    const shared = await _saveOrShareBlob(blob, `cinemail-backup-${_todayStr()}.xlsx`,
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    showToast(shared ? `✓ ${rows.length} items - choose where to save`
+                     : `✓ Exported ${rows.length} items`);
   } catch(e) { showToast("Export failed: " + e.message, true); }
   finally { if (btn) { btn.disabled = false; } }
 }
