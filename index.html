@@ -2467,6 +2467,13 @@ body {
           onblur="this.style.borderColor='var(--border)'">
         <button class="btn-modal-save" id="btn-save-name" onclick="saveDisplayName()" style="flex:none;min-width:120px;padding:10px 18px;font-size:14px" data-i18n="save">Save</button>
       </div>
+      <div id="notif-row" style="display:none">
+        <div class="add-label" data-i18n="notif_lbl" style="margin-top:4px">Notifications</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px">
+          <div style="flex:1;font-size:12px;color:var(--muted);line-height:1.4" data-i18n="notif_hint">Get notified about new messages, friend requests and feedback replies.</div>
+          <button class="btn-modal-save" onclick="enablePushNotifications()" data-i18n="notif_enable" style="flex:none;min-width:110px;padding:10px 16px;font-size:14px">Turn on</button>
+        </div>
+      </div>
       <div class="add-label" data-i18n="backup_lbl" style="margin-top:4px">Backup</div>
       <div class="backup-row">
         <button class="btn-backup" onclick="backupExportXLSX()" data-i18n="backup_btn_download" title="Download an Excel (.xlsx) backup — films, lists and members">↓ Download</button>
@@ -3333,6 +3340,18 @@ const _I18N_README_X = {
   it:{ rm_inside_q:"Cosa contiene", rm_inside_films:"Films - i tuoi film, voti e commenti", rm_inside_lists:"Lists - le tue liste", rm_inside_members:"Members - chi è nelle tue liste condivise", rm_contact_q:"Contatta l'autore", rm_contact_a:"Domande, idee, bug o supporto - scrivimi:" },
 };
 Object.keys(_I18N_README_X).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_README_X[l]); });
+// Push notifications opt-in (native account panel)
+const _I18N_PUSH = {
+  en:{ notif_lbl:"Notifications", notif_hint:"Get notified about new messages, friend requests and feedback replies.", notif_enable:"Turn on", push_on:"Notifications on", push_denied:"Turn on notifications in Settings", push_native_only:"Notifications work in the app" },
+  ru:{ notif_lbl:"Уведомления", notif_hint:"Получай уведомления о новых сообщениях, заявках в друзья и ответах на отзывы.", notif_enable:"Включить", push_on:"Уведомления включены", push_denied:"Включи уведомления в Настройках", push_native_only:"Уведомления работают в приложении" },
+  uk:{ notif_lbl:"Сповіщення", notif_hint:"Отримуй сповіщення про нові повідомлення, заявки в друзі та відповіді на відгуки.", notif_enable:"Увімкнути", push_on:"Сповіщення увімкнено", push_denied:"Увімкни сповіщення в Налаштуваннях", push_native_only:"Сповіщення працюють у застосунку" },
+  ka:{ notif_lbl:"შეტყობინებები", notif_hint:"მიიღე შეტყობინებები ახალ მესიჯებზე, მეგობრობის მოთხოვნებსა და პასუხებზე.", notif_enable:"ჩართვა", push_on:"შეტყობინებები ჩართულია", push_denied:"ჩართე შეტყობინებები პარამეტრებში", push_native_only:"შეტყობინებები აპში მუშაობს" },
+  es:{ notif_lbl:"Notificaciones", notif_hint:"Recibe avisos de mensajes nuevos, solicitudes de amistad y respuestas.", notif_enable:"Activar", push_on:"Notificaciones activadas", push_denied:"Activa las notificaciones en Ajustes", push_native_only:"Las notificaciones funcionan en la app" },
+  fr:{ notif_lbl:"Notifications", notif_hint:"Sois informé des nouveaux messages, demandes d'ami et réponses.", notif_enable:"Activer", push_on:"Notifications activées", push_denied:"Active les notifications dans Réglages", push_native_only:"Les notifications fonctionnent dans l'appli" },
+  de:{ notif_lbl:"Benachrichtigungen", notif_hint:"Werde über neue Nachrichten, Freundschaftsanfragen und Antworten informiert.", notif_enable:"Aktivieren", push_on:"Benachrichtigungen an", push_denied:"Aktiviere Benachrichtigungen in den Einstellungen", push_native_only:"Benachrichtigungen funktionieren in der App" },
+  it:{ notif_lbl:"Notifiche", notif_hint:"Ricevi avvisi su nuovi messaggi, richieste di amicizia e risposte.", notif_enable:"Attiva", push_on:"Notifiche attive", push_denied:"Attiva le notifiche nelle Impostazioni", push_native_only:"Le notifiche funzionano nell'app" },
+};
+Object.keys(_I18N_PUSH).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_PUSH[l]); });
 // Checklist section header in the detail card
 const _I18N_LISTS_HDR = { en:"Add to lists", ru:"Добавить в списки", uk:"Додати до списків", ka:"სიებში დამატება", es:"Añadir a listas", fr:"Ajouter aux listes", de:"Zu Listen hinzufügen", it:"Aggiungi alle liste" };
 Object.keys(_I18N_LISTS_HDR).forEach(l => { if (I18N[l]) I18N[l].lists_header = _I18N_LISTS_HDR[l]; });
@@ -3882,6 +3901,7 @@ async function onSignedIn(user) {
   await checkFeedbackBadge();
   checkPendingJoinToken(); // process ?join= token if present
   startInboxPolling();
+  _pushSyncOnLogin(); // native-only, non-prompting: refresh push token if already granted
 }
 
 async function signOut() {
@@ -8841,9 +8861,67 @@ function _initNativeTweaks() {
     const Kb = C.Plugins && C.Plugins.Keyboard;
     // Hide the iOS keyboard accessory bar (the ‹ › arrows + Done checkmark).
     if (Kb && Kb.setAccessoryBarVisible) Kb.setAccessoryBarVisible({ isVisible: false });
+    // Notifications opt-in is only meaningful on a real device, so reveal it
+    // only on the native platform.
+    const nr = document.getElementById("notif-row");
+    if (nr) nr.style.display = "block";
   } catch (e) {}
 }
 _initNativeTweaks();
+
+// ── Push notifications (client side: register + store token only) ────────────
+// Sending is server-side (Supabase Edge Function + APNs/FCM). A real token is
+// only issued on a physical device with a signed build — never in the simulator
+// or on the web. All calls are guarded so this is inert until then.
+let _pushWired = false;
+function _pushPlugin() {
+  const C = window.Capacitor;
+  if (!C || typeof C.isNativePlatform !== "function" || !C.isNativePlatform()) return null;
+  return (C.Plugins && C.Plugins.PushNotifications) || null;
+}
+function _isNativePlatform() { return !!_pushPlugin(); }
+async function _saveDeviceToken(token) {
+  if (!token || !currentUser || currentUser.is_anonymous || !sbClient) return;
+  const platform = (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform()) || "ios";
+  try {
+    await sbClient.from("device_tokens").upsert(
+      { user_id: currentUser.id, token, platform, updated_at: new Date().toISOString() },
+      { onConflict: "token" }
+    );
+  } catch (e) { console.warn("[push] save token:", e && e.message); }
+}
+function _wirePushListeners() {
+  const P = _pushPlugin();
+  if (!P || _pushWired) return;
+  _pushWired = true;
+  try {
+    P.addListener("registration", (t) => { _saveDeviceToken(t && t.value); });
+    P.addListener("registrationError", (e) => { console.warn("[push] reg error:", e); });
+  } catch (e) {}
+}
+// Login sync: re-register ONLY if permission was already granted. Never prompts.
+async function _pushSyncOnLogin() {
+  const P = _pushPlugin();
+  if (!P || !currentUser || currentUser.is_anonymous) return;
+  try {
+    const perm = await P.checkPermissions();
+    if (perm && perm.receive === "granted") { _wirePushListeners(); await P.register(); }
+  } catch (e) {}
+}
+// Deliberate opt-in (from the Notifications toggle): asks permission, registers.
+async function enablePushNotifications() {
+  const P = _pushPlugin();
+  if (!P) { showToast(t("push_native_only") || "Notifications work in the app"); return false; }
+  try {
+    let perm = await P.checkPermissions();
+    if (perm.receive !== "granted") perm = await P.requestPermissions();
+    if (perm.receive !== "granted") { showToast(t("push_denied") || "Turn on notifications in Settings"); return false; }
+    _wirePushListeners();
+    await P.register();
+    showToast(t("push_on") || "Notifications on");
+    return true;
+  } catch (e) { console.warn("[push]", e); return false; }
+}
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 function initUI() {
