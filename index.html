@@ -2477,7 +2477,7 @@ body {
       <button onclick="backupExportJSON()" data-i18n="backup_json_nerd" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;opacity:0.5;padding:4px 0 0;margin-top:2px;text-decoration:underline;font-family:'DM Sans',sans-serif">JSON backup (advanced)</button>
       <div id="backup-status" style="display:none;font-size:11px;line-height:1.45;margin-top:8px"></div>
       <div id="btn-backfill-crew-row" style="display:none;margin-top:8px">
-        <button id="btn-backfill-crew" onclick="backfillCrewData()" data-i18n="backfill_crew" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;opacity:0.6;padding:4px 0;text-decoration:underline;font-family:'DM Sans',sans-serif">🔄 Refresh crew data</button>
+        <button id="btn-backfill-crew" onclick="backfillCrewData()" data-i18n="backfill_crew" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;opacity:0.6;padding:4px 0;text-decoration:underline;font-family:'DM Sans',sans-serif">Update film details</button>
       </div>
       <div class="backup-row" id="drive-backup-row">
         <button class="btn-backup btn-backup-drive-action" id="btn-drive-save" onclick="backupSaveToDrive()">
@@ -2651,7 +2651,7 @@ const I18N = {
     display_name_lbl:"Display Name", backup_lbl:"Backup", friends_lbl:"Friends",
     add_friend:"Add", save:"Save",
     export_csv:"↓ Export CSV", import_csv:"↑ Import CSV", export_json:"↓ Export JSON",
-    backfill_crew:"🔄 Refresh crew data",
+    backfill_crew:"Update film details",
     save_drive:"Save to Drive", restore_drive:"Restore",
     ob0_body:"Films. Music. Friends.",
     ob1_title:"Find your film", ob1_body:"Heard about a film? Just search. Read the synopsis, check the rating, spot familiar names in the cast. Like it? Drop it into your list.",
@@ -2703,7 +2703,7 @@ const I18N = {
     display_name_lbl:"Имя", backup_lbl:"Резервная копия", friends_lbl:"Друзья",
     add_friend:"Добавить", save:"Сохранить",
     export_csv:"↓ Экспорт CSV", import_csv:"↑ Импорт CSV", export_json:"↓ Экспорт JSON",
-    backfill_crew:"🔄 Обновить данные о crew",
+    backfill_crew:"Обновить данные фильмов",
     save_drive:"Сохранить в Drive", restore_drive:"Восстановить",
     ob0_body:"Фильмы. Музыка. Друзья.",
     ob1_title:"Найди своё кино", ob1_body:"Услышал о фильме? Просто набери его в поиске. Почитай синопсис, посмотри рейтинг и найди знакомые имена в касте. Нравится? Закидывай в свой лист.",
@@ -2755,7 +2755,7 @@ const I18N = {
     display_name_lbl:"Ім'я", backup_lbl:"Резервна копія", friends_lbl:"Друзі",
     add_friend:"Додати", save:"Зберегти",
     export_csv:"↓ Експорт CSV", import_csv:"↑ Імпорт CSV", export_json:"↓ Експорт JSON",
-    backfill_crew:"🔄 Оновити дані crew",
+    backfill_crew:"Оновити дані фільмів",
     save_drive:"Зберегти на Drive", restore_drive:"Відновити",
     ob0_body:"Фільми. Музика. Друзі.",
     ob1_title:"Знайди своє кіно", ob1_body:"Почув про фільм? Просто шукай. Почитай синопсис, поглянь на рейтинг, знайди знайомі імена в касті. Подобається? Додавай у свій список.",
@@ -2807,7 +2807,7 @@ const I18N = {
     display_name_lbl:"სახელი", backup_lbl:"სარეზერვო ასლი", friends_lbl:"მეგობრები",
     add_friend:"დამატება", save:"შენახვა",
     export_csv:"↓ CSV ექსპორტი", import_csv:"↑ CSV იმპორტი", export_json:"↓ JSON ექსპორტი",
-    backfill_crew:"🔄 crew-მონაცემების განახლება",
+    backfill_crew:"ფილმის მონაცემების განახლება",
     save_drive:"Drive-ზე შენახვა", restore_drive:"აღდგენა",
     ob0_body:"ფილმები. მუსიკა. მეგობრები.",
     ob1_title:"მოძებნე შენი ფილმი", ob1_body:"გაიგე ფილმის შესახებ? უბრალოდ მოძებნე. წაიკითხე სინოფსისი, ნახე რეიტინგი, იპოვე ნაცნობი სახელები მსახიობებში. მოგწონს? დაამატე შენს სიაში.",
@@ -2859,7 +2859,7 @@ const I18N = {
     display_name_lbl:"Nombre", backup_lbl:"Copia de seguridad", friends_lbl:"Amigos",
     add_friend:"Añadir", save:"Guardar",
     export_csv:"↓ Exportar CSV", import_csv:"↑ Importar CSV", export_json:"↓ Exportar JSON",
-    backfill_crew:"🔄 Actualizar datos del equipo",
+    backfill_crew:"Actualizar datos de películas",
     save_drive:"Guardar en Drive", restore_drive:"Restaurar",
     ob0_body:"Películas. Música. Amigos.",
     ob1_title:"Encuentra tu película", ob1_body:"¿Oíste hablar de una película? Solo búscala. Lee la sinopsis, mira la valoración, reconoce nombres en el reparto. ¿Te gusta? Añádela a tu lista.",
@@ -2911,7 +2911,7 @@ const I18N = {
     display_name_lbl:"Nom", backup_lbl:"Sauvegarde", friends_lbl:"Amis",
     add_friend:"Ajouter", save:"Enregistrer",
     export_csv:"↓ Exporter CSV", import_csv:"↑ Importer CSV", export_json:"↓ Exporter JSON",
-    backfill_crew:"🔄 Actualiser l'équipe",
+    backfill_crew:"Mettre à jour les détails des films",
     save_drive:"Enregistrer sur Drive", restore_drive:"Restaurer",
     ob0_body:"Films. Musique. Amis.",
     ob1_title:"Trouvez votre film", ob1_body:"Vous avez entendu parler d'un film ? Cherchez-le. Lisez le synopsis, regardez la note, repérez des noms connus au casting. Ça vous plaît ? Ajoutez-le à votre liste.",
@@ -2963,7 +2963,7 @@ const I18N = {
     display_name_lbl:"Name", backup_lbl:"Backup", friends_lbl:"Freunde",
     add_friend:"Hinzufügen", save:"Speichern",
     export_csv:"↓ CSV exportieren", import_csv:"↑ CSV importieren", export_json:"↓ JSON exportieren",
-    backfill_crew:"🔄 Crew-Daten aktualisieren",
+    backfill_crew:"Filmdaten aktualisieren",
     save_drive:"Auf Drive speichern", restore_drive:"Wiederherstellen",
     ob0_body:"Filme. Musik. Freunde.",
     ob1_title:"Finde deinen Film", ob1_body:"Von einem Film gehört? Such ihn einfach. Lies die Handlung, sieh dir die Bewertung an, entdecke bekannte Namen in der Besetzung. Gefällt er dir? Pack ihn in deine Liste.",
@@ -3015,7 +3015,7 @@ const I18N = {
     display_name_lbl:"Nome", backup_lbl:"Backup", friends_lbl:"Amici",
     add_friend:"Aggiungi", save:"Salva",
     export_csv:"↓ Esporta CSV", import_csv:"↑ Importa CSV", export_json:"↓ Esporta JSON",
-    backfill_crew:"🔄 Aggiorna dati troupe",
+    backfill_crew:"Aggiorna i dati dei film",
     save_drive:"Salva su Drive", restore_drive:"Ripristina",
     ob0_body:"Film. Musica. Amici.",
     ob1_title:"Trova il tuo film", ob1_body:"Hai sentito parlare di un film? Cercalo. Leggi la trama, controlla il voto, riconosci nomi noti nel cast. Ti piace? Mettilo nella tua lista.",
@@ -8187,9 +8187,9 @@ async function backupImportCSV() {
 // silently saves changes back as .numbers (its proprietary format) - the re-import
 // then fails. XLSX is the format every spreadsheet app *both* opens and saves to
 // without conversion. Numbers/Sheets/Excel/LibreOffice all behave correctly.
-// We lazy-load SheetJS only on the first export/import to avoid weighing the
-// regular app load with ~200KB of library.
-let _xlsxLoading = null;
+// We lazy-load the spreadsheet library (ExcelJS) only on the first export/import
+// so the regular app load isn't weighed down by ~900KB of library.
+let _exceljsLoading = null;
 // Save a generated file. On the web this is a normal browser download.
 // In the native app the <a download> blob trick silently does nothing, so we
 // write the file to disk via Filesystem and hand it to the system share sheet
@@ -8236,22 +8236,22 @@ function _loadScript(src) {
     document.head.appendChild(s);
   });
 }
-async function _loadXLSX() {
-  if (window.XLSX) return;
-  if (!_xlsxLoading) {
+async function _loadExcelJS() {
+  if (window.ExcelJS) return;
+  if (!_exceljsLoading) {
     // Local copy first (bundled with the app — works offline and in the native
-    // WKWebView). Fall back to the official SheetJS CDN only if the local file
-    // is somehow missing. Reset on failure so a later call can retry.
-    _xlsxLoading = (async () => {
+    // WKWebView). Fall back to cdnjs only if the local file is somehow missing.
+    // Reset on failure so a later call can retry.
+    _exceljsLoading = (async () => {
       try {
-        await _loadScript('./xlsx.full.min.js');
+        await _loadScript('./exceljs.min.js');
       } catch {
-        await _loadScript('https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js');
+        await _loadScript('https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js');
       }
-      if (!window.XLSX) throw new Error('Spreadsheet library failed to load');
-    })().catch(err => { _xlsxLoading = null; throw err; });
+      if (!window.ExcelJS) throw new Error('Spreadsheet library failed to load');
+    })().catch(err => { _exceljsLoading = null; throw err; });
   }
-  await _xlsxLoading;
+  await _exceljsLoading;
 }
 
 // Ensure a list with each given name exists and is owned by the current user.
@@ -8288,69 +8288,87 @@ async function backupExportXLSX() {
   const btn = event?.currentTarget;
   if (btn) { btn.disabled = true; }
   try {
-    await _loadXLSX();
+    await _loadExcelJS();
     const rows = await getBackupData();
     if (!rows.length) { showToast("Nothing to export yet"); return; }
     if (!(_listsCache && _listsCache.length)) { try { await loadListsCache(); } catch(e) {} }
     const listNameById = {};
     (_listsCache || []).forEach(l => { listNameById[l.id] = l.name; });
 
+    const BRAND = "FF7C3AED";   // Cinemail purple (ARGB)
+    const LINK  = "FF2563EB";
+    const wb = new ExcelJS.Workbook();
+    wb.creator = "Cinemail";
+    wb.created = new Date();
+
+    // Brand the header row of a data sheet and freeze it.
+    const brandHeader = (ws) => {
+      const hr = ws.getRow(1);
+      hr.eachCell(c => {
+        c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BRAND } };
+        c.font = { bold: true, color: { argb: "FFFFFFFF" } };
+        c.alignment = { vertical: 'middle' };
+      });
+      hr.height = 20;
+      ws.views = [{ state: 'frozen', ySplit: 1 }];
+    };
+
+    // Sheet 0 — Read me (first tab: what this file is + how to restore, with logo)
+    const rm = wb.addWorksheet("Read me");
+    rm.getColumn(1).width = 22; rm.getColumn(2).width = 64;
+    try {
+      const resp = await fetch('./logo.png');
+      if (resp.ok) {
+        const imgBuf = await resp.arrayBuffer();
+        const imgId = wb.addImage({ buffer: imgBuf, extension: 'png' });
+        rm.addImage(imgId, { tl: { col: 2.15, row: 0.2 }, ext: { width: 88, height: 88 } });
+      }
+    } catch(e) { /* logo is decorative — skip on failure */ }
+    const title = rm.getCell('A1'); title.value = t('rm_title');
+    title.font = { bold: true, size: 16, color: { argb: BRAND } };
+    rm.getCell('A3').value = t('rm_site') + ":";
+    const link = rm.getCell('B3');
+    link.value = { text: "cinemail.app", hyperlink: "https://cinemail.app" };
+    link.font = { color: { argb: LINK }, underline: true };
+    const block = [['A5', 'rm_what_q', 'A6', 'rm_what_a'], ['A8', 'rm_how_q', 'A9', 'rm_how_a'], ['A11', 'rm_edit_q', 'A12', 'rm_edit_a']];
+    block.forEach(([qc, qk, ac, ak]) => {
+      const q = rm.getCell(qc); q.value = t(qk); q.font = { bold: true };
+      rm.getCell(ac).value = t(ak);
+    });
+
     // Sheet 1 — Films (one row per entry, with the readable list name)
-    const filmHeaders = ["tmdb_id","title","year","type","status","list","rating","comment","director","cinematographer","composer","actors","runtime","poster","added_at"];
-    const filmAoa = [filmHeaders];
+    const wsFilms = wb.addWorksheet("Films");
+    wsFilms.columns = [
+      { header: "tmdb_id", width: 12 }, { header: "title", width: 34 }, { header: "year", width: 6 },
+      { header: "type", width: 7 }, { header: "status", width: 9 }, { header: "list", width: 20 },
+      { header: "rating", width: 7 }, { header: "comment", width: 42 }, { header: "director", width: 24 },
+      { header: "cinematographer", width: 24 }, { header: "composer", width: 24 }, { header: "actors", width: 34 },
+      { header: "runtime", width: 9 }, { header: "poster", width: 42 }, { header: "added_at", width: 22 },
+    ];
     for (const r of rows) {
-      filmAoa.push([
+      wsFilms.addRow([
         r.imdb_id, r.title, r.year, r.media_type || "movie",
         r.status || "watched", (r.list_id && listNameById[r.list_id]) ? listNameById[r.list_id] : "",
-        r.stars || 0, r.comment || "",
-        r.director || "", r.cinematographer || "", r.composer || "",
+        r.stars || 0, r.comment || "", r.director || "", r.cinematographer || "", r.composer || "",
         r.actors || "", r.runtime || "", r.poster || "", r.created_at || ""
       ]);
     }
-    const wsFilms = XLSX.utils.aoa_to_sheet(filmAoa);
-    wsFilms['!cols'] = [{wch:12},{wch:34},{wch:6},{wch:7},{wch:9},{wch:20},{wch:7},{wch:42},{wch:24},{wch:24},{wch:24},{wch:34},{wch:9},{wch:42},{wch:22}];
+    brandHeader(wsFilms);
 
     // Sheet 2 — Lists (your lists and your role in each)
-    const listAoa = [["list","your_role"]];
-    (_listsCache || []).forEach(l => { listAoa.push([l.name, l.role || "owner"]); });
-    const wsLists = XLSX.utils.aoa_to_sheet(listAoa);
-    wsLists['!cols'] = [{wch:30},{wch:12}];
+    const wsLists = wb.addWorksheet("Lists");
+    wsLists.columns = [{ header: "list", width: 30 }, { header: "your_role", width: 12 }];
+    (_listsCache || []).forEach(l => wsLists.addRow([l.name, l.role || "owner"]));
+    brandHeader(wsLists);
 
     // Sheet 3 — Members (who is in each list; reference only)
-    const memAoa = [["list","member","role"]];
-    (_listsCache || []).forEach(l => {
-      (l.members || []).forEach(m => { memAoa.push([l.name, m.name || "", m.role || ""]); });
-    });
-    const wsMem = XLSX.utils.aoa_to_sheet(memAoa);
-    wsMem['!cols'] = [{wch:30},{wch:24},{wch:12}];
+    const wsMem = wb.addWorksheet("Members");
+    wsMem.columns = [{ header: "list", width: 30 }, { header: "member", width: 24 }, { header: "role", width: 12 }];
+    (_listsCache || []).forEach(l => (l.members || []).forEach(m => wsMem.addRow([l.name, m.name || "", m.role || ""])));
+    brandHeader(wsMem);
 
-    // Sheet 0 — Read me (first tab shown on open: what this file is + how to restore)
-    const readmeAoa = [
-      [t('rm_title')],
-      [],
-      [t('rm_site') + ":", "https://cinemail.app"],
-      [],
-      [t('rm_what_q')],
-      [t('rm_what_a')],
-      [],
-      [t('rm_how_q')],
-      [t('rm_how_a')],
-      [],
-      [t('rm_edit_q')],
-      [t('rm_edit_a')],
-    ];
-    const wsReadme = XLSX.utils.aoa_to_sheet(readmeAoa);
-    wsReadme['!cols'] = [{wch:20},{wch:64}];
-    // Make the website a real clickable hyperlink (cell B3).
-    if (wsReadme['B3']) wsReadme['B3'].l = { Target: "https://cinemail.app", Tooltip: "cinemail.app" };
-
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, wsReadme, "Read me");
-    XLSX.utils.book_append_sheet(wb, wsFilms, "Films");
-    XLSX.utils.book_append_sheet(wb, wsLists, "Lists");
-    XLSX.utils.book_append_sheet(wb, wsMem, "Members");
-    const data = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const out = await wb.xlsx.writeBuffer();
+    const blob = new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     const shared = await _saveOrShareBlob(blob, `cinemail-backup-${_todayStr()}.xlsx`,
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     showToast(shared ? `✓ ${rows.length} items - choose where to save`
@@ -8398,38 +8416,73 @@ async function backupImportXLSX() {
       const text = await file.text();
       rows = _parseCSV(text);
     } else {
-      await _loadXLSX();
+      await _loadExcelJS();
       const buf = await file.arrayBuffer();
-      const wb = XLSX.read(buf, { type: 'array' });
-      // Films sheet: prefer the named "Films" sheet, fall back to the first sheet
-      // (old single-sheet exports were named "Cinemail").
-      const filmsSheet = wb.Sheets["Films"] || wb.Sheets[wb.SheetNames[0]];
-      const records = XLSX.utils.sheet_to_json(filmsSheet, { defval: "", raw: false });
-      rows = records.map(obj => {
-        const rt = parseInt(obj.runtime, 10);
-        return {
-          imdb_id: String(obj.tmdb_id || "").trim(),
-          title: String(obj.title || "").trim(),
-          year: String(obj.year || "").trim(),
-          media_type: String(obj.type || "movie").trim(),
-          status: String(obj.status || "watched").trim(),
-          list_name: String(obj.list || "").trim(),
-          stars: parseInt(obj.rating) || 0,
-          comment: String(obj.comment || ""),
-          director: String(obj.director || ""),
-          composer: String(obj.composer || ""),
-          cinematographer: String(obj.cinematographer || ""),
-          actors: String(obj.actors || ""),
+      const wb = new ExcelJS.Workbook();
+      await wb.xlsx.load(buf);
+      // Flatten any ExcelJS cell value (string, number, date, hyperlink, formula,
+      // rich text) to a plain string. Dates are normalized to ISO so an edit in
+      // Numbers/Excel that reformats added_at as a real date still round-trips.
+      const cellText = (v) => {
+        if (v == null) return "";
+        if (v instanceof Date) return v.toISOString();
+        if (typeof v === 'object') {
+          if (Array.isArray(v.richText)) return v.richText.map(t => t.text).join('');
+          if (v.text != null) return v.text;
+          if (v.result != null) return v.result;
+          if (v.hyperlink != null) return v.hyperlink;
+          return "";
+        }
+        return v;
+      };
+      // Build a header-name → column-number map from row 1 of a worksheet.
+      const headerMap = (ws) => {
+        const map = {};
+        ws.getRow(1).eachCell((cell, col) => { map[cellText(cell.value).trim().toLowerCase()] = col; });
+        return map;
+      };
+      // Films sheet: prefer the named "Films" sheet, fall back to the first
+      // non-metadata sheet (old single-sheet exports were named "Cinemail").
+      const filmsWs = wb.getWorksheet("Films")
+        || wb.worksheets.find(w => !["Read me","Lists","Members"].includes(w.name))
+        || wb.worksheets[0];
+      const fmap = headerMap(filmsWs);
+      const fget = (row, name) => cellText(row.getCell(fmap[name] || 0)?.value);
+      rows = [];
+      filmsWs.eachRow((row, rn) => {
+        if (rn === 1) return; // header
+        const imdb_id = String(fget(row, 'tmdb_id') || "").trim();
+        const title   = String(fget(row, 'title') || "").trim();
+        if (!imdb_id || !title) return;
+        const rt = parseInt(fget(row, 'runtime'), 10);
+        rows.push({
+          imdb_id, title,
+          year: String(fget(row, 'year') || "").trim(),
+          media_type: String(fget(row, 'type') || "movie").trim(),
+          status: String(fget(row, 'status') || "watched").trim(),
+          list_name: String(fget(row, 'list') || "").trim(),
+          stars: parseInt(fget(row, 'rating')) || 0,
+          comment: String(fget(row, 'comment') || ""),
+          director: String(fget(row, 'director') || ""),
+          composer: String(fget(row, 'composer') || ""),
+          cinematographer: String(fget(row, 'cinematographer') || ""),
+          actors: String(fget(row, 'actors') || ""),
           runtime: Number.isFinite(rt) && rt > 0 ? rt : null,
-          poster: String(obj.poster || ""),
-          added_at: String(obj.added_at || "")
-        };
-      }).filter(r => r.imdb_id && r.title);
+          poster: String(fget(row, 'poster') || ""),
+          added_at: String(fget(row, 'added_at') || "")
+        });
+      });
       // Optional Lists sheet — so we recreate even empty lists, not just ones
       // that happen to have a film attached.
-      if (wb.Sheets["Lists"]) {
-        const lrec = XLSX.utils.sheet_to_json(wb.Sheets["Lists"], { defval: "", raw: false });
-        listNamesFromBackup = lrec.map(o => String(o.list || "").trim()).filter(Boolean);
+      const listsWs = wb.getWorksheet("Lists");
+      if (listsWs) {
+        const lmap = headerMap(listsWs);
+        const lcol = lmap['list'] || 1;
+        listsWs.eachRow((row, rn) => {
+          if (rn === 1) return;
+          const nm = String(cellText(row.getCell(lcol)?.value) || "").trim();
+          if (nm) listNamesFromBackup.push(nm);
+        });
       }
     }
 
