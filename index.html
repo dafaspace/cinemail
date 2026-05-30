@@ -3321,18 +3321,18 @@ const _I18N_README_SUB = {
   de:"Sicherung deiner Filme und Listen", it:"Backup dei tuoi film e liste",
 };
 Object.keys(_I18N_README_SUB).forEach(l => { if (I18N[l]) I18N[l].rm_subtitle = _I18N_README_SUB[l]; });
-// Read me footer: the website, placed last, with a reason to visit it.
-const _I18N_README_GET = {
-  en:{ rm_get_q:"Get Cinemail", rm_get_a:"Open the app, or install it on another device:" },
-  ru:{ rm_get_q:"Установить Cinemail", rm_get_a:"Открой приложение или установи его на другом устройстве:" },
-  uk:{ rm_get_q:"Встановити Cinemail", rm_get_a:"Відкрий застосунок або встанови його на іншому пристрої:" },
-  ka:{ rm_get_q:"ჩამოტვირთე Cinemail", rm_get_a:"გახსენი აპი ან დააინსტალირე სხვა მოწყობილობაზე:" },
-  es:{ rm_get_q:"Instala Cinemail", rm_get_a:"Abre la app o instálala en otro dispositivo:" },
-  fr:{ rm_get_q:"Installe Cinemail", rm_get_a:"Ouvre l'appli ou installe-la sur un autre appareil :" },
-  de:{ rm_get_q:"Cinemail holen", rm_get_a:"Öffne die App oder installiere sie auf einem anderen Gerät:" },
-  it:{ rm_get_q:"Scarica Cinemail", rm_get_a:"Apri l'app o installala su un altro dispositivo:" },
+// Read me: tab legend ("What's inside") + author contact block (footer).
+const _I18N_README_X = {
+  en:{ rm_inside_q:"What's inside", rm_inside_films:"Films - your films, ratings and comments", rm_inside_lists:"Lists - your lists", rm_inside_members:"Members - who's in your shared lists", rm_contact_q:"Contact the author", rm_contact_a:"Questions, ideas, bugs or support - get in touch:" },
+  ru:{ rm_inside_q:"Что внутри", rm_inside_films:"Films - твои фильмы, оценки и комментарии", rm_inside_lists:"Lists - твои списки", rm_inside_members:"Members - кто состоит в твоих общих списках", rm_contact_q:"Связаться с автором", rm_contact_a:"Вопросы, идеи, баги или поддержка - напиши:" },
+  uk:{ rm_inside_q:"Що всередині", rm_inside_films:"Films - твої фільми, оцінки та коментарі", rm_inside_lists:"Lists - твої списки", rm_inside_members:"Members - хто в твоїх спільних списках", rm_contact_q:"Зв'язатися з автором", rm_contact_a:"Питання, ідеї, баги чи підтримка - напиши:" },
+  ka:{ rm_inside_q:"რა არის შიგნით", rm_inside_films:"Films - შენი ფილმები, შეფასებები და კომენტარები", rm_inside_lists:"Lists - შენი სიები", rm_inside_members:"Members - ვინ არის შენს გაზიარებულ სიებში", rm_contact_q:"დაუკავშირდი ავტორს", rm_contact_a:"კითხვები, იდეები, ხარვეზები ან მხარდაჭერა - მომწერე:" },
+  es:{ rm_inside_q:"Qué contiene", rm_inside_films:"Films - tus películas, valoraciones y comentarios", rm_inside_lists:"Lists - tus listas", rm_inside_members:"Members - quién está en tus listas compartidas", rm_contact_q:"Contactar al autor", rm_contact_a:"Preguntas, ideas, errores o ayuda - escríbeme:" },
+  fr:{ rm_inside_q:"Ce que contient le fichier", rm_inside_films:"Films - tes films, notes et commentaires", rm_inside_lists:"Lists - tes listes", rm_inside_members:"Members - qui figure dans tes listes partagées", rm_contact_q:"Contacter l'auteur", rm_contact_a:"Questions, idées, bugs ou aide - écris-moi :" },
+  de:{ rm_inside_q:"Was drin ist", rm_inside_films:"Films - deine Filme, Bewertungen und Kommentare", rm_inside_lists:"Lists - deine Listen", rm_inside_members:"Members - wer in deinen geteilten Listen ist", rm_contact_q:"Kontakt zum Autor", rm_contact_a:"Fragen, Ideen, Bugs oder Support - schreib mir:" },
+  it:{ rm_inside_q:"Cosa contiene", rm_inside_films:"Films - i tuoi film, voti e commenti", rm_inside_lists:"Lists - le tue liste", rm_inside_members:"Members - chi è nelle tue liste condivise", rm_contact_q:"Contatta l'autore", rm_contact_a:"Domande, idee, bug o supporto - scrivimi:" },
 };
-Object.keys(_I18N_README_GET).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_README_GET[l]); });
+Object.keys(_I18N_README_X).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_README_X[l]); });
 // Checklist section header in the detail card
 const _I18N_LISTS_HDR = { en:"Add to lists", ru:"Добавить в списки", uk:"Додати до списків", ka:"სიებში დამატება", es:"Añadir a listas", fr:"Ajouter aux listes", de:"Zu Listen hinzufügen", it:"Aggiungi alle liste" };
 Object.keys(_I18N_LISTS_HDR).forEach(l => { if (I18N[l]) I18N[l].lists_header = _I18N_LISTS_HDR[l]; });
@@ -8380,19 +8380,27 @@ async function backupExportXLSX() {
     } catch(e) { /* logo is decorative — skip on failure */ }
     // Everything below stacks in column C so nothing gets clipped by a neighbour.
     const accent = (cell, text) => { cell.value = text; cell.font = { bold: true, size: 12, color: { argb: BRAND } }; };
-    const blocks = [['C5','rm_what_q','C6','rm_what_a'], ['C8','rm_how_q','C9','rm_how_a'], ['C11','rm_edit_q','C12','rm_edit_a']];
-    blocks.forEach(([qc, qk, ac, ak]) => {
-      accent(rm.getCell(qc), t(qk));
-      const a = rm.getCell(ac); a.value = t(ak);
-      a.alignment = { wrapText: true, vertical: 'top' };
-    });
-    // Website goes last, with a reason to visit it.
-    accent(rm.getCell('C14'), t('rm_get_q'));
-    rm.getCell('C15').value = t('rm_get_a');
-    rm.getCell('C15').alignment = { wrapText: true, vertical: 'top' };
-    const link = rm.getCell('C16');
-    link.value = { text: "cinemail.app", hyperlink: "https://cinemail.app" };
-    link.font = { color: { argb: LINK }, underline: true, bold: true };
+    const para   = (cell, text) => { cell.value = text; cell.alignment = { wrapText: true, vertical: 'top' }; };
+    const linkCell = (cell, text, href) => { cell.value = { text, hyperlink: href }; cell.font = { color: { argb: LINK }, underline: true, bold: true }; };
+    // What is this file?
+    accent(rm.getCell('C5'), t('rm_what_q'));
+    para(rm.getCell('C6'), t('rm_what_a'));
+    // What's inside — a tab legend (robust alternative to arrows pointing at tabs)
+    accent(rm.getCell('C8'), t('rm_inside_q'));
+    para(rm.getCell('C9'),  '🎬  ' + t('rm_inside_films'));
+    para(rm.getCell('C10'), '📋  ' + t('rm_inside_lists'));
+    para(rm.getCell('C11'), '👥  ' + t('rm_inside_members'));
+    // How to restore it
+    accent(rm.getCell('C13'), t('rm_how_q'));
+    para(rm.getCell('C14'), t('rm_how_a'));
+    // Editing this file
+    accent(rm.getCell('C16'), t('rm_edit_q'));
+    para(rm.getCell('C17'), t('rm_edit_a'));
+    // Contact the author — durable support channel (email first, site second)
+    accent(rm.getCell('C19'), t('rm_contact_q'));
+    para(rm.getCell('C20'), t('rm_contact_a'));
+    linkCell(rm.getCell('C21'), "hello@cinemail.app", "mailto:hello@cinemail.app");
+    linkCell(rm.getCell('C22'), "dafaspace.com", "https://dafaspace.com");
 
     // Sheet 1 — Films (one row per entry, with the readable list name)
     const wsFilms = wb.addWorksheet("Films");
