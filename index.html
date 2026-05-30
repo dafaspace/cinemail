@@ -2475,6 +2475,7 @@ body {
       </div>
       <div class="backup-hint" data-i18n="backup_hint" style="font-size:11px;color:var(--muted);line-height:1.4;margin-top:6px;opacity:0.8">Save an Excel backup of your lists, or restore them from a backup file.</div>
       <button onclick="backupExportJSON()" data-i18n="backup_json_nerd" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;opacity:0.5;padding:4px 0 0;margin-top:2px;text-decoration:underline;font-family:'DM Sans',sans-serif">JSON backup (advanced)</button>
+      <div id="backup-status" style="display:none;font-size:11px;line-height:1.45;margin-top:8px"></div>
       <div class="backup-row" id="btn-backfill-crew-row" style="display:none">
         <button class="btn-backup" id="btn-backfill-crew" onclick="backfillCrewData()" data-i18n="backfill_crew">🔄 Refresh crew data</button>
       </div>
@@ -3277,6 +3278,18 @@ const _I18N_BACKUP_JSON = {
   de:"JSON-Backup (erweitert)", it:"Backup JSON (avanzato)",
 };
 Object.keys(_I18N_BACKUP_JSON).forEach(l => { if (I18N[l]) I18N[l].backup_json_nerd = _I18N_BACKUP_JSON[l]; });
+// Import progress + "safe to leave" reassurance shown under the backup buttons
+const _I18N_BACKUP_BUSY = {
+  en:{ backup_restoring:"Restoring your backup…", backup_saving:"Saving…", backup_safe_hint:"You can keep using the app - a message will appear when it's done. Just don't close the app." },
+  ru:{ backup_restoring:"Восстанавливаю копию…", backup_saving:"Сохраняю…", backup_safe_hint:"Можешь продолжать пользоваться приложением - сообщение появится, когда всё загрузится. Только не закрывай приложение." },
+  uk:{ backup_restoring:"Відновлюю копію…", backup_saving:"Зберігаю…", backup_safe_hint:"Можеш користуватися застосунком далі - повідомлення з'явиться, коли все завантажиться. Тільки не закривай застосунок." },
+  ka:{ backup_restoring:"ვაღდგენ ასლს…", backup_saving:"ვინახავ…", backup_safe_hint:"შეგიძლია გააგრძელო აპით სარგებლობა - შეტყობინება გამოჩნდება დასრულებისას. უბრალოდ არ დახურო აპი." },
+  es:{ backup_restoring:"Restaurando tu copia…", backup_saving:"Guardando…", backup_safe_hint:"Puedes seguir usando la app - aparecerá un aviso al terminar. Solo no cierres la app." },
+  fr:{ backup_restoring:"Restauration de ta sauvegarde…", backup_saving:"Enregistrement…", backup_safe_hint:"Tu peux continuer à utiliser l'appli - un message s'affichera à la fin. Ne ferme juste pas l'appli." },
+  de:{ backup_restoring:"Backup wird wiederhergestellt…", backup_saving:"Speichern…", backup_safe_hint:"Du kannst die App weiter nutzen - eine Meldung erscheint, wenn es fertig ist. Schließe nur die App nicht." },
+  it:{ backup_restoring:"Ripristino il backup…", backup_saving:"Salvataggio…", backup_safe_hint:"Puoi continuare a usare l'app - apparirà un messaggio al termine. Non chiudere l'app." },
+};
+Object.keys(_I18N_BACKUP_BUSY).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_BACKUP_BUSY[l]); });
 // Checklist section header in the detail card
 const _I18N_LISTS_HDR = { en:"Add to lists", ru:"Добавить в списки", uk:"Додати до списків", ka:"სიებში დამატება", es:"Añadir a listas", fr:"Ajouter aux listes", de:"Zu Listen hinzufügen", it:"Aggiungi alle liste" };
 Object.keys(_I18N_LISTS_HDR).forEach(l => { if (I18N[l]) I18N[l].lists_header = _I18N_LISTS_HDR[l]; });
@@ -8303,8 +8316,22 @@ async function backupExportXLSX() {
 
 async function backupImportXLSX() {
   const importBtn = document.querySelector('.btn-backup[onclick="backupImportXLSX()"]');
-  const setLabel = (txt) => { if (importBtn) { importBtn.textContent = txt; importBtn.disabled = true; } };
+  const exportBtn = document.querySelector('.btn-backup[onclick="backupExportXLSX()"]');
+  const statusEl  = document.getElementById('backup-status');
+  // Progress goes to a dedicated status line (not the button label, which used to
+  // get stuck on "Saving…"). Both buttons are disabled while we work, and the line
+  // reassures the user they can keep browsing.
+  const setStatus = (main) => {
+    if (!statusEl) return;
+    if (!main) { statusEl.style.display = "none"; statusEl.innerHTML = ""; return; }
+    statusEl.style.display = "block";
+    statusEl.innerHTML = `<div style="color:var(--accent)">${main}</div>`
+      + `<div style="color:var(--muted);opacity:0.85;margin-top:3px">${t('backup_safe_hint')}</div>`;
+  };
+  const setBusy = (on) => { [importBtn, exportBtn].forEach(b => { if (b) b.disabled = on; }); };
+  const setLabel = (txt) => setStatus(txt); // keep call-sites below tidy
   try {
+    setBusy(true);
     // Let the user pick either an .xlsx or a legacy .csv.
     const file = await new Promise((res, rej) => {
       const inp = document.getElementById("backup-import-input");
@@ -8368,7 +8395,7 @@ async function backupImportXLSX() {
     rows.forEach(r => { if (r.list_name) wantedLists.add(r.list_name); });
     let listsCreated = 0;
     if (wantedLists.size) {
-      setLabel("Lists…");
+      setLabel(t('backup_restoring'));
       const { map, created } = await _ensureListsByName([...wantedLists]);
       listsCreated = created;
       rows.forEach(r => {
@@ -8377,9 +8404,9 @@ async function backupImportXLSX() {
       });
     }
 
-    setLabel(`Fetching 1/${rows.length}…`);
-    const enriched = await _enrichFromTMDB(rows, (done, total) => setLabel(`Fetching ${done}/${total}…`));
-    setLabel("Saving…");
+    setLabel(`${t('backup_restoring')} 1/${rows.length}`);
+    const enriched = await _enrichFromTMDB(rows, (done, total) => setLabel(`${t('backup_restoring')} ${done}/${total}`));
+    setLabel(t('backup_saving'));
     const { added, updated, skipped } = await applyBackupData(enriched);
     await loadListsCache();
     watchHistory = await loadHistoryFromDB();
@@ -8394,7 +8421,8 @@ async function backupImportXLSX() {
   } catch(e) {
     if (e.message !== "No file selected") showToast("Import failed: " + e.message, true);
   } finally {
-    if (importBtn) { importBtn.textContent = "↑ Excel"; importBtn.disabled = false; }
+    setBusy(false);
+    setStatus("");
   }
 }
 
