@@ -2474,7 +2474,7 @@ body {
         <button class="btn-backup" onclick="backupExportJSON()" title="Export as JSON (full structured backup)">↓ JSON</button>
         <input type="file" id="backup-import-input" accept=".xlsx,.csv" style="display:none">
       </div>
-      <div class="backup-hint" data-i18n="backup_hint" style="font-size:11px;color:var(--muted);line-height:1.4;margin-top:6px;opacity:0.8">Excel file. If you edit it, save it back as Excel (.xlsx) - not .numbers.</div>
+      <div class="backup-hint" data-i18n="backup_hint" style="font-size:11px;color:var(--muted);line-height:1.4;margin-top:6px;opacity:0.8">Save an Excel backup of your lists, or restore them from a backup file.</div>
       <div class="backup-row" id="btn-backfill-crew-row" style="display:none">
         <button class="btn-backup" id="btn-backfill-crew" onclick="backfillCrewData()" data-i18n="backfill_crew">🔄 Refresh crew data</button>
       </div>
@@ -3260,14 +3260,14 @@ const _I18N_DEL = { en:"Delete?", ru:"Удалить?", uk:"Видалити?", 
 Object.keys(_I18N_DEL).forEach(l => { if (I18N[l]) I18N[l].confirm_delete = _I18N_DEL[l]; });
 // One-line hint under the backup buttons (explains the .numbers save trap)
 const _I18N_BACKUP_HINT = {
-  en:"Excel file. If you edit it, save it back as Excel (.xlsx) - not .numbers.",
-  ru:"Excel-файл. Если редактируешь - сохраняй обратно как Excel (.xlsx), а не .numbers.",
-  uk:"Excel-файл. Якщо редагуєш - зберігай назад як Excel (.xlsx), а не .numbers.",
-  ka:"Excel-ფაილი. თუ არედაქტირებ - შეინახე ისევ Excel (.xlsx) ფორმატში, არა .numbers.",
-  es:"Archivo Excel. Si lo editas, guárdalo de nuevo como Excel (.xlsx), no .numbers.",
-  fr:"Fichier Excel. Si tu le modifies, enregistre-le en Excel (.xlsx), pas en .numbers.",
-  de:"Excel-Datei. Wenn du sie bearbeitest, speichere sie wieder als Excel (.xlsx) - nicht .numbers.",
-  it:"File Excel. Se lo modifichi, salvalo di nuovo come Excel (.xlsx), non .numbers.",
+  en:"Save an Excel backup of your lists, or restore them from a backup file.",
+  ru:"Сохрани резервную копию списков в Excel или восстанови списки из файла.",
+  uk:"Збережи резервну копію списків у Excel або віднови списки з файлу.",
+  ka:"შეინახე სიების სარეზერვო ასლი Excel-ში, ან აღადგინე სიები ფაილიდან.",
+  es:"Guarda una copia de seguridad de tus listas en Excel, o restáuralas desde un archivo.",
+  fr:"Enregistre une sauvegarde Excel de tes listes, ou restaure-les depuis un fichier.",
+  de:"Speichere ein Excel-Backup deiner Listen oder stelle sie aus einer Datei wieder her.",
+  it:"Salva un backup Excel delle tue liste, o ripristinale da un file.",
 };
 Object.keys(_I18N_BACKUP_HINT).forEach(l => { if (I18N[l]) I18N[l].backup_hint = _I18N_BACKUP_HINT[l]; });
 // Checklist section header in the detail card
