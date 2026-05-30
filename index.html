@@ -3314,6 +3314,13 @@ const _I18N_README = {
   it:{ rm_title:"Cinemail - backup dei tuoi film e liste", rm_site:"Sito web", rm_what_q:"Cos'è questo file?", rm_what_a:"Un backup dei tuoi film, voti, commenti e liste. Le schede Films, Lists e Members contengono i tuoi dati.", rm_how_q:"Come ripristinarlo", rm_how_a:"Apri Cinemail - Profilo - tocca Ripristina (↑) - scegli questo file. Le tue liste e i film tornano.", rm_edit_q:"Se modifichi il file", rm_edit_a:"Puoi modificarlo in Excel, Numbers o Google Sheets. Quando salvi, mantieni il formato Excel (.xlsx)." },
 };
 Object.keys(_I18N_README).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_README[l]); });
+const _I18N_README_SUB = {
+  en:"Backup of your films & lists", ru:"Резервная копия твоих фильмов и списков",
+  uk:"Резервна копія твоїх фільмів і списків", ka:"შენი ფილმებისა და სიების სარეზერვო ასლი",
+  es:"Copia de seguridad de tus películas y listas", fr:"Sauvegarde de tes films et listes",
+  de:"Sicherung deiner Filme und Listen", it:"Backup dei tuoi film e liste",
+};
+Object.keys(_I18N_README_SUB).forEach(l => { if (I18N[l]) I18N[l].rm_subtitle = _I18N_README_SUB[l]; });
 // Checklist section header in the detail card
 const _I18N_LISTS_HDR = { en:"Add to lists", ru:"Добавить в списки", uk:"Додати до списків", ka:"სიებში დამატება", es:"Añadir a listas", fr:"Ajouter aux listes", de:"Zu Listen hinzufügen", it:"Aggiungi alle liste" };
 Object.keys(_I18N_LISTS_HDR).forEach(l => { if (I18N[l]) I18N[l].lists_header = _I18N_LISTS_HDR[l]; });
@@ -8295,45 +8302,78 @@ async function backupExportXLSX() {
     const listNameById = {};
     (_listsCache || []).forEach(l => { listNameById[l.id] = l.name; });
 
-    const BRAND = "FF7C3AED";   // Cinemail purple (ARGB)
-    const LINK  = "FF2563EB";
+    const BRAND   = "FF7C3AED";   // Cinemail purple (ARGB)
+    const BRAND_D = "FF5B21B6";   // deeper purple
+    const LINK    = "FF6D28D9";
+    const ZEBRA   = "FFF5F3FB";   // very light purple for alternating rows
+    const RULE    = "FFE5E1F2";   // light border
     const wb = new ExcelJS.Workbook();
     wb.creator = "Cinemail";
     wb.created = new Date();
 
-    // Brand the header row of a data sheet and freeze it.
-    const brandHeader = (ws) => {
+    // Style a data sheet: purple header band, frozen + filterable header,
+    // zebra striping and thin row rules so it reads like a designed table.
+    const styleDataSheet = (ws, colCount) => {
       const hr = ws.getRow(1);
-      hr.eachCell(c => {
-        c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BRAND } };
-        c.font = { bold: true, color: { argb: "FFFFFFFF" } };
-        c.alignment = { vertical: 'middle' };
-      });
-      hr.height = 20;
-      ws.views = [{ state: 'frozen', ySplit: 1 }];
+      for (let c = 1; c <= colCount; c++) {
+        const cell = hr.getCell(c);
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BRAND } };
+        cell.font = { bold: true, color: { argb: "FFFFFFFF" }, size: 11 };
+        cell.alignment = { vertical: 'middle' };
+        cell.border = { bottom: { style: 'thin', color: { argb: BRAND_D } } };
+      }
+      hr.height = 22;
+      for (let r = 2; r <= ws.rowCount; r++) {
+        const row = ws.getRow(r);
+        row.height = 18;
+        for (let c = 1; c <= colCount; c++) {
+          const cell = row.getCell(c);
+          if (r % 2 === 1) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ZEBRA } };
+          cell.border = { bottom: { style: 'hair', color: { argb: RULE } } };
+          cell.alignment = { vertical: 'middle' };
+        }
+      }
+      ws.views = [{ state: 'frozen', ySplit: 1, showGridLines: false }];
+      if (ws.rowCount >= 1) ws.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: colCount } };
     };
 
-    // Sheet 0 — Read me (first tab: what this file is + how to restore, with logo)
-    const rm = wb.addWorksheet("Read me");
-    rm.getColumn(1).width = 22; rm.getColumn(2).width = 64;
+    // Sheet 0 — Read me: a designed cover page, not a spreadsheet.
+    const rm = wb.addWorksheet("Read me", { views: [{ showGridLines: false }] });
+    rm.getColumn(1).width = 3;    // left margin
+    rm.getColumn(2).width = 14;   // logo column
+    rm.getColumn(3).width = 92;   // content
+    // Purple banner across B1:C3 with the logo and white title.
+    rm.mergeCells('B1:C3');
+    rm.getRow(1).height = 30; rm.getRow(2).height = 30; rm.getRow(3).height = 30;
+    const banner = rm.getCell('B1');
+    banner.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BRAND } };
+    banner.value = { richText: [
+      { font: { bold: true, size: 22, color: { argb: "FFFFFFFF" } }, text: "Cinemail\n" },
+      { font: { size: 12, color: { argb: "FFE9DEFB" } }, text: t('rm_subtitle') },
+    ]};
+    banner.alignment = { vertical: 'middle', indent: 6, wrapText: true };
     try {
       const resp = await fetch('./logo.png');
       if (resp.ok) {
         const imgBuf = await resp.arrayBuffer();
         const imgId = wb.addImage({ buffer: imgBuf, extension: 'png' });
-        rm.addImage(imgId, { tl: { col: 2.15, row: 0.2 }, ext: { width: 88, height: 88 } });
+        // Sits on the left of the banner.
+        rm.addImage(imgId, { tl: { col: 1.12, row: 0.18 }, ext: { width: 78, height: 78 } });
       }
     } catch(e) { /* logo is decorative — skip on failure */ }
-    const title = rm.getCell('A1'); title.value = t('rm_title');
-    title.font = { bold: true, size: 16, color: { argb: BRAND } };
-    rm.getCell('A3').value = t('rm_site') + ":";
-    const link = rm.getCell('B3');
+    // Website row
+    rm.getCell('B5').value = t('rm_site') + ":";
+    rm.getCell('B5').font = { bold: true, color: { argb: BRAND_D } };
+    const link = rm.getCell('C5');
     link.value = { text: "cinemail.app", hyperlink: "https://cinemail.app" };
-    link.font = { color: { argb: LINK }, underline: true };
-    const block = [['A5', 'rm_what_q', 'A6', 'rm_what_a'], ['A8', 'rm_how_q', 'A9', 'rm_how_a'], ['A11', 'rm_edit_q', 'A12', 'rm_edit_a']];
+    link.font = { color: { argb: LINK }, underline: true, bold: true };
+    // Q/A blocks with accent section labels and a thin rule under each label.
+    const block = [['B7', 'rm_what_q', 'C7', 'rm_what_a'], ['B9', 'rm_how_q', 'C9', 'rm_how_a'], ['B11', 'rm_edit_q', 'C11', 'rm_edit_a']];
     block.forEach(([qc, qk, ac, ak]) => {
-      const q = rm.getCell(qc); q.value = t(qk); q.font = { bold: true };
-      rm.getCell(ac).value = t(ak);
+      const q = rm.getCell(qc); q.value = t(qk);
+      q.font = { bold: true, size: 12, color: { argb: BRAND } };
+      const a = rm.getCell(ac); a.value = t(ak);
+      a.alignment = { wrapText: true, vertical: 'top' };
     });
 
     // Sheet 1 — Films (one row per entry, with the readable list name)
@@ -8353,19 +8393,19 @@ async function backupExportXLSX() {
         r.actors || "", r.runtime || "", r.poster || "", r.created_at || ""
       ]);
     }
-    brandHeader(wsFilms);
+    styleDataSheet(wsFilms, 15);
 
     // Sheet 2 — Lists (your lists and your role in each)
     const wsLists = wb.addWorksheet("Lists");
     wsLists.columns = [{ header: "list", width: 30 }, { header: "your_role", width: 12 }];
     (_listsCache || []).forEach(l => wsLists.addRow([l.name, l.role || "owner"]));
-    brandHeader(wsLists);
+    styleDataSheet(wsLists, 2);
 
     // Sheet 3 — Members (who is in each list; reference only)
     const wsMem = wb.addWorksheet("Members");
     wsMem.columns = [{ header: "list", width: 30 }, { header: "member", width: 24 }, { header: "role", width: 12 }];
     (_listsCache || []).forEach(l => (l.members || []).forEach(m => wsMem.addRow([l.name, m.name || "", m.role || ""])));
-    brandHeader(wsMem);
+    styleDataSheet(wsMem, 3);
 
     const out = await wb.xlsx.writeBuffer();
     const blob = new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
