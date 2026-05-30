@@ -2469,12 +2469,12 @@ body {
       </div>
       <div class="add-label" data-i18n="backup_lbl" style="margin-top:4px">Backup</div>
       <div class="backup-row">
-        <button class="btn-backup" onclick="backupExportXLSX()" title="Export as Excel (.xlsx) — opens in Numbers/Sheets/Excel">↓ Excel</button>
-        <button class="btn-backup" onclick="backupImportXLSX()" title="Import an Excel/Sheets/Numbers file (.xlsx) or legacy .csv">↑ Excel</button>
-        <button class="btn-backup" onclick="backupExportJSON()" title="Export as JSON (full structured backup)">↓ JSON</button>
+        <button class="btn-backup" onclick="backupExportXLSX()" title="Export everything as Excel (.xlsx) — films, lists and members, opens in Numbers/Sheets/Excel">↓ Excel</button>
+        <button class="btn-backup" onclick="backupImportXLSX()" title="Restore from an Excel (.xlsx) backup or legacy .csv">↑ Excel</button>
         <input type="file" id="backup-import-input" accept=".xlsx,.csv" style="display:none">
       </div>
       <div class="backup-hint" data-i18n="backup_hint" style="font-size:11px;color:var(--muted);line-height:1.4;margin-top:6px;opacity:0.8">Save an Excel backup of your lists, or restore them from a backup file.</div>
+      <button onclick="backupExportJSON()" data-i18n="backup_json_nerd" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;opacity:0.5;padding:4px 0 0;margin-top:2px;text-decoration:underline;font-family:'DM Sans',sans-serif">JSON backup (advanced)</button>
       <div class="backup-row" id="btn-backfill-crew-row" style="display:none">
         <button class="btn-backup" id="btn-backfill-crew" onclick="backfillCrewData()" data-i18n="backfill_crew">🔄 Refresh crew data</button>
       </div>
@@ -3270,6 +3270,13 @@ const _I18N_BACKUP_HINT = {
   it:"Salva un backup Excel delle tue liste, o ripristinale da un file.",
 };
 Object.keys(_I18N_BACKUP_HINT).forEach(l => { if (I18N[l]) I18N[l].backup_hint = _I18N_BACKUP_HINT[l]; });
+// Low-key "advanced" link to the developer JSON dump (tucked away for power users)
+const _I18N_BACKUP_JSON = {
+  en:"JSON backup (advanced)", ru:"JSON-бэкап (для продвинутых)", uk:"JSON-резервна копія (для просунутих)",
+  ka:"JSON-ბექაპი (გაფართოებული)", es:"Copia JSON (avanzada)", fr:"Sauvegarde JSON (avancé)",
+  de:"JSON-Backup (erweitert)", it:"Backup JSON (avanzato)",
+};
+Object.keys(_I18N_BACKUP_JSON).forEach(l => { if (I18N[l]) I18N[l].backup_json_nerd = _I18N_BACKUP_JSON[l]; });
 // Checklist section header in the detail card
 const _I18N_LISTS_HDR = { en:"Add to lists", ru:"Добавить в списки", uk:"Додати до списків", ka:"სიებში დამატება", es:"Añadir a listas", fr:"Ajouter aux listes", de:"Zu Listen hinzufügen", it:"Aggiungi alle liste" };
 Object.keys(_I18N_LISTS_HDR).forEach(l => { if (I18N[l]) I18N[l].lists_header = _I18N_LISTS_HDR[l]; });
@@ -8210,6 +8217,36 @@ async function _loadXLSX() {
   await _xlsxLoading;
 }
 
+// Ensure a list with each given name exists and is owned by the current user.
+// Returns { map: lowercasedName→id, created: N } so import can reattach films
+// to lists by their human name (and recreate any missing ones on restore).
+async function _ensureListsByName(names) {
+  const map = {};
+  let created = 0;
+  if (!currentUser || !names.length) return { map, created };
+  try {
+    const { data: owned } = await sbClient.from('lists').select('id,name').eq('owner_id', currentUser.id);
+    (owned || []).forEach(l => { if (l.name) map[l.name.trim().toLowerCase()] = l.id; });
+  } catch(e) {}
+  for (const raw of names) {
+    const name = String(raw || "").trim();
+    if (!name) continue;
+    const key = name.toLowerCase();
+    if (map[key]) continue;
+    try {
+      const { data, error } = await sbClient.from('lists').insert({ name, owner_id: currentUser.id }).select().single();
+      if (error || !data) continue;
+      await sbClient.from('list_members').insert({ list_id: data.id, user_id: currentUser.id, role: 'owner' });
+      map[key] = data.id; created++;
+    } catch(e) { /* skip this list, keep going */ }
+  }
+  return { map, created };
+}
+
+// Full multi-sheet Excel backup: Films + Lists + Members. The Films sheet carries
+// each film's list name so import can put it back in the right list; the Lists and
+// Members sheets are human-readable structure (Members is reference-only — other
+// people can't be re-added to shared lists from a file).
 async function backupExportXLSX() {
   const btn = event?.currentTarget;
   if (btn) { btn.disabled = true; }
@@ -8217,21 +8254,43 @@ async function backupExportXLSX() {
     await _loadXLSX();
     const rows = await getBackupData();
     if (!rows.length) { showToast("Nothing to export yet"); return; }
-    const headers = ["tmdb_id","title","year","type","status","rating","comment","director","cinematographer","composer","actors","runtime","poster","added_at"];
-    const aoa = [headers];
+    if (!(_listsCache && _listsCache.length)) { try { await loadListsCache(); } catch(e) {} }
+    const listNameById = {};
+    (_listsCache || []).forEach(l => { listNameById[l.id] = l.name; });
+
+    // Sheet 1 — Films (one row per entry, with the readable list name)
+    const filmHeaders = ["tmdb_id","title","year","type","status","list","rating","comment","director","cinematographer","composer","actors","runtime","poster","added_at"];
+    const filmAoa = [filmHeaders];
     for (const r of rows) {
-      aoa.push([
+      filmAoa.push([
         r.imdb_id, r.title, r.year, r.media_type || "movie",
-        r.status || "watched", r.stars || 0, r.comment || "",
+        r.status || "watched", (r.list_id && listNameById[r.list_id]) ? listNameById[r.list_id] : "",
+        r.stars || 0, r.comment || "",
         r.director || "", r.cinematographer || "", r.composer || "",
         r.actors || "", r.runtime || "", r.poster || "", r.created_at || ""
       ]);
     }
-    const ws = XLSX.utils.aoa_to_sheet(aoa);
-    // Reasonable initial column widths so the file opens looking sensible.
-    ws['!cols'] = [{wch:12},{wch:34},{wch:6},{wch:7},{wch:9},{wch:7},{wch:42},{wch:24},{wch:24},{wch:24},{wch:34},{wch:9},{wch:42},{wch:22}];
+    const wsFilms = XLSX.utils.aoa_to_sheet(filmAoa);
+    wsFilms['!cols'] = [{wch:12},{wch:34},{wch:6},{wch:7},{wch:9},{wch:20},{wch:7},{wch:42},{wch:24},{wch:24},{wch:24},{wch:34},{wch:9},{wch:42},{wch:22}];
+
+    // Sheet 2 — Lists (your lists and your role in each)
+    const listAoa = [["list","your_role"]];
+    (_listsCache || []).forEach(l => { listAoa.push([l.name, l.role || "owner"]); });
+    const wsLists = XLSX.utils.aoa_to_sheet(listAoa);
+    wsLists['!cols'] = [{wch:30},{wch:12}];
+
+    // Sheet 3 — Members (who is in each list; reference only)
+    const memAoa = [["list","member","role"]];
+    (_listsCache || []).forEach(l => {
+      (l.members || []).forEach(m => { memAoa.push([l.name, m.name || "", m.role || ""]); });
+    });
+    const wsMem = XLSX.utils.aoa_to_sheet(memAoa);
+    wsMem['!cols'] = [{wch:30},{wch:24},{wch:12}];
+
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Cinemail");
+    XLSX.utils.book_append_sheet(wb, wsFilms, "Films");
+    XLSX.utils.book_append_sheet(wb, wsLists, "Lists");
+    XLSX.utils.book_append_sheet(wb, wsMem, "Members");
     const data = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     const shared = await _saveOrShareBlob(blob, `cinemail-backup-${_todayStr()}.xlsx`,
@@ -8261,7 +8320,7 @@ async function backupImportXLSX() {
       inp.click();
     });
 
-    let rows;
+    let rows, listNamesFromBackup = [];
     if (/\.csv$/i.test(file.name)) {
       // Legacy CSV path - parse via the same RFC 4180 reader the old button used.
       const text = await file.text();
@@ -8270,8 +8329,10 @@ async function backupImportXLSX() {
       await _loadXLSX();
       const buf = await file.arrayBuffer();
       const wb = XLSX.read(buf, { type: 'array' });
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const records = XLSX.utils.sheet_to_json(ws, { defval: "", raw: false });
+      // Films sheet: prefer the named "Films" sheet, fall back to the first sheet
+      // (old single-sheet exports were named "Cinemail").
+      const filmsSheet = wb.Sheets["Films"] || wb.Sheets[wb.SheetNames[0]];
+      const records = XLSX.utils.sheet_to_json(filmsSheet, { defval: "", raw: false });
       rows = records.map(obj => {
         const rt = parseInt(obj.runtime, 10);
         return {
@@ -8280,6 +8341,7 @@ async function backupImportXLSX() {
           year: String(obj.year || "").trim(),
           media_type: String(obj.type || "movie").trim(),
           status: String(obj.status || "watched").trim(),
+          list_name: String(obj.list || "").trim(),
           stars: parseInt(obj.rating) || 0,
           comment: String(obj.comment || ""),
           director: String(obj.director || ""),
@@ -8291,20 +8353,43 @@ async function backupImportXLSX() {
           added_at: String(obj.added_at || "")
         };
       }).filter(r => r.imdb_id && r.title);
+      // Optional Lists sheet — so we recreate even empty lists, not just ones
+      // that happen to have a film attached.
+      if (wb.Sheets["Lists"]) {
+        const lrec = XLSX.utils.sheet_to_json(wb.Sheets["Lists"], { defval: "", raw: false });
+        listNamesFromBackup = lrec.map(o => String(o.list || "").trim()).filter(Boolean);
+      }
     }
 
     if (!rows.length) { showToast("No valid entries in file", true); return; }
+
+    // Recreate lists and map their names → ids, then reattach films by name.
+    const wantedLists = new Set(listNamesFromBackup);
+    rows.forEach(r => { if (r.list_name) wantedLists.add(r.list_name); });
+    let listsCreated = 0;
+    if (wantedLists.size) {
+      setLabel("Lists…");
+      const { map, created } = await _ensureListsByName([...wantedLists]);
+      listsCreated = created;
+      rows.forEach(r => {
+        const id = r.list_name && map[r.list_name.toLowerCase()];
+        if (id) r.list_id = id;
+      });
+    }
+
     setLabel(`Fetching 1/${rows.length}…`);
     const enriched = await _enrichFromTMDB(rows, (done, total) => setLabel(`Fetching ${done}/${total}…`));
     setLabel("Saving…");
     const { added, updated, skipped } = await applyBackupData(enriched);
+    await loadListsCache();
     watchHistory = await loadHistoryFromDB();
     renderHistory();
     closeAccount();
     const parts = [];
-    if (added)   parts.push(`✓ ${added} new`);
-    if (updated) parts.push(`↻ ${updated} updated`);
-    if (skipped) parts.push(`${skipped} unchanged`);
+    if (added)        parts.push(`✓ ${added} new`);
+    if (updated)      parts.push(`↻ ${updated} updated`);
+    if (skipped)      parts.push(`${skipped} unchanged`);
+    if (listsCreated) parts.push(`+${listsCreated} lists`);
     showToast(parts.join(" · ") || "Nothing changed");
   } catch(e) {
     if (e.message !== "No file selected") showToast("Import failed: " + e.message, true);
