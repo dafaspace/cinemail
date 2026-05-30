@@ -8312,17 +8312,41 @@ async function _renderBannerPNG(subtitle) {
     const ctx = canvas.getContext('2d');
     ctx.scale(scale, scale);
     try { await document.fonts.load('700 46px "Bebas Neue"'); await document.fonts.ready; } catch(e) {}
-    let logoImg = null;
+    let logoImg = null, lbox = null;
     try {
       const resp = await fetch('./logo.png');
-      if (resp.ok) logoImg = await createImageBitmap(await resp.blob());
+      if (resp.ok) {
+        logoImg = await createImageBitmap(await resp.blob());
+        // The PNG has transparent padding around the artwork, which made the
+        // drawn logo look ~30% small and floaty. Find the opaque bounding box so
+        // we can draw the artwork itself at the exact target size/position.
+        const oc = document.createElement('canvas');
+        oc.width = logoImg.width; oc.height = logoImg.height;
+        const octx = oc.getContext('2d');
+        octx.drawImage(logoImg, 0, 0);
+        const px = octx.getImageData(0, 0, oc.width, oc.height).data;
+        let minX = oc.width, minY = oc.height, maxX = 0, maxY = 0, found = false;
+        for (let y = 0; y < oc.height; y++) {
+          for (let x = 0; x < oc.width; x++) {
+            if (px[(y * oc.width + x) * 4 + 3] > 16) {
+              found = true;
+              if (x < minX) minX = x; if (x > maxX) maxX = x;
+              if (y < minY) minY = y; if (y > maxY) maxY = y;
+            }
+          }
+        }
+        if (found) lbox = { x: minX, y: minY, w: maxX - minX + 1, h: maxY - minY + 1 };
+      }
     } catch(e) {}
     const padX = 4;
     const baseline = 48;          // wordmark baseline
     let textX = padX;
     if (logoImg) {
-      const lh = 40, lw = 40, ly = baseline - lh;   // bottom-aligned to the wordmark
-      ctx.drawImage(logoImg, padX, ly, lw, lh);
+      const src = lbox || { x: 0, y: 0, w: logoImg.width, h: logoImg.height };
+      const targetH = 44;                               // ~ the wordmark's visual height
+      const lw = Math.round(targetH * (src.w / src.h)); // keep aspect from trimmed art
+      const ly = baseline - targetH + 1;                // bottoms aligned to the text
+      ctx.drawImage(logoImg, src.x, src.y, src.w, src.h, padX, ly, lw, targetH);
       textX = padX + lw + 12;
     }
     ctx.textBaseline = 'alphabetic';
@@ -8440,8 +8464,8 @@ async function backupExportXLSX() {
     // Contact the author — durable support channel (email first, site second)
     accent(rm.getCell('C19'), t('rm_contact_q'));
     para(rm.getCell('C20'), t('rm_contact_a'));
-    linkCell(rm.getCell('C21'), "hello@cinemail.app", "mailto:hello@cinemail.app");
-    linkCell(rm.getCell('C22'), "dafaspace.com", "https://dafaspace.com");
+    linkCell(rm.getCell('C21'), "✉️  hello@cinemail.app", "mailto:hello@cinemail.app");
+    linkCell(rm.getCell('C22'), "🌐  dafaspace.com", "https://dafaspace.com");
 
     // Sheet 1 — Films (one row per entry, with the readable list name)
     const wsFilms = wb.addWorksheet("Films");
