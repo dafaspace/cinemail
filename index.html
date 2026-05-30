@@ -8299,6 +8299,51 @@ async function _ensureListsByName(names) {
   return { map, created };
 }
 
+// Render the Read me banner lockup (logo + CINEMAIL wordmark + subtitle) to a
+// transparent PNG using the app's own Bebas Neue font. Baking it to an image is
+// the only way to guarantee the exact in-app typeface in the xlsx — a font name
+// set on a cell only renders if the viewer happens to have that font installed.
+// Returns an ArrayBuffer, or null if the canvas can't be produced.
+async function _renderBannerPNG(subtitle) {
+  try {
+    const scale = 3, W = 560, H = 84;
+    const canvas = document.createElement('canvas');
+    canvas.width = W * scale; canvas.height = H * scale;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(scale, scale);
+    try { await document.fonts.load('700 46px "Bebas Neue"'); await document.fonts.ready; } catch(e) {}
+    let logoImg = null;
+    try {
+      const resp = await fetch('./logo.png');
+      if (resp.ok) logoImg = await createImageBitmap(await resp.blob());
+    } catch(e) {}
+    const padX = 4;
+    const baseline = 48;          // wordmark baseline
+    let textX = padX;
+    if (logoImg) {
+      const lh = 40, lw = 40, ly = baseline - lh;   // bottom-aligned to the wordmark
+      ctx.drawImage(logoImg, padX, ly, lw, lh);
+      textX = padX + lw + 12;
+    }
+    ctx.textBaseline = 'alphabetic';
+    try { ctx.letterSpacing = '2px'; } catch(e) {}
+    ctx.font = '46px "Bebas Neue", "Oswald", sans-serif';
+    ctx.fillStyle = '#F5C518';     // CINE — brand gold
+    ctx.fillText('CINE', textX, baseline);
+    const cineW = ctx.measureText('CINE').width;
+    ctx.fillStyle = '#FFFFFF';     // MAIL — white
+    ctx.fillText('MAIL', textX + cineW + 2, baseline);
+    if (subtitle) {
+      try { ctx.letterSpacing = '0px'; } catch(e) {}
+      ctx.font = '15px "DM Sans", -apple-system, sans-serif';
+      ctx.fillStyle = '#E9DEFB';
+      ctx.fillText(subtitle, textX, 68);
+    }
+    const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+    return blob ? await blob.arrayBuffer() : null;
+  } catch(e) { return null; }
+}
+
 // Full multi-sheet Excel backup: Films + Lists + Members. The Films sheet carries
 // each film's list name so import can put it back in the right list; the Lists and
 // Members sheets are human-readable structure (Members is reference-only — other
@@ -8355,29 +8400,25 @@ async function backupExportXLSX() {
     rm.getColumn(1).width = 2;     // thin left margin
     rm.getColumn(2).width = 11;    // logo column (banner left)
     rm.getColumn(3).width = 106;   // all content lives here
-    // Banner: logo in its own merged block (B1:B3), wordmark + subtitle in C1:C3.
-    rm.getRow(1).height = 26; rm.getRow(2).height = 26; rm.getRow(3).height = 26;
-    rm.mergeCells('B1:B3');
-    rm.mergeCells('C1:C3');
+    // Banner: purple fill across B1:C3, with the brand lockup baked as one image
+    // (logo + CINEMAIL in the real app font) overlaid on top.
+    rm.getRow(1).height = 28; rm.getRow(2).height = 28; rm.getRow(3).height = 28;
+    rm.mergeCells('B1:C3');
     rm.getCell('B1').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BRAND } };
-    const titleCell = rm.getCell('C1');
-    titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BRAND } };
-    // Wordmark exactly as in the app: CINE in gold, MAIL in white, uppercase.
-    titleCell.value = { richText: [
-      { font: { bold: true, size: 22, color: { argb: GOLD } }, text: "CINE" },
-      { font: { bold: true, size: 22, color: { argb: "FFFFFFFF" } }, text: "MAIL\n" },
-      { font: { size: 11, color: { argb: "FFE9DEFB" } }, text: t('rm_subtitle') },
-    ]};
-    titleCell.alignment = { vertical: 'middle', indent: 1, wrapText: true };
-    try {
-      const resp = await fetch('./logo.png');
-      if (resp.ok) {
-        const imgBuf = await resp.arrayBuffer();
-        const imgId = wb.addImage({ buffer: imgBuf, extension: 'png' });
-        // Sized to roughly the wordmark's cap height and sitting on its baseline.
-        rm.addImage(imgId, { tl: { col: 1.18, row: 0.62 }, ext: { width: 34, height: 34 } });
-      }
-    } catch(e) { /* logo is decorative — skip on failure */ }
+    const bannerBuf = await _renderBannerPNG(t('rm_subtitle'));
+    if (bannerBuf) {
+      const bid = wb.addImage({ buffer: bannerBuf, extension: 'png' });
+      rm.addImage(bid, { tl: { col: 1.1, row: 0.05 }, ext: { width: 560, height: 84 } });
+    } else {
+      // Fallback if canvas isn't available: plain styled wordmark text.
+      const tc = rm.getCell('B1');
+      tc.value = { richText: [
+        { font: { bold: true, size: 22, color: { argb: GOLD } }, text: "CINE" },
+        { font: { bold: true, size: 22, color: { argb: "FFFFFFFF" } }, text: "MAIL\n" },
+        { font: { size: 11, color: { argb: "FFE9DEFB" } }, text: t('rm_subtitle') },
+      ]};
+      tc.alignment = { vertical: 'middle', indent: 2, wrapText: true };
+    }
     // Everything below stacks in column C so nothing gets clipped by a neighbour.
     const accent = (cell, text) => { cell.value = text; cell.font = { bold: true, size: 12, color: { argb: BRAND } }; };
     const para   = (cell, text) => { cell.value = text; cell.alignment = { wrapText: true, vertical: 'top' }; };
