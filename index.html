@@ -2469,15 +2469,15 @@ body {
       </div>
       <div class="add-label" data-i18n="backup_lbl" style="margin-top:4px">Backup</div>
       <div class="backup-row">
-        <button class="btn-backup" onclick="backupExportXLSX()" title="Export everything as Excel (.xlsx) — films, lists and members, opens in Numbers/Sheets/Excel">↓ Excel</button>
-        <button class="btn-backup" onclick="backupImportXLSX()" title="Restore from an Excel (.xlsx) backup or legacy .csv">↑ Excel</button>
+        <button class="btn-backup" onclick="backupExportXLSX()" data-i18n="backup_btn_download" title="Download an Excel (.xlsx) backup — films, lists and members">↓ Download</button>
+        <button class="btn-backup" onclick="backupImportXLSX()" data-i18n="backup_btn_restore" title="Restore from an Excel (.xlsx) backup or legacy .csv">↑ Restore</button>
         <input type="file" id="backup-import-input" accept=".xlsx,.csv" style="display:none">
       </div>
       <div class="backup-hint" data-i18n="backup_hint" style="font-size:11px;color:var(--muted);line-height:1.4;margin-top:6px;opacity:0.8">Save an Excel backup of your lists, or restore them from a backup file.</div>
       <button onclick="backupExportJSON()" data-i18n="backup_json_nerd" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;opacity:0.5;padding:4px 0 0;margin-top:2px;text-decoration:underline;font-family:'DM Sans',sans-serif">JSON backup (advanced)</button>
       <div id="backup-status" style="display:none;font-size:11px;line-height:1.45;margin-top:8px"></div>
-      <div class="backup-row" id="btn-backfill-crew-row" style="display:none">
-        <button class="btn-backup" id="btn-backfill-crew" onclick="backfillCrewData()" data-i18n="backfill_crew">🔄 Refresh crew data</button>
+      <div id="btn-backfill-crew-row" style="display:none;margin-top:8px">
+        <button id="btn-backfill-crew" onclick="backfillCrewData()" data-i18n="backfill_crew" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;opacity:0.6;padding:4px 0;text-decoration:underline;font-family:'DM Sans',sans-serif">🔄 Refresh crew data</button>
       </div>
       <div class="backup-row" id="drive-backup-row">
         <button class="btn-backup btn-backup-drive-action" id="btn-drive-save" onclick="backupSaveToDrive()">
@@ -3290,6 +3290,30 @@ const _I18N_BACKUP_BUSY = {
   it:{ backup_restoring:"Ripristino il backup…", backup_saving:"Salvataggio…", backup_safe_hint:"Puoi continuare a usare l'app - apparirà un messaggio al termine. Non chiudere l'app." },
 };
 Object.keys(_I18N_BACKUP_BUSY).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_BACKUP_BUSY[l]); });
+// Backup button labels (verbs only — the section header already says BACKUP)
+const _I18N_BACKUP_BTN = {
+  en:{ backup_btn_download:"↓ Download", backup_btn_restore:"↑ Restore" },
+  ru:{ backup_btn_download:"↓ Скачать", backup_btn_restore:"↑ Восстановить" },
+  uk:{ backup_btn_download:"↓ Скачати", backup_btn_restore:"↑ Відновити" },
+  ka:{ backup_btn_download:"↓ ჩამოტვირთვა", backup_btn_restore:"↑ აღდგენა" },
+  es:{ backup_btn_download:"↓ Descargar", backup_btn_restore:"↑ Restaurar" },
+  fr:{ backup_btn_download:"↓ Télécharger", backup_btn_restore:"↑ Restaurer" },
+  de:{ backup_btn_download:"↓ Sichern", backup_btn_restore:"↑ Wiederherstellen" },
+  it:{ backup_btn_download:"↓ Scarica", backup_btn_restore:"↑ Ripristina" },
+};
+Object.keys(_I18N_BACKUP_BTN).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_BACKUP_BTN[l]); });
+// "Read me" sheet content for the Excel backup (first tab the user sees on open)
+const _I18N_README = {
+  en:{ rm_title:"Cinemail - backup of your films & lists", rm_site:"Website", rm_what_q:"What is this file?", rm_what_a:"A backup of your films, ratings, comments and lists. The tabs Films, Lists and Members hold your data.", rm_how_q:"How to restore it", rm_how_a:"Open Cinemail - Profile - tap Restore (↑) - choose this file. Your lists and films come back.", rm_edit_q:"Editing this file", rm_edit_a:"You can edit it in Excel, Numbers or Google Sheets. When saving, keep the Excel (.xlsx) format." },
+  ru:{ rm_title:"Cinemail - резервная копия твоих фильмов и списков", rm_site:"Сайт", rm_what_q:"Что это за файл?", rm_what_a:"Резервная копия твоих фильмов, оценок, комментариев и списков. Вкладки Films, Lists и Members хранят данные.", rm_how_q:"Как восстановить", rm_how_a:"Открой Cinemail - Профиль - нажми Восстановить (↑) - выбери этот файл. Списки и фильмы вернутся.", rm_edit_q:"Если редактируешь файл", rm_edit_a:"Можно править в Excel, Numbers или Google Таблицах. При сохранении оставляй формат Excel (.xlsx)." },
+  uk:{ rm_title:"Cinemail - резервна копія твоїх фільмів і списків", rm_site:"Сайт", rm_what_q:"Що це за файл?", rm_what_a:"Резервна копія твоїх фільмів, оцінок, коментарів і списків. Вкладки Films, Lists і Members зберігають дані.", rm_how_q:"Як відновити", rm_how_a:"Відкрий Cinemail - Профіль - натисни Відновити (↑) - обери цей файл. Списки і фільми повернуться.", rm_edit_q:"Якщо редагуєш файл", rm_edit_a:"Можна правити в Excel, Numbers чи Google Таблицях. При збереженні залишай формат Excel (.xlsx)." },
+  ka:{ rm_title:"Cinemail - შენი ფილმებისა და სიების სარეზერვო ასლი", rm_site:"საიტი", rm_what_q:"რა ფაილია ეს?", rm_what_a:"შენი ფილმების, შეფასებების, კომენტარებისა და სიების სარეზერვო ასლი. ჩანართები Films, Lists და Members ინახავს მონაცემებს.", rm_how_q:"როგორ აღვადგინო", rm_how_a:"გახსენი Cinemail - პროფილი - დააჭირე აღდგენა (↑) - აირჩიე ეს ფაილი. სიები და ფილმები დაბრუნდება.", rm_edit_q:"თუ არედაქტირებ ფაილს", rm_edit_a:"შეგიძლია დაარედაქტირო Excel-ში, Numbers-ში ან Google Sheets-ში. შენახვისას დატოვე Excel (.xlsx) ფორმატი." },
+  es:{ rm_title:"Cinemail - copia de seguridad de tus películas y listas", rm_site:"Sitio web", rm_what_q:"¿Qué es este archivo?", rm_what_a:"Una copia de tus películas, valoraciones, comentarios y listas. Las pestañas Films, Lists y Members guardan tus datos.", rm_how_q:"Cómo restaurarlo", rm_how_a:"Abre Cinemail - Perfil - pulsa Restaurar (↑) - elige este archivo. Tus listas y películas vuelven.", rm_edit_q:"Si editas el archivo", rm_edit_a:"Puedes editarlo en Excel, Numbers o Google Sheets. Al guardar, mantén el formato Excel (.xlsx)." },
+  fr:{ rm_title:"Cinemail - sauvegarde de tes films et listes", rm_site:"Site web", rm_what_q:"Qu'est-ce que ce fichier ?", rm_what_a:"Une sauvegarde de tes films, notes, commentaires et listes. Les onglets Films, Lists et Members contiennent tes données.", rm_how_q:"Comment le restaurer", rm_how_a:"Ouvre Cinemail - Profil - appuie sur Restaurer (↑) - choisis ce fichier. Tes listes et films reviennent.", rm_edit_q:"Si tu modifies le fichier", rm_edit_a:"Tu peux l'éditer dans Excel, Numbers ou Google Sheets. À l'enregistrement, garde le format Excel (.xlsx)." },
+  de:{ rm_title:"Cinemail - Sicherung deiner Filme und Listen", rm_site:"Website", rm_what_q:"Was ist diese Datei?", rm_what_a:"Eine Sicherung deiner Filme, Bewertungen, Kommentare und Listen. Die Tabs Films, Lists und Members enthalten deine Daten.", rm_how_q:"Wiederherstellen", rm_how_a:"Öffne Cinemail - Profil - tippe auf Wiederherstellen (↑) - wähle diese Datei. Deine Listen und Filme kommen zurück.", rm_edit_q:"Datei bearbeiten", rm_edit_a:"Du kannst sie in Excel, Numbers oder Google Sheets bearbeiten. Beim Speichern das Excel-Format (.xlsx) behalten." },
+  it:{ rm_title:"Cinemail - backup dei tuoi film e liste", rm_site:"Sito web", rm_what_q:"Cos'è questo file?", rm_what_a:"Un backup dei tuoi film, voti, commenti e liste. Le schede Films, Lists e Members contengono i tuoi dati.", rm_how_q:"Come ripristinarlo", rm_how_a:"Apri Cinemail - Profilo - tocca Ripristina (↑) - scegli questo file. Le tue liste e i film tornano.", rm_edit_q:"Se modifichi il file", rm_edit_a:"Puoi modificarlo in Excel, Numbers o Google Sheets. Quando salvi, mantieni il formato Excel (.xlsx)." },
+};
+Object.keys(_I18N_README).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_README[l]); });
 // Checklist section header in the detail card
 const _I18N_LISTS_HDR = { en:"Add to lists", ru:"Добавить в списки", uk:"Додати до списків", ka:"სიებში დამატება", es:"Añadir a listas", fr:"Ajouter aux listes", de:"Zu Listen hinzufügen", it:"Aggiungi alle liste" };
 Object.keys(_I18N_LISTS_HDR).forEach(l => { if (I18N[l]) I18N[l].lists_header = _I18N_LISTS_HDR[l]; });
@@ -8300,7 +8324,28 @@ async function backupExportXLSX() {
     const wsMem = XLSX.utils.aoa_to_sheet(memAoa);
     wsMem['!cols'] = [{wch:30},{wch:24},{wch:12}];
 
+    // Sheet 0 — Read me (first tab shown on open: what this file is + how to restore)
+    const readmeAoa = [
+      [t('rm_title')],
+      [],
+      [t('rm_site') + ":", "https://cinemail.app"],
+      [],
+      [t('rm_what_q')],
+      [t('rm_what_a')],
+      [],
+      [t('rm_how_q')],
+      [t('rm_how_a')],
+      [],
+      [t('rm_edit_q')],
+      [t('rm_edit_a')],
+    ];
+    const wsReadme = XLSX.utils.aoa_to_sheet(readmeAoa);
+    wsReadme['!cols'] = [{wch:20},{wch:64}];
+    // Make the website a real clickable hyperlink (cell B3).
+    if (wsReadme['B3']) wsReadme['B3'].l = { Target: "https://cinemail.app", Tooltip: "cinemail.app" };
+
     const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, wsReadme, "Read me");
     XLSX.utils.book_append_sheet(wb, wsFilms, "Films");
     XLSX.utils.book_append_sheet(wb, wsLists, "Lists");
     XLSX.utils.book_append_sheet(wb, wsMem, "Members");
