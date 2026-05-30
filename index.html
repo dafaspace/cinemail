@@ -3321,6 +3321,18 @@ const _I18N_README_SUB = {
   de:"Sicherung deiner Filme und Listen", it:"Backup dei tuoi film e liste",
 };
 Object.keys(_I18N_README_SUB).forEach(l => { if (I18N[l]) I18N[l].rm_subtitle = _I18N_README_SUB[l]; });
+// Read me footer: the website, placed last, with a reason to visit it.
+const _I18N_README_GET = {
+  en:{ rm_get_q:"Get Cinemail", rm_get_a:"Open the app, or install it on another device:" },
+  ru:{ rm_get_q:"Установить Cinemail", rm_get_a:"Открой приложение или установи его на другом устройстве:" },
+  uk:{ rm_get_q:"Встановити Cinemail", rm_get_a:"Відкрий застосунок або встанови його на іншому пристрої:" },
+  ka:{ rm_get_q:"ჩამოტვირთე Cinemail", rm_get_a:"გახსენი აპი ან დააინსტალირე სხვა მოწყობილობაზე:" },
+  es:{ rm_get_q:"Instala Cinemail", rm_get_a:"Abre la app o instálala en otro dispositivo:" },
+  fr:{ rm_get_q:"Installe Cinemail", rm_get_a:"Ouvre l'appli ou installe-la sur un autre appareil :" },
+  de:{ rm_get_q:"Cinemail holen", rm_get_a:"Öffne die App oder installiere sie auf einem anderen Gerät:" },
+  it:{ rm_get_q:"Scarica Cinemail", rm_get_a:"Apri l'app o installala su un altro dispositivo:" },
+};
+Object.keys(_I18N_README_GET).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_README_GET[l]); });
 // Checklist section header in the detail card
 const _I18N_LISTS_HDR = { en:"Add to lists", ru:"Добавить в списки", uk:"Додати до списків", ka:"სიებში დამატება", es:"Añadir a listas", fr:"Ajouter aux listes", de:"Zu Listen hinzufügen", it:"Aggiungi alle liste" };
 Object.keys(_I18N_LISTS_HDR).forEach(l => { if (I18N[l]) I18N[l].lists_header = _I18N_LISTS_HDR[l]; });
@@ -8338,21 +8350,23 @@ async function backupExportXLSX() {
     };
 
     // Sheet 0 — Read me: a designed cover page, not a spreadsheet.
+    const GOLD = "FFF5C518";   // brand gold (matches the in-app CINE wordmark)
     const rm = wb.addWorksheet("Read me", { views: [{ showGridLines: false }] });
     rm.getColumn(1).width = 2;     // thin left margin
-    rm.getColumn(2).width = 13;    // logo column (banner left)
-    rm.getColumn(3).width = 104;   // all content lives here
-    // Banner: logo gets its own merged block (B1:B3) so it never overlaps the
-    // title, which sits in its own merged block (C1:C3).
-    rm.getRow(1).height = 30; rm.getRow(2).height = 30; rm.getRow(3).height = 30;
+    rm.getColumn(2).width = 11;    // logo column (banner left)
+    rm.getColumn(3).width = 106;   // all content lives here
+    // Banner: logo in its own merged block (B1:B3), wordmark + subtitle in C1:C3.
+    rm.getRow(1).height = 26; rm.getRow(2).height = 26; rm.getRow(3).height = 26;
     rm.mergeCells('B1:B3');
     rm.mergeCells('C1:C3');
     rm.getCell('B1').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BRAND } };
     const titleCell = rm.getCell('C1');
     titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BRAND } };
+    // Wordmark exactly as in the app: CINE in gold, MAIL in white, uppercase.
     titleCell.value = { richText: [
-      { font: { bold: true, size: 22, color: { argb: "FFFFFFFF" } }, text: "Cinemail\n" },
-      { font: { size: 12, color: { argb: "FFE9DEFB" } }, text: t('rm_subtitle') },
+      { font: { bold: true, size: 22, color: { argb: GOLD } }, text: "CINE" },
+      { font: { bold: true, size: 22, color: { argb: "FFFFFFFF" } }, text: "MAIL\n" },
+      { font: { size: 11, color: { argb: "FFE9DEFB" } }, text: t('rm_subtitle') },
     ]};
     titleCell.alignment = { vertical: 'middle', indent: 1, wrapText: true };
     try {
@@ -8360,30 +8374,34 @@ async function backupExportXLSX() {
       if (resp.ok) {
         const imgBuf = await resp.arrayBuffer();
         const imgId = wb.addImage({ buffer: imgBuf, extension: 'png' });
-        rm.addImage(imgId, { tl: { col: 1.15, row: 0.18 }, ext: { width: 74, height: 74 } });
+        // Sized to roughly the wordmark's cap height and sitting on its baseline.
+        rm.addImage(imgId, { tl: { col: 1.18, row: 0.62 }, ext: { width: 34, height: 34 } });
       }
     } catch(e) { /* logo is decorative — skip on failure */ }
     // Everything below stacks in column C so nothing gets clipped by a neighbour.
     const accent = (cell, text) => { cell.value = text; cell.font = { bold: true, size: 12, color: { argb: BRAND } }; };
-    accent(rm.getCell('C5'), t('rm_site'));
-    const link = rm.getCell('C6');
-    link.value = { text: "cinemail.app", hyperlink: "https://cinemail.app" };
-    link.font = { color: { argb: LINK }, underline: true, bold: true };
-    const blocks = [['C8','rm_what_q','C9','rm_what_a'], ['C11','rm_how_q','C12','rm_how_a'], ['C14','rm_edit_q','C15','rm_edit_a']];
+    const blocks = [['C5','rm_what_q','C6','rm_what_a'], ['C8','rm_how_q','C9','rm_how_a'], ['C11','rm_edit_q','C12','rm_edit_a']];
     blocks.forEach(([qc, qk, ac, ak]) => {
       accent(rm.getCell(qc), t(qk));
       const a = rm.getCell(ac); a.value = t(ak);
       a.alignment = { wrapText: true, vertical: 'top' };
     });
+    // Website goes last, with a reason to visit it.
+    accent(rm.getCell('C14'), t('rm_get_q'));
+    rm.getCell('C15').value = t('rm_get_a');
+    rm.getCell('C15').alignment = { wrapText: true, vertical: 'top' };
+    const link = rm.getCell('C16');
+    link.value = { text: "cinemail.app", hyperlink: "https://cinemail.app" };
+    link.font = { color: { argb: LINK }, underline: true, bold: true };
 
     // Sheet 1 — Films (one row per entry, with the readable list name)
     const wsFilms = wb.addWorksheet("Films");
     wsFilms.columns = [
-      { header: "tmdb_id", width: 12 }, { header: "title", width: 34 }, { header: "year", width: 9 },
-      { header: "type", width: 9 }, { header: "status", width: 11 }, { header: "list", width: 20 },
-      { header: "rating", width: 10 }, { header: "comment", width: 42 }, { header: "director", width: 24 },
-      { header: "cinematographer", width: 24 }, { header: "composer", width: 24 }, { header: "actors", width: 34 },
-      { header: "runtime", width: 9 }, { header: "poster", width: 42 }, { header: "added_at", width: 22 },
+      { header: "TMDB ID", width: 12 }, { header: "Title", width: 34 }, { header: "Year", width: 9 },
+      { header: "Type", width: 9 }, { header: "Status", width: 11 }, { header: "List", width: 20 },
+      { header: "Rating", width: 10 }, { header: "Comment", width: 42 }, { header: "Director", width: 24 },
+      { header: "Cinematographer", width: 24 }, { header: "Composer", width: 24 }, { header: "Actors", width: 34 },
+      { header: "Runtime", width: 12 }, { header: "Poster", width: 42 }, { header: "Added At", width: 22 },
     ];
     for (const r of rows) {
       wsFilms.addRow([
@@ -8397,13 +8415,13 @@ async function backupExportXLSX() {
 
     // Sheet 2 — Lists (your lists and your role in each)
     const wsLists = wb.addWorksheet("Lists");
-    wsLists.columns = [{ header: "list", width: 30 }, { header: "your_role", width: 12 }];
+    wsLists.columns = [{ header: "List", width: 30 }, { header: "Your Role", width: 14 }];
     (_listsCache || []).forEach(l => wsLists.addRow([l.name, l.role || "owner"]));
     styleDataSheet(wsLists, 2);
 
     // Sheet 3 — Members (who is in each list; reference only)
     const wsMem = wb.addWorksheet("Members");
-    wsMem.columns = [{ header: "list", width: 30 }, { header: "member", width: 24 }, { header: "role", width: 12 }];
+    wsMem.columns = [{ header: "List", width: 30 }, { header: "Member", width: 24 }, { header: "Role", width: 12 }];
     (_listsCache || []).forEach(l => (l.members || []).forEach(m => wsMem.addRow([l.name, m.name || "", m.role || ""])));
     styleDataSheet(wsMem, 3);
 
@@ -8475,10 +8493,14 @@ async function backupImportXLSX() {
         }
         return v;
       };
+      // Normalize a header label to a stable key so both the new Title-Case
+      // headers ("TMDB ID", "Added At") and old lowercase ones ("tmdb_id")
+      // map to the same field name (lowercase, spaces/underscores collapsed).
+      const norm = (s) => cellText(s).trim().toLowerCase().replace(/[\s_]+/g, '_');
       // Build a header-name → column-number map from row 1 of a worksheet.
       const headerMap = (ws) => {
         const map = {};
-        ws.getRow(1).eachCell((cell, col) => { map[cellText(cell.value).trim().toLowerCase()] = col; });
+        ws.getRow(1).eachCell((cell, col) => { map[norm(cell.value)] = col; });
         return map;
       };
       // Films sheet: prefer the named "Films" sheet, fall back to the first
