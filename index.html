@@ -2474,6 +2474,7 @@ body {
         <button class="btn-backup" onclick="backupExportJSON()" title="Export as JSON (full structured backup)">↓ JSON</button>
         <input type="file" id="backup-import-input" accept=".xlsx,.csv" style="display:none">
       </div>
+      <div class="backup-hint" data-i18n="backup_hint" style="font-size:11px;color:var(--muted);line-height:1.4;margin-top:6px;opacity:0.8">Excel file. If you edit it, save it back as Excel (.xlsx) - not .numbers.</div>
       <div class="backup-row" id="btn-backfill-crew-row" style="display:none">
         <button class="btn-backup" id="btn-backfill-crew" onclick="backfillCrewData()" data-i18n="backfill_crew">🔄 Refresh crew data</button>
       </div>
@@ -3257,6 +3258,18 @@ Object.keys(_I18N_PICKS_HINT).forEach(l => { if (I18N[l]) Object.assign(I18N[l],
 // Inline delete confirmation label
 const _I18N_DEL = { en:"Delete?", ru:"Удалить?", uk:"Видалити?", ka:"წავშალო?", es:"¿Eliminar?", fr:"Supprimer ?", de:"Löschen?", it:"Eliminare?" };
 Object.keys(_I18N_DEL).forEach(l => { if (I18N[l]) I18N[l].confirm_delete = _I18N_DEL[l]; });
+// One-line hint under the backup buttons (explains the .numbers save trap)
+const _I18N_BACKUP_HINT = {
+  en:"Excel file. If you edit it, save it back as Excel (.xlsx) - not .numbers.",
+  ru:"Excel-файл. Если редактируешь - сохраняй обратно как Excel (.xlsx), а не .numbers.",
+  uk:"Excel-файл. Якщо редагуєш - зберігай назад як Excel (.xlsx), а не .numbers.",
+  ka:"Excel-ფაილი. თუ არედაქტირებ - შეინახე ისევ Excel (.xlsx) ფორმატში, არა .numbers.",
+  es:"Archivo Excel. Si lo editas, guárdalo de nuevo como Excel (.xlsx), no .numbers.",
+  fr:"Fichier Excel. Si tu le modifies, enregistre-le en Excel (.xlsx), pas en .numbers.",
+  de:"Excel-Datei. Wenn du sie bearbeitest, speichere sie wieder als Excel (.xlsx) - nicht .numbers.",
+  it:"File Excel. Se lo modifichi, salvalo di nuovo come Excel (.xlsx), non .numbers.",
+};
+Object.keys(_I18N_BACKUP_HINT).forEach(l => { if (I18N[l]) I18N[l].backup_hint = _I18N_BACKUP_HINT[l]; });
 // Checklist section header in the detail card
 const _I18N_LISTS_HDR = { en:"Add to lists", ru:"Добавить в списки", uk:"Додати до списків", ka:"სიებში დამატება", es:"Añadir a listas", fr:"Ajouter aux listes", de:"Zu Listen hinzufügen", it:"Aggiungi alle liste" };
 Object.keys(_I18N_LISTS_HDR).forEach(l => { if (I18N[l]) I18N[l].lists_header = _I18N_LISTS_HDR[l]; });
