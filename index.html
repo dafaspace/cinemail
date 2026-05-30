@@ -8339,39 +8339,39 @@ async function backupExportXLSX() {
 
     // Sheet 0 — Read me: a designed cover page, not a spreadsheet.
     const rm = wb.addWorksheet("Read me", { views: [{ showGridLines: false }] });
-    rm.getColumn(1).width = 3;    // left margin
-    rm.getColumn(2).width = 14;   // logo column
-    rm.getColumn(3).width = 92;   // content
-    // Purple banner across B1:C3 with the logo and white title.
-    rm.mergeCells('B1:C3');
+    rm.getColumn(1).width = 2;     // thin left margin
+    rm.getColumn(2).width = 13;    // logo column (banner left)
+    rm.getColumn(3).width = 104;   // all content lives here
+    // Banner: logo gets its own merged block (B1:B3) so it never overlaps the
+    // title, which sits in its own merged block (C1:C3).
     rm.getRow(1).height = 30; rm.getRow(2).height = 30; rm.getRow(3).height = 30;
-    const banner = rm.getCell('B1');
-    banner.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BRAND } };
-    banner.value = { richText: [
+    rm.mergeCells('B1:B3');
+    rm.mergeCells('C1:C3');
+    rm.getCell('B1').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BRAND } };
+    const titleCell = rm.getCell('C1');
+    titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BRAND } };
+    titleCell.value = { richText: [
       { font: { bold: true, size: 22, color: { argb: "FFFFFFFF" } }, text: "Cinemail\n" },
       { font: { size: 12, color: { argb: "FFE9DEFB" } }, text: t('rm_subtitle') },
     ]};
-    banner.alignment = { vertical: 'middle', indent: 6, wrapText: true };
+    titleCell.alignment = { vertical: 'middle', indent: 1, wrapText: true };
     try {
       const resp = await fetch('./logo.png');
       if (resp.ok) {
         const imgBuf = await resp.arrayBuffer();
         const imgId = wb.addImage({ buffer: imgBuf, extension: 'png' });
-        // Sits on the left of the banner.
-        rm.addImage(imgId, { tl: { col: 1.12, row: 0.18 }, ext: { width: 78, height: 78 } });
+        rm.addImage(imgId, { tl: { col: 1.15, row: 0.18 }, ext: { width: 74, height: 74 } });
       }
     } catch(e) { /* logo is decorative — skip on failure */ }
-    // Website row
-    rm.getCell('B5').value = t('rm_site') + ":";
-    rm.getCell('B5').font = { bold: true, color: { argb: BRAND_D } };
-    const link = rm.getCell('C5');
+    // Everything below stacks in column C so nothing gets clipped by a neighbour.
+    const accent = (cell, text) => { cell.value = text; cell.font = { bold: true, size: 12, color: { argb: BRAND } }; };
+    accent(rm.getCell('C5'), t('rm_site'));
+    const link = rm.getCell('C6');
     link.value = { text: "cinemail.app", hyperlink: "https://cinemail.app" };
     link.font = { color: { argb: LINK }, underline: true, bold: true };
-    // Q/A blocks with accent section labels and a thin rule under each label.
-    const block = [['B7', 'rm_what_q', 'C7', 'rm_what_a'], ['B9', 'rm_how_q', 'C9', 'rm_how_a'], ['B11', 'rm_edit_q', 'C11', 'rm_edit_a']];
-    block.forEach(([qc, qk, ac, ak]) => {
-      const q = rm.getCell(qc); q.value = t(qk);
-      q.font = { bold: true, size: 12, color: { argb: BRAND } };
+    const blocks = [['C8','rm_what_q','C9','rm_what_a'], ['C11','rm_how_q','C12','rm_how_a'], ['C14','rm_edit_q','C15','rm_edit_a']];
+    blocks.forEach(([qc, qk, ac, ak]) => {
+      accent(rm.getCell(qc), t(qk));
       const a = rm.getCell(ac); a.value = t(ak);
       a.alignment = { wrapText: true, vertical: 'top' };
     });
@@ -8379,9 +8379,9 @@ async function backupExportXLSX() {
     // Sheet 1 — Films (one row per entry, with the readable list name)
     const wsFilms = wb.addWorksheet("Films");
     wsFilms.columns = [
-      { header: "tmdb_id", width: 12 }, { header: "title", width: 34 }, { header: "year", width: 6 },
-      { header: "type", width: 7 }, { header: "status", width: 9 }, { header: "list", width: 20 },
-      { header: "rating", width: 7 }, { header: "comment", width: 42 }, { header: "director", width: 24 },
+      { header: "tmdb_id", width: 12 }, { header: "title", width: 34 }, { header: "year", width: 9 },
+      { header: "type", width: 9 }, { header: "status", width: 11 }, { header: "list", width: 20 },
+      { header: "rating", width: 10 }, { header: "comment", width: 42 }, { header: "director", width: 24 },
       { header: "cinematographer", width: 24 }, { header: "composer", width: 24 }, { header: "actors", width: 34 },
       { header: "runtime", width: 9 }, { header: "poster", width: 42 }, { header: "added_at", width: 22 },
     ];
