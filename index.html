@@ -537,9 +537,12 @@ body {
 .status-tag.plan { background: rgba(255,255,255,0.06); color: #777; }
 
 /* ── Stars ──────────────────────────────────────────────────────────── */
-.stars-row { display: flex; gap: 4px; margin-bottom: 14px; }
-.star { font-size: 26px; cursor: pointer; color: #333; transition: color 0.15s; user-select: none; }
-.star.on { color: var(--primary); }
+.stars-row { display: flex; gap: 4px; margin-bottom: 14px; touch-action: none; -webkit-user-select: none; user-select: none; padding: 4px 0; width: max-content; }
+.star { font-size: 30px; cursor: pointer; user-select: none; display: inline-block; pointer-events: none;
+  transform-origin: center bottom; transition: transform .12s ease;
+  background: linear-gradient(90deg, var(--primary) var(--fill, 0%), #333 var(--fill, 0%));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent; }
 
 /* ── History stats ──────────────────────────────────────────────────── */
 .stats-block {
@@ -2362,11 +2365,11 @@ body {
       <div id="add-stars-section">
         <div class="add-label" data-i18n="your_rating">Your Rating</div>
         <div class="stars-row" id="stars-row">
-          <span class="star" onclick="setStar(1)">★</span>
-          <span class="star" onclick="setStar(2)">★</span>
-          <span class="star" onclick="setStar(3)">★</span>
-          <span class="star" onclick="setStar(4)">★</span>
-          <span class="star" onclick="setStar(5)">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
         </div>
         <div class="add-label" data-i18n="notes">Notes</div>
         <textarea id="add-note" data-i18n-ph="note_ph" placeholder="What did you think?" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
@@ -2387,11 +2390,11 @@ body {
       <div class="sheet-title" id="edit-movie-title"></div>
       <div class="add-label" data-i18n="your_rating">Rating</div>
       <div class="stars-row" id="edit-stars-row">
-        <span class="star" id="edit-star-1" onclick="setEditStar(1)">★</span>
-        <span class="star" id="edit-star-2" onclick="setEditStar(2)">★</span>
-        <span class="star" id="edit-star-3" onclick="setEditStar(3)">★</span>
-        <span class="star" id="edit-star-4" onclick="setEditStar(4)">★</span>
-        <span class="star" id="edit-star-5" onclick="setEditStar(5)">★</span>
+        <span class="star">★</span>
+        <span class="star">★</span>
+        <span class="star">★</span>
+        <span class="star">★</span>
+        <span class="star">★</span>
       </div>
       <div class="add-label" data-i18n="notes">Notes</div>
       <textarea id="edit-note" data-i18n-ph="note_ph" placeholder="What did you think?" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
@@ -2551,7 +2554,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.18.3</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.25.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -4192,7 +4195,7 @@ async function loadHistoryFromDB() {
   if (!Array.isArray(rows)) return watchHistory;
   const mapped = rows.map(r => ({
     id: r.id, tmdbID: r.imdb_id, title: r.title, year: r.year,
-    poster: r.poster, stars: r.stars || 0, comment: r.comment || "",
+    poster: r.poster, stars: Number(r.stars) || 0, comment: r.comment || "",
     status: r.status || "watched", mediaType: r.media_type || "movie",
     composer: r.composer || "", director: r.director || "",
     cinematographer: r.cinematographer || "",
@@ -4466,7 +4469,11 @@ function posterHTML(src, title, w=56, h=80, lightbox=false) {
   return `<div style="${s}">🎬</div>`;
 }
 function starsHTML(n, size=13) {
-  return [1,2,3,4,5].map(s => `<span style="font-size:${size}px;color:${s<=n?'var(--primary)':'#333'}">★</span>`).join("");
+  const v = Number(n) || 0;
+  return [0,1,2,3,4].map(i => {
+    const fill = Math.max(0, Math.min(100, (v - i) * 100));
+    return `<span style="font-size:${size}px;display:inline-block;background:linear-gradient(90deg,var(--primary) ${fill}%,#333 ${fill}%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent">★</span>`;
+  }).join("");
 }
 
 function loadingHTML(quote, withSkeletons, cancellable) {
@@ -5092,12 +5099,65 @@ function openAdd(movie, status, listId) {
   document.getElementById("add-modal-label").textContent = status === "plan" ? `${t('add_modal_list')}${listLabel}` : t('add_modal_seen');
   document.getElementById("add-stars-section").style.display = status === "plan" ? "none" : "block";
   document.getElementById("add-note").value = "";
+  _wireStars();
   renderStars(0);
   document.getElementById("add-overlay").style.display = "flex";
 }
 function closeAdd() { document.getElementById("add-overlay").style.display = "none"; }
+// ── Half-star rating widget (0.5–5, Letterboxd-style, drag to rate) ─────────
+// Press and slide your finger/mouse across the row — the rating follows
+// continuously in 0.5 steps. A mouse also gets a live hover preview. The star
+// nearest the pointer gently grows (dock-style) so the control feels alive.
+// Fill is painted via a CSS gradient clipped to the ★ glyph.
+let _starsWired = false;
+function _paintStars(stars, v) {
+  stars.forEach((s, i) => s.style.setProperty('--fill', Math.max(0, Math.min(100, ((Number(v)||0) - i) * 100)) + '%'));
+}
+function _wireStarRow(rowId, getVal, setVal) {
+  const row = document.getElementById(rowId);
+  if (!row) return;
+  const stars = [...row.querySelectorAll('.star')];
+  if (!stars.length) return;
+  // Map an absolute X position to a rating in 0.5 steps across the whole row.
+  const ratingFromX = (clientX) => {
+    const first = stars[0].getBoundingClientRect();
+    const last  = stars[stars.length - 1].getBoundingClientRect();
+    const frac  = (clientX - first.left) / (last.right - first.left);
+    return Math.max(0.5, Math.min(5, Math.ceil(frac * 10) / 2));
+  };
+  // Dock-style proximity scale: the closer a star is to the pointer, the bigger.
+  const scaleByPointer = (clientX) => {
+    stars.forEach(s => {
+      const r = s.getBoundingClientRect();
+      const t = Math.max(0, 1 - Math.abs(clientX - (r.left + r.width / 2)) / 64);
+      s.style.transform = `scale(${1 + t * 0.4})`;
+    });
+  };
+  const resetScale = () => stars.forEach(s => s.style.transform = '');
+  let dragging = false;
+  row.addEventListener('pointerdown', e => {
+    dragging = true;
+    try { row.setPointerCapture(e.pointerId); } catch (_) {}
+    const v = ratingFromX(e.clientX); _paintStars(stars, v); setVal(v); scaleByPointer(e.clientX);
+    e.preventDefault();
+  });
+  row.addEventListener('pointermove', e => {
+    if (dragging) { const v = ratingFromX(e.clientX); _paintStars(stars, v); setVal(v); scaleByPointer(e.clientX); }
+    else if (e.pointerType === 'mouse') { _paintStars(stars, ratingFromX(e.clientX)); scaleByPointer(e.clientX); }
+  });
+  const end = () => { dragging = false; resetScale(); _paintStars(stars, getVal()); };
+  row.addEventListener('pointerup', end);
+  row.addEventListener('pointercancel', end);
+  row.addEventListener('pointerleave', e => { if (!dragging && e.pointerType === 'mouse') { resetScale(); _paintStars(stars, getVal()); } });
+}
+function _wireStars() {
+  if (_starsWired) return;
+  _starsWired = true;
+  _wireStarRow('stars-row', () => currentStars, v => currentStars = v);
+  _wireStarRow('edit-stars-row', () => currentEditStars, v => currentEditStars = v);
+}
 function setStar(n) { currentStars = n; renderStars(n); }
-function renderStars(n) { document.querySelectorAll("#stars-row .star").forEach((s, i) => s.classList.toggle("on", i < n)); }
+function renderStars(v) { const row = document.getElementById('stars-row'); if (row) _paintStars([...row.querySelectorAll('.star')], v || 0); }
 
 async function confirmAdd() {
   const m = currentAddMovie;
@@ -5161,12 +5221,13 @@ function openEdit(id) {
   currentEditId = id; currentEditStars = item.stars || 0;
   document.getElementById("edit-movie-title").textContent = `${item.title} (${item.year})`;
   document.getElementById("edit-note").value = item.comment || "";
+  _wireStars();
   renderEditStars(currentEditStars);
   document.getElementById("edit-overlay").style.display = "flex";
 }
 function closeEdit() { document.getElementById("edit-overlay").style.display = "none"; }
 function setEditStar(n) { currentEditStars = n; renderEditStars(n); }
-function renderEditStars(n) { [1,2,3,4,5].forEach(i => { const s = document.getElementById("edit-star-"+i); if (s) s.classList.toggle("on", i <= n); }); }
+function renderEditStars(v) { const row = document.getElementById('edit-stars-row'); if (row) _paintStars([...row.querySelectorAll('.star')], v || 0); }
 async function confirmEdit() {
   const btn = document.getElementById("edit-confirm-btn");
   btn.textContent = "Saving…"; btn.disabled = true;
@@ -7709,7 +7770,7 @@ async function applyBackupData(rows) {
       // UPDATE the mutable fields with whatever's in the CSV. This is what makes the round-trip
       // actually round-trip: edit in Excel, re-import, changes land.
       const patch = {
-        stars:    parseInt(r.stars) || 0,
+        stars:    parseFloat(r.stars) || 0,
         comment:  r.comment || "",
         status:   r.status || "watched",
         runtime:  _parseRuntimeMin(r.runtime),
@@ -7728,7 +7789,7 @@ async function applyBackupData(rows) {
       await saveEntryToDB({
         tmdbID: r.imdb_id, title: r.title, year: r.year,
         poster: r.poster || "",
-        stars: parseInt(r.stars) || 0,
+        stars: parseFloat(r.stars) || 0,
         comment: r.comment || "",
         status: r.status || "watched",
         mediaType: r.media_type || "movie",
@@ -7745,7 +7806,7 @@ async function applyBackupData(rows) {
       if (e.message?.includes('foreign key') || e.message?.includes('violates')) {
         await saveEntryToDB({
           tmdbID: r.imdb_id, title: r.title, year: r.year,
-          poster: r.poster || "", stars: parseInt(r.stars) || 0,
+          poster: r.poster || "", stars: parseFloat(r.stars) || 0,
           comment: r.comment || "", status: r.status || "watched",
           mediaType: r.media_type || "movie",
           director: r.director || "", composer: r.composer || "",
@@ -7834,7 +7895,7 @@ function _parseCSV(text) {
       year:            obj.year            || "",
       media_type:      obj.type            || "movie",
       status:          obj.status          || "watched",
-      stars:           parseInt(obj.rating) || 0,
+      stars:           parseFloat(obj.rating) || 0,
       comment:         obj.comment         || "",
       director:        obj.director        || "",
       composer:        obj.composer        || "",
@@ -8616,7 +8677,7 @@ async function backupImportXLSX() {
           media_type: String(fget(row, 'type') || "movie").trim(),
           status: String(fget(row, 'status') || "watched").trim(),
           list_name: String(fget(row, 'list') || "").trim(),
-          stars: parseInt(fget(row, 'rating')) || 0,
+          stars: parseFloat(fget(row, 'rating')) || 0,
           comment: String(fget(row, 'comment') || ""),
           director: String(fget(row, 'director') || ""),
           composer: String(fget(row, 'composer') || ""),
