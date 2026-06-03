@@ -2484,6 +2484,7 @@ body {
         <input type="file" id="backup-import-input" accept=".xlsx,.csv" style="display:none">
       </div>
       <div class="backup-hint" data-i18n="backup_hint" style="font-size:11px;color:var(--muted);line-height:1.4;margin-top:6px;opacity:0.8">Save an Excel backup of your lists, or restore them from a backup file.</div>
+      <button class="btn-backup" onclick="backupImportLetterboxd()" data-i18n="lb_import_btn" title="Coming from Letterboxd? On Letterboxd: Settings → Data → Export Your Data, unzip, then pick a .csv (e.g. watched.csv or ratings.csv)." style="width:100%;margin-top:8px">↑ Import from Letterboxd</button>
       <button onclick="backupExportJSON()" data-i18n="backup_json_nerd" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;opacity:0.5;padding:4px 0 0;margin-top:2px;text-decoration:underline;font-family:'DM Sans',sans-serif">JSON backup (advanced)</button>
       <div id="backup-status" style="display:none;font-size:11px;line-height:1.45;margin-top:8px"></div>
       <div id="btn-backfill-crew-row" style="display:none;margin-top:8px">
@@ -2554,7 +2555,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.25.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.26.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3300,6 +3301,12 @@ const _I18N_BACKUP_BUSY = {
   it:{ backup_restoring:"Ripristino il backup…", backup_saving:"Salvataggio…", backup_safe_hint:"Puoi continuare a usare l'app - apparirà un messaggio al termine. Non chiudere l'app." },
 };
 Object.keys(_I18N_BACKUP_BUSY).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_BACKUP_BUSY[l]); });
+// Letterboxd import (en/ru; other languages fall back to en via t())
+const _I18N_LB = {
+  en:{ lb_import_btn:"↑ Import from Letterboxd", lb_matching:"Matching films…", lb_not_lb:"That doesn't look like a Letterboxd CSV." },
+  ru:{ lb_import_btn:"↑ Импорт из Letterboxd", lb_matching:"Сопоставляю фильмы…", lb_not_lb:"Это не похоже на CSV из Letterboxd." },
+};
+Object.keys(_I18N_LB).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_LB[l]); });
 // Backup button labels (verbs only — the section header already says BACKUP)
 const _I18N_BACKUP_BTN = {
   en:{ backup_btn_download:"↓ Download", backup_btn_restore:"↑ Restore" },
@@ -8279,6 +8286,123 @@ async function backupImportCSV() {
     if (e.message !== "No file selected") showToast("Import failed: " + e.message, true);
   } finally {
     if (importBtn) { importBtn.textContent = "↑ Import CSV"; importBtn.disabled = false; }
+  }
+}
+
+// ── Letterboxd import ─────────────────────────────────────────────────────────
+// Letterboxd (Settings → Data → Export) gives a .zip of CSVs (watched, ratings,
+// diary, watchlist, reviews). The user unzips and picks one .csv. These files have
+// no TMDB id — only Name, Year, Letterboxd URI, [Rating], [Review] — so we resolve
+// each title+year against TMDB search. Letterboxd is movies-only. Ratings are 0.5–5
+// (half-stars), which now map 1:1 onto our scale with no rounding.
+
+// Generic RFC-4180 CSV → array of {header: value} objects.
+function _csvToObjects(text) {
+  const rows = [];
+  let row = [], field = "", inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQ) {
+      if (c === '"') { if (text[i+1] === '"') { field += '"'; i++; } else inQ = false; }
+      else field += c;
+    } else {
+      if (c === '"') inQ = true;
+      else if (c === ',') { row.push(field); field = ""; }
+      else if (c === '\n' || c === '\r') { if (c === '\r' && text[i+1] === '\n') i++; row.push(field); field = ""; if (row.some(v => v.length)) rows.push(row); row = []; }
+      else field += c;
+    }
+  }
+  if (field.length || row.length) { row.push(field); if (row.some(v => v.length)) rows.push(row); }
+  if (rows.length < 2) return [];
+  const headers = rows[0].map(h => h.trim());
+  return rows.slice(1).map(vals => { const o = {}; headers.forEach((h, i) => o[h] = (vals[i] || "").trim()); return o; });
+}
+
+// Detect + map a Letterboxd CSV into our row shape. Returns null if it isn't one.
+function _parseLetterboxdRows(text, fileName) {
+  const recs = _csvToObjects(text);
+  if (!recs.length) return null;
+  const keys = Object.keys(recs[0]);
+  if (!keys.includes('Name') || !keys.includes('Year')) return null; // not Letterboxd
+  const isWatchlist = /watchlist/i.test(fileName || "");
+  return recs.map(r => {
+    const rt = parseFloat(r['Rating']);
+    return {
+      title: (r['Name'] || "").trim(),
+      year: String(r['Year'] || "").trim().slice(0, 4),
+      stars: Number.isFinite(rt) ? Math.max(0, Math.min(5, rt)) : 0,
+      comment: (r['Review'] || "").trim(),
+      status: isWatchlist ? 'plan' : 'watched',
+      media_type: 'movie'
+    };
+  }).filter(r => r.title);
+}
+
+// Resolve id-less rows (title+year) to a TMDB movie: fills imdb_id, poster, canonical title/year.
+async function _resolveViaTMDBSearch(rows, onProgress) {
+  const out = [];
+  const _delay = ms => new Promise(r => setTimeout(r, ms));
+  for (let i = 0; i < rows.length; i++) {
+    onProgress?.(i + 1, rows.length);
+    if (i > 0 && i % 20 === 0) await _delay(500); // be gentle with TMDB
+    const r = { ...rows[i] };
+    try {
+      const yr = r.year ? `&year=${encodeURIComponent(r.year)}` : "";
+      const res = await tmdbFetch(`/search/movie?query=${encodeURIComponent(r.title)}${yr}&include_adult=false&language=${_tmdbLang()}`);
+      const hit = ((res && res.results) || [])[0];
+      if (hit) {
+        r.imdb_id = String(hit.id);
+        r.poster  = hit.poster_path ? TMDB_IMG + hit.poster_path : "";
+        r.title   = hit.title || r.title;
+        r.year    = (hit.release_date || "").slice(0, 4) || r.year;
+      }
+    } catch (e) { /* leave unresolved; counted as "not found" */ }
+    out.push(r);
+  }
+  return out;
+}
+
+async function backupImportLetterboxd() {
+  const statusEl = document.getElementById('backup-status');
+  const setStatus = (main) => {
+    if (!statusEl) return;
+    if (!main) { statusEl.style.display = "none"; statusEl.innerHTML = ""; return; }
+    statusEl.style.display = "block";
+    statusEl.innerHTML = `<div style="color:var(--accent)">${main}</div>`
+      + `<div style="color:var(--muted);opacity:0.85;margin-top:3px">${t('backup_safe_hint')}</div>`;
+  };
+  try {
+    const file = await new Promise((res, rej) => {
+      const inp = document.getElementById("backup-import-input");
+      inp.accept = ".csv";
+      const handler = (e) => { inp.removeEventListener("change", handler); const f = e.target.files[0]; inp.value = ""; if (!f) return rej(new Error("No file selected")); res(f); };
+      inp.addEventListener("change", handler);
+      inp.click();
+    });
+    const text = await file.text();
+    const rows = _parseLetterboxdRows(text, file.name);
+    if (!rows) { showToast(t('lb_not_lb'), true); return; }
+    if (!rows.length) { showToast("No films found in file", true); return; }
+    setStatus(`${t('lb_matching')} 1/${rows.length}`);
+    const resolved = await _resolveViaTMDBSearch(rows, (d, tot) => setStatus(`${t('lb_matching')} ${d}/${tot}`));
+    const ok = resolved.filter(r => r.imdb_id && r.title);
+    const unmatched = resolved.length - ok.length;
+    setStatus(t('backup_restoring'));
+    const { added, updated } = await applyBackupData(ok);
+    watchHistory = await loadHistoryFromDB();
+    renderHistory();
+    closeAccount();
+    const parts = [];
+    if (added)     parts.push(`✓ ${added} new`);
+    if (updated)   parts.push(`↻ ${updated} updated`);
+    if (unmatched) parts.push(`${unmatched} not found`);
+    showToast(parts.length ? parts.join(" · ") : "Nothing imported");
+  } catch (e) {
+    if (e.message !== "No file selected") showToast("Import failed: " + e.message, true);
+  } finally {
+    setStatus(null);
+    const inp = document.getElementById("backup-import-input");
+    if (inp) inp.accept = ".xlsx,.csv"; // restore for the normal Restore button
   }
 }
 
