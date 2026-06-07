@@ -1490,11 +1490,8 @@ body {
 }
 .ob-title span { color: var(--primary); }
 .ob-body { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 280px; text-align: center; }
-/* Arrow animation */
-.ob-arr {
-  display: flex; justify-content: center; margin: 3px 0;
-  animation: ob-bounce 1.5s ease-in-out infinite;
-}
+/* Down arrows removed - each slide now plays a one-time thematic micro-animation */
+.ob-arr { display: none; }
 @keyframes ob-bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
 @keyframes ob-pulse-y {
   0%,100%{box-shadow:0 0 0 0 rgba(245,197,24,0.35)}
@@ -2576,7 +2573,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.27.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.28.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3640,6 +3637,7 @@ function _obGoTo(idx) {
   _obSlide = idx;
   const wrap = document.getElementById('ob-slides-wrap');
   if (wrap) wrap.style.transform = `translateX(-${idx * 100}vw)`;
+  _obPlaySlideAnim(idx);
   document.querySelectorAll('.ob-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
   const nextBtn = document.getElementById('ob-next-btn');
   const skipBtn = document.getElementById('ob-skip-btn');
@@ -3697,6 +3695,119 @@ function _obFinalePopcorn() {
     { transform:'scale(1) rotate(0deg)' }
   ], { duration: 700, easing:'ease-out' });
   setTimeout(() => layer.remove(), 2400);
+}
+
+// ── Onboarding: one-time thematic micro-animation per slide ──────────────────
+// Each slide plays a short, NON-LINEAR animation of the feature in action, once,
+// when it first becomes active. Honors prefers-reduced-motion.
+const _obAnimPlayed = new Set();
+function _obReduceMotion(){ try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch(e){ return false; } }
+const _OB_EASE = 'cubic-bezier(0.34,0.02,0.18,1)'; // gentle start → slight accel → soft finish
+function _obEaseInOut(p){ return p < 0.5 ? 4*p*p*p : 1 - Math.pow(-2*p+2, 3)/2; }
+function _obTween(from, to, dur, onUpd, onDone){
+  const t0 = performance.now();
+  (function f(now){
+    const p = Math.min(1, (now - t0)/Math.max(1, dur));
+    onUpd(from + (to - from) * _obEaseInOut(p));
+    if (p < 1) requestAnimationFrame(f); else if (onDone) onDone();
+  })(performance.now());
+}
+function _obSetStars(spans, v){
+  spans.forEach((s, i) => {
+    const f = Math.max(0, Math.min(100, (v - i) * 100));
+    s.style.backgroundImage = `linear-gradient(90deg,var(--primary) ${f}%,#333 ${f}%)`;
+    const near = Math.max(0, 1 - Math.abs((i + 0.5) - v));
+    s.style.transform = `scale(${1 + near * 0.16})`;
+  });
+}
+// Typewriter: reveal `text` one character at a time with a blinking caret.
+function _obTypewriter(el, text, charMs, startDelay, onDone){
+  if (!el) return;
+  el.textContent = '';
+  const textNode = document.createTextNode('');
+  const caret = document.createElement('span');
+  caret.textContent = '▋';
+  caret.style.cssText = 'font-weight:400;margin-left:1px;';
+  let blink; try { blink = caret.animate([{opacity:1},{opacity:1,offset:0.49},{opacity:0,offset:0.5},{opacity:0}], {duration:760,iterations:Infinity}); } catch(e){}
+  setTimeout(function start(){
+    el.appendChild(textNode);
+    el.appendChild(caret);
+    let i = 0;
+    (function tick(){
+      textNode.nodeValue = text.slice(0, i);
+      i++;
+      if (i <= text.length) setTimeout(tick, charMs);
+      else { setTimeout(()=>{ try{ blink && blink.cancel(); }catch(e){} if (caret.parentNode) caret.remove(); if (onDone) onDone(); }, 600); }
+    })();
+  }, startDelay);
+}
+function _obPlaySlideAnim(idx){
+  if (_obAnimPlayed.has(idx) || _obSlide !== idx) return;
+  _obAnimPlayed.add(idx);
+  if (_obReduceMotion()) return;
+  const slide = document.querySelectorAll('.ob-slide')[idx];
+  if (!slide) return;
+  const A = (el, kf, opt) => { if (el) { try { el.animate(kf, Object.assign({ easing: _OB_EASE, fill: 'backwards' }, opt)); } catch(e){} } };
+  // Base delay so animations begin AFTER the slide-in transition (0.4s) settles,
+  // otherwise the start is masked while the slide is still flying into view.
+  const BASE = 420;
+  if (idx === 1){ // Find: blocks pop in, then the list item gets ticked
+    const kids = [...(slide.querySelector('.ob-mock')||{children:[]}).children];
+    kids.forEach((el,i)=>A(el,[{opacity:0,transform:'translateY(12px) scale(0.96)'},{opacity:1,transform:'none'}],{duration:540,delay:BASE+i*130}));
+    // The list shows "Watch with friends" UNchecked, then the checkmark ticks on.
+    const tickDelay = BASE + kids.length*130 + 260;
+    const row = slide.querySelector('.list-check-row.checked');
+    if (row){
+      A(row, [{backgroundColor:'rgba(245,197,24,0)'},{backgroundColor:'rgba(245,197,24,0.16)',offset:0.45},{backgroundColor:'rgba(245,197,24,0)'}], {duration:1000,delay:tickDelay,fill:'none'});
+      A(row.querySelector('.list-check-icon'), [{transform:'scale(0)',opacity:0},{transform:'scale(1.3)',opacity:1,offset:0.55},{transform:'scale(0.92)',offset:0.78},{transform:'scale(1)',opacity:1}], {duration:620,delay:tickDelay});
+      A(row.querySelector('span:last-child'), [{opacity:0,transform:'translateX(8px)'},{opacity:1,transform:'none'}], {duration:480,delay:tickDelay+200});
+    }
+  } else if (idx === 2){ // Lists: personal list gets selected, its films appear as content
+    const tab = slide.querySelector('.list-tab.personal');
+    // tap + light up the personal list tab (it becomes the active gold one)
+    A(tab, [{transform:'scale(0.9)',opacity:0.45},{transform:'scale(1.05)',opacity:1,offset:0.55},{transform:'scale(1)',opacity:1}], {duration:560,delay:BASE});
+    if (tab){ A(tab, [{boxShadow:'0 0 0 0 rgba(245,197,24,0.55)'},{boxShadow:'0 0 0 7px rgba(245,197,24,0)'}], {duration:700,delay:BASE+120,fill:'none'}); }
+    // then the films belonging to that list drop in as its content
+    [...slide.querySelectorAll('.ob-mock > div')].slice(1).forEach((c,i)=>A(c,[{opacity:0,transform:'translateY(14px) scale(0.97)'},{opacity:1,transform:'none'}],{duration:520,delay:BASE+420+i*170}));
+  } else if (idx === 3){ // Rate: star sweep 0→5→3.5→4.5 + bars fill
+    const starsDiv = [...slide.querySelectorAll('.ob-mock > div')].find(d => { const sp=d.querySelectorAll('span'); return sp.length===5 && (sp[0].textContent||'').trim()==='★'; });
+    const stars = starsDiv ? [...starsDiv.querySelectorAll('span')] : [];
+    if (stars.length === 5){
+      _obSetStars(stars, 0);
+      _obTween(0, 5, 640, v=>_obSetStars(stars,v), ()=>{
+        _obTween(5, 3.5, 280, v=>_obSetStars(stars,v), ()=>{
+          _obTween(3.5, 4.5, 560, v=>_obSetStars(stars,v), ()=>{ stars.forEach(s=>s.style.transform=''); });
+        });
+      });
+    }
+    slide.querySelectorAll('.stats-bar-fill').forEach((f,i)=>{ const w=f.style.width||'0%'; A(f,[{width:'0%'},{width:w}],{duration:680,delay:1620+i*150}); });
+  } else if (idx === 4){ // Soundtracks: streaming buttons pop in
+    slide.querySelectorAll('.ob-mock-stream-btn').forEach((b,i)=>A(b,[{opacity:0,transform:'scale(0.4)'},{opacity:1,transform:'scale(1.18)',offset:0.7},{transform:'scale(1)',opacity:1}],{duration:440,delay:230+i*140}));
+  } else if (idx === 5){ // Explore people: rows pop in, then crew names light up
+    const kids = [...(slide.querySelector('.ob-mock')||{children:[]}).children];
+    kids.forEach((el,i)=>A(el,[{opacity:0,transform:'translateY(12px) scale(0.96)'},{opacity:1,transform:'none'}],{duration:520,delay:BASE+i*110}));
+    const flashStart = BASE + kids.length*110 + 180;
+    slide.querySelectorAll('.crew-val span').forEach((n,i)=>{ try { n.animate([{color:'#ddd'},{color:'#F5C518',offset:0.4},{color:'#ddd'}], {duration:760,delay:flashStart+i*340,easing:_OB_EASE}); } catch(e){} });
+  } else if (idx === 6){ // Share: a friend's recommendation arrives, the note types out
+    A(slide.querySelector('.ob-mock-msg-from'), [{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}], {duration:460,delay:BASE});
+    A(slide.querySelector('.ob-mock-film-chip'), [{opacity:0,transform:'translateY(8px) scale(0.97)'},{opacity:1,transform:'none'}], {duration:500,delay:BASE+260});
+    const note = slide.querySelector('[data-i18n="ob_inbox_note"]');
+    if (note){
+      const txt = (note.textContent || '').trim();
+      A(note, [{opacity:0},{opacity:1}], {duration:300,delay:BASE+620});
+      _obTypewriter(note, txt, 26, BASE+700);
+    }
+  } else if (idx === 7){ // Account: Watched count ticks up
+    slide.querySelectorAll('.ob-mock-stat-n').forEach((stat,i)=>{
+      const target = parseInt(stat.textContent,10);
+      if (!target) return;
+      stat.textContent = '0';
+      setTimeout(()=>{ _obTween(0, target, 1000, v=>stat.textContent=String(Math.round(v))); }, BASE + i*140);
+    });
+  } else if (idx === 8){ // Surprise Me: the pick appears, button pulses
+    A(slide.querySelector('.ob-mock > div[style*="align-items:center"]'), [{opacity:0,transform:'translateY(11px) scale(0.96)'},{opacity:1,transform:'none'}], {duration:540,delay:160});
+    A(slide.querySelector('.ob-mock-surprise'), [{transform:'scale(1)'},{transform:'scale(1.06)',offset:0.5},{transform:'scale(1)'}], {duration:640,delay:680});
+  }
 }
 
 function _obNext() {
