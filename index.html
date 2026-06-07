@@ -1823,16 +1823,26 @@ body {
       <div class="ob-mock">
         <div class="ob-mock-search">
           <span style="opacity:0.4;font-size:13px">🔍</span>
-          <span style="color:var(--text);font-size:13px">Inception</span>
+          <span style="color:var(--text);font-size:13px">The Phoenician Scheme</span>
         </div>
-        <div class="ob-mock-row">
-          <div class="ob-mock-poster">🎬</div>
+        <div style="display:flex;gap:11px;margin-top:11px">
+          <img src="posters/phoenician.jpg" alt="" style="width:58px;height:87px;border-radius:7px;object-fit:cover;flex-shrink:0">
           <div style="flex:1;min-width:0">
-            <div class="ob-mock-ftitle">Inception</div>
-            <div class="ob-mock-fmeta">2010 · Sci-Fi · ★ 8.8</div>
-            <div class="ob-mock-credit">DiCaprio · <span class="ob-mock-link">Nolan</span></div>
+            <div class="hist-title">The Phoenician Scheme</div>
+            <div class="hist-meta">2025 · Comedy</div>
+            <div class="rating-badge" style="font-size:14px;margin-top:3px">★ 6.5 <span>/ 10 TMDB</span></div>
+            <div class="crew-label" style="margin-top:7px">🎬 Director</div>
+            <div class="crew-val" style="margin-bottom:0">Wes Anderson</div>
           </div>
-          <div class="ob-mock-add">+</div>
+        </div>
+        <div class="list-check-section" style="margin-top:11px;margin-bottom:0">
+          <div class="list-check-header" data-i18n="lists_header">Add to a list</div>
+          <div class="list-check-row"><span class="list-check-icon">○</span><span style="font-size:13px">Date night</span></div>
+          <div class="list-check-row checked"><span class="list-check-icon">✓</span><span style="font-size:13px">Watch with friends</span><span style="font-size:10px;color:var(--muted);margin-left:auto">added</span></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn-modal-primary" data-i18n="mark_watched" style="flex:1;padding:9px 8px;font-size:13px">Mark as Watched</button>
+          <button class="btn-modal-secondary" data-i18n="act_share" style="flex:1;padding:9px 8px;font-size:13px">Share</button>
         </div>
       </div>
       <div class="ob-arr">
@@ -1847,19 +1857,18 @@ body {
     <!-- Slide 2: Lists -->
     <div class="ob-slide">
       <div class="ob-mock">
-        <div class="ob-mock-tab-row">
-          <div class="ob-mock-tab-hl">Date night</div>
-          <div class="ob-mock-tab">With friends</div>
-          <div class="ob-mock-tab" style="overflow:hidden;max-width:70px;text-overflow:ellipsis">Solo</div>
+        <div class="list-tabs-row" style="margin-bottom:12px">
+          <button class="list-tab personal active">Leo's List</button>
+          <button class="list-tab">Date night</button>
+          <button class="list-tab">With friends</button>
         </div>
-        <div class="ob-mock-sep"></div>
-        <div class="ob-mock-row" style="margin-bottom:6px">
-          <div class="ob-mock-poster" style="width:28px;height:40px;font-size:12px">🎬</div>
-          <div style="flex:1"><div class="ob-mock-ftitle">In the Mood for Love</div><div class="ob-mock-fmeta">2000 · Romance</div></div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:9px">
+          <img src="posters/mood.jpg" alt="" style="width:38px;height:57px;border-radius:5px;object-fit:cover;flex-shrink:0">
+          <div style="flex:1;min-width:0"><div class="hist-title">In the Mood for Love</div><div class="hist-meta">2000 · Romance</div></div>
         </div>
-        <div class="ob-mock-row" style="opacity:0.6">
-          <div class="ob-mock-poster" style="width:28px;height:40px;font-size:12px">🎬</div>
-          <div style="flex:1"><div class="ob-mock-ftitle">Past Lives</div><div class="ob-mock-fmeta">2023 · Drama</div></div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <img src="posters/pastlives.jpg" alt="" style="width:38px;height:57px;border-radius:5px;object-fit:cover;flex-shrink:0">
+          <div style="flex:1;min-width:0"><div class="hist-title">Past Lives</div><div class="hist-meta">2023 · Drama</div></div>
         </div>
       </div>
       <div class="ob-arr">
@@ -1874,20 +1883,23 @@ body {
     <!-- Slide 3: Rate + Cinema Profile -->
     <div class="ob-slide">
       <div class="ob-mock">
-        <div class="ob-mock-btn-pair">
-          <div class="ob-mock-btn" style="font-size:11px" data-i18n="act_addlist">≡ Add to list</div>
-          <div class="ob-mock-btn-hl" data-i18n="act_watched">✓ Watched</div>
+        <div class="add-label" data-i18n="your_rating" style="font-size:11px;color:var(--muted);margin-bottom:6px">Your Rating</div>
+        <div style="display:flex;gap:4px;margin-bottom:14px">
+          <span style="font-size:25px;display:inline-block;background:linear-gradient(90deg,var(--primary) 100%,#333 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent">★</span>
+          <span style="font-size:25px;display:inline-block;background:linear-gradient(90deg,var(--primary) 100%,#333 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent">★</span>
+          <span style="font-size:25px;display:inline-block;background:linear-gradient(90deg,var(--primary) 100%,#333 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent">★</span>
+          <span style="font-size:25px;display:inline-block;background:linear-gradient(90deg,var(--primary) 100%,#333 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent">★</span>
+          <span style="font-size:25px;display:inline-block;background:linear-gradient(90deg,var(--primary) 50%,#333 50%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent">★</span>
         </div>
-        <div class="ob-mock-stars">★★★★☆</div>
-        <div class="ob-mock-mini-block">
-          <div class="ob-mock-mini-title">🎬 Top Directors</div>
-          <div class="ob-mock-bar-row">
-            <div class="ob-mock-bar-name">Nolan</div>
-            <div class="ob-mock-bar-track"><div class="ob-mock-bar-fill" style="width:88%"></div></div>
+        <div class="stats-block">
+          <div class="stats-block-header">
+            <div class="stats-block-title">🎬 <span data-i18n="cp_dir">Top Directors</span></div>
+            <span class="stats-block-arrow">▲</span>
           </div>
-          <div class="ob-mock-bar-row">
-            <div class="ob-mock-bar-name">Wong KW</div>
-            <div class="ob-mock-bar-track"><div class="ob-mock-bar-fill" style="width:62%"></div></div>
+          <div class="stats-block-body" style="display:block">
+            <div class="stats-bar-row"><div class="stats-bar-name">Wong Kar-wai</div><div class="stats-bar-track"><div class="stats-bar-fill" style="width:100%"></div></div><div class="stats-bar-count">7 films</div></div>
+            <div class="stats-bar-row"><div class="stats-bar-name">Denis Villeneuve</div><div class="stats-bar-track"><div class="stats-bar-fill" style="width:71%"></div></div><div class="stats-bar-count">5 films</div></div>
+            <div class="stats-bar-row"><div class="stats-bar-name">Wes Anderson</div><div class="stats-bar-track"><div class="stats-bar-fill" style="width:57%"></div></div><div class="stats-bar-count">4 films</div></div>
           </div>
         </div>
       </div>
@@ -1903,15 +1915,15 @@ body {
     <!-- Slide 4: Soundtracks -->
     <div class="ob-slide">
       <div class="ob-mock">
-        <div class="ob-mock-row" style="margin-bottom:6px">
-          <div class="ob-mock-poster">🎬</div>
+        <div style="display:flex;gap:11px;margin-bottom:11px">
+          <img src="posters/taxidriver.jpg" alt="" style="width:50px;height:75px;border-radius:6px;object-fit:cover;flex-shrink:0">
           <div style="flex:1;min-width:0">
-            <div class="ob-mock-ftitle">Interstellar</div>
-            <div class="ob-mock-fmeta">2014 · Sci-Fi</div>
+            <div class="hist-title">Taxi Driver</div>
+            <div class="hist-meta">1976 · Drama</div>
           </div>
         </div>
-        <div class="ob-mock-section-label">🎵 Composer</div>
-        <div class="ob-mock-composer">Hans Zimmer</div>
+        <div class="crew-label">🎵 Composer</div>
+        <div class="crew-val" style="margin-bottom:8px">Bernard Herrmann</div>
         <div class="ob-mock-stream-row">
           <div class="ob-mock-stream-btn spotify">
             <svg width="16" height="16" viewBox="0 0 168 168"><circle cx="84" cy="84" r="84" fill="#1DB954"/><path d="M120.7 116.4c-1.6 2.7-5.1 3.5-7.7 1.9-21.2-13-47.9-15.9-79.3-8.7-3 .7-6.1-1.2-6.8-4.2-.7-3 1.2-6.1 4.2-6.8 34.4-7.9 64-4.5 87.8 10.1 2.7 1.6 3.5 5.1 1.9 7.7zm10.2-22.8c-2 3.4-6.4 4.5-9.8 2.5-24.3-14.9-61.3-19.3-90-10.5-3.7 1.1-7.6-1-8.7-4.7-1.1-3.7 1-7.6 4.7-8.7 32.8-10 73.5-5.1 101.3 12 3.4 2 4.5 6.4 2.5 9.8zm.9-23.8c-29.1-17.3-77.2-18.9-105-10.5-4.5 1.4-9.2-1.2-10.5-5.6-1.4-4.5 1.2-9.2 5.6-10.5 31.9-9.7 84.9-7.8 118.4 12.1 4 2.4 5.4 7.6 3 11.6-2.4 4.1-7.6 5.4-11.6 3z" fill="white"/></svg>
@@ -1936,15 +1948,19 @@ body {
     <!-- Slide 5: Explore People -->
     <div class="ob-slide">
       <div class="ob-mock">
-        <div class="ob-mock-row">
-          <div class="ob-mock-poster">🎬</div>
+        <div style="display:flex;gap:11px;margin-bottom:11px">
+          <img src="posters/bladerunner.jpg" alt="" style="width:54px;height:81px;border-radius:6px;object-fit:cover;flex-shrink:0">
           <div style="flex:1;min-width:0">
-            <div class="ob-mock-ftitle">Blade Runner 2049</div>
-            <div class="ob-mock-fmeta">2017 · Sci-Fi</div>
-            <div class="ob-mock-credit">Dir. <span class="ob-mock-link">Villeneuve</span></div>
-            <div class="ob-mock-credit">📷 <span class="ob-mock-link">Deakins</span> · 🎵 <span class="ob-mock-link">Zimmer</span></div>
+            <div class="hist-title">Blade Runner 2049</div>
+            <div class="hist-meta">2017 · Sci-Fi · ★ 7.6</div>
           </div>
         </div>
+        <div class="crew-label">🎬 Director</div>
+        <div class="crew-val" style="margin-bottom:7px"><span style="color:#ddd;border-bottom:1px dotted rgba(255,255,255,0.25)">Denis Villeneuve</span></div>
+        <div class="crew-label">📷 Cinematography</div>
+        <div class="crew-val" style="margin-bottom:7px"><span style="color:#ddd;border-bottom:1px dotted rgba(255,255,255,0.25)">Roger Deakins</span></div>
+        <div class="crew-label">🎵 Composer</div>
+        <div class="crew-val" style="margin-bottom:0"><span style="color:#ddd;border-bottom:1px dotted rgba(255,255,255,0.25)">Hans Zimmer</span></div>
       </div>
       <div class="ob-arr">
         <svg viewBox="0 0 34 40" width="30" height="36" fill="none">
@@ -1959,19 +1975,20 @@ body {
     <div class="ob-slide">
       <div class="ob-mock">
         <div class="ob-mock-msg-from">
-          <div class="ob-mock-av">A</div>
+          <div class="ob-mock-av">L</div>
           <div style="flex:1">
-            <div style="font-size:12px;color:var(--text);font-weight:600">Alex</div>
-            <div style="font-size:11px;color:var(--muted)">sent you a film →</div>
+            <div style="font-size:12px;color:var(--text);font-weight:600">Ludwig</div>
+            <div style="font-size:11px;color:var(--muted)" data-i18n="ob_inbox_sent">sent you a film →</div>
           </div>
         </div>
         <div class="ob-mock-film-chip">
-          <div class="ob-mock-poster" style="width:28px;height:40px;font-size:12px">🎬</div>
+          <img src="posters/sinners.jpg" alt="" style="width:30px;height:45px;border-radius:4px;object-fit:cover;flex-shrink:0">
           <div>
-            <div class="ob-mock-ftitle">Only Lovers Left Alive</div>
-            <div class="ob-mock-fmeta">2013 · ★ 7.2</div>
+            <div class="ob-mock-ftitle">Sinners</div>
+            <div class="ob-mock-fmeta">2025 · ★ 7.5</div>
           </div>
         </div>
+        <div data-i18n="ob_inbox_note" style="font-size:12px;color:#ddd;line-height:1.45;margin-top:9px;font-style:italic">"Great film overall - but the soundtrack is the real star. Highly recommend."</div>
       </div>
       <div class="ob-arr">
         <svg viewBox="0 0 34 40" width="30" height="36" fill="none">
@@ -1988,8 +2005,8 @@ body {
         <div class="ob-mock-acc-hd">
           <div class="ob-mock-acc-av">🎬</div>
           <div style="flex:1;min-width:0">
-            <div style="font-size:13px;font-weight:600;color:var(--text)">Your Name</div>
-            <div style="font-size:11px;color:var(--muted)">name@email.com</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text)">Leo</div>
+            <div style="font-size:11px;color:var(--muted)">leo@gmail.com</div>
           </div>
         </div>
         <div class="ob-mock-stats">
@@ -2007,7 +2024,7 @@ body {
           <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Watch time · tap</div>
         </div>
         <div class="ob-mock-backup-row">
-          <div class="ob-mock-mini-btn">↓ CSV</div>
+          <div class="ob-mock-mini-btn">↓ Excel</div>
           <div class="ob-mock-mini-btn">☁ Drive</div>
         </div>
       </div>
@@ -2017,13 +2034,17 @@ body {
         </svg>
       </div>
       <div class="ob-title" data-i18n="ob7_title">Safe &amp; yours</div>
-      <div class="ob-body" data-i18n="ob7_body">Your lists and reviews never disappear. Your profile keeps a backup on Google Drive and as CSV - plus all your stats.</div>
+      <div class="ob-body" data-i18n="ob7_body">Your lists and reviews never disappear. Your profile keeps a backup on Google Drive and as Excel - plus all your stats.</div>
     </div>
 
     <!-- Slide 8: Surprise Me / AI Picks -->
     <div class="ob-slide">
       <div class="ob-mock">
         <div data-i18n="ob8_picks" style="font-size:11px;color:var(--muted);margin-bottom:10px;letter-spacing:0.3px;text-transform:uppercase">✨ Personal picks for you</div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px">
+          <img src="posters/minotaur.jpg" alt="" style="width:40px;height:60px;border-radius:5px;object-fit:cover;flex-shrink:0">
+          <div style="flex:1;min-width:0"><div class="hist-title">Minotaur</div><div class="hist-meta">2026 · Andrey Zvyagintsev</div></div>
+        </div>
         <button class="ob-mock-surprise" data-i18n="surprise">✨ Surprise Me</button>
       </div>
       <div class="ob-arr">
@@ -2555,7 +2576,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.26.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.27.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -2671,7 +2692,7 @@ const I18N = {
     ob4_title:"Soundtracks", ob4_body:"Loved the music? Every film has direct links to its soundtrack on Spotify, Apple Music and YouTube Music.",
     ob5_title:"Explore people", ob5_body:"Tap any director, actor, composer or cinematographer to see their full filmography. The fastest way to find \"that actress\" and her other work.",
     ob6_title:"Share with friends", ob6_body:"Send a film to a friend - it lands right in their Inbox. Built a list everyone should see? Add your friends to it. Don't be stingy.",
-    ob7_title:"Safe & yours", ob7_body:"Your lists and reviews never disappear. Your profile keeps a backup on Google Drive and as CSV - plus all your stats.",
+    ob7_title:"Safe & yours", ob7_body:"Your lists and reviews never disappear. Your profile keeps a backup on Google Drive and as Excel - plus all your stats.",
     ob8_title:"Surprise Me", ob8_body:"No idea what to watch? Tap Surprise Me. The more films in your Watched list, the better the surprises.",
     ob9_title:"Showtime!", ob9_body:"All set. What are we waiting for? The movie won't watch itself!",
     ob_next:"Next", ob_start:"Find your first film", ob_skip:"Skip",
@@ -2723,7 +2744,7 @@ const I18N = {
     ob4_title:"Саундтреки", ob4_body:"Понравилась музыка? Под каждым фильмом - прямые ссылки на саундтрек в Spotify, Apple Music и YouTube Music.",
     ob5_title:"Фильмографии", ob5_body:"Нажми на имя любого режиссёра, актёра, композитора или оператора, чтобы увидеть всю его фильмографию.",
     ob6_title:"Делись с друзьями", ob6_body:"Отправь фильм другу - все подробности прилетят ему во Входящие. Создал крутой список? Добавь в него друзей, не жадничай.",
-    ob7_title:"Всё под рукой", ob7_body:"Твои списки и рецензии никуда не исчезнут. В профиле - надёжный бэкап в Google Drive и CSV, и вся твоя статистика.",
+    ob7_title:"Всё под рукой", ob7_body:"Твои списки и рецензии никуда не исчезнут. В профиле - надёжный бэкап в Google Drive и Excel, и вся твоя статистика.",
     ob8_title:"Удиви меня", ob8_body:"Не знаешь что посмотреть? Жми «Удиви меня». Чем больше фильмов в «Просмотрено», тем приятнее сюрпризы.",
     ob9_title:"Поехали!", ob9_body:"Всё готово. Кого ждём? Кино само себя не посмотрит!",
     ob_next:"Далее", ob_start:"Найти первый фильм", ob_skip:"Пропустить",
@@ -2775,7 +2796,7 @@ const I18N = {
     ob4_title:"Саундтреки", ob4_body:"Сподобалась музика? Під кожним фільмом - прямі посилання на саундтрек у Spotify, Apple Music і YouTube Music.",
     ob5_title:"Фільмографії", ob5_body:"Тисни на ім'я будь-якого режисера, актора, композитора чи оператора, щоб побачити всю фільмографію.",
     ob6_title:"Ділись з друзями", ob6_body:"Надішли фільм другу - усе прилетить йому у «Вхідні». Створив крутий список? Додай до нього друзів, не жадібнічай.",
-    ob7_title:"Все під рукою", ob7_body:"Твої списки й рецензії нікуди не зникнуть. У профілі - надійний бекап у Google Drive і CSV, і вся твоя статистика.",
+    ob7_title:"Все під рукою", ob7_body:"Твої списки й рецензії нікуди не зникнуть. У профілі - надійний бекап у Google Drive і Excel, і вся твоя статистика.",
     ob8_title:"Здивуй мене", ob8_body:"Не знаєш що подивитись? Тисни «Здивуй мене». Чим більше фільмів у «Переглянуто», тим приємніші сюрпризи.",
     ob9_title:"Поїхали!", ob9_body:"Усе готово. Чого чекаємо? Кіно само себе не подивиться!",
     ob_next:"Далі", ob_start:"Знайди свій перший фільм", ob_skip:"Пропустити",
@@ -2827,7 +2848,7 @@ const I18N = {
     ob4_title:"საუნდტრეკები", ob4_body:"მოგწონს მუსიკა? ყველა ფილმს აქვს პირდაპირი ბმულები საუნდტრეკზე Spotify-ზე, Apple Music-სა და YouTube Music-ზე.",
     ob5_title:"ფილმოგრაფიები", ob5_body:"დააჭირე ნებისმიერი რეჟისორის, მსახიობის, კომპოზიტორის ან ოპერატორის სახელს მთელი ფილმოგრაფიის სანახავად.",
     ob6_title:"გაუზიარე მეგობრებს", ob6_body:"გაუგზავნე ფილმი მეგობარს - ყველაფერი მის „შემოსულში“ მოვა. შექმენი მაგარი სია? დაამატე მასში მეგობრები, ნუ იძუნწებ.",
-    ob7_title:"ყველაფერი ხელთ", ob7_body:"შენი სიები და რეცენზიები არსად გაქრება. პროფილში - საიმედო ბექაპი Google Drive-ზე და CSV-ში, და მთელი შენი სტატისტიკა.",
+    ob7_title:"ყველაფერი ხელთ", ob7_body:"შენი სიები და რეცენზიები არსად გაქრება. პროფილში - საიმედო ბექაპი Google Drive-ზე და Excel-ში, და მთელი შენი სტატისტიკა.",
     ob8_title:"გამაკვირვე", ob8_body:"არ იცი რა უყურო? დააჭირე „გამაკვირვე“. რაც მეტი ფილმია „ნანახში“, მით უკეთესი სიურპრიზები.",
     ob9_title:"დავიწყოთ!", ob9_body:"ყველაფერი მზადაა. რას ველოდებით? დროა, ფილმი ნახო!",
     ob_next:"შემდეგი", ob_start:"მოძებნე შენი პირველი ფილმი", ob_skip:"გამოტოვება",
@@ -2879,7 +2900,7 @@ const I18N = {
     ob4_title:"Bandas sonoras", ob4_body:"¿Te encantó la música? Cada película tiene enlaces directos a su banda sonora en Spotify, Apple Music y YouTube Music.",
     ob5_title:"Explora personas", ob5_body:"Toca cualquier director, actor, compositor o director de fotografía para ver su filmografía completa. La forma más rápida de encontrar a \"esa actriz\" y sus otras obras.",
     ob6_title:"Comparte con amigos", ob6_body:"Envía una película a un amigo - llega directo a su bandeja. ¿Creaste una buena lista? Añade a tus amigos. No seas tacaño.",
-    ob7_title:"Seguro y tuyo", ob7_body:"Tus listas y reseñas nunca desaparecen. Tu perfil guarda una copia en Google Drive y como CSV - además de todas tus estadísticas.",
+    ob7_title:"Seguro y tuyo", ob7_body:"Tus listas y reseñas nunca desaparecen. Tu perfil guarda una copia en Google Drive y como Excel - además de todas tus estadísticas.",
     ob8_title:"Sorpréndeme", ob8_body:"¿No sabes qué ver? Toca Sorpréndeme. Cuantas más películas en tu lista de Vistas, mejores sorpresas.",
     ob9_title:"¡Acción!", ob9_body:"Todo listo. ¿A qué esperamos? ¡La película no se va a ver sola!",
     ob_next:"Siguiente", ob_start:"Encuentra tu primera película", ob_skip:"Omitir",
@@ -2931,7 +2952,7 @@ const I18N = {
     ob4_title:"Bandes originales", ob4_body:"Vous avez aimé la musique ? Chaque film a des liens directs vers sa BO sur Spotify, Apple Music et YouTube Music.",
     ob5_title:"Explorez les talents", ob5_body:"Touchez n'importe quel réalisateur, acteur, compositeur ou chef opérateur pour voir sa filmographie complète. Le moyen le plus rapide de retrouver \"cette actrice\" et ses autres films.",
     ob6_title:"Partagez avec vos amis", ob6_body:"Envoyez un film à un ami - il arrive directement dans sa boîte. Vous avez créé une belle liste ? Ajoutez-y vos amis. Ne soyez pas avare.",
-    ob7_title:"En sécurité, à vous", ob7_body:"Vos listes et critiques ne disparaissent jamais. Votre profil garde une sauvegarde sur Google Drive et en CSV - ainsi que toutes vos stats.",
+    ob7_title:"En sécurité, à vous", ob7_body:"Vos listes et critiques ne disparaissent jamais. Votre profil garde une sauvegarde sur Google Drive et en Excel - ainsi que toutes vos stats.",
     ob8_title:"Surprenez-moi", ob8_body:"Aucune idée de quoi regarder ? Touchez Surprenez-moi. Plus il y a de films dans vos Vus, meilleures sont les surprises.",
     ob9_title:"Action !", ob9_body:"Tout est prêt. Qu'est-ce qu'on attend ? Le film ne va pas se regarder tout seul !",
     ob_next:"Suivant", ob_start:"Trouvez votre premier film", ob_skip:"Passer",
@@ -2983,7 +3004,7 @@ const I18N = {
     ob4_title:"Soundtracks", ob4_body:"Die Musik geliebt? Jeder Film hat direkte Links zu seinem Soundtrack auf Spotify, Apple Music und YouTube Music.",
     ob5_title:"Entdecke Filmemacher", ob5_body:"Tippe auf einen Regisseur, Schauspieler, Komponisten oder Kameramann, um seine komplette Filmografie zu sehen. Der schnellste Weg, \"diese eine Schauspielerin\" und ihre anderen Filme zu finden.",
     ob6_title:"Teile mit Freunden", ob6_body:"Schick einem Freund einen Film - er landet direkt in seinem Postfach. Eine Liste erstellt, die alle sehen sollten? Füge deine Freunde hinzu. Sei nicht geizig.",
-    ob7_title:"Sicher & deins", ob7_body:"Deine Listen und Kritiken verschwinden nie. Dein Profil sichert ein Backup auf Google Drive und als CSV - dazu all deine Statistiken.",
+    ob7_title:"Sicher & deins", ob7_body:"Deine Listen und Kritiken verschwinden nie. Dein Profil sichert ein Backup auf Google Drive und als Excel - dazu all deine Statistiken.",
     ob8_title:"Überrasch mich", ob8_body:"Keine Ahnung, was du sehen sollst? Tippe auf Überrasch mich. Je mehr Filme in deiner Gesehen-Liste, desto besser die Überraschungen.",
     ob9_title:"Film ab!", ob9_body:"Alles bereit. Worauf warten wir? Der Film schaut sich nicht von allein!",
     ob_next:"Weiter", ob_start:"Finde deinen ersten Film", ob_skip:"Überspringen",
@@ -3035,7 +3056,7 @@ const I18N = {
     ob4_title:"Colonne sonore", ob4_body:"Hai amato la musica? Ogni film ha link diretti alla sua colonna sonora su Spotify, Apple Music e YouTube Music.",
     ob5_title:"Esplora gli artisti", ob5_body:"Tocca un regista, attore, compositore o direttore della fotografia per vedere la sua filmografia completa. Il modo più veloce per ritrovare \"quell'attrice\" e i suoi altri film.",
     ob6_title:"Condividi con gli amici", ob6_body:"Manda un film a un amico - arriva dritto nella sua posta. Hai creato una lista che tutti dovrebbero vedere? Aggiungi i tuoi amici. Non essere avaro.",
-    ob7_title:"Al sicuro e tuo", ob7_body:"Le tue liste e recensioni non spariscono mai. Il tuo profilo conserva un backup su Google Drive e in CSV - oltre a tutte le tue statistiche.",
+    ob7_title:"Al sicuro e tuo", ob7_body:"Le tue liste e recensioni non spariscono mai. Il tuo profilo conserva un backup su Google Drive e in Excel - oltre a tutte le tue statistiche.",
     ob8_title:"Sorprendimi", ob8_body:"Nessuna idea su cosa guardare? Tocca Sorprendimi. Più film hai nella lista Visti, migliori sono le sorprese.",
     ob9_title:"Si gira!", ob9_body:"Tutto pronto. Cosa aspettiamo? Il film non si guarda da solo!",
     ob_next:"Avanti", ob_start:"Trova il tuo primo film", ob_skip:"Salta",
@@ -3307,6 +3328,18 @@ const _I18N_LB = {
   ru:{ lb_import_btn:"↑ Импорт из Letterboxd", lb_matching:"Сопоставляю фильмы…", lb_not_lb:"Это не похоже на CSV из Letterboxd." },
 };
 Object.keys(_I18N_LB).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_LB[l]); });
+// Onboarding inbox slide (Ludwig → Sinners, recommendation with a note)
+const _I18N_OB = {
+  en:{ ob_inbox_sent:"sent you a film →", ob_inbox_note:"Great film overall - but the soundtrack is the real star. Highly recommend." },
+  ru:{ ob_inbox_sent:"прислал тебе фильм →", ob_inbox_note:"Кино отличное, но саундтрек - круче всего. Очень советую." },
+  uk:{ ob_inbox_sent:"надіслав тобі фільм →", ob_inbox_note:"Кіно чудове, але саундтрек - найкраще. Дуже раджу." },
+  ka:{ ob_inbox_sent:"გამოგიგზავნა ფილმი →", ob_inbox_note:"ფილმი მაგარია, მაგრამ საუნდტრეკი ყველაზე მაგარია. გირჩევ." },
+  es:{ ob_inbox_sent:"te envió una película →", ob_inbox_note:"Gran película en general, pero la banda sonora es lo mejor. Muy recomendable." },
+  fr:{ ob_inbox_sent:"t'a envoyé un film →", ob_inbox_note:"Super film, mais la bande originale est le clou. Je recommande vivement." },
+  de:{ ob_inbox_sent:"hat dir einen Film geschickt →", ob_inbox_note:"Toller Film - aber der Soundtrack ist das Beste. Sehr empfehlenswert." },
+  it:{ ob_inbox_sent:"ti ha mandato un film →", ob_inbox_note:"Bel film, ma la colonna sonora è il vero gioiello. Consigliatissimo." },
+};
+Object.keys(_I18N_OB).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_OB[l]); });
 // Backup button labels (verbs only — the section header already says BACKUP)
 const _I18N_BACKUP_BTN = {
   en:{ backup_btn_download:"↓ Download", backup_btn_restore:"↑ Restore" },
