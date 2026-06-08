@@ -1753,6 +1753,8 @@ body {
 #lightbox-close:hover { background: rgba(0,0,0,0.75); }
 .poster-zoomable { cursor: zoom-in; transition: filter 0.15s, opacity 0.15s; }
 .poster-zoomable:hover { filter: brightness(1.12); opacity: 0.92; }
+/* Hide the Ko-fi support button inside the native app (App Store 3.1.1 + no monetization at launch). Stays visible on the web. */
+.native-app #support-kofi { display: none !important; }
 </style>
 </head>
 <body>
@@ -2528,7 +2530,7 @@ body {
         <div data-i18n="support_text" data-i18n-html="1" style="color:var(--muted);margin-bottom:9px">
           Early supporters get lifetime Pro features free when Cinemail goes paid on the App Store &amp; Google Play.
         </div>
-        <a href="https://ko-fi.com/dafaspace" target="_blank" rel="noopener" style="display:inline-block;padding:7px 13px;border-radius:7px;background:rgba(255,140,40,0.18);border:1px solid rgba(255,140,40,0.35);color:var(--text);text-decoration:none;font-size:12px;font-weight:600;transition:all 0.15s" data-i18n="support_button">☕ Support on Ko-fi →</a>
+        <a id="support-kofi" href="https://ko-fi.com/dafaspace" target="_blank" rel="noopener" style="display:inline-block;padding:7px 13px;border-radius:7px;background:rgba(255,140,40,0.18);border:1px solid rgba(255,140,40,0.35);color:var(--text);text-decoration:none;font-size:12px;font-weight:600;transition:all 0.15s" data-i18n="support_button">☕ Support on Ko-fi →</a>
         <div style="margin-top:9px;display:flex;align-items:center;gap:7px">
           <button onclick="copyUSDT(event)" style="display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:7px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--muted);font-size:11px;font-weight:500;cursor:pointer;transition:all 0.15s" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--accent-border)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">
             <span style="font-size:12px">◈</span><span id="usdt-acc-label">USDT (TRC20)</span>
@@ -2551,7 +2553,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.29.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.29.1</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
