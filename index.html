@@ -2573,7 +2573,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.30.2</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.30.3</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -7456,10 +7456,13 @@ function triggerVibration(){try{if(navigator.vibrate)navigator.vibrate([80,60,12
 function notifyNewInvite(count){playNotificationSound();triggerVibration();showToast(`🎬 You have ${count} new film recommendation${count>1?"s":""}!`);}
 function checkPendingInvites(notify=false) {
   if (_inboxCacheLoaded) { _updateInboxBadge(); return; }
-  // Fallback before cache loads
-  sbClient.from("invites").select("id").eq("to_user_id",currentUser?.id||"").eq("status","pending")
+  // Fallback before cache loads. Must use the SAME definition of "new" as
+  // _updateInboxBadge (pending AND unread) — counting every pending invite here
+  // showed a badge for invites the user had already seen but not yet answered,
+  // so opening the inbox revealed nothing new and the count silently reset.
+  sbClient.from("invites").select("id,read_at").eq("to_user_id",currentUser?.id||"").eq("status","pending")
     .then(({data})=>{
-      const count=data?.length||0;
+      const count=(data||[]).filter(r=>!(_invReadAt[r.id]||r.read_at)).length;
       const badge=document.getElementById("inbox-badge");
       if(badge){badge.textContent=count;badge.style.display=count>0?"inline":"none";}
       if(notify&&count>_lastKnownPendingCount) notifyNewInvite(count-_lastKnownPendingCount);
