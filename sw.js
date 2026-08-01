@@ -1,5 +1,5 @@
 // ── Cache version — bump this string on every deploy to force refresh ──────────
-const CACHE_VERSION = "v135";
+const CACHE_VERSION = "v137";
 const CACHE_NAME = "cinemail-" + CACHE_VERSION;
 
 // Files to cache for offline use
@@ -11,12 +11,29 @@ const PRECACHE = [
   "./exceljs.min.js",
 ];
 
+// Minimal branded offline page — last-resort fallback so a home-screen launch with
+// no network AND an evicted cache shows a friendly screen (auto-reloading when back
+// online) instead of the browser's error page. Never replaces the cached app shell.
+function offlineFallback() {
+  return new Response(
+    `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cinemail</title><body style="margin:0;background:#0e081c;color:#e8e8ee;font-family:-apple-system,BlinkMacSystemFont,sans-serif;display:flex;min-height:100vh;align-items:center;justify-content:center;text-align:center"><div style="padding:24px"><div style="font-size:44px">🎬</div><h2 style="font-weight:600;margin:10px 0 6px">You're offline</h2><p style="color:#8a8a96;font-size:14px;margin:0">Cinemail will reload automatically when you're back online.</p></div><script>addEventListener("online",function(){location.reload()});setInterval(function(){if(navigator.onLine)location.reload()},3000)</script>`,
+    { headers: { "Content-Type": "text/html; charset=utf-8" } }
+  );
+}
+
 // ── Install: cache core files ─────────────────────────────────────────────────
 self.addEventListener("install", event => {
   // Skip waiting — activate immediately without waiting for old SW to die
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(PRECACHE).catch(() => {}))
+    caches.open(CACHE_NAME).then(cache =>
+      // Cache each item independently. addAll() is atomic: one failed or oversized
+      // asset (e.g. exceljs) would otherwise silently prevent index.html — the app
+      // shell — from being cached at all, leaving nothing to fall back to offline.
+      Promise.allSettled(PRECACHE.map(url =>
+        fetch(url, { cache: "reload" }).then(r => (r && r.ok) ? cache.put(url, r) : null)
+      ))
+    )
   );
 });
 
@@ -55,7 +72,9 @@ self.addEventListener("fetch", event => {
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
           return response;
         })
-        .catch(() => caches.match(event.request).then(r => r || caches.match("./index.html")))
+        .catch(() => caches.match(event.request)
+          .then(r => r || caches.match("./index.html"))
+          .then(r => r || offlineFallback())) // never return undefined → never a raw browser error
     );
     return;
   }

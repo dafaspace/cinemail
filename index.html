@@ -14,7 +14,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ── Reset ─────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -44,7 +44,7 @@ html, body { height: 100%; overflow-x: clip; overscroll-behavior-x: none; }
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
   font-size: 14px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -70,7 +70,7 @@ body {
 }
 
 .auth-logo {
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 42px;
   letter-spacing: 2px;
   margin-bottom: 8px;
@@ -96,7 +96,7 @@ body {
 }
 
 .auth-card h2 {
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 22px;
   letter-spacing: 1px;
   margin-bottom: 20px;
@@ -107,7 +107,7 @@ body {
 .form-group { margin-bottom: 14px; }
 .form-group label {
   display: block;
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 13px;
   letter-spacing: 0.8px;
   color: var(--muted);
@@ -121,7 +121,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
   font-size: 14px;
   padding: 10px 12px;
   outline: none;
@@ -141,7 +141,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   letter-spacing: 1px;
   border-radius: 8px;
   border: none;
@@ -153,6 +153,25 @@ body {
   white-space: nowrap;
 }
 .btn:active { opacity: 0.8; }
+
+/* ── Global touch feedback (apple-design §1: respond on press, instantly) ──────
+   Driven by a delegated pointerdown handler (.is-pressed) because iOS WKWebView
+   does not fire :active reliably on non-button elements. Dragged elements
+   (.list-tab) use brightness, never transform, so the reorder drag stays 1:1. */
+.is-pressed { transition: transform 90ms ease-out, filter 90ms ease-out; }
+button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { transform: scale(0.95); }
+.card.is-pressed, .list-row.is-pressed, .list-tab.is-pressed, .friend-row.is-pressed,
+.friend-pick-row.is-pressed, .list-check-row.is-pressed, .list-picker-opt.is-pressed,
+.inv-card.is-pressed, .stats-bar-row.is-pressed { filter: brightness(1.18); }
+@media (prefers-reduced-motion: reduce) { .is-pressed { transition: filter 90ms ease-out; transform: none !important; } }
+
+/* ── Accessibility: honor transparency & contrast preferences (apple-design §14) ── */
+@media (prefers-reduced-transparency: reduce) {
+  *, *::before, *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+}
+@media (prefers-contrast: more) {
+  :root { --muted: #c9c9d2; --border: rgba(255,255,255,0.38); }
+}
 .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .btn-primary {
@@ -218,7 +237,7 @@ body {
   height: calc(52px + env(safe-area-inset-top));
 }
 .topbar-logo {
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 24px;
   letter-spacing: 2px;
 }
@@ -237,7 +256,7 @@ body {
   background: var(--primary);
   border: none;
   color: #111;
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 15px;
   cursor: pointer;
   display: flex;
@@ -265,7 +284,7 @@ body {
   border-bottom: 2px solid transparent;
   color: var(--muted);
   cursor: pointer;
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 12px;
   letter-spacing: 0.6px;
   margin-bottom: -1px;
@@ -289,7 +308,7 @@ body {
   margin-bottom: 14px;
 }
 .section-title {
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 18px;
   letter-spacing: 1px;
 }
@@ -308,7 +327,7 @@ body {
   color: var(--text);
   font-size: 15px;
   padding: 11px 14px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
   outline: none;
   transition: border-color 0.2s;
 }
@@ -360,7 +379,7 @@ body {
 /* ── Card body ──────────────────────────────────────────────────────── */
 .card-body { flex: 1; min-width: 0; }
 .card-title {
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 16px;
   letter-spacing: 0.5px;
   line-height: 1.2;
@@ -378,7 +397,7 @@ body {
   background: transparent;
   color: #aaa;
   font-size: 11px;
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   letter-spacing: 1px;
   cursor: pointer;
   transition: all 0.15s;
@@ -407,7 +426,7 @@ body {
   border: 1px solid var(--accent-border);
   color: var(--accent-text);
   font-size: 10px;
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   letter-spacing: 1px;
   cursor: pointer;
   transition: all 0.15s;
@@ -423,7 +442,7 @@ body {
   padding: 2px 7px;
   color: var(--primary);
   font-size: 10px;
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   letter-spacing: 0.5px;
 }
 .badge-plan { color: #888; font-size: 11px; }
@@ -437,7 +456,7 @@ body {
   border: 1px solid var(--border);
   color: var(--muted);
   font-size: 12px;
-  font-family: 'DM Sans', -apple-system, sans-serif;
+  font-family: 'DM Sans', 'Noto Sans Georgian', -apple-system, sans-serif;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s;
@@ -469,7 +488,7 @@ body {
   line-height: 1.5;
 }
 .why-brand {
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, sans-serif;
   font-style: normal;
   color: var(--primary);
   letter-spacing: 0.5px;
@@ -485,7 +504,7 @@ body {
   background: transparent;
   color: var(--muted);
   font-size: 12px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -514,7 +533,7 @@ body {
 .hist-card.plan { border-color: rgba(255,255,255,0.05); opacity: 0.85; }
 
 .hist-top { display: flex; justify-content: space-between; align-items: flex-start; }
-.hist-title { font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; font-size: 15px; letter-spacing: 0.5px; }
+.hist-title { font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; font-size: 15px; letter-spacing: 0.5px; }
 .hist-meta { color: var(--muted); font-size: 10px; }
 .hist-del {
   background: none; border: none; color: #444;
@@ -630,7 +649,7 @@ body {
 }
 .search-logo.pop { animation: logo-pop .6s cubic-bezier(.34,1.56,.64,1); }
 .empty-state-title {
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 18px;
   letter-spacing: 1px;
   color: var(--text);
@@ -683,7 +702,7 @@ body {
   border-bottom: 1px solid var(--border);
 }
 .modal-title {
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 22px;
   letter-spacing: 0.5px;
   line-height: 1.15;
@@ -709,14 +728,14 @@ body {
 
 /* ── Modal sheet label ──────────────────────────────────────────────── */
 .sheet-label {
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 12px;
   letter-spacing: 2px;
   margin-bottom: 4px;
   color: var(--muted);
 }
 .sheet-title {
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 19px;
   margin-bottom: 14px;
   line-height: 1.2;
@@ -727,7 +746,7 @@ body {
   margin-bottom: 5px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
 }
 
 /* ── Chips ──────────────────────────────────────────────────────────── */
@@ -774,7 +793,7 @@ body {
 .btn-modal-primary, .btn-modal-secondary {
   width: 100%; padding: 13px; border-radius: 11px;
   background: transparent; color: var(--text); border: 1px solid var(--border);
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 16px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.15s;
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
 }
@@ -794,7 +813,7 @@ body {
   color: #f87171 !important; background: rgba(248,113,113,0.12);
   border: 1px solid rgba(248,113,113,0.45); border-radius: 7px;
   font-size: 11px !important; font-weight: 600; letter-spacing: 0.3px;
-  padding: 4px 9px !important; line-height: 1; font-family: 'DM Sans', sans-serif;
+  padding: 4px 9px !important; line-height: 1; font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
 }
 /* One-time coach bubble (first-run hint pointing at the action icons) */
 .coach-bubble {
@@ -811,7 +830,7 @@ body {
 .coach-got {
   margin-top: 2px; width: 100%; padding: 7px; border-radius: 8px;
   background: transparent; border: 1px solid rgba(167,139,250,0.6); color: rgba(167,139,250,1);
-  font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
   transition: background 0.15s;
 }
 .coach-got:hover { background: rgba(167,139,250,0.12); }
@@ -826,26 +845,26 @@ body {
   flex: 1; min-width: 80px; padding: 10px;
   border-radius: 9px; background: rgba(255,255,255,0.05);
   border: 1px solid var(--border); color: #777;
-  cursor: pointer; font-size: 13px; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; font-size: 13px; font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
 }
 .btn-modal-add-watched {
   flex: 2; padding: 10px; border-radius: 9px;
   background: transparent; border: 1px solid var(--primary-border);
-  color: #888; font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  color: #888; font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 14px; letter-spacing: 1px; cursor: pointer; transition: all 0.15s;
 }
 .btn-modal-add-watched:hover { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
 .btn-modal-save {
   flex: 2; padding: 10px; border-radius: 9px;
   background: var(--primary); border: none;
-  color: #111; font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  color: #111; font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 15px; letter-spacing: 1px; cursor: pointer;
 }
 .btn-modal-save:hover { background: var(--primary-dark); }
 .btn-modal-plan {
   flex: 2; padding: 10px; border-radius: 9px;
   background: transparent; border: 1px solid rgba(255,255,255,0.2);
-  color: #aaa; font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  color: #aaa; font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 14px; letter-spacing: 1px; cursor: pointer;
 }
 .btn-modal-plan:hover { border-color: rgba(255,255,255,0.4); color: var(--text); }
@@ -884,7 +903,7 @@ body {
   padding: 4px 8px;
   border-radius: 8px;
   color: var(--muted);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
   font-size: 13px;
   transition: color 0.15s, background 0.15s;
 }
@@ -950,7 +969,7 @@ body {
   border-radius: 8px;
   color: var(--text);
   font-size: 13px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
   padding: 9px 16px;
   white-space: nowrap;
   z-index: 500;
@@ -989,7 +1008,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 32px;
   color: #111;
   margin: 0 auto 12px;
@@ -1002,7 +1021,7 @@ body {
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
-.acc-stat-val { font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; font-size: 24px; color: var(--primary); }
+.acc-stat-val { font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; font-size: 24px; color: var(--primary); }
 .acc-stat-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
 .hb-heart { color: var(--primary); display: inline-block; animation: heartbeat 1s ease-in-out infinite; }
 @keyframes heartbeat { 0%,100%{transform:scale(1);} 15%{transform:scale(1.3);} 30%{transform:scale(1);} 45%{transform:scale(1.2);} }
@@ -1079,7 +1098,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
   font-size: 13px;
   padding: 7px 10px;
   outline: none;
@@ -1119,7 +1138,7 @@ body {
   background: var(--accent-soft);
   border: 1px solid var(--accent-border);
   color: var(--accent-text);
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 20px;
   display: flex;
   align-items: center;
@@ -1153,7 +1172,7 @@ body {
   background: var(--accent-soft);
   border: 1px solid var(--accent-border);
   color: var(--accent-text);
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 15px;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
@@ -1217,7 +1236,7 @@ body {
   background: transparent;
   color: var(--muted);
   font-size: 12px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
   cursor: pointer;
   transition: all 0.15s;
   white-space: nowrap;
@@ -1252,7 +1271,7 @@ body {
   border: 1px solid rgba(255,255,255,0.25);
   color: var(--text);
   font-size: 12px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
   padding: 6px 14px;
   white-space: nowrap;
   box-shadow: 0 6px 20px rgba(0,0,0,0.5);
@@ -1351,7 +1370,7 @@ body {
   transition: all 0.15s;
   white-space: nowrap;
   flex-shrink: 0;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
 }
 @media (hover: hover) {
   .list-tab:not(.active):hover { color: var(--text); border-color: rgba(255,255,255,0.25); }
@@ -1370,7 +1389,7 @@ body {
 .list-chip {
   display: inline-flex; align-items: center;
   padding: 2px 8px; border-radius: 4px;
-  font-size: 10px; font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; letter-spacing: 0.5px;
+  font-size: 10px; font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; letter-spacing: 0.5px;
   background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.25);
   color: var(--accent-text); white-space: nowrap;
 }
@@ -1381,7 +1400,7 @@ body {
   border-radius: 10px; color: var(--text);
   padding: 12px 14px; cursor: pointer;
   transition: background 0.15s; margin-bottom: 8px;
-  font-family: 'DM Sans', sans-serif; display: block;
+  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif; display: block;
 }
 @media (hover: hover) { .list-picker-opt:hover { background: rgba(255,255,255,0.08); } }
 
@@ -1398,7 +1417,7 @@ body {
   background: rgba(255,255,255,0.04);
   border: 1px solid var(--border);
   color: var(--text);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -1477,7 +1496,7 @@ body {
   align-items: center; justify-content: center; padding: 24px 28px 190px; gap: 4px;
 }
 .ob-title {
-  font-family: 'Bebas Neue', 'Oswald', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
   font-size: 30px; letter-spacing: 1.5px; color: var(--text);
   margin-bottom: 4px; line-height: 1.1; text-align: center;
 }
@@ -1512,14 +1531,14 @@ body {
   background: none; border: 1px solid var(--border); border-radius: 9px;
   color: var(--muted); font-size: 14px; cursor: pointer;
   width: 112px; flex-shrink: 0; padding: 10px 0; text-align: center;
-  font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif; transition: all 0.15s;
 }
 .ob-btn-skip:hover { border-color: var(--primary-border); color: var(--text); }
 .ob-btn-next {
   flex: 1; padding: 14px; border-radius: 14px; border: none;
   background: var(--accent); color: var(--accent-text);
   font-size: 15px; font-weight: 600; cursor: pointer;
-  font-family: 'DM Sans', sans-serif; transition: opacity 0.15s;
+  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif; transition: opacity 0.15s;
 }
 .ob-btn-next:active { opacity: 0.8; }
 /* ── Mock UI elements ────────────────────────────────────────────── */
@@ -1662,7 +1681,7 @@ body {
 .lang-btn {
   padding:5px 12px; border-radius:20px; border:1px solid var(--border);
   background:none; color:var(--muted); font-size:12px; cursor:pointer;
-  font-family:'DM Sans',sans-serif; transition:all 0.15s;
+  font-family:'DM Sans','Noto Sans Georgian',sans-serif; transition:all 0.15s;
 }
 .lang-btn.active { background:var(--accent-soft); border-color:var(--accent-border); color:var(--accent-text); font-weight:600; }
 
@@ -2117,7 +2136,7 @@ body {
     <div class="auth-logo"><span>CINE</span>MAIL</div>
     <div class="auth-tagline" data-i18n="auth_tagline" data-i18n-html="1">Track films.<br>Get personal picks.<br>Share with friends.</div>
     <div class="auth-card">
-      <button onclick="showScreen('signin')" data-i18n="back" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:16px;padding:0;display:flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif">← Back</button>
+      <button onclick="showScreen('signin')" data-i18n="back" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:16px;padding:0;display:flex;align-items:center;gap:5px;font-family:'DM Sans','Noto Sans Georgian',sans-serif">← Back</button>
       <h2 data-i18n="sign_up_title">Create Account</h2>
       <div id="signup-error" class="error-msg"></div>
       <div class="form-group">
@@ -2151,7 +2170,7 @@ body {
   <div class="auth-wrap">
     <div class="auth-card" style="text-align:center">
       <div style="font-size:52px;margin-bottom:16px">📬</div>
-      <div data-i18n="check_inbox_title" style="font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:26px;letter-spacing:1px;margin-bottom:10px">Check Your Inbox</div>
+      <div data-i18n="check_inbox_title" style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:26px;letter-spacing:1px;margin-bottom:10px">Check Your Inbox</div>
       <p id="check-email-msg" data-i18n="email_sent" data-i18n-html="1" style="color:var(--muted);font-size:14px;line-height:1.7;margin-bottom:24px">
         We sent a confirmation link to your email.<br>Click it to activate your account.
       </p>
@@ -2169,7 +2188,7 @@ body {
     <img src="icon.png" alt="Cinemail" style="width:80px;height:80px;border-radius:19px;margin:0 auto 14px;display:block;filter:drop-shadow(0 0 24px rgba(245,197,24,0.18))">
     <div class="auth-logo"><span>CINE</span>MAIL</div>
     <div class="auth-card">
-      <button onclick="showScreen('signin')" data-i18n="back" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:16px;padding:0;display:flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif">← Back</button>
+      <button onclick="showScreen('signin')" data-i18n="back" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:16px;padding:0;display:flex;align-items:center;gap:5px;font-family:'DM Sans','Noto Sans Georgian',sans-serif">← Back</button>
       <h2 data-i18n="forgot_title">Reset Password</h2>
       <div id="forgot-error" class="error-msg"></div>
       <p data-i18n="forgot_sub" style="color:var(--muted);font-size:13px;line-height:1.6;margin:0 0 16px">Enter your email - we'll send a reset link.</p>
@@ -2267,7 +2286,7 @@ body {
   <!-- Guest banner (hidden for real users) -->
   <div id="guest-banner" style="display:none;background:linear-gradient(90deg,rgba(124,58,237,0.14),rgba(124,58,237,0.08));border-bottom:1px solid rgba(124,58,237,0.22);padding:9px 16px;align-items:center;justify-content:space-between;gap:12px">
     <span id="guest-banner-text" style="font-size:13px;color:var(--accent-text)" data-i18n="guest_banner">You're browsing as guest</span>
-    <button onclick="showGuestConvertModal()" data-i18n="guest_join_btn" style="padding:6px 16px;border-radius:20px;background:var(--accent);border:none;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0">Join Cinemail</button>
+    <button onclick="showGuestConvertModal()" data-i18n="guest_join_btn" style="padding:6px 16px;border-radius:20px;background:var(--accent);border:none;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif;white-space:nowrap;flex-shrink:0">Join Cinemail</button>
   </div>
 
   <!-- Tab bar -->
@@ -2300,10 +2319,10 @@ body {
       <input id="rec-input" type="text" data-i18n-ph="recs_ph" placeholder="Mood, genre, or anything…">
       <button class="btn btn-primary btn-sm" style="width:auto;min-width:104px" id="rec-btn" onclick="loadRecs()" data-i18n="find_btn">Find</button>
     </div>
-    <button onclick="surpriseMe()" data-i18n="surprise" style="width:100%;margin-top:0;margin-bottom:12px;padding:11px;border-radius:11px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.5);color:#c4b5fd;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:1.5px;cursor:pointer;transition:all .18s;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)" onmouseover="this.style.background='rgba(124,58,237,0.22)';this.style.borderColor='rgba(124,58,237,0.85)';this.style.boxShadow='0 4px 18px rgba(124,58,237,0.28)';this.style.color='#ddd6fe'" onmouseout="this.style.background='rgba(124,58,237,0.12)';this.style.borderColor='rgba(124,58,237,0.5)';this.style.boxShadow='none';this.style.color='#c4b5fd'">✨ Surprise Me</button>
+    <button onclick="surpriseMe()" data-i18n="surprise" style="width:100%;margin-top:0;margin-bottom:12px;padding:11px;border-radius:11px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.5);color:#c4b5fd;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:1.5px;cursor:pointer;transition:all .18s;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)" onmouseover="this.style.background='rgba(124,58,237,0.22)';this.style.borderColor='rgba(124,58,237,0.85)';this.style.boxShadow='0 4px 18px rgba(124,58,237,0.28)';this.style.color='#ddd6fe'" onmouseout="this.style.background='rgba(124,58,237,0.12)';this.style.borderColor='rgba(124,58,237,0.5)';this.style.boxShadow='none';this.style.color='#c4b5fd'">✨ Surprise Me</button>
     <div id="picks-hint" style="display:none;margin-bottom:12px;padding:11px 13px;background:rgba(245,197,24,0.07);border:1px solid rgba(245,197,24,0.22);border-radius:10px;font-size:12px;line-height:1.5;color:var(--text)">
       <div data-i18n="picks_random_hint" style="margin-bottom:9px;color:#cfcfcf">Without watched films, picks are random. Mark 5-10 films as Watched and they become personal to your taste.</div>
-      <button onclick="dismissPicksHint()" data-i18n="picks_hint_got" style="padding:5px 14px;border-radius:8px;background:rgba(245,197,24,0.15);border:1px solid rgba(245,197,24,0.3);color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Got it</button>
+      <button onclick="dismissPicksHint()" data-i18n="picks_hint_got" style="padding:5px 14px;border-radius:8px;background:rgba(245,197,24,0.15);border:1px solid rgba(245,197,24,0.3);color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">Got it</button>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
       <div id="rec-history-hint" style="color:#444;font-size:11px"></div>
@@ -2381,7 +2400,7 @@ body {
           <span class="star">★</span>
         </div>
         <div class="add-label" data-i18n="notes">Notes</div>
-        <textarea id="add-note" data-i18n-ph="note_ph" placeholder="What did you think?" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+        <textarea id="add-note" data-i18n-ph="note_ph" placeholder="What did you think?" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       </div>
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" onclick="closeAdd()" data-i18n="cancel">Cancel</button>
@@ -2406,7 +2425,7 @@ body {
         <span class="star">★</span>
       </div>
       <div class="add-label" data-i18n="notes">Notes</div>
-      <textarea id="edit-note" data-i18n-ph="note_ph" placeholder="What did you think?" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      <textarea id="edit-note" data-i18n-ph="note_ph" placeholder="What did you think?" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" onclick="closeEdit()" data-i18n="cancel">Cancel</button>
         <button class="btn-modal-save" id="edit-confirm-btn" onclick="confirmEdit()" data-i18n="save">Save</button>
@@ -2424,10 +2443,10 @@ body {
       <div class="add-label" data-i18n="send_to">Send to</div>
       <div id="share-friends-list" style="margin-bottom:12px;max-height:170px;overflow-y:auto"></div>
       <div class="add-label" data-i18n="msg_opt">Message (optional)</div>
-      <textarea id="share-message" data-i18n-ph="share_msg_ph" placeholder="Why you'd love this…" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:55px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--accent-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      <textarea id="share-message" data-i18n-ph="share_msg_ph" placeholder="Why you'd love this…" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:55px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--accent-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" onclick="closeShare()" data-i18n="cancel">Cancel</button>
-        <button id="share-confirm-btn" onclick="confirmShare()" style="flex:2;padding:10px;border-radius:9px;background:var(--accent);border:none;color:#fff;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer" data-i18n="send_btn">Send</button>
+        <button id="share-confirm-btn" onclick="confirmShare()" style="flex:2;padding:10px;border-radius:9px;background:var(--accent);border:none;color:#fff;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer" data-i18n="send_btn">Send</button>
       </div>
     </div>
   </div>
@@ -2444,14 +2463,14 @@ body {
           <div class="avatar-edit-badge">✏️</div>
         </div>
         <div id="avatar-picker-wrap" class="avatar-picker-wrap"></div>
-        <div style="font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:24px;letter-spacing:0.5px;color:var(--text)" id="acc-name-display">User</div>
+        <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:24px;letter-spacing:0.5px;color:var(--text)" id="acc-name-display">User</div>
         <div style="font-size:13px;color:#aaa;margin-top:2px" id="acc-email-display"></div>
       </div>
 
       <!-- Guest card (shown only in guest mode) -->
       <div id="acc-guest-card" style="display:none;text-align:center;padding:0 0 8px">
         <p style="color:var(--muted);font-size:13px;line-height:1.55;margin-bottom:18px" data-i18n="guest_save_sub">Save films, get personal picks and share with friends - free forever.</p>
-        <button onclick="closeAccount();showGuestConvertModal()" data-i18n="guest_join_btn" style="width:100%;padding:12px;border-radius:10px;background:var(--accent);border:none;color:#fff;font-size:15px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:8px">Join Cinemail</button>
+        <button onclick="closeAccount();showGuestConvertModal()" data-i18n="guest_join_btn" style="width:100%;padding:12px;border-radius:10px;background:var(--accent);border:none;color:#fff;font-size:15px;font-weight:600;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;margin-bottom:8px">Join Cinemail</button>
       </div>
 
       <!-- Member-only block: stats, name, backup, friends (hidden for guests) -->
@@ -2474,7 +2493,7 @@ body {
       <div class="add-label" data-i18n="display_name_lbl">Display Name</div>
       <div style="display:flex;gap:8px;margin-bottom:24px">
         <input type="text" id="acc-name-input" data-i18n-ph="display_name" placeholder="Your name"
-          style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:14px;padding:10px 12px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s"
+          style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:14px;padding:10px 12px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;transition:border-color .2s"
           onfocus="this.style.borderColor='var(--primary-border)'"
           onblur="this.style.borderColor='var(--border)'">
         <button class="btn-modal-save" id="btn-save-name" onclick="saveDisplayName()" style="flex:none;min-width:120px;padding:10px 18px;font-size:14px" data-i18n="save">Save</button>
@@ -2494,16 +2513,17 @@ body {
       </div>
       <div class="backup-hint" data-i18n="backup_hint" style="font-size:11px;color:var(--muted);line-height:1.4;margin-top:6px;opacity:0.8">Save an Excel backup of your lists, or restore them from a backup file.</div>
       <button class="btn-backup" onclick="backupImportLetterboxd()" data-i18n="lb_import_btn" title="Coming from Letterboxd? On Letterboxd: Settings → Data → Export Your Data, unzip, then pick a .csv (e.g. watched.csv or ratings.csv)." style="width:100%;margin-top:8px">↑ Import from Letterboxd</button>
-      <button onclick="backupExportJSON()" data-i18n="backup_json_nerd" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;opacity:0.5;padding:4px 0 0;margin-top:2px;text-decoration:underline;font-family:'DM Sans',sans-serif">JSON backup (advanced)</button>
+      <button class="btn-backup" onclick="backupImportIMDb()" data-i18n="imdb_import_btn" title="Coming from IMDb? On your phone: open imdb.com in Safari → aA menu → Request Desktop Website → sign in → your profile → Your Ratings (or Watchlist) → Export → save the .csv, then pick it here. (Also works on a desktop browser.)" style="width:100%;margin-top:8px">↑ Import from IMDb</button>
+      <button onclick="backupExportJSON()" data-i18n="backup_json_nerd" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;opacity:0.5;padding:4px 0 0;margin-top:2px;text-decoration:underline;font-family:'DM Sans','Noto Sans Georgian',sans-serif">JSON backup (advanced)</button>
       <div id="backup-status" style="display:none;font-size:11px;line-height:1.45;margin-top:8px"></div>
       <div id="btn-backfill-crew-row" style="display:none;margin-top:8px">
-        <button id="btn-backfill-crew" onclick="backfillCrewData()" data-i18n="backfill_crew" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;opacity:0.6;padding:4px 0;text-decoration:underline;font-family:'DM Sans',sans-serif">Update film details</button>
+        <button id="btn-backfill-crew" onclick="backfillCrewData()" data-i18n="backfill_crew" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;opacity:0.6;padding:4px 0;text-decoration:underline;font-family:'DM Sans','Noto Sans Georgian',sans-serif">Update film details</button>
       </div>
 
       <div class="add-label" data-i18n="friends_lbl" style="margin-top:4px">Friends</div>
       <div id="friends-section" style="margin-bottom:12px;min-height:20px"></div>
 
-      <button onclick="toggleAppInvite()" id="app-invite-btn" style="width:100%;padding:9px;border-radius:9px;background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.3);color:var(--primary);font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:10px;transition:all 0.15s" data-i18n="invite_to_app">✨ Invite friends to Cinemail</button>
+      <button onclick="toggleAppInvite()" id="app-invite-btn" style="width:100%;padding:9px;border-radius:9px;background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.3);color:var(--primary);font-size:13px;font-weight:600;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;margin-bottom:10px;transition:all 0.15s" data-i18n="invite_to_app">✨ Invite friends to Cinemail</button>
       <div id="app-invite-panel" style="display:none;margin-bottom:16px;padding:12px;background:rgba(245,197,24,0.05);border:1px solid rgba(245,197,24,0.18);border-radius:10px;text-align:center"></div>
       </div><!-- /acc-member-block -->
 
@@ -2519,7 +2539,7 @@ body {
         <button class="lang-btn" data-lang="it" onclick="setLang('it')">IT</button>
       </div>
 
-      <button onclick="replayOnboarding()" data-i18n="replay_onboarding" style="width:100%;padding:9px;border-radius:9px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;margin-bottom:14px;transition:all 0.15s" onmouseover="this.style.borderColor='var(--accent-border)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">🎬 Replay Welcome Tour</button>
+      <button onclick="replayOnboarding()" data-i18n="replay_onboarding" style="width:100%;padding:9px;border-radius:9px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;margin-bottom:14px;transition:all 0.15s" onmouseover="this.style.borderColor='var(--accent-border)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">🎬 Replay Welcome Tour</button>
 
       <!-- Support Cinemail -->
       <div style="margin-bottom:14px;padding:12px 14px;background:rgba(255,140,40,0.06);border:1px solid rgba(255,140,40,0.22);border-radius:10px;font-size:12px;line-height:1.55">
@@ -2553,7 +2573,7 @@ body {
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.29.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.30.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -2561,7 +2581,7 @@ body {
         <button class="btn-modal-close" id="acc-signout-btn" data-i18n="sign_out" onclick="closeAccount();signOut();" style="color:#f87171;border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.05)">Sign Out</button>
       </div>
       <div style="margin-top:24px;text-align:center" id="acc-delete-row">
-        <button onclick="confirmDeleteAccount()" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;opacity:0.6;font-family:'DM Sans',sans-serif" data-i18n="delete_account">Delete account</button>
+        <button onclick="confirmDeleteAccount()" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;opacity:0.6;font-family:'DM Sans','Noto Sans Georgian',sans-serif" data-i18n="delete_account">Delete account</button>
       </div>
     </div>
   </div>
@@ -2572,7 +2592,7 @@ body {
   <div style="padding:20px;width:100%;display:flex;justify-content:center" onclick="event.stopPropagation()">
     <div class="modal-sheet" style="max-width:360px" onclick="event.stopPropagation()">
       <div class="modal-handle"></div>
-      <div style="font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:19px;letter-spacing:0.5px;margin-bottom:14px;color:var(--text)" data-i18n="list_picker_title">Add to List</div>
+      <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:19px;letter-spacing:0.5px;margin-bottom:14px;color:var(--text)" data-i18n="list_picker_title">Add to List</div>
       <div id="list-picker-options"></div>
       <button class="btn-modal-close" onclick="closeListPicker()" style="margin-top:4px" data-i18n="cancel">Cancel</button>
     </div>
@@ -2586,21 +2606,21 @@ body {
       <button onclick="closeFeedback()" aria-label="Close" style="position:absolute;top:12px;right:12px;z-index:5;width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--muted);font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--primary-border)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">×</button>
 
       <div style="flex-shrink:0;">
-        <div style="font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;color:#F5C518;font-size:12px;letter-spacing:2px;margin-bottom:3px">FEEDBACK</div>
-        <div style="font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:19px;margin-bottom:14px;line-height:1.2">Share a thought or report a bug</div>
+        <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;color:#F5C518;font-size:12px;letter-spacing:2px;margin-bottom:3px">FEEDBACK</div>
+        <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:19px;margin-bottom:14px;line-height:1.2">Share a thought or report a bug</div>
         <div class="add-label">Type</div>
         <div style="display:flex;gap:8px;margin-bottom:14px">
-          <button id="fb-type-bug" onclick="setFbType('bug')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s">🐛 Bug</button>
-          <button id="fb-type-idea" onclick="setFbType('idea')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s">💡 Idea</button>
-          <button id="fb-type-other" onclick="setFbType('other')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s">💬 Other</button>
+          <button id="fb-type-bug" onclick="setFbType('bug')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s">🐛 Bug</button>
+          <button id="fb-type-idea" onclick="setFbType('idea')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s">💡 Idea</button>
+          <button id="fb-type-other" onclick="setFbType('other')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s">💬 Other</button>
         </div>
         <div class="add-label">Message</div>
-        <textarea id="fb-message" placeholder="Tell me what's on your mind..." style="min-height:70px;margin-bottom:10px;width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 12px;outline:none;resize:vertical;transition:border-color .2s"></textarea>
+        <textarea id="fb-message" placeholder="Tell me what's on your mind..." style="min-height:70px;margin-bottom:10px;width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:13px;padding:10px 12px;outline:none;resize:vertical;transition:border-color .2s"></textarea>
 
         <!-- Screenshot attach -->
         <input type="file" id="fb-screenshot" accept="image/*" style="display:none" onchange="onFbScreenshotPicked(event)">
         <div id="fb-attach-row" style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-          <button id="fb-attach-btn" onclick="document.getElementById('fb-screenshot').click()" style="display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s">
+          <button id="fb-attach-btn" onclick="document.getElementById('fb-screenshot').click()" style="display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s">
             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             <span id="fb-attach-lbl">Attach screenshot</span>
           </button>
@@ -3293,8 +3313,8 @@ const _I18N_BACKUP_BUSY = {
 Object.keys(_I18N_BACKUP_BUSY).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_BACKUP_BUSY[l]); });
 // Letterboxd import (en/ru; other languages fall back to en via t())
 const _I18N_LB = {
-  en:{ lb_import_btn:"↑ Import from Letterboxd", lb_matching:"Matching films…", lb_not_lb:"That doesn't look like a Letterboxd CSV." },
-  ru:{ lb_import_btn:"↑ Импорт из Letterboxd", lb_matching:"Сопоставляю фильмы…", lb_not_lb:"Это не похоже на CSV из Letterboxd." },
+  en:{ lb_import_btn:"↑ Import from Letterboxd", lb_matching:"Matching films…", lb_not_lb:"That doesn't look like a Letterboxd CSV.", imdb_import_btn:"↑ Import from IMDb", imdb_not_imdb:"That doesn't look like an IMDb CSV." },
+  ru:{ lb_import_btn:"↑ Импорт из Letterboxd", lb_matching:"Сопоставляю фильмы…", lb_not_lb:"Это не похоже на CSV из Letterboxd.", imdb_import_btn:"↑ Импорт из IMDb", imdb_not_imdb:"Это не похоже на CSV из IMDb." },
 };
 Object.keys(_I18N_LB).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_LB[l]); });
 // Onboarding inbox slide (Ludwig → Sinners, recommendation with a note)
@@ -4057,8 +4077,8 @@ function confirmDeleteAccount() {
       <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:10px">Delete account?</div>
       <div style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:22px">This will permanently delete your watch history, all lists, friends and account data. This cannot be undone.</div>
       <div style="display:flex;flex-direction:column;gap:9px">
-        <button onclick="deleteAccount()" style="background:#f87171;border:none;color:#fff;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;padding:12px;border-radius:10px;cursor:pointer">Delete my account</button>
-        <button onclick="document.getElementById('delete-account-overlay').remove();openAccount();" style="background:none;border:1px solid rgba(255,255,255,0.12);color:var(--muted);font-size:14px;font-family:'DM Sans',sans-serif;padding:11px;border-radius:10px;cursor:pointer">Cancel</button>
+        <button onclick="deleteAccount()" style="background:#f87171;border:none;color:#fff;font-size:14px;font-weight:700;font-family:'DM Sans','Noto Sans Georgian',sans-serif;padding:12px;border-radius:10px;cursor:pointer">Delete my account</button>
+        <button onclick="document.getElementById('delete-account-overlay').remove();openAccount();" style="background:none;border:1px solid rgba(255,255,255,0.12);color:var(--muted);font-size:14px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;padding:11px;border-radius:10px;cursor:pointer">Cancel</button>
       </div>
     </div>
   `;
@@ -4388,7 +4408,7 @@ function _whereToWatchInner(wp) {
   const logos = (data.flatrate || []).map(p =>
     `<img src="https://image.tmdb.org/t/p/w92${p.logo_path}" alt="${(p.provider_name||'').replace(/"/g,'')}" title="${(p.provider_name||'').replace(/"/g,'')}" style="width:34px;height:34px;border-radius:8px;display:block" loading="lazy">`
   ).join('');
-  const sel = `<select onchange="_setWatchRegion(this.value)" style="background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px;padding:2px 4px;font-family:'DM Sans',sans-serif;cursor:pointer">${regions.map(c => `<option value="${c}" ${c===region?'selected':''}>${c}</option>`).join('')}</select>`;
+  const sel = `<select onchange="_setWatchRegion(this.value)" style="background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px;padding:2px 4px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer">${regions.map(c => `<option value="${c}" ${c===region?'selected':''}>${c}</option>`).join('')}</select>`;
   const open = data.link ? `onclick='window.open(${JSON.stringify(data.link)},"_blank","noopener")'` : '';
   return `<div style="margin-bottom:14px">
     <div class="crew-label" style="display:flex;align-items:center;gap:8px">${t('where_to_watch')} ${sel}</div>
@@ -4585,10 +4605,10 @@ function _maybeShowSearchCoach() {
 function posterHTML(src, title, w=56, h=80, lightbox=false) {
   const s = `width:${w}px;height:${h}px;flex-shrink:0;border-radius:8px;overflow:hidden;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:22px`;
   if (src && src !== "N/A") {
-    const safeTitle = (title||'').replace(/'/g, "\\'");
+    const safeTitle = (title||'').replace(/\\/g,'\\\\').replace(/'/g, "\\'").replace(/"/g,'&quot;');
     const imgClass = lightbox ? 'class="poster-zoomable"' : '';
     const imgClick = lightbox ? `onclick="event.stopPropagation();openLightbox('${src}','${safeTitle}')"` : '';
-    return `<div style="${s}"><img src="${src}" alt="${title||''}" ${imgClass} ${imgClick} style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.parentNode.innerHTML='🎬'"></div>`;
+    return `<div style="${s}"><img src="${src}" alt="${escapeHtml(title||'')}" ${imgClass} ${imgClick} style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.parentNode.innerHTML='🎬'"></div>`;
   }
   return `<div style="${s}">🎬</div>`;
 }
@@ -4610,7 +4630,7 @@ function loadingHTML(quote, withSkeletons, cancellable) {
       </div>
     </div>`).join("") : "";
   const cancelBtn = cancellable ? `
-    <button id="ai-cancel-btn" onclick="cancelAIRequest()" style="margin-top:14px;padding:7px 18px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#888;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#f87171';this.style.color='#f87171'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='#888'">Cancel</button>` : "";
+    <button id="ai-cancel-btn" onclick="cancelAIRequest()" style="margin-top:14px;padding:7px 18px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#888;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#f87171';this.style.color='#f87171'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='#888'">Cancel</button>` : "";
   return `
     <div class="loading-box">
       <div class="loading-dots">${[0,1,2,3,4].map(()=>`<div class="loading-dot"></div>`).join("")}</div>
@@ -4658,7 +4678,7 @@ function _buildListChecklistHTML(tmdbID) {
     const inList = !!fls.listEntries[l.id];
     html += `<div class="list-check-row ${inList ? 'checked' : ''}" onclick="toggleFilmInList('${l.id}','${tmdbID}')">
       <span class="list-check-icon">${inList ? '✓' : '○'}</span>
-      <span style="font-size:13px">${l.name}</span>
+      <span style="font-size:13px">${escapeHtml(l.name)}</span>
       ${inList ? '<span style="font-size:10px;color:var(--muted);margin-left:auto">added</span>' : ''}
     </div>`;
   });
@@ -4765,7 +4785,7 @@ function movieCardHTML(m, why) {
         <div onclick="${idVal ? `openDetail('${idVal}','${typeVal}')` : ''}" style="display:flex;gap:11px;flex:1;min-width:0;cursor:${idVal?'pointer':'default'}">
           ${posterHTML(m.Poster, m.Title)}
           <div class="card-body">
-            <div class="card-title">${m.Title||""}</div>
+            <div class="card-title">${escapeHtml(m.Title||"")}</div>
             <div class="card-meta">${m.Year||""}${rating}${genre}${mediaTag}</div>
             ${idVal ? `<div class="card-hint">tap for details →</div>` : ""}
           </div>
@@ -4775,7 +4795,7 @@ function movieCardHTML(m, why) {
           ${shareBtn}
         </div>
       </div>
-      ${why ? `<div class="why-strip"><span class="why-brand">Cinemail</span> ${why}</div>` : ""}
+      ${why ? `<div class="why-strip"><span class="why-brand">Cinemail</span> ${escapeHtml(why)}</div>` : ""}
     </div>`;
 }
 
@@ -4793,7 +4813,7 @@ function personRowHTML(p) {
   return `<div class="card" style="align-items:center;cursor:pointer" onclick="openPerson('${safe}', ${p.id})">
     ${avatar}
     <div class="card-body" style="flex:1;min-width:0">
-      <div class="card-title">${p.name || ""}</div>
+      <div class="card-title">${escapeHtml(p.name || "")}</div>
       <div class="card-meta">${dept}${knownFor ? ` · ${knownFor}` : ""}</div>
     </div>
     <span style="color:var(--muted);font-size:20px;padding-right:8px">›</span>
@@ -5038,7 +5058,7 @@ function _renderAvatarPicker() {
     <div class="avatar-emoji-grid">${emojiHTML}</div>
     <div class="avatar-picker-label">Color</div>
     <div class="avatar-color-row">${colorHTML}</div>
-    ${curEmoji ? `<button onclick="clearAvatarEmoji()" style="margin-top:10px;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:2px 0;font-family:'DM Sans',sans-serif">✕ Remove emoji</button>` : ''}
+    ${curEmoji ? `<button onclick="clearAvatarEmoji()" style="margin-top:10px;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:2px 0;font-family:'DM Sans','Noto Sans Georgian',sans-serif">✕ Remove emoji</button>` : ''}
   `;
 }
 function pickAvatarEmoji(e) { localStorage.setItem('avEmoji', e); _applyAvatar(); _renderAvatarPicker(); _syncAvatarToDB(); }
@@ -5065,9 +5085,10 @@ async function _fetchProfileAvatars(userIds, rerender) {
 }
 function _avatarMarkup(userId, fallbackName, size, cls) {
   const p = _profileCache[userId] || {};
-  const color = p.color || '#7c3aed';
+  const rawColor = p.color || '#7c3aed';
+  const color = /^#[0-9a-fA-F]{3,8}$/.test(rawColor) ? rawColor : '#7c3aed'; // reject CSS/attr injection via profile color
   const label = p.emoji || (p.name || fallbackName || '?').charAt(0).toUpperCase();
-  return `<div class="${cls || ''}" style="width:${size}px;height:${size}px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.5)}px;line-height:1;flex-shrink:0;color:${_avatarInk(color)}">${label}</div>`;
+  return `<div class="${cls || ''}" style="width:${size}px;height:${size}px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.5)}px;line-height:1;flex-shrink:0;color:${_avatarInk(color)}">${escapeHtml(label)}</div>`;
 }
 
 // ── Lightbox ──────────────────────────────────────────────────────────────────
@@ -5115,19 +5136,19 @@ function streamingLinks(query, compact) {
   if (compact) {
     return `<div style="display:flex;gap:7px;margin-top:8px">
       ${links.map(s => {
-        const onclick = s.deep ? `openStreaming('${s.deep.replace(/'/g,"\\'")}','${s.web.replace(/'/g,"\\'")}')` : `window.open('${s.web.replace(/'/g,"\\'")}','_blank')`;
+        const onclick = s.deep ? `openStreaming('${s.deep.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;')}','${s.web.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')` : `window.open('${s.web.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;')}','_blank')`;
         return `<button title="${s.label}" onclick="${onclick}" style="width:30px;height:30px;border-radius:${s.label==='Spotify'?'50%':'8px'};background:transparent;border:1px solid rgba(255,255,255,0.12);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:border-color .15s" onmouseover="this.style.borderColor='rgba(255,255,255,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">${s.icon}</button>`;
       }).join("")}
     </div>`;
   }
   return `<div style="display:flex;gap:7px;margin-top:8px;flex-wrap:wrap">
     ${links.map(s => {
-      const onclick = s.deep ? `openStreaming('${s.deep.replace(/'/g,"\\'")}','${s.web.replace(/'/g,"\\'")}')` : `window.open('${s.web.replace(/'/g,"\\'")}','_blank')`;
+      const onclick = s.deep ? `openStreaming('${s.deep.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;')}','${s.web.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')` : `window.open('${s.web.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;')}','_blank')`;
       return `<button onclick="${onclick}" style="display:flex;align-items:center;gap:7px;padding:6px 13px;border-radius:20px;background:transparent;border:1px solid rgba(255,255,255,0.12);cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='rgba(255,255,255,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">${s.icon}<span style="color:#ddd;font-size:11px;font-weight:500;white-space:nowrap">${s.label}</span></button>`;
     }).join("")}
   </div>`;
 }
-function openStreaming(deepLink, webUrl) { window.location.href = deepLink; setTimeout(() => { window.open(webUrl, "_blank"); }, 600); }
+function openStreaming(deepLink, webUrl) { if (/^(spotify:|music:\/\/|https:\/\/)/i.test(deepLink)) window.location.href = deepLink; setTimeout(() => { window.open(webUrl, "_blank"); }, 600); }
 
 async function openPerson(name, personId) {
   _currentModal = { type: 'person', name };
@@ -5411,7 +5432,7 @@ function renderHistory() {
     filtered = watchHistory.filter(h => h.status === 'plan' && h.listId === _activeListId);
   }
   if (!watchHistory.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">${t('empty_list_title')}</div><p>${t('empty_list_sub')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">${t('empty_list_title')}</div><p>${t('empty_list_sub')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
     return;
   }
   if (!filtered.length) {
@@ -5420,9 +5441,9 @@ function renderHistory() {
     if (isWatchedTab) {
       emptyMsg = `<div class="empty-state"><div class="empty-state-icon">🍿</div><div class="empty-state-title">${t('nothing_yet')}</div><p>${t('mark_seen')}</p></div>`;
     } else if (activeList) {
-      emptyMsg = `<div class="empty-state"><div class="empty-state-icon">🎬</div><div class="empty-state-title">${activeList.name}</div><p>${t('empty_shared_sub')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
+      emptyMsg = `<div class="empty-state"><div class="empty-state-icon">🎬</div><div class="empty-state-title">${escapeHtml(activeList.name)}</div><p>${t('empty_shared_sub')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
     } else {
-      emptyMsg = `<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">${t('nothing_yet')}</div><p>${t('save_to_list')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
+      emptyMsg = `<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">${t('nothing_yet')}</div><p>${t('save_to_list')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
     }
     el.innerHTML = emptyMsg;
     return;
@@ -5485,14 +5506,14 @@ function renderHistory() {
         return `
         <div class="hist-card ${item.status==='plan'?'plan':''}" data-movie-id="${item.id}" onclick="${item.tmdbID?`openDetail('${item.tmdbID}','${item.mediaType||"movie"}')`:''}">
           <div style="display:flex;gap:11px;width:100%">
-            <div class="hist-poster">${item.poster&&item.poster!=="N/A"?`<img src="${item.poster}" alt="" class="poster-zoomable" onclick="event.stopPropagation();openLightbox('${item.poster}','${(item.title||'').replace(/'/g,"\\'")}${item.year?' ('+item.year+')':''}')" onerror="this.parentNode.innerHTML='🎬'"`+`>`:"🎬"}</div>
+            <div class="hist-poster">${item.poster&&item.poster!=="N/A"?`<img src="${item.poster}" alt="" class="poster-zoomable" onclick="event.stopPropagation();openLightbox('${item.poster}','${(item.title||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;')}${item.year?' ('+item.year+')':''}')" onerror="this.parentNode.innerHTML='🎬'"`+`>`:"🎬"}</div>
             <div style="flex:1;min-width:0">
-              <div class="hist-title">${item.title}</div>
+              <div class="hist-title">${escapeHtml(item.title)}</div>
               <div class="hist-meta">${item.year} · ${item.date}</div>
               ${item.status==="watched"
                 ? `<div style="display:flex;gap:2px;margin-top:3px">${starsHTML(item.stars)}</div>`
                 : ''}
-              ${item.comment?`<div class="hist-note">"${item.comment}" <span style="color:var(--muted);font-style:normal;font-size:10px">— ${item.date}</span></div>`:""}
+              ${item.comment?`<div class="hist-note">"${escapeHtml(item.comment)}" <span style="color:var(--muted);font-style:normal;font-size:10px">— ${item.date}</span></div>`:""}
             </div>
             <button class="hist-del" data-del-id="${item.id}" onclick="event.stopPropagation();_armDelete(${item.id}, this)" title="${t('list_delete')}" style="align-self:flex-start;flex-shrink:0;margin-left:8px">×</button>
           </div>
@@ -5709,8 +5730,8 @@ function renderFriendsSection() {
       const name = f.user_name || "?";
       html += `<div class="friend-row">
         ${_avatarMarkup(f.user_id, name, 30)}
-        <div style="flex:1;font-size:13px">${name} <span style="color:var(--muted);font-size:11px">${t('friend_wants')}</span></div>
-        <button onclick="respondFriendRequest('${f.id}','accepted')" style="background:var(--accent);border:none;color:#fff;border-radius:6px;padding:4px 10px;font-size:11px;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${t('accept')}</button>
+        <div style="flex:1;font-size:13px">${escapeHtml(name)} <span style="color:var(--muted);font-size:11px">${t('friend_wants')}</span></div>
+        <button onclick="respondFriendRequest('${f.id}','accepted')" style="background:var(--accent);border:none;color:#fff;border-radius:6px;padding:4px 10px;font-size:11px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${t('accept')}</button>
         <button onclick="respondFriendRequest('${f.id}','declined')" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#666;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;margin-left:4px">✕</button>
       </div>`;
     }
@@ -5730,7 +5751,7 @@ function renderFriendsSection() {
       </div>
       <input type="text" id="friend-filter-input" value="${(_friendFilter||'').replace(/"/g,'&quot;')}" placeholder="${t('filter_friends')}"
         oninput="_friendFilter=this.value;renderFriendsSection()"
-        style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:13px;padding:7px 12px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:8px;box-sizing:border-box">`;
+        style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:13px;padding:7px 12px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:8px;box-sizing:border-box">`;
     }
     html += `<div${many ? ' style="max-height:248px;overflow-y:auto;margin:-2px;padding:2px"' : ''}>`;
     for (const f of shown) {
@@ -5738,14 +5759,14 @@ function renderFriendsSection() {
       if (_friendDeleteConfirmFid === fid) {
         // Confirm row
         html += `<div class="friend-row" style="background:rgba(248,113,113,0.06);border-radius:8px;padding:8px 10px;gap:8px">
-          <div style="flex:1;font-size:12px;color:#f87171"><strong>${name}</strong> ${t('friend_remove_suffix')}</div>
-          <button onclick="event.stopPropagation();deleteFriendConfirmed('${fid}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${t('list_remove')}</button>
+          <div style="flex:1;font-size:12px;color:#f87171"><strong>${escapeHtml(name)}</strong> ${t('friend_remove_suffix')}</div>
+          <button onclick="event.stopPropagation();deleteFriendConfirmed('${fid}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${t('list_remove')}</button>
           <button onclick="event.stopPropagation();_friendDeleteConfirmFid=null;renderFriendsSection()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#aaa;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer">${t('cancel')}</button>
         </div>`;
       } else {
         html += `<div class="friend-row">
           ${_avatarMarkup(id, name, 30)}
-          <div style="flex:1;font-size:13px">${name}</div>
+          <div style="flex:1;font-size:13px">${escapeHtml(name)}</div>
           <button onclick="event.stopPropagation();_friendDeleteConfirmFid='${fid}';renderFriendsSection()"
             style="background:none;border:none;color:#555;font-size:18px;line-height:1;cursor:pointer;padding:6px 8px;margin:-6px -4px" title="${t('list_remove')}">×</button>
         </div>`;
@@ -5777,11 +5798,11 @@ async function searchFriendUsers(q) {
       el.innerHTML = `<div style="padding:8px 12px;color:var(--muted);font-size:12px">Not found</div>`; return;
     }
     el.innerHTML = data.map(u => {
-      const safe = (u.display_name || "").replace(/'/g, "\\'");
+      const safe = (u.display_name || "").replace(/\\/g,'\\\\').replace(/'/g, "\\'").replace(/"/g,'&quot;');
       return `<div onclick="selectFriendToAdd('${u.id}','${safe}')"
         style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border)"
         onmouseover="this.style.background='rgba(255,255,255,0.05)'"
-        onmouseout="this.style.background='none'">${u.display_name}</div>`;
+        onmouseout="this.style.background='none'">${escapeHtml(u.display_name)}</div>`;
     }).join("");
   } catch(e) { el.innerHTML = `<div style="padding:8px 12px;color:#f87171;font-size:12px">⚠ ${e.message}</div>`; }
 }
@@ -5962,16 +5983,16 @@ function renderListTabs() {
   html += `<button class="list-tab watched ${_activeListId === 'watched' ? 'active' : ''}" onclick="switchListTab('watched')">${t('tab_watched')}</button>`;
 
   _listsCache.forEach(l => {
-    html += `<button class="list-tab ${_activeListId === l.id ? 'active' : ''}" data-listid="${l.id}" onpointerdown="_listTabPointerDown(event,this,this.closest('.list-tabs-row'))" onclick="switchListTab('${l.id}')"><span class="tab-drag-handle">⠿</span>${l.name}</button>`;
+    html += `<button class="list-tab ${_activeListId === l.id ? 'active' : ''}" data-listid="${l.id}" onpointerdown="_listTabPointerDown(event,this,this.closest('.list-tabs-row'))" onclick="switchListTab('${l.id}')"><span class="tab-drag-handle">⠿</span>${escapeHtml(l.name)}</button>`;
   });
 
   if (_listTabCreating) {
     html += `<input id="list-tab-input" type="text" placeholder="List name…"
-      style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:rgba(124,58,237,0.1);color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;width:110px;flex-shrink:0"
+      style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:rgba(124,58,237,0.1);color:var(--text);font-size:12px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;width:110px;flex-shrink:0"
       enterkeyhint="done"
       onkeydown="if(event.key==='Enter'){event.preventDefault();_confirmNewListTab()}if(event.key==='Escape')_cancelNewListTab()"
       onblur="_blurNewListTab()">
-    <button onclick="_confirmNewListTab()" style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px;flex-shrink:0">Create</button>`;
+    <button onclick="_confirmNewListTab()" style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px;flex-shrink:0">Create</button>`;
   } else {
     html += `<button class="list-tab-add" onclick="_startNewListTab()">${t('new_list_tab')}</button>`;
   }
@@ -6280,8 +6301,8 @@ function renderListManageStrip() {
   if (_listManageMode === 'confirm-delete') {
     el.innerHTML = `
       <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(248,113,113,0.06);border-radius:10px;border:1px solid rgba(248,113,113,0.15)">
-        <span style="flex:1;font-size:12px;color:#f87171">${isOwner ? t('list_delete') : t('list_leave')} <strong>${list.name}</strong>?</span>
-        <button onclick="confirmListDelete('${list.id}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${isOwner ? t('list_delete') : t('list_leave')}</button>
+        <span style="flex:1;font-size:12px;color:#f87171">${isOwner ? t('list_delete') : t('list_leave')} <strong>${escapeHtml(list.name)}</strong>?</span>
+        <button onclick="confirmListDelete('${list.id}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${isOwner ? t('list_delete') : t('list_leave')}</button>
         <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#aaa;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer">${t('cancel')}</button>
       </div>`;
     return;
@@ -6291,9 +6312,9 @@ function renderListManageStrip() {
     el.innerHTML = `
       <div style="display:flex;gap:8px;align-items:center">
         <input id="list-rename-input" type="text" value="${list.name.replace(/"/g,'&quot;')}"
-          style="flex:1;padding:7px 12px;border-radius:9px;border:1px solid var(--accent-border);background:rgba(124,58,237,0.08);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none"
+          style="flex:1;padding:7px 12px;border-radius:9px;border:1px solid var(--accent-border);background:rgba(124,58,237,0.08);color:var(--text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none"
           onkeydown="if(event.key==='Enter')renameList('${list.id}');if(event.key==='Escape'){_listManageMode=null;renderListManageStrip();}">
-        <button onclick="renameList('${list.id}')" style="padding:7px 14px;border-radius:9px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">${t('save')}</button>
+        <button onclick="renameList('${list.id}')" style="padding:7px 14px;border-radius:9px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${t('save')}</button>
         <button onclick="_listManageMode=null;renderListManageStrip()" style="padding:7px 10px;border-radius:9px;background:none;border:1px solid var(--border);color:#666;font-size:13px;cursor:pointer">✕</button>
       </div>`;
     setTimeout(() => { const i = document.getElementById('list-rename-input'); if(i){i.focus();i.select();} }, 50);
@@ -6305,13 +6326,13 @@ function renderListManageStrip() {
     el.innerHTML = `
       <div style="padding:10px;background:rgba(124,58,237,0.05);border-radius:10px;border:1px solid rgba(124,58,237,0.15);margin-bottom:4px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <span style="font-size:12px;color:var(--muted)">${t('list_invite_to')} <strong style="color:var(--text)">${list.name}</strong></span>
+          <span style="font-size:12px;color:var(--muted)">${t('list_invite_to')} <strong style="color:var(--text)">${escapeHtml(list.name)}</strong></span>
           <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;line-height:1;padding:2px 4px">×</button>
         </div>
         ${friends.length ? `<div style="font-size:11px;color:var(--muted);margin-bottom:6px">${t('list_select_friend')}</div>` + friends.map(f => {
           const fi = _friendInfo(f);
           return `<button data-uid="${fi.id}" data-name="${fi.name.replace(/"/g,'&quot;')}" onclick="_doInviteToList('${list.id}',this)"
-            style="display:block;width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;padding:8px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:4px">${fi.name}</button>`;
+            style="display:block;width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;padding:8px 12px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif;margin-bottom:4px">${escapeHtml(fi.name)}</button>`;
         }).join('') : `<div style="font-size:12px;color:var(--muted);padding:4px 0">${t('no_friends_share')}</div>`}
       </div>`;
     return;
@@ -6326,7 +6347,7 @@ function renderListManageStrip() {
         <div style="display:flex;align-items:center;gap:8px">
           ${_avatarMarkup(m.user_id, m.name, 28)}
           <div>
-            <div style="font-size:13px;color:var(--text)">${m.name}${isMe ? ' <span style="color:var(--muted);font-size:11px">'+t('you_label')+'</span>' : ''}</div>
+            <div style="font-size:13px;color:var(--text)">${escapeHtml(m.name)}${isMe ? ' <span style="color:var(--muted);font-size:11px">'+t('you_label')+'</span>' : ''}</div>
             <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">${m.role === 'owner' ? t('role_owner') : t('role_member')}</div>
           </div>
         </div>
@@ -6335,7 +6356,7 @@ function renderListManageStrip() {
     }).join('');
     el.innerHTML = `<div style="padding:10px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid var(--border)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <span style="font-size:12px;color:var(--muted)">${t('list_members_title')} · <strong style="color:var(--text)">${list.name}</strong></span>
+        <span style="font-size:12px;color:var(--muted)">${t('list_members_title')} · <strong style="color:var(--text)">${escapeHtml(list.name)}</strong></span>
         <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;padding:2px 4px">×</button>
       </div>
       ${rows || `<div style="font-size:12px;color:var(--muted);padding:4px 0">${t('no_members')}</div>`}
@@ -6346,7 +6367,7 @@ function renderListManageStrip() {
   if (_listManageMode === 'link') {
     el.innerHTML = `<div style="padding:10px;background:rgba(124,58,237,0.05);border-radius:10px;border:1px solid rgba(124,58,237,0.15)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <span style="font-size:12px;color:var(--muted)">${t('list_invite_link_for')} <strong style="color:var(--text)">${list.name}</strong></span>
+        <span style="font-size:12px;color:var(--muted)">${t('list_invite_link_for')} <strong style="color:var(--text)">${escapeHtml(list.name)}</strong></span>
         <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;padding:2px 4px">×</button>
       </div>
       <div id="invite-link-content" style="text-align:center;padding:8px 0">
@@ -6361,15 +6382,15 @@ function renderListManageStrip() {
   el.innerHTML = `
     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
       ${isOwner ? `<button onclick="_listManageMode='rename';renderListManageStrip()"
-        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:none;color:#888;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">${t('list_rename')}</button>` : ''}
+        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:none;color:#888;font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${t('list_rename')}</button>` : ''}
       ${isOwner ? `<button onclick="_listManageMode='invite';renderListManageStrip()"
-        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(124,58,237,0.3);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">+ ${t('list_invite')}</button>` : ''}
+        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(124,58,237,0.3);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">+ ${t('list_invite')}</button>` : ''}
       ${isOwner ? `<button onclick="_listManageMode='link';renderListManageStrip()"
-        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(124,58,237,0.3);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" style="vertical-align:middle;margin-right:3px"><circle cx="11" cy="2.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="11" cy="11.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="3" cy="7" r="1.8" stroke="currentColor" stroke-width="1.4"/><line x1="4.7" y1="6.1" x2="9.3" y2="3.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="4.7" y1="7.9" x2="9.3" y2="10.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>${t('list_link')}</button>` : ''}
+        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(124,58,237,0.3);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" style="vertical-align:middle;margin-right:3px"><circle cx="11" cy="2.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="11" cy="11.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="3" cy="7" r="1.8" stroke="currentColor" stroke-width="1.4"/><line x1="4.7" y1="6.1" x2="9.3" y2="3.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="4.7" y1="7.9" x2="9.3" y2="10.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>${t('list_link')}</button>` : ''}
       <button onclick="_listManageMode='confirm-delete';renderListManageStrip()"
-        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:none;color:#666;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">${isOwner ? t('list_delete') : t('list_leave')}</button>
+        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:none;color:#666;font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${isOwner ? t('list_delete') : t('list_leave')}</button>
       ${list.memberCount > 0 ? `<button onclick="_listManageMode='members';renderListManageStrip()"
-        style="padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);background:none;color:#555;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">
+        style="padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);background:none;color:#555;font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">
         👥 ${list.memberCount} ${_membersWord(list.memberCount)}
       </button>` : ''}
     </div>`;
@@ -6392,34 +6413,34 @@ function renderListsSection() {
     const sub = (list.memberCount ? `${list.memberCount} ${_membersWord(list.memberCount)} · ` : '') + (isOwner ? t('role_owner') : t('role_member'));
     if (_listDeleteConfirmId === list.id) {
       html += `<div class="list-row" style="background:rgba(248,113,113,0.06);border-radius:8px;padding:8px 10px;gap:8px">
-        <div style="flex:1;font-size:12px;color:#f87171">${isOwner ? t('list_delete') : t('list_leave')} <strong>${list.name}</strong>?</div>
-        <button onclick="confirmListDelete('${list.id}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${isOwner ? t('list_delete') : t('list_leave')}</button>
+        <div style="flex:1;font-size:12px;color:#f87171">${isOwner ? t('list_delete') : t('list_leave')} <strong>${escapeHtml(list.name)}</strong>?</div>
+        <button onclick="confirmListDelete('${list.id}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${isOwner ? t('list_delete') : t('list_leave')}</button>
         <button onclick="_listDeleteConfirmId=null;renderListsSection()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#aaa;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer">${t('cancel')}</button>
       </div>`;
     } else if (_listInviteTargetId === list.id) {
       const avail = _friendsCache;
       html += `<div class="list-row" style="flex-direction:column;align-items:flex-start;background:rgba(124,58,237,0.05);border-radius:8px;padding:10px;gap:6px">
         <div style="display:flex;align-items:center;gap:8px;width:100%">
-          <span style="font-size:13px;font-weight:600;flex:1">${list.name}</span>
+          <span style="font-size:13px;font-weight:600;flex:1">${escapeHtml(list.name)}</span>
           <button onclick="event.stopPropagation();_listInviteTargetId=null;renderListsSection()" style="background:none;border:none;color:#555;font-size:18px;line-height:1;cursor:pointer;padding:4px 6px">×</button>
         </div>
         <div style="font-size:11px;color:var(--muted)">${t('select_friend_invite')}</div>
         ${avail.length ? avail.map(f => {
           const fi = _friendInfo(f);
-          const nm = fi.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-          const ln = list.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+          const nm = fi.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+          const ln = list.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
           return `<button onclick="event.stopPropagation();inviteToList('${list.id}','${fi.id}','${nm}','${ln}')"
-            style="width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;padding:7px 10px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:4px">${fi.name}</button>`;
+            style="width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;padding:7px 10px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif;margin-bottom:4px">${escapeHtml(fi.name)}</button>`;
         }).join('') : `<div style="font-size:12px;color:var(--muted)">${t('add_friends_first')}</div>`}
       </div>`;
     } else {
       html += `<div class="list-row">
         <div style="flex:1;min-width:0">
-          <div style="font-size:13px;font-weight:500">${list.name}</div>
+          <div style="font-size:13px;font-weight:500">${escapeHtml(list.name)}</div>
           <div style="font-size:11px;color:var(--muted)">${sub}</div>
         </div>
         ${isOwner ? `<button onclick="event.stopPropagation();_listInviteTargetId='${list.id}';_listDeleteConfirmId=null;renderListsSection()"
-          style="background:none;border:1px solid rgba(124,58,237,0.3);color:var(--accent-text);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">+ ${t('list_invite')}</button>` : ''}
+          style="background:none;border:1px solid rgba(124,58,237,0.3);color:var(--accent-text);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">+ ${t('list_invite')}</button>` : ''}
         <button onclick="event.stopPropagation();_listDeleteConfirmId='${list.id}';_listInviteTargetId=null;renderListsSection()"
           style="background:none;border:none;color:#555;font-size:18px;line-height:1;cursor:pointer;padding:6px 8px;margin:-6px -4px" title="${isOwner ? 'Delete list' : 'Leave list'}">${isOwner ? '×' : '↩'}</button>
       </div>`;
@@ -6496,9 +6517,9 @@ async function toggleAppInvite() {
     <div style="font-size:11px;color:var(--muted);margin-bottom:10px">${t('invite_connect_hint')}</div>
     <div style="display:flex;gap:8px">
       <button onclick='_shareOrCopy(${JSON.stringify(url)}, "Cinemail", ${JSON.stringify(msg)})'
-        style="flex:2;padding:9px;border-radius:8px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue','Oswald',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;font-weight:600">${t('share_invite')}</button>
+        style="flex:2;padding:9px;border-radius:8px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;font-weight:600">${t('share_invite')}</button>
       <button onclick='navigator.clipboard.writeText(${JSON.stringify(url)}).then(()=>showToast("Link copied!"))'
-        style="flex:1;padding:9px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">${t('copy')}</button>
+        style="flex:1;padding:9px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${t('copy')}</button>
     </div>`;
   panel.style.display = 'block';
 }
@@ -6571,9 +6592,9 @@ async function _loadInviteLink(listId) {
       <div style="font-size:10px;color:var(--muted);margin-bottom:10px">${t('invite_valid_48')}</div>
       <div style="display:flex;gap:8px">
         <button onclick='_shareOrCopy(${JSON.stringify(url)}, "Cinemail", ${JSON.stringify(msg)})'
-          style="flex:2;padding:9px;border-radius:8px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer">${t('share_invite')}</button>
+          style="flex:2;padding:9px;border-radius:8px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer">${t('share_invite')}</button>
         <button onclick='navigator.clipboard.writeText(${JSON.stringify(url)}).then(()=>showToast("Link copied!"))'
-          style="flex:1;padding:9px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">${t('copy')}</button>
+          style="flex:1;padding:9px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${t('copy')}</button>
       </div>`;
   } catch(e) { if (el) el.innerHTML = `<div style="font-size:12px;color:#f87171">${e.message}</div>`; }
 }
@@ -6607,14 +6628,14 @@ function _showJoinConfirm(tokenId, listId, listName) {
   const ov = document.createElement('div');
   ov.id = 'join-confirm-overlay';
   ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
-  const safeName = listName.replace(/'/g,"\\'");
+  const safeName = listName.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
   ov.innerHTML = `<div style="background:var(--surface2);border-radius:18px;padding:26px 22px;max-width:320px;width:100%;text-align:center">
     <div style="font-size:36px;margin-bottom:12px">📋</div>
-    <div style="font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:22px;margin-bottom:6px">${t('join_list_q')} "${listName}"?</div>
+    <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:22px;margin-bottom:6px">${t('join_list_q')} "${escapeHtml(listName)}"?</div>
     <div style="font-size:13px;color:var(--muted);margin-bottom:22px">${t('join_invited_sub')}</div>
     <div style="display:flex;gap:10px">
       <button onclick="_confirmJoin('${tokenId}','${listId}','${safeName}')"
-        style="flex:1;padding:13px;border-radius:10px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:16px;cursor:pointer;letter-spacing:1px">${t('inv_join_list')}</button>
+        style="flex:1;padding:13px;border-radius:10px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:16px;cursor:pointer;letter-spacing:1px">${t('inv_join_list')}</button>
       <button onclick="document.getElementById('join-confirm-overlay').remove()"
         style="flex:1;padding:13px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--muted);font-size:14px;cursor:pointer">${t('inv_decline')}</button>
     </div>
@@ -6647,7 +6668,7 @@ async function _listInviteSearch(query, listId) {
     if (!hits.length) { res.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:4px 0">No users found</div>'; return; }
     res.innerHTML = hits.map(u =>
       `<button data-uid="${u.id}" data-name="${(u.display_name||u.email||'?').replace(/"/g,'&quot;')}" onclick="_doInviteToList('${listId}',this)"
-        style="display:block;width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;padding:8px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:4px">${u.display_name||u.email||'?'}</button>`
+        style="display:block;width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;padding:8px 12px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif;margin-bottom:4px">${escapeHtml(u.display_name||u.email||'?')}</button>`
     ).join('');
   } catch(e) { res.innerHTML = ''; }
 }
@@ -6739,7 +6760,7 @@ function openListPicker(movie, status, callback = null) {
   if (opts) opts.innerHTML = `
     <button class="list-picker-opt" style="${isPersonalActive && !callback ? activeStyle : ''}" onclick="_onListPicked(null)">
       <div style="display:flex;align-items:center;gap:6px">
-        <div style="font-size:14px;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">${(currentUser?.displayName||currentUser?.email?.split('@')[0]||'My')+"'s List"}</div>
+        <div style="font-size:14px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">${(currentUser?.displayName||currentUser?.email?.split('@')[0]||'My')+"'s List"}</div>
         ${isPersonalActive && !callback ? '<span style="font-size:10px;color:var(--accent-text);background:rgba(124,58,237,0.15);padding:1px 7px;border-radius:10px">active</span>' : ''}
       </div>
       <div style="font-size:11px;color:var(--muted);margin-top:2px">Personal</div>
@@ -6748,7 +6769,7 @@ function openListPicker(movie, status, callback = null) {
       const isActive = !callback && _activeListId === l.id;
       return `<button class="list-picker-opt" style="${isActive ? activeStyle : ''}" onclick="_onListPicked('${l.id}')">
         <div style="display:flex;align-items:center;gap:6px">
-          <div style="font-size:14px;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">${l.name}</div>
+          <div style="font-size:14px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">${escapeHtml(l.name)}</div>
           ${isActive ? '<span style="font-size:10px;color:var(--accent-text);background:rgba(124,58,237,0.15);padding:1px 7px;border-radius:10px">active</span>' : ''}
         </div>
         <div style="font-size:11px;color:var(--muted);margin-top:2px">${l.memberCount ? l.memberCount + ' member' + (l.memberCount !== 1 ? 's' : '') : l.role}</div>
@@ -6768,9 +6789,9 @@ function _renderListPickerNewRow() {
     row.innerHTML = `
       <div style="display:flex;gap:6px">
         <input id="list-picker-new-input" type="text" placeholder="New list name…" maxlength="40"
-          style="flex:1;padding:9px 11px;border-radius:8px;border:1px solid var(--accent-border);background:rgba(124,58,237,0.08);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none"
+          style="flex:1;padding:9px 11px;border-radius:8px;border:1px solid var(--accent-border);background:rgba(124,58,237,0.08);color:var(--text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none"
           onkeydown="if(event.key==='Enter')_createListFromPicker();if(event.key==='Escape'){_listPickerNewMode=false;_renderListPickerNewRow()}">
-        <button onclick="_createListFromPicker()" style="padding:9px 14px;border-radius:8px;border:none;background:var(--accent);color:var(--accent-text);font-size:12px;cursor:pointer;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">Create</button>
+        <button onclick="_createListFromPicker()" style="padding:9px 14px;border-radius:8px;border:none;background:var(--accent);color:var(--accent-text);font-size:12px;cursor:pointer;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">Create</button>
       </div>`;
     setTimeout(() => document.getElementById('list-picker-new-input')?.focus(), 30);
   } else {
@@ -6868,9 +6889,9 @@ function _renderShareFriendsList() {
   el.innerHTML = _friendsCache.map(f => {
     const { id, name } = _friendInfo(f);
     const sel = currentShareToUser?.id === id;
-    return `<div class="friend-pick-row${sel ? " selected" : ""}" onclick="selectFriendForShare('${id}','${name.replace(/'/g,"\\'")}')">
+    return `<div class="friend-pick-row${sel ? " selected" : ""}" onclick="selectFriendForShare('${id}','${name.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">
       ${_avatarMarkup(id, name, 30)}
-      <div style="flex:1;font-size:14px">${name}</div>
+      <div style="flex:1;font-size:14px">${escapeHtml(name)}</div>
       ${sel ? `<span style="color:var(--accent-text);font-size:13px">✓</span>` : ""}
     </div>`;
   }).join("");
@@ -7079,7 +7100,7 @@ function _renderChatList() {
       ${_avatarMarkup(p.id, p.name, 40)}
       <div style="flex:1;min-width:0">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-          <div style="font-weight:600;font-size:15px">${p.name}</div>
+          <div style="font-weight:600;font-size:15px">${escapeHtml(p.name)}</div>
           <div style="font-size:11px;color:var(--muted);white-space:nowrap">${count} ${_filmsWord(count)}</div>
         </div>
         <div style="font-size:12px;color:${hasUnread ? "var(--text)" : "var(--muted)"};margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(preview)}</div>
@@ -7106,18 +7127,18 @@ function _renderChatDetail(partnerId) {
     <div style="display:flex;align-items:center;gap:10px;padding:4px 0 14px">
       <button class="inv-chat-back" onclick="closeChat()">←</button>
       ${_avatarMarkup(_chatViewPartnerId, partnerName, 32)}
-      <div style="font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:18px;letter-spacing:1px">${partnerName}</div>
+      <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:18px;letter-spacing:1px">${escapeHtml(partnerName)}</div>
     </div>
     <div class="card-list">${sorted.map(inv => _renderInvCard(inv)).join("")}</div>`;
 }
 
 function _sentStatusHTML(inv) {
   const to = inv.to_name
-    ? `<span style="color:var(--accent-text)">↑ ${t('inv_to')} ${inv.to_name}</span><span style="display:inline-block;width:8px"></span>`
+    ? `<span style="color:var(--accent-text)">↑ ${t('inv_to')} ${escapeHtml(inv.to_name)}</span><span style="display:inline-block;width:8px"></span>`
     : "";
   if (inv.status === "accepted") {
     const listName = inv.list_id ? _getListName(inv.list_id) : null;
-    const addedLabel = listName ? `${t('inv_added_to')} "${listName}"` : t('inv_accepted');
+    const addedLabel = listName ? `${t('inv_added_to')} "${escapeHtml(listName)}"` : t('inv_accepted');
     return `${to}<span style="color:#4ade80">${addedLabel}</span>`;
   }
   if (inv.status === "declined") return `${to}<span style="color:#f87171">${t('inv_declined')}</span>`;
@@ -7126,7 +7147,7 @@ function _sentStatusHTML(inv) {
 }
 
 function _receivedStatusHTML(inv) {
-  const from = `<span style="color:var(--accent-text)">↓ ${t('inv_from')} ${inv.from_name || "someone"}</span>`;
+  const from = `<span style="color:var(--accent-text)">↓ ${t('inv_from')} ${escapeHtml(inv.from_name || "someone")}</span>`;
   if (inv.status === "accepted") {
     const listName = inv.list_id ? _getListName(inv.list_id) : null;
     // Count distinct lists this film currently lives in (personal + shared)
@@ -7135,7 +7156,7 @@ function _receivedStatusHTML(inv) {
       const fls = _filmListStatus(inv.tmdb_id);
       count = (fls.personalPlanEntry ? 1 : 0) + Object.keys(fls.listEntries).length;
     }
-    const addedLabel = listName ? `${t('inv_added_to')} "${listName}"` : t('inv_added');
+    const addedLabel = listName ? `${t('inv_added_to')} "${escapeHtml(listName)}"` : t('inv_added');
     const listCount = count >= 2 ? `<span style="color:var(--muted)"> · ${count} ${_listsWord(count)}</span>` : "";
     return `${from}<span style="display:inline-block;width:8px"></span><span style="color:#4ade80">${addedLabel}</span>${listCount}`;
   }
@@ -7165,22 +7186,22 @@ function _renderListInvCard(inv) {
 
   let statusLine = '';
   if (isReceived) {
-    statusLine = `<span style="color:var(--accent-text)">↓ ${inv.from_name || 'Someone'} ${t('inv_invited_you')}</span>`;
+    statusLine = `<span style="color:var(--accent-text)">↓ ${escapeHtml(inv.from_name || 'Someone')} ${t('inv_invited_you')}</span>`;
   } else {
-    if (inv.status === 'accepted') statusLine = `<span style="color:var(--accent-text)">↑ ${t('inv_to')} ${inv.to_name || '?'}</span><span style="display:inline-block;width:8px"></span><span style="color:#4ade80">${t('inv_accepted')}</span>`;
-    else if (inv.status === 'declined') statusLine = `<span style="color:var(--accent-text)">↑ ${t('inv_to')} ${inv.to_name || '?'}</span><span style="display:inline-block;width:8px"></span><span style="color:#f87171">${t('inv_declined')}</span>`;
-    else statusLine = `<span style="color:var(--accent-text)">↑ ${t('inv_to')} ${inv.to_name || '?'}</span><span style="display:inline-block;width:8px"></span><span style="color:#555">📤 ${t('inv_sent')}</span>`;
+    if (inv.status === 'accepted') statusLine = `<span style="color:var(--accent-text)">↑ ${t('inv_to')} ${escapeHtml(inv.to_name || '?')}</span><span style="display:inline-block;width:8px"></span><span style="color:#4ade80">${t('inv_accepted')}</span>`;
+    else if (inv.status === 'declined') statusLine = `<span style="color:var(--accent-text)">↑ ${t('inv_to')} ${escapeHtml(inv.to_name || '?')}</span><span style="display:inline-block;width:8px"></span><span style="color:#f87171">${t('inv_declined')}</span>`;
+    else statusLine = `<span style="color:var(--accent-text)">↑ ${t('inv_to')} ${escapeHtml(inv.to_name || '?')}</span><span style="display:inline-block;width:8px"></span><span style="color:#555">📤 ${t('inv_sent')}</span>`;
   }
 
   return `<div class="inv-card${isCardUnread ? ' inv-unread' : ''}" id="inv-card-${inv.id}">
     <div style="display:flex;gap:11px;align-items:center">
       <div style="width:46px;height:66px;border-radius:10px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">📋</div>
       <div style="flex:1;min-width:0">
-        <div style="font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;line-height:1.2">${inv.title || 'Shared List'}</div>
+        <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;line-height:1.2">${escapeHtml(inv.title || 'Shared List')}</div>
         <div style="font-size:11px;margin-top:3px">${statusLine}</div>
         ${isPending ? `<div style="display:flex;gap:8px;margin-top:8px;position:relative;z-index:2" onclick="event.stopPropagation()">
-          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','accepted')" style="padding:6px 14px;border-radius:6px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">${t('inv_join_list')}</button>
-          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','declined')" style="padding:6px 14px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">✕ ${t('inv_decline')}</button>
+          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','accepted')" style="padding:6px 14px;border-radius:6px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">${t('inv_join_list')}</button>
+          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','declined')" style="padding:6px 14px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">✕ ${t('inv_decline')}</button>
         </div>` : ''}
       </div>
       <button onclick="event.stopPropagation();_armDeleteInvite('${inv.id}', this)" class="hist-del" style="flex-shrink:0;padding:6px 8px;align-self:flex-start;margin-top:2px">×</button>
@@ -7214,7 +7235,7 @@ function _renderInvCard(inv) {
       <div style="flex:1;min-width:0">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
           <div>
-            <div style="font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;line-height:1.2">${inv.title}${inv.year ? ` (${inv.year})` : ""}</div>
+            <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;line-height:1.2">${escapeHtml(inv.title)}${inv.year ? ` (${inv.year})` : ""}</div>
             <div style="font-size:11px;margin-top:2px;display:flex;align-items:center;flex-wrap:wrap;gap:2px">
               ${isReceived ? _receivedStatusHTML(inv) : _sentStatusHTML(inv)}
               ${msgBadge}
@@ -7223,10 +7244,10 @@ function _renderInvCard(inv) {
           </div>
           <button onclick="event.stopPropagation();_armDeleteInvite('${inv.id}', this)" class="hist-del" style="flex-shrink:0;padding:6px 8px;margin-top:2px">×</button>
         </div>
-        ${inv.message ? `<div style="color:#aaa;font-size:12px;font-style:italic;margin-top:4px">"${inv.message}"</div>` : ""}
+        ${inv.message ? `<div style="color:#aaa;font-size:12px;font-style:italic;margin-top:4px">"${escapeHtml(inv.message)}"</div>` : ""}
         ${isPending ? `<div style="display:flex;gap:8px;margin-top:8px;position:relative;z-index:2" onclick="event.stopPropagation()">
-          <button onclick="event.stopPropagation();acceptFilmInvite('${inv.id}')" style="padding:6px 14px;border-radius:6px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">+ ${t('inv_add_to_list')}</button>
-          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','declined')" style="padding:6px 14px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue', 'Oswald',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">✕ ${t('inv_decline')}</button>
+          <button onclick="event.stopPropagation();acceptFilmInvite('${inv.id}')" style="padding:6px 14px;border-radius:6px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">+ ${t('inv_add_to_list')}</button>
+          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','declined')" style="padding:6px 14px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">✕ ${t('inv_decline')}</button>
         </div>` : ""}
       </div>
     </div>
@@ -7241,7 +7262,7 @@ function _renderInvThread(inv) {
     const ts = msg.at ? `<div style="font-size:9px;color:var(--muted);margin-top:3px">${_fmtDT(msg.at)}</div>` : "";
     return `<div class="inv-msg ${mine ? "mine" : "theirs"}">
       ${msg.type === "reaction"
-        ? `<span style="font-size:22px;line-height:1">${msg.text}</span>`
+        ? `<span style="font-size:22px;line-height:1">${escapeHtml(msg.text)}</span>`
         : `<span class="inv-msg-bubble">${escapeHtml(msg.text)}</span>`}
       ${ts}
     </div>`;
@@ -7263,8 +7284,23 @@ function _renderInvThread(inv) {
 }
 
 function escapeHtml(s) {
-  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
 }
+
+// ── Global press feedback (apple-design §1) ───────────────────────────────────
+// Delegated so it covers dynamically-rendered elements and works in iOS WKWebView
+// where :active is unreliable on non-button nodes. Adds .is-pressed on press,
+// clears it on release/cancel. Purely visual; never blocks the actual click.
+(function initPressFeedback(){
+  const SEL = 'button, .card, .list-row, .list-tab, .friend-row, .friend-pick-row, .list-check-row, .list-picker-opt, .inv-card, .stats-bar-row, .avatar-emoji-btn, .avatar-color-dot';
+  const clear = () => document.querySelectorAll('.is-pressed').forEach(el => el.classList.remove('is-pressed'));
+  document.addEventListener('pointerdown', (e) => {
+    const el = e.target.closest && e.target.closest(SEL);
+    if (el && !el.disabled) el.classList.add('is-pressed');
+  }, true);
+  ['pointerup','pointercancel','pointerleave','dragstart','scroll'].forEach(ev =>
+    document.addEventListener(ev, clear, true));
+})();
 
 function toggleInviteThread(id) {
   _expandedInviteId = _expandedInviteId === id ? null : id;
@@ -7798,9 +7834,9 @@ function renderProfileStats(watched) {
     const maxC = items[0][1];
     const rows = items.map(([name, count]) => {
       const pct = Math.round((count/maxC)*100);
-      const safe = name.replace(/'/g,"\\'");
+      const safe = name.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
       return `<div class="stats-bar-row" onclick="closeAccount();openPerson('${safe}')">
-        <div class="stats-bar-name">${name}</div>
+        <div class="stats-bar-name">${escapeHtml(name)}</div>
         <div class="stats-bar-track"><div class="stats-bar-fill" style="width:${pct}%"></div></div>
         <div class="stats-bar-count">${count} film${count>1?'s':''}</div>
       </div>`;
@@ -8276,6 +8312,119 @@ async function backupImportLetterboxd() {
     if (!rows.length) { showToast("No films found in file", true); return; }
     setStatus(`${t('lb_matching')} 1/${rows.length}`);
     const resolved = await _resolveViaTMDBSearch(rows, (d, tot) => setStatus(`${t('lb_matching')} ${d}/${tot}`));
+    const ok = resolved.filter(r => r.imdb_id && r.title);
+    const unmatched = resolved.length - ok.length;
+    setStatus(t('backup_restoring'));
+    const { added, updated } = await applyBackupData(ok);
+    watchHistory = await loadHistoryFromDB();
+    renderHistory();
+    closeAccount();
+    const parts = [];
+    if (added)     parts.push(`✓ ${added} new`);
+    if (updated)   parts.push(`↻ ${updated} updated`);
+    if (unmatched) parts.push(`${unmatched} not found`);
+    showToast(parts.length ? parts.join(" · ") : "Nothing imported");
+  } catch (e) {
+    if (e.message !== "No file selected") showToast("Import failed: " + e.message, true);
+  } finally {
+    setStatus(null);
+    const inp = document.getElementById("backup-import-input");
+    if (inp) inp.accept = ".xlsx,.csv"; // restore for the normal Restore button
+  }
+}
+
+// ── IMDb import ───────────────────────────────────────────────────────────────
+// IMDb (desktop site, or mobile Safari → aA → "Request Desktop Website"): profile →
+// Your Ratings / Watchlist / any list → Export → downloads a .csv. Columns include
+// Const (the tt IMDb id), Title, Year, Title Type, Your Rating (1–10), Date Rated.
+// We resolve the tt-id to a TMDB entry EXACTLY via /find?external_source=imdb_id,
+// falling back to title+year search for the rare miss. IMDb ratings are 1–10 → ÷2.
+
+// Detect + map an IMDb CSV into our row shape. Returns null if it isn't one.
+function _parseIMDbRows(text, fileName) {
+  const recs = _csvToObjects(text);
+  if (!recs.length) return null;
+  const keys = Object.keys(recs[0]);
+  if (!keys.includes('Const') || !keys.includes('Title')) return null; // not an IMDb export
+  const isWatchlist = /watchlist/i.test(fileName || "");
+  const TYPE_MAP = { movie:'movie', short:'movie', tvmovie:'movie', video:'movie',
+                     tvseries:'tv', tvminiseries:'tv', tvspecial:'tv' };
+  return recs.map(r => {
+    const type = TYPE_MAP[String(r['Title Type'] || '').toLowerCase().replace(/[^a-z]/g,'')];
+    if (!type) return null; // skip videoGame, podcastSeries, tvEpisode, musicVideo, etc.
+    const rating10 = parseFloat(r['Your Rating']);
+    const rated = Number.isFinite(rating10) && rating10 > 0;
+    const date = (r['Date Rated'] || r['Created'] || r['Date Added'] || '').trim();
+    return {
+      imdbConst: (r['Const'] || '').trim(),               // tt-id → resolved to TMDB below
+      title: (r['Title'] || r['Original Title'] || '').trim(),
+      year: String(r['Year'] || '').trim().slice(0, 4),
+      stars: rated ? Math.max(0, Math.min(5, rating10 / 2)) : 0, // IMDb 1–10 → our 0–5
+      comment: '',                                          // IMDb doesn't export review text
+      status: (isWatchlist && !rated) ? 'plan' : 'watched',
+      media_type: type,
+      added_at: /^\d{4}-\d{2}-\d{2}/.test(date) ? date : null
+    };
+  }).filter(r => r && r.title && r.imdbConst);
+}
+
+// Resolve rows carrying an IMDb tt-id to TMDB — exact via /find, then title+year fallback.
+async function _resolveViaIMDbId(rows, onProgress) {
+  const out = [];
+  const _delay = ms => new Promise(r => setTimeout(r, ms));
+  for (let i = 0; i < rows.length; i++) {
+    onProgress?.(i + 1, rows.length);
+    if (i > 0 && i % 20 === 0) await _delay(500); // be gentle with TMDB
+    const r = { ...rows[i] };
+    try {
+      const res = await tmdbFetch(`/find/${encodeURIComponent(r.imdbConst)}?external_source=imdb_id&language=${_tmdbLang()}`);
+      const tv = (res && res.tv_results) || [], mv = (res && res.movie_results) || [];
+      let hit = r.media_type === 'tv' ? tv[0] : mv[0];
+      let isTV = r.media_type === 'tv' && !!hit;
+      if (!hit) { hit = mv[0] || tv[0]; isTV = !mv[0] && !!tv[0]; } // type-mismatch fallback
+      if (hit) {
+        r.imdb_id = String(hit.id);
+        r.media_type = isTV ? 'tv' : 'movie';
+        r.poster = hit.poster_path ? TMDB_IMG + hit.poster_path : "";
+        r.title  = (isTV ? hit.name : hit.title) || r.title;
+        r.year   = ((isTV ? hit.first_air_date : hit.release_date) || "").slice(0, 4) || r.year;
+      }
+    } catch (e) { /* leave unresolved; fallback below */ }
+    out.push(r);
+  }
+  // Rare misses (tt-id not in TMDB): try the title+year search resolver as a fallback.
+  const missing = out.filter(r => !r.imdb_id);
+  if (missing.length) {
+    const fixed = await _resolveViaTMDBSearch(missing, null);
+    const byConst = new Map(fixed.map(r => [r.imdbConst, r]));
+    return out.map(r => r.imdb_id ? r : (byConst.get(r.imdbConst) || r));
+  }
+  return out;
+}
+
+async function backupImportIMDb() {
+  const statusEl = document.getElementById('backup-status');
+  const setStatus = (main) => {
+    if (!statusEl) return;
+    if (!main) { statusEl.style.display = "none"; statusEl.innerHTML = ""; return; }
+    statusEl.style.display = "block";
+    statusEl.innerHTML = `<div style="color:var(--accent)">${main}</div>`
+      + `<div style="color:var(--muted);opacity:0.85;margin-top:3px">${t('backup_safe_hint')}</div>`;
+  };
+  try {
+    const file = await new Promise((res, rej) => {
+      const inp = document.getElementById("backup-import-input");
+      inp.accept = ".csv";
+      const handler = (e) => { inp.removeEventListener("change", handler); const f = e.target.files[0]; inp.value = ""; if (!f) return rej(new Error("No file selected")); res(f); };
+      inp.addEventListener("change", handler);
+      inp.click();
+    });
+    const text = await file.text();
+    const rows = _parseIMDbRows(text, file.name);
+    if (!rows) { showToast(t('imdb_not_imdb'), true); return; }
+    if (!rows.length) { showToast("No films found in file", true); return; }
+    setStatus(`${t('lb_matching')} 1/${rows.length}`);
+    const resolved = await _resolveViaIMDbId(rows, (d, tot) => setStatus(`${t('lb_matching')} ${d}/${tot}`));
     const ok = resolved.filter(r => r.imdb_id && r.title);
     const unmatched = resolved.length - ok.length;
     setStatus(t('backup_restoring'));
@@ -8915,15 +9064,15 @@ async function loadFeedbackReplies() {
           <div style="font-size:11px;color:var(--muted)">${typeEmoji[f.type]||"💬"} ${_fmtDT(f.created_at)}</div>
           <button data-del-id="${f.id}" onclick="deleteFeedback('${f.id}')" style="background:none;border:none;color:#888;cursor:pointer;font-size:18px;line-height:1;padding:6px 8px;border-radius:6px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='none'">×</button>
         </div>
-        <div style="font-size:13px;color:#ccc">${f.message}</div>
+        <div style="font-size:13px;color:#ccc">${escapeHtml(f.message)}</div>
         ${f.screenshot_url?`<a href="${f.screenshot_url}" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px"><img src="${f.screenshot_url}" style="max-width:120px;max-height:80px;border-radius:6px;border:1px solid var(--border);object-fit:cover" alt="Screenshot"/></a>`:""}
-        ${f.reply?`<div class="fb-reply-card"><div class="fb-reply-label">↩ Reply${f.replied_at?` · ${_fmtDT(f.replied_at)}`:""}</div><div class="fb-reply-text">${f.reply}</div></div>`:""}
+        ${f.reply?`<div class="fb-reply-card"><div class="fb-reply-label">↩ Reply${f.replied_at?` · ${_fmtDT(f.replied_at)}`:""}</div><div class="fb-reply-text">${escapeHtml(f.reply)}</div></div>`:""}
       </div>`).join("")}`;
   } catch(e){
     el.style.display="block";
     el.innerHTML=`<div style="color:var(--muted);font-size:12px;padding:8px 0;text-align:center">
       Couldn't load history &nbsp;
-      <button onclick="loadFeedbackReplies()" style="background:none;border:1px solid var(--border);color:var(--muted);font-size:11px;padding:3px 8px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif">↺ Retry</button>
+      <button onclick="loadFeedbackReplies()" style="background:none;border:1px solid var(--border);color:var(--muted);font-size:11px;padding:3px 8px;border-radius:6px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">↺ Retry</button>
     </div>`;
   }
 }
