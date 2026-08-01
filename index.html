@@ -2573,7 +2573,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.30.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.30.1</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -8301,7 +8301,7 @@ async function backupImportLetterboxd() {
   try {
     const file = await new Promise((res, rej) => {
       const inp = document.getElementById("backup-import-input");
-      inp.accept = ".csv";
+      inp.accept = ""; // iOS greys out CSVs it typed as plain-text under a strict .csv filter; accept any file and let the parser validate the contents
       const handler = (e) => { inp.removeEventListener("change", handler); const f = e.target.files[0]; inp.value = ""; if (!f) return rej(new Error("No file selected")); res(f); };
       inp.addEventListener("change", handler);
       inp.click();
@@ -8414,7 +8414,7 @@ async function backupImportIMDb() {
   try {
     const file = await new Promise((res, rej) => {
       const inp = document.getElementById("backup-import-input");
-      inp.accept = ".csv";
+      inp.accept = ""; // iOS greys out CSVs it typed as plain-text under a strict .csv filter; accept any file and let the parser validate the contents
       const handler = (e) => { inp.removeEventListener("change", handler); const f = e.target.files[0]; inp.value = ""; if (!f) return rej(new Error("No file selected")); res(f); };
       inp.addEventListener("change", handler);
       inp.click();
