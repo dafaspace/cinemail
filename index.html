@@ -2573,7 +2573,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.30.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.30.2</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -8402,6 +8402,57 @@ async function _resolveViaIMDbId(rows, onProgress) {
   return out;
 }
 
+// ── Import progress overlay ───────────────────────────────────────────────────
+// The old inline #backup-status sits at the bottom of a scrollable modal, so on a
+// phone the whole import ran invisibly. This is a top-level panel (above the
+// account overlay) that always shows what's happening and keeps the result on
+// screen until dismissed, instead of a 2.5s toast that's easy to miss.
+const ImportProgress = {
+  _el: null,
+  show(title) {
+    this.close();
+    const ov = document.createElement('div');
+    ov.id = 'import-progress-overlay';
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9998;display:flex;align-items:center;justify-content:center;padding:24px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)';
+    ov.innerHTML = `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:18px;padding:24px 22px;max-width:320px;width:100%;text-align:center">
+      <div id="ip-title" style="font-family:'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif;font-size:20px;letter-spacing:1px;margin-bottom:10px">${escapeHtml(title)}</div>
+      <div id="ip-msg" style="font-size:13px;color:var(--muted);line-height:1.5"></div>
+      <div id="ip-barwrap" style="height:6px;background:rgba(255,255,255,0.08);border-radius:4px;margin-top:16px;margin-bottom:4px;position:relative;display:none">
+        <div id="ip-bar" style="height:100%;width:0%;background:var(--primary);border-radius:4px;transition:width .2s ease"></div>
+        <div id="ip-env" style="position:absolute;top:50%;left:0%;transform:translate(-50%,-50%);transition:left .2s ease;line-height:0;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5))">
+          <svg width="15" height="11" viewBox="0 0 16 12" fill="none" aria-hidden="true">
+            <rect x="0.6" y="0.6" width="14.8" height="10.8" rx="2" fill="#fff"/>
+            <path d="M1.8 2.4 8 7l6.2-4.6" stroke="#0e081c" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <div id="ip-actions" style="margin-top:18px;display:none">
+        <button onclick="ImportProgress.close()" style="width:100%;padding:11px;border-radius:10px;background:var(--accent);border:none;color:var(--accent-text);font-size:14px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer">OK</button>
+      </div>
+    </div>`;
+    document.body.appendChild(ov);
+    this._el = ov;
+  },
+  update(msg, done, total) {
+    if (!this._el) return;
+    const m = this._el.querySelector('#ip-msg'); if (m) m.textContent = msg;
+    const wrap = this._el.querySelector('#ip-barwrap'), bar = this._el.querySelector('#ip-bar'), env = this._el.querySelector('#ip-env');
+    if (wrap && bar && total) {
+      const pct = Math.round((done / total) * 100);
+      wrap.style.display = 'block';
+      bar.style.width = pct + '%';
+      if (env) env.style.left = pct + '%'; // the envelope rides the leading edge — films being delivered
+    }
+  },
+  finish(msg) {
+    if (!this._el) return;
+    const m = this._el.querySelector('#ip-msg'); if (m) m.innerHTML = msg;
+    const wrap = this._el.querySelector('#ip-barwrap'); if (wrap) wrap.style.display = 'none';
+    const a = this._el.querySelector('#ip-actions'); if (a) a.style.display = 'block';
+  },
+  close() { if (this._el) { this._el.remove(); this._el = null; } }
+};
+
 async function backupImportIMDb() {
   const statusEl = document.getElementById('backup-status');
   const setStatus = (main) => {
@@ -8419,26 +8470,37 @@ async function backupImportIMDb() {
       inp.addEventListener("change", handler);
       inp.click();
     });
+    ImportProgress.show('IMDb import');
+    ImportProgress.update('Reading file…');
     const text = await file.text();
     const rows = _parseIMDbRows(text, file.name);
-    if (!rows) { showToast(t('imdb_not_imdb'), true); return; }
-    if (!rows.length) { showToast("No films found in file", true); return; }
-    setStatus(`${t('lb_matching')} 1/${rows.length}`);
-    const resolved = await _resolveViaIMDbId(rows, (d, tot) => setStatus(`${t('lb_matching')} ${d}/${tot}`));
+    if (!rows) { ImportProgress.finish(`<span style="color:#f87171">${escapeHtml(t('imdb_not_imdb'))}</span><br><br>Pick the .csv you exported from IMDb (Your Ratings or Watchlist).`); return; }
+    if (!rows.length) { ImportProgress.finish(`<span style="color:#f87171">No films found in that file.</span>`); return; }
+    // Importing writes to your account, so a session is required — say so plainly
+    // instead of silently importing nothing.
+    if (!currentUser || currentUser.is_anonymous) {
+      ImportProgress.finish(`<span style="color:#f87171">Sign in first.</span><br><br>Your films are saved to your Cinemail account, so you need to be signed in to import.`);
+      return;
+    }
+    ImportProgress.update(`Found ${rows.length} films. Matching…`, 0, rows.length);
+    const resolved = await _resolveViaIMDbId(rows, (d, tot) => ImportProgress.update(`Matching films… ${d}/${tot}`, d, tot));
     const ok = resolved.filter(r => r.imdb_id && r.title);
     const unmatched = resolved.length - ok.length;
-    setStatus(t('backup_restoring'));
+    ImportProgress.update(`Saving ${ok.length} films…`);
     const { added, updated } = await applyBackupData(ok);
     watchHistory = await loadHistoryFromDB();
     renderHistory();
-    closeAccount();
     const parts = [];
-    if (added)     parts.push(`✓ ${added} new`);
-    if (updated)   parts.push(`↻ ${updated} updated`);
-    if (unmatched) parts.push(`${unmatched} not found`);
-    showToast(parts.length ? parts.join(" · ") : "Nothing imported");
+    if (added)     parts.push(`✓ <b>${added}</b> added`);
+    if (updated)   parts.push(`↻ <b>${updated}</b> updated`);
+    if (unmatched) parts.push(`<span style="color:var(--muted)">${unmatched} not found on TMDB</span>`);
+    ImportProgress.finish(parts.length
+      ? parts.join('<br>') + `<br><br><span style="color:var(--muted)">Films are in your Watched and To-Watch lists.</span>`
+      : 'Nothing new to import - these films were already in your account.');
   } catch (e) {
-    if (e.message !== "No file selected") showToast("Import failed: " + e.message, true);
+    if (e.message === "No file selected") { ImportProgress.close(); return; }
+    ImportProgress.show('IMDb import');
+    ImportProgress.finish(`<span style="color:#f87171">Import failed</span><br><br><span style="color:var(--muted)">${escapeHtml(e.message || String(e))}</span>`);
   } finally {
     setStatus(null);
     const inp = document.getElementById("backup-import-input");
