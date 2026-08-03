@@ -2490,8 +2490,8 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div class="acc-stat-lbl" data-i18n="stat_time" style="margin-top:3px">Watch time · tap</div>
       </div>
       <div id="acc-profile-stats" style="margin-bottom:4px"></div>
-      <div class="add-label" data-i18n="display_name_lbl">Display Name</div>
-      <div style="display:flex;gap:8px;margin-bottom:24px">
+      <div class="add-label" id="acc-name-lbl" data-i18n="display_name_lbl">Display Name</div>
+      <div id="acc-name-row" style="display:flex;gap:8px;margin-bottom:24px">
         <input type="text" id="acc-name-input" data-i18n-ph="display_name" placeholder="Your name"
           style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:14px;padding:10px 12px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;transition:border-color .2s"
           onfocus="this.style.borderColor='var(--primary-border)'"
@@ -2573,7 +2573,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.31.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.31.2</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3468,7 +3468,8 @@ async function doGuestSignIn() {
   try {
     const { data, error } = await sbClient.auth.signInAnonymously();
     if (error) throw error;
-    // onSignedIn handles showing the app; it detects user.is_anonymous and skips DB loading
+    // onSignedIn handles showing the app; guests load their data like anyone else,
+    // it only skips the profile lookup and the social layer they don't have.
     await onSignedIn(data.user);
   } catch(e) {
     btns.forEach(b => { b.style.opacity = ''; b.style.pointerEvents = ''; });
@@ -7623,17 +7624,34 @@ async function openAccount() {
   const emailEl     = document.getElementById("acc-email-display");
   const editBadge   = document.querySelector("#account-modal-sheet .avatar-edit-badge");
   if (guestCard)   guestCard.style.display   = guest ? "block" : "none";
-  if (memberBlock) memberBlock.style.display = guest ? "none" : "block";
+  // Guests now have films, so the member block applies to them too: their stats,
+  // taste profile, lists and — most importantly — backup/import, since a guest's
+  // data lives only on this device until they upgrade. Only the parts that need a
+  // real profile (name editing) or a real account (push) stay hidden.
+  if (memberBlock) memberBlock.style.display = "block";
+  const nameLbl = document.getElementById("acc-name-lbl");
+  const nameRow = document.getElementById("acc-name-row");
+  const notifRow = document.getElementById("notif-row");
+  if (nameLbl)  nameLbl.style.display  = guest ? "none" : "";
+  if (nameRow)  nameRow.style.display  = guest ? "none" : "flex";
+  if (notifRow) notifRow.style.display = guest ? "none" : "";
   if (signoutBtn)  signoutBtn.style.display  = guest ? "none" : "";
   if (deleteRow)   deleteRow.style.display   = guest ? "none" : "";
   if (editBadge)   editBadge.style.display   = guest ? "none" : "";
 
   if (guest) {
-    // Guests have no profile, email, stats, friends or backups - just show the card + language
+    // No profile row and no email, but everything built from their own films does
+    // apply now — stats, taste profile, lists and backup/import.
     document.getElementById("acc-name-display").textContent = t('guest_label') || 'Guest';
     if (emailEl) emailEl.textContent = "";
     const av = document.getElementById("acc-modal-avatar");
     if (av) av.textContent = (t('guest_label') || 'G').charAt(0).toUpperCase();
+    _updateAccountStats();
+    renderListsSection();
+    loadHistoryFromDB().then(fresh => {
+      if (fresh.length > 0 || watchHistory.length === 0) watchHistory = fresh;
+      _updateAccountStats();
+    }).catch(() => {});
     return;
   }
 
