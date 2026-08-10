@@ -2573,7 +2573,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.34.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.34.2</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -6624,10 +6624,13 @@ async function shareFilmLink(id, type) {
 function _checkFilmLink() {
   const p = new URLSearchParams(location.search);
   const film = p.get('film');
-  if (!film) return;
+  // Validate before storing: these come straight off a URL anyone can edit, and an
+  // unchecked value is later sent to TMDB and Supabase, where a malformed id is a
+  // rejected request rather than a graceful miss.
+  if (!film || !/^\d{1,12}$/.test(film)) return;
   localStorage.setItem('pendingFilmLink', JSON.stringify({ id: film, tv: p.get('tv') === '1' }));
   const friend = p.get('friend');
-  if (friend) localStorage.setItem('pendingFriendInvite', friend); // reuse the existing referral path
+  if (friend && /^[0-9a-f-]{36}$/i.test(friend)) localStorage.setItem('pendingFriendInvite', friend); // reuse the existing referral path
   history.replaceState({}, '', location.pathname);
 }
 
@@ -8410,6 +8413,7 @@ async function _resolveViaTMDBSearch(rows, onProgress) {
   const out = [];
   const _delay = ms => new Promise(r => setTimeout(r, ms));
   for (let i = 0; i < rows.length; i++) {
+    if (ImportProgress.isCancelled()) break; // user bailed out — stop hitting TMDB
     onProgress?.(i + 1, rows.length);
     if (i > 0 && i % 20 === 0) await _delay(500); // be gentle with TMDB
     const r = { ...rows[i] };
@@ -8513,6 +8517,7 @@ async function _resolveViaIMDbId(rows, onProgress) {
   const out = [];
   const _delay = ms => new Promise(r => setTimeout(r, ms));
   for (let i = 0; i < rows.length; i++) {
+    if (ImportProgress.isCancelled()) break; // user bailed out — stop hitting TMDB
     onProgress?.(i + 1, rows.length);
     if (i > 0 && i % 20 === 0) await _delay(500); // be gentle with TMDB
     const r = { ...rows[i] };
@@ -8549,8 +8554,11 @@ async function _resolveViaIMDbId(rows, onProgress) {
 // screen until dismissed, instead of a 2.5s toast that's easy to miss.
 const ImportProgress = {
   _el: null,
+  _cancelled: false,
+  isCancelled() { return this._cancelled; },
   show(title) {
     this.close();
+    this._cancelled = false;
     const ov = document.createElement('div');
     ov.id = 'import-progress-overlay';
     ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9998;display:flex;align-items:center;justify-content:center;padding:24px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)';
@@ -8569,6 +8577,9 @@ const ImportProgress = {
       <div id="ip-actions" style="margin-top:18px;display:none">
         <button onclick="ImportProgress.close()" style="width:100%;padding:11px;border-radius:10px;background:var(--accent);border:none;color:var(--accent-text);font-size:14px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer">OK</button>
       </div>
+      <div id="ip-cancel-wrap" style="margin-top:14px">
+        <button onclick="ImportProgress.cancel()" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${escapeHtml(t('cancel'))}</button>
+      </div>
     </div>`;
     document.body.appendChild(ov);
     this._el = ov;
@@ -8584,10 +8595,16 @@ const ImportProgress = {
       if (env) env.style.left = pct + '%'; // the envelope rides the leading edge — films being delivered
     }
   },
+  // Lets the user out of a stalled import. tmdbFetch has no timeout and an import
+  // walks hundreds of films one request at a time, so a dropped connection used to
+  // leave a full-screen overlay with no exit but a page reload — which reads as a
+  // frozen app. Films already saved before cancelling stay saved.
+  cancel() { this._cancelled = true; this.close(); },
   finish(msg) {
     if (!this._el) return;
-    const m = this._el.querySelector('#ip-msg'); if (m) m.innerHTML = msg;
+    const m = this._el.querySelector('#ip-msg'); if (m) m.innerHTML = msg; // callers escape user content
     const wrap = this._el.querySelector('#ip-barwrap'); if (wrap) wrap.style.display = 'none';
+    const c = this._el.querySelector('#ip-cancel-wrap'); if (c) c.style.display = 'none';
     const a = this._el.querySelector('#ip-actions'); if (a) a.style.display = 'block';
   },
   close() { if (this._el) { this._el.remove(); this._el = null; } }
