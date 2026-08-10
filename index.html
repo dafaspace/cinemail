@@ -2573,7 +2573,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.32.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.33.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3313,14 +3313,14 @@ const _I18N_BACKUP_BUSY = {
 Object.keys(_I18N_BACKUP_BUSY).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_BACKUP_BUSY[l]); });
 // Letterboxd import (en/ru; other languages fall back to en via t())
 const _I18N_LB = {
-  en:{ lb_import_btn:"↑ Import from Letterboxd", lb_matching:"Matching films…", lb_not_lb:"That doesn't look like a Letterboxd CSV.", imdb_import_btn:"↑ Import from IMDb", imdb_not_imdb:"That doesn't look like an IMDb CSV.", imp_pick_imdb:"Pick the .csv you exported from IMDb (Your Ratings or Watchlist).", imp_none_found:"No films found in that file.", imp_found:"Found {n} films. Matching…", imp_saving:"Saving {n} films…", imp_added:"added", imp_updated:"updated", imp_notfound:"not found", imp_nothing:"Nothing imported", imp_failed:"Import failed", share_link_btn:"🔗 Share a link to this film", share_link_copied:"Link copied", imp_reading:"Reading file…", imp_where:"Films are in your Watched and To-Watch lists." },
-  ru:{ lb_import_btn:"↑ Импорт из Letterboxd", lb_matching:"Сопоставляю фильмы…", lb_not_lb:"Это не похоже на CSV из Letterboxd.", imdb_import_btn:"↑ Импорт из IMDb", imdb_not_imdb:"Это не похоже на CSV из IMDb.", imp_pick_imdb:"Выбери .csv, который выгрузил из IMDb (Your Ratings или Watchlist).", imp_none_found:"В этом файле не нашлось фильмов.", imp_found:"Найдено фильмов: {n}. Сопоставляю…", imp_saving:"Сохраняю фильмы: {n}…", imp_added:"добавлено", imp_updated:"обновлено", imp_notfound:"не найдено", imp_nothing:"Ничего не импортировано", imp_failed:"Импорт не удался", share_link_btn:"🔗 Поделиться ссылкой на фильм", share_link_copied:"Ссылка скопирована", imp_reading:"Читаю файл…", imp_where:"Фильмы теперь в списках «Просмотрено» и «Посмотреть»." },
-  uk:{ lb_import_btn:"↑ Імпорт з Letterboxd", lb_matching:"Зіставляю фільми…", lb_not_lb:"Це не схоже на CSV з Letterboxd.", imdb_import_btn:"↑ Імпорт з IMDb", imdb_not_imdb:"Це не схоже на CSV з IMDb.", imp_pick_imdb:"Обери .csv, який вивантажив з IMDb (Your Ratings або Watchlist).", imp_none_found:"У цьому файлі не знайшлося фільмів.", imp_found:"Знайдено фільмів: {n}. Зіставляю…", imp_saving:"Зберігаю фільми: {n}…", imp_added:"додано", imp_updated:"оновлено", imp_notfound:"не знайдено", imp_nothing:"Нічого не імпортовано", imp_failed:"Імпорт не вдався", share_link_btn:"🔗 Поділитися посиланням на фільм", share_link_copied:"Посилання скопійовано", imp_reading:"Читаю файл…", imp_where:"Фільми тепер у списках «Переглянуто» та «Подивитися»." },
-  ka:{ lb_import_btn:"↑ იმპორტი Letterboxd-იდან", lb_matching:"ვადარებ ფილმებს…", lb_not_lb:"ეს არ ჰგავს Letterboxd-ის CSV-ს.", imdb_import_btn:"↑ იმპორტი IMDb-იდან", imdb_not_imdb:"ეს არ ჰგავს IMDb-ის CSV-ს.", imp_pick_imdb:"აირჩიე .csv, რომელიც IMDb-იდან ჩამოტვირთე (Your Ratings ან Watchlist).", imp_none_found:"ამ ფაილში ფილმები ვერ მოიძებნა.", imp_found:"ნაპოვნია {n} ფილმი. ვადარებ…", imp_saving:"ვინახავ {n} ფილმს…", imp_added:"დამატებულია", imp_updated:"განახლებულია", imp_notfound:"ვერ მოიძებნა", imp_nothing:"არაფერი დაიმპორტდა", imp_failed:"იმპორტი ვერ მოხერხდა", share_link_btn:"🔗 გააზიარე ფილმის ბმული", share_link_copied:"ბმული დაკოპირდა", imp_reading:"ვკითხულობ ფაილს…", imp_where:"ფილმები შენს სიებშია: ნანახი და სანახავი." },
-  es:{ lb_import_btn:"↑ Importar de Letterboxd", lb_matching:"Buscando películas…", lb_not_lb:"Esto no parece un CSV de Letterboxd.", imdb_import_btn:"↑ Importar de IMDb", imdb_not_imdb:"Esto no parece un CSV de IMDb.", imp_pick_imdb:"Elige el .csv que exportaste de IMDb (Your Ratings o Watchlist).", imp_none_found:"No se encontraron películas en ese archivo.", imp_found:"{n} películas encontradas. Buscando…", imp_saving:"Guardando {n} películas…", imp_added:"añadidas", imp_updated:"actualizadas", imp_notfound:"no encontradas", imp_nothing:"No se importó nada", imp_failed:"Error al importar", share_link_btn:"🔗 Compartir enlace de la película", share_link_copied:"Enlace copiado", imp_reading:"Leyendo el archivo…", imp_where:"Las películas están en tus listas Vistas y Por ver." },
-  fr:{ lb_import_btn:"↑ Importer depuis Letterboxd", lb_matching:"Recherche des films…", lb_not_lb:"Cela ne ressemble pas à un CSV Letterboxd.", imdb_import_btn:"↑ Importer depuis IMDb", imdb_not_imdb:"Cela ne ressemble pas à un CSV IMDb.", imp_pick_imdb:"Choisis le .csv exporté depuis IMDb (Your Ratings ou Watchlist).", imp_none_found:"Aucun film trouvé dans ce fichier.", imp_found:"{n} films trouvés. Recherche…", imp_saving:"Enregistrement de {n} films…", imp_added:"ajoutés", imp_updated:"mis à jour", imp_notfound:"introuvables", imp_nothing:"Rien n'a été importé", imp_failed:"Échec de l'import", share_link_btn:"🔗 Partager le lien du film", share_link_copied:"Lien copié", imp_reading:"Lecture du fichier…", imp_where:"Les films sont dans tes listes Vus et À voir." },
-  de:{ lb_import_btn:"↑ Aus Letterboxd importieren", lb_matching:"Filme werden zugeordnet…", lb_not_lb:"Das sieht nicht nach einer Letterboxd-CSV aus.", imdb_import_btn:"↑ Aus IMDb importieren", imdb_not_imdb:"Das sieht nicht nach einer IMDb-CSV aus.", imp_pick_imdb:"Wähle die .csv, die du aus IMDb exportiert hast (Your Ratings oder Watchlist).", imp_none_found:"In dieser Datei wurden keine Filme gefunden.", imp_found:"{n} Filme gefunden. Wird zugeordnet…", imp_saving:"{n} Filme werden gespeichert…", imp_added:"hinzugefügt", imp_updated:"aktualisiert", imp_notfound:"nicht gefunden", imp_nothing:"Nichts importiert", imp_failed:"Import fehlgeschlagen", share_link_btn:"🔗 Link zum Film teilen", share_link_copied:"Link kopiert", imp_reading:"Datei wird gelesen…", imp_where:"Die Filme sind in deinen Listen Gesehen und Zu sehen." },
-  it:{ lb_import_btn:"↑ Importa da Letterboxd", lb_matching:"Abbinamento film…", lb_not_lb:"Non sembra un CSV di Letterboxd.", imdb_import_btn:"↑ Importa da IMDb", imdb_not_imdb:"Non sembra un CSV di IMDb.", imp_pick_imdb:"Scegli il .csv esportato da IMDb (Your Ratings o Watchlist).", imp_none_found:"Nessun film trovato in questo file.", imp_found:"Trovati {n} film. Abbinamento…", imp_saving:"Salvataggio di {n} film…", imp_added:"aggiunti", imp_updated:"aggiornati", imp_notfound:"non trovati", imp_nothing:"Niente importato", imp_failed:"Importazione non riuscita", share_link_btn:"🔗 Condividi il link del film", share_link_copied:"Link copiato", imp_reading:"Lettura del file…", imp_where:"I film sono nelle tue liste Visti e Da vedere." },
+  en:{ lb_import_btn:"↑ Import from Letterboxd", lb_matching:"Matching films…", lb_not_lb:"That doesn't look like a Letterboxd CSV.", imdb_import_btn:"↑ Import from IMDb", imdb_not_imdb:"That doesn't look like an IMDb CSV.", imp_pick_imdb:"Pick the .csv you exported from IMDb (Your Ratings or Watchlist).", imp_none_found:"No films found in that file.", imp_found:"Found {n} films. Matching…", imp_saving:"Saving {n} films…", imp_added:"added", imp_updated:"updated", imp_notfound:"not found", imp_nothing:"Nothing imported", imp_failed:"Import failed", share_link_btn:"🔗 Share a link to this film", sending:"Sending…", share_pick_friend:"Pick at least one friend", share_sent_to:"Sent to", share_failed:"Could not send", share_link_copied:"Link copied", imp_reading:"Reading file…", imp_where:"Films are in your Watched and To-Watch lists." },
+  ru:{ lb_import_btn:"↑ Импорт из Letterboxd", lb_matching:"Сопоставляю фильмы…", lb_not_lb:"Это не похоже на CSV из Letterboxd.", imdb_import_btn:"↑ Импорт из IMDb", imdb_not_imdb:"Это не похоже на CSV из IMDb.", imp_pick_imdb:"Выбери .csv, который выгрузил из IMDb (Your Ratings или Watchlist).", imp_none_found:"В этом файле не нашлось фильмов.", imp_found:"Найдено фильмов: {n}. Сопоставляю…", imp_saving:"Сохраняю фильмы: {n}…", imp_added:"добавлено", imp_updated:"обновлено", imp_notfound:"не найдено", imp_nothing:"Ничего не импортировано", imp_failed:"Импорт не удался", share_link_btn:"🔗 Поделиться ссылкой на фильм", sending:"Отправляю…", share_pick_friend:"Выбери хотя бы одного друга", share_sent_to:"Отправлено", share_failed:"Не удалось отправить", share_link_copied:"Ссылка скопирована", imp_reading:"Читаю файл…", imp_where:"Фильмы теперь в списках «Просмотрено» и «Посмотреть»." },
+  uk:{ lb_import_btn:"↑ Імпорт з Letterboxd", lb_matching:"Зіставляю фільми…", lb_not_lb:"Це не схоже на CSV з Letterboxd.", imdb_import_btn:"↑ Імпорт з IMDb", imdb_not_imdb:"Це не схоже на CSV з IMDb.", imp_pick_imdb:"Обери .csv, який вивантажив з IMDb (Your Ratings або Watchlist).", imp_none_found:"У цьому файлі не знайшлося фільмів.", imp_found:"Знайдено фільмів: {n}. Зіставляю…", imp_saving:"Зберігаю фільми: {n}…", imp_added:"додано", imp_updated:"оновлено", imp_notfound:"не знайдено", imp_nothing:"Нічого не імпортовано", imp_failed:"Імпорт не вдався", share_link_btn:"🔗 Поділитися посиланням на фільм", sending:"Надсилаю…", share_pick_friend:"Обери хоча б одного друга", share_sent_to:"Надіслано", share_failed:"Не вдалося надіслати", share_link_copied:"Посилання скопійовано", imp_reading:"Читаю файл…", imp_where:"Фільми тепер у списках «Переглянуто» та «Подивитися»." },
+  ka:{ lb_import_btn:"↑ იმპორტი Letterboxd-იდან", lb_matching:"ვადარებ ფილმებს…", lb_not_lb:"ეს არ ჰგავს Letterboxd-ის CSV-ს.", imdb_import_btn:"↑ იმპორტი IMDb-იდან", imdb_not_imdb:"ეს არ ჰგავს IMDb-ის CSV-ს.", imp_pick_imdb:"აირჩიე .csv, რომელიც IMDb-იდან ჩამოტვირთე (Your Ratings ან Watchlist).", imp_none_found:"ამ ფაილში ფილმები ვერ მოიძებნა.", imp_found:"ნაპოვნია {n} ფილმი. ვადარებ…", imp_saving:"ვინახავ {n} ფილმს…", imp_added:"დამატებულია", imp_updated:"განახლებულია", imp_notfound:"ვერ მოიძებნა", imp_nothing:"არაფერი დაიმპორტდა", imp_failed:"იმპორტი ვერ მოხერხდა", share_link_btn:"🔗 გააზიარე ფილმის ბმული", sending:"იგზავნება…", share_pick_friend:"აირჩიე მინიმუმ ერთი მეგობარი", share_sent_to:"გაიგზავნა", share_failed:"გაგზავნა ვერ მოხერხდა", share_link_copied:"ბმული დაკოპირდა", imp_reading:"ვკითხულობ ფაილს…", imp_where:"ფილმები შენს სიებშია: ნანახი და სანახავი." },
+  es:{ lb_import_btn:"↑ Importar de Letterboxd", lb_matching:"Buscando películas…", lb_not_lb:"Esto no parece un CSV de Letterboxd.", imdb_import_btn:"↑ Importar de IMDb", imdb_not_imdb:"Esto no parece un CSV de IMDb.", imp_pick_imdb:"Elige el .csv que exportaste de IMDb (Your Ratings o Watchlist).", imp_none_found:"No se encontraron películas en ese archivo.", imp_found:"{n} películas encontradas. Buscando…", imp_saving:"Guardando {n} películas…", imp_added:"añadidas", imp_updated:"actualizadas", imp_notfound:"no encontradas", imp_nothing:"No se importó nada", imp_failed:"Error al importar", share_link_btn:"🔗 Compartir enlace de la película", sending:"Enviando…", share_pick_friend:"Elige al menos un amigo", share_sent_to:"Enviado a", share_failed:"No se pudo enviar", share_link_copied:"Enlace copiado", imp_reading:"Leyendo el archivo…", imp_where:"Las películas están en tus listas Vistas y Por ver." },
+  fr:{ lb_import_btn:"↑ Importer depuis Letterboxd", lb_matching:"Recherche des films…", lb_not_lb:"Cela ne ressemble pas à un CSV Letterboxd.", imdb_import_btn:"↑ Importer depuis IMDb", imdb_not_imdb:"Cela ne ressemble pas à un CSV IMDb.", imp_pick_imdb:"Choisis le .csv exporté depuis IMDb (Your Ratings ou Watchlist).", imp_none_found:"Aucun film trouvé dans ce fichier.", imp_found:"{n} films trouvés. Recherche…", imp_saving:"Enregistrement de {n} films…", imp_added:"ajoutés", imp_updated:"mis à jour", imp_notfound:"introuvables", imp_nothing:"Rien n'a été importé", imp_failed:"Échec de l'import", share_link_btn:"🔗 Partager le lien du film", sending:"Envoi…", share_pick_friend:"Choisis au moins un ami", share_sent_to:"Envoyé à", share_failed:"Envoi impossible", share_link_copied:"Lien copié", imp_reading:"Lecture du fichier…", imp_where:"Les films sont dans tes listes Vus et À voir." },
+  de:{ lb_import_btn:"↑ Aus Letterboxd importieren", lb_matching:"Filme werden zugeordnet…", lb_not_lb:"Das sieht nicht nach einer Letterboxd-CSV aus.", imdb_import_btn:"↑ Aus IMDb importieren", imdb_not_imdb:"Das sieht nicht nach einer IMDb-CSV aus.", imp_pick_imdb:"Wähle die .csv, die du aus IMDb exportiert hast (Your Ratings oder Watchlist).", imp_none_found:"In dieser Datei wurden keine Filme gefunden.", imp_found:"{n} Filme gefunden. Wird zugeordnet…", imp_saving:"{n} Filme werden gespeichert…", imp_added:"hinzugefügt", imp_updated:"aktualisiert", imp_notfound:"nicht gefunden", imp_nothing:"Nichts importiert", imp_failed:"Import fehlgeschlagen", share_link_btn:"🔗 Link zum Film teilen", sending:"Wird gesendet…", share_pick_friend:"Wähle mindestens einen Freund", share_sent_to:"Gesendet an", share_failed:"Senden fehlgeschlagen", share_link_copied:"Link kopiert", imp_reading:"Datei wird gelesen…", imp_where:"Die Filme sind in deinen Listen Gesehen und Zu sehen." },
+  it:{ lb_import_btn:"↑ Importa da Letterboxd", lb_matching:"Abbinamento film…", lb_not_lb:"Non sembra un CSV di Letterboxd.", imdb_import_btn:"↑ Importa da IMDb", imdb_not_imdb:"Non sembra un CSV di IMDb.", imp_pick_imdb:"Scegli il .csv esportato da IMDb (Your Ratings o Watchlist).", imp_none_found:"Nessun film trovato in questo file.", imp_found:"Trovati {n} film. Abbinamento…", imp_saving:"Salvataggio di {n} film…", imp_added:"aggiunti", imp_updated:"aggiornati", imp_notfound:"non trovati", imp_nothing:"Niente importato", imp_failed:"Importazione non riuscita", share_link_btn:"🔗 Condividi il link del film", sending:"Invio…", share_pick_friend:"Scegli almeno un amico", share_sent_to:"Inviato a", share_failed:"Invio non riuscito", share_link_copied:"Link copiato", imp_reading:"Lettura del file…", imp_where:"I film sono nelle tue liste Visti e Da vedere." },
 };
 Object.keys(_I18N_LB).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_LB[l]); });
 // Onboarding inbox slide (Ludwig → Sinners, recommendation with a note)
@@ -6926,11 +6926,14 @@ async function _doAcceptFilmInvite(invId, inv, listId) {
 }
 
 // ── Share ─────────────────────────────────────────────────────────────────────
-let currentShareToUser = null;
+// A share can go to several friends at once. Each recipient still gets their OWN
+// invite row: the thread, the read state and the accepted/declined status are all
+// per-person, so one shared row could never represent them.
+let currentShareToUsers = [];
 
 function openShare(movie) {
   if (!_requireAccount()) return; // guest → show conversion modal
-  currentShareMovie = movie; currentShareToUser = null;
+  currentShareMovie = movie; currentShareToUsers = [];
   document.getElementById("share-movie-title").textContent = `${movie.Title} (${movie.Year})`;
   document.getElementById("share-message").value = "";
   _renderShareFriendsList();
@@ -6948,47 +6951,55 @@ function _renderShareFriendsList() {
   _fetchProfileAvatars(_friendsCache.map(f => _friendInfo(f).id), _renderShareFriendsList);
   el.innerHTML = _friendsCache.map(f => {
     const { id, name } = _friendInfo(f);
-    const sel = currentShareToUser?.id === id;
+    const sel = currentShareToUsers.some(u => u.id === id);
     return `<div class="friend-pick-row${sel ? " selected" : ""}" onclick="selectFriendForShare('${id}','${name.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">
       ${_avatarMarkup(id, name, 30)}
       <div style="flex:1;font-size:14px">${escapeHtml(name)}</div>
-      ${sel ? `<span style="color:var(--accent-text);font-size:13px">✓</span>` : ""}
+      <span style="color:${sel ? 'var(--accent-text)' : 'var(--border)'};font-size:15px">${sel ? '☑' : '☐'}</span>
     </div>`;
   }).join("");
 }
 
 function selectFriendForShare(id, name) {
-  currentShareToUser = { id, name };
+  const i = currentShareToUsers.findIndex(u => u.id === id);
+  if (i >= 0) currentShareToUsers.splice(i, 1); else currentShareToUsers.push({ id, name });
   _renderShareFriendsList();
 }
 
 async function confirmShare() {
-  if (!currentShareToUser) { showToast("Select a friend first"); return; }
+  if (!currentShareToUsers.length) { showToast(t('share_pick_friend')); return; }
   const m = currentShareMovie;
   const btn = document.getElementById("share-confirm-btn");
-  btn.textContent = "Sending…"; btn.disabled = true;
+  const recipients = [...currentShareToUsers];
+  btn.textContent = t('sending'); btn.disabled = true;
+  const fromName = currentUser.displayName || currentUser.email?.split("@")[0] || "someone";
+  const base = {
+    from_user_id: currentUser.id,
+    tmdb_id:      String(m.tmdbID || m.id || ""),
+    title:        m.Title || "", year: m.Year || "",
+    poster:       m.Poster || "", media_type: m.type || m.mediaType || "movie",
+    message:      document.getElementById("share-message").value || null,
+    status:       "pending",
+    from_name:    fromName
+  };
   try {
-    const { error } = await sbClient.from("invites").insert({
-      from_user_id: currentUser.id,
-      to_user_id:   currentShareToUser.id,
-      tmdb_id:      String(m.tmdbID || m.id || ""),
-      title:        m.Title || "", year: m.Year || "",
-      poster:       m.Poster || "", media_type: m.type || m.mediaType || "movie",
-      message:      document.getElementById("share-message").value || null,
-      status:       "pending",
-      from_name:    currentUser.displayName || currentUser.email?.split("@")[0] || "someone",
-      to_name:      currentShareToUser.name || ""
-    });
+    // One row per recipient, inserted in a single call.
+    const { error } = await sbClient.from("invites").insert(
+      recipients.map(u => ({ ...base, to_user_id: u.id, to_name: u.name || "" }))
+    );
     if (error) throw new Error(error.message);
     // Update inbox cache optimistically
-    const newInv = { id: crypto.randomUUID(), from_user_id: currentUser.id, to_user_id: currentShareToUser.id,
-      title: m.Title, year: m.Year, poster: m.Poster, media_type: m.type || m.mediaType || "movie",
-      status: "pending", from_name: currentUser.displayName, to_name: currentShareToUser.name,
-      messages: [], created_at: new Date().toISOString() };
-    _inboxCache.sent.unshift(newInv);
-    closeShare(); showToast(`Sent to ${currentShareToUser.name} 🎬`);
-  } catch(e) { showToast("Could not send: " + e.message); }
-  btn.textContent = "Send"; btn.disabled = false;
+    recipients.forEach(u => _inboxCache.sent.unshift({
+      id: crypto.randomUUID(), from_user_id: currentUser.id, to_user_id: u.id,
+      title: m.Title, year: m.Year, poster: m.Poster, media_type: base.media_type,
+      status: "pending", from_name: currentUser.displayName, to_name: u.name,
+      messages: [], created_at: new Date().toISOString() }));
+    closeShare();
+    showToast(recipients.length === 1
+      ? `${t('share_sent_to')} ${recipients[0].name} 🎬`
+      : `${t('share_sent_to')} ${recipients.length} 🎬`);
+  } catch(e) { showToast(t('share_failed') + ": " + e.message); }
+  btn.textContent = t('send_btn'); btn.disabled = false;
 }
 
 // ── Inbox ─────────────────────────────────────────────────────────────────────
