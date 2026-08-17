@@ -2578,7 +2578,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.35.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.36.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -6616,16 +6616,37 @@ function shareFromModal() {
   shareFilmLink(String(m.tmdbID || m.id || ''), m.type || m.mediaType || 'movie', note);
 }
 
+// 7 chars from an unambiguous alphabet (no 0/O/1/l) — ~35 bits, plenty for a table
+// this size, and readable if someone ever types one by hand.
+function _shareCode() {
+  const A = '23456789abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
+  const b = crypto.getRandomValues(new Uint8Array(7));
+  return Array.from(b, n => A[n % A.length]).join('');
+}
+
 async function shareFilmLink(id, type, note) {
-  const p = new URLSearchParams();
-  if (currentUser && !currentUser.is_anonymous) p.set('from', currentUser.id);
-  if (type === 'tv') p.set('tv', '1');
-  // The note deliberately does NOT travel in the URL. Percent-encoding a sentence
-  // turned a two-line link into an eleven-line wall that reads like a tracking URL,
-  // and a link people are embarrassed to paste defeats the whole feature. Carrying
-  // the note needs a short code stored server-side; until then the link stays clean.
-  const qs = p.toString();
-  const url = `https://cinemail.app/f/${encodeURIComponent(id)}${qs ? '?' + qs : ''}`;
+  // Preferred shape: a short code that carries the film, the sender and the note in
+  // a row rather than in the address. Keeps the link two lines instead of eleven,
+  // and means the displayed message can't be fabricated by editing the URL.
+  let url = null;
+  if (currentUser && sbClient) {
+    try {
+      const code = _shareCode();
+      const { error } = await sbClient.from('share_links').insert({
+        code, tmdb_id: String(id), media_type: type === 'tv' ? 'tv' : 'movie',
+        from_user_id: currentUser.id, note: note ? String(note).slice(0, 300) : null
+      });
+      if (!error) url = `https://cinemail.app/f/${code}`;
+    } catch (e) { /* fall back to the plain link below */ }
+  }
+  if (!url) {
+    // Fallback: still shareable if the insert failed (offline, table missing, RLS).
+    const p = new URLSearchParams();
+    if (currentUser && !currentUser.is_anonymous) p.set('from', currentUser.id);
+    if (type === 'tv') p.set('tv', '1');
+    const qs = p.toString();
+    url = `https://cinemail.app/f/${encodeURIComponent(id)}${qs ? '?' + qs : ''}`;
+  }
   const title = (currentShareMovie && currentShareMovie.Title) || window._detailMovie?.Title || 'Cinemail';
   try {
     if (navigator.share) { await navigator.share({ title, url }); return; }
