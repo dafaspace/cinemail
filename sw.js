@@ -1,5 +1,5 @@
 // ── Cache version — bump this string on every deploy to force refresh ──────────
-const CACHE_VERSION = "v155";
+const CACHE_VERSION = "v165";
 const CACHE_NAME = "cinemail-" + CACHE_VERSION;
 
 // Files to cache for offline use
@@ -8,8 +8,10 @@ const PRECACHE = [
   "./index.html",
   "./manifest.json",
   "./logo.png",
+  "./icon.png",          // shown on the splash and all four auth screens, not just as the home-screen icon
   "./exceljs.min.js",
   "./emoji.js",
+  "./avatars.webp",
 ];
 
 // Minimal branded offline page — last-resort fallback so a home-screen launch with
@@ -80,17 +82,32 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  // Other same-origin assets: network-first, fall back to cache (never undefined)
+  // Other same-origin assets: cache-first, then refresh in the background.
+  //
+  // This used to be network-first, with the cache reached only when the network
+  // FAILED - never when it was merely slow. So every reload made logo.png, icon.png
+  // and avatars.webp wait for a full round-trip before they could paint, even though
+  // the identical bytes were already sitting in the cache. That is why the images took
+  // so long to appear after every single reload, and why it happened every time rather
+  // than once.
+  //
+  // Serving from cache first is safe here because CACHE_NAME carries the version and
+  // `activate` deletes every older cache, so a release always lands on fresh assets.
+  // The background fetch keeps the cache current within a release too.
   event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        if (response.ok) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-        }
-        return response;
-      })
-      .catch(() => caches.match(event.request).then(r => r || Response.error()))
+    caches.match(event.request).then(cached => {
+      const network = fetch(event.request)
+        .then(response => {
+          if (response && response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => cached || Response.error());
+      // Cached copy wins the race outright; nothing waits on the network to paint.
+      return cached || network;
+    })
   );
 });
 
