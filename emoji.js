@@ -7,7 +7,7 @@
 // Order is row-major, six per row, and must match the sheet exactly - a wrong index
 // silently shows the neighbouring character rather than failing, so ORDER below is the
 // single source of truth for both the picker and the avatar.
-const AVATAR_SPRITE = "./avatars.webp?v=0.43.1";
+const AVATAR_SPRITE = "./avatars.webp?v=0.44.0";
 const AVATAR_COLS = 6;
 // Grouped, not arbitrary: the picker is 62 circles now, and it reads as sections -
 // animals, then creatures, then monsters, then magic folk, then people, then the
@@ -65,17 +65,41 @@ function avatarKey(v) {
   return AVATAR_FROM_EMOJI[v] || "";
 }
 
-// Background-size is a percentage of the element, so a 6-column sheet is 600%, and each
-// step is 100/(cols-1) percent - not 100/cols, which is the mistake that leaves the
-// first cell right and shifts every other one.
-function avatarSpriteStyle(key) {
+// Percentage background/mask positioning: a 6-column sheet is 600%, and each step is
+// 100/(cols-1) percent - not 100/cols, which is the mistake that leaves the first cell
+// right and shifts every other one.
+function _avatarCellPos(key) {
   const i = AVATAR_ORDER.indexOf(key);
-  if (i < 0) return "";
+  if (i < 0) return null;
   const c = i % AVATAR_COLS, r = Math.floor(i / AVATAR_COLS);
   const x = AVATAR_COLS > 1 ? (c * 100) / (AVATAR_COLS - 1) : 0;
   const y = AVATAR_ROWS > 1 ? (r * 100) / (AVATAR_ROWS - 1) : 0;
+  return `${x.toFixed(4)}% ${y.toFixed(4)}%`;
+}
+
+// The sprite is used as a MASK, not as a picture: its alpha is the drawing and the ink
+// colour is painted underneath it. That is what lets a disc stay the exact palette
+// colour. Painting the sprite as an image forced the opposite - the ink was baked
+// near-black, so the disc had to be lightened to about 74% to carry it, which threw
+// away the chosen colour's own lightness and made white and dark grey land on the same
+// pale tone.
+function avatarMaskVars(key) {
+  const pos = _avatarCellPos(key);
+  if (!pos) return "";
+  return `--av-pos:${pos};--av-size:${AVATAR_COLS * 100}% ${AVATAR_ROWS * 100}%;`;
+}
+
+// Kept for anything that still wants the flat picture (the ink is near-black there).
+function avatarSpriteStyle(key) {
+  const pos = _avatarCellPos(key);
+  if (!pos) return "";
   return `background-image:url(${AVATAR_SPRITE});` +
          `background-size:${AVATAR_COLS * 100}% ${AVATAR_ROWS * 100}%;` +
-         `background-position:${x.toFixed(4)}% ${y.toFixed(4)}%;` +
-         `background-repeat:no-repeat;`;
+         `background-position:${pos};background-repeat:no-repeat;`;
+}
+
+// One place holds the sprite URL for CSS, so the versioned filename is not repeated
+// into every element's inline style.
+if (typeof document !== "undefined") {
+  document.documentElement.style.setProperty("--av-sprite", `url(${AVATAR_SPRITE})`);
 }

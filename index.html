@@ -14,9 +14,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- Versioned on purpose. index.html is served network-first while assets are
      cache-first, so without the query a fresh page could load a cached older
-     emoji.js - which is exactly what emptied the avatar picker after v0.43.1.
+     emoji.js - which is exactly what emptied the avatar picker after v0.44.0.
      Bump this with the release; sw.js precaches the same URL. -->
-<script src="./emoji.js?v=0.43.1"></script>
+<script src="./emoji.js?v=0.44.0"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1719,6 +1719,20 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;
 }
 .avatar-emoji-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; margin-bottom:12px; }
+/* The drawing is painted through the sprite's alpha as a MASK, so the disc keeps the
+   exact palette colour and the ink is free to be dark on a light card or light on a
+   dark one. Drawing the sprite as a picture forces near-black ink, which is why the
+   disc used to be lightened to 74% - and why white and dark grey came out identical.
+   -webkit-mask carries WKWebView and older Safari; the unprefixed form is the standard. */
+.av-glyph { position:relative; overflow:hidden; }
+.av-glyph::after {
+  content:''; position:absolute; inset:0; background:var(--av-ink,#141420);
+  -webkit-mask-image:var(--av-sprite); mask-image:var(--av-sprite);
+  -webkit-mask-size:var(--av-size); mask-size:var(--av-size);
+  -webkit-mask-position:var(--av-pos); mask-position:var(--av-pos);
+  -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+}
+
 /* Round, not the old 8px square: the picker now draws the same disc the avatar does,
    so what you tap is exactly what other people will see. */
 .avatar-emoji-btn {
@@ -2591,7 +2605,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.43.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.44.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -5083,26 +5097,57 @@ function _avatarRing(hex) {
   const [h, s] = _hexToHsl(hex);
   return `hsl(${h.toFixed(0)} ${(Math.min(s,0.55)*100).toFixed(0)}% 42%)`;
 }
-// Full-bleed CSS for one drawing: tinted paper behind, the sprite's ink on top. The
-// drawing fills the whole disc rather than sitting inside it as a small glyph did,
-// because these are portraits and cropping them to 62% would throw away the framing.
-// Returns '' when the stored value names no drawing, so callers fall back to the
-// initial instead of dropping a raw system emoji into the set.
+// The mask variables for one drawing, or '' when the stored value names none - callers
+// then fall back to the initial instead of dropping a raw system emoji into the set.
 function _glyphStyle(em) {
   if (typeof avatarKey !== 'function') return '';
   const key = avatarKey(em);
-  return key ? avatarSpriteStyle(key) : '';
+  return key ? avatarMaskVars(key) : '';
 }
-// Coloured paper stock, not cream with a hint. At 30% saturation and 88% lightness the
-// eight palette colours were indistinguishable from each other and from plain paper -
-// the same "блекло" that sank five earlier attempts. Kept light enough (74%) that the
-// near-black ink still reads: the drawing has to survive, the colour only has to be
-// recognisable. These two numbers are the whole knob if it wants tuning.
-function _avatarPaper(hex) {
+const _AV_INK = '#141420';
+const _AV_TARGET_LUM = 0.345;   // ~6.9:1 against the ink
+
+function _relLum(hex) {
+  const ch = i => {
+    const v = parseInt(hex.slice(i, i + 2), 16) / 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  };
+  return 0.2126 * ch(1) + 0.7152 * ch(3) + 0.0722 * ch(5);
+}
+function _hslToHex(h, s, l) {
+  const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs(((h / 60) % 2) - 1)), m = l - c / 2;
+  const [r, g, b] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x]
+                  : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+  return '#' + [r, g, b].map(v => Math.round((v + m) * 255).toString(16).padStart(2, '0')).join('');
+}
+
+// The card carries the chosen palette colour, lifted in lightness ONLY as far as it
+// must be to hold near-black ink - and not one step further.
+//
+// Two earlier attempts got this wrong in opposite directions. Forcing every colour to
+// hsl(h, s, 74%) threw away its own lightness, so #EDEDF2 and #3A3A4A rendered as the
+// same pale tone: two of the eight choices were indistinguishable. Leaving the colours
+// at full strength and flipping the ink to white instead produced a photographic
+// negative rather than a chalk drawing - these are pen-and-ink pieces, so their darks
+// are eyes and shadows, and painting the darks white made every animal's eyes glow.
+//
+// Lifting per-colour keeps both properties: gold and white are already bright enough
+// and are returned untouched, while the dark entries keep their own hue and stay apart
+// from each other.
+function _avatarDiscColor(hex) {
   if (!/^#[0-9a-fA-F]{6}$/.test(hex)) hex = '#F5C518';
+  if (_relLum(hex) >= _AV_TARGET_LUM) return hex;
   const [h, s] = _hexToHsl(hex);
-  return `hsl(${h.toFixed(0)} ${(Math.min(s, 0.75) * 100).toFixed(0)}% 74%)`;
+  let lo = 0, hi = 1;
+  for (let i = 0; i < 24; i++) {
+    const mid = (lo + hi) / 2;
+    if (_relLum(_hslToHex(h, s, mid)) < _AV_TARGET_LUM) lo = mid; else hi = mid;
+  }
+  return _hslToHex(h, s, hi);
 }
+// Always the dark ink: the drawings are ink on paper, and there is no inversion of them
+// that reads as chalk. See _avatarDiscColor for why the card moves instead.
+function _avatarGlyphInk() { return _AV_INK; }
 function getAvatarPrefs() {
   return { emoji: localStorage.getItem('avEmoji')||'', color: localStorage.getItem('avColor')||'#F5C518' };
 }
@@ -5115,11 +5160,13 @@ function _applyAvatar() {
     if (!el) return;
     if (sprite) {
       el.textContent = '';
+      el.classList.add('av-glyph');
       el.style.cssText += ';' + sprite;
-      el.style.backgroundColor = _avatarPaper(color);
+      el.style.setProperty('--av-ink', _avatarGlyphInk(color));
+      el.style.backgroundColor = _avatarDiscColor(color);
       el.style.color = 'transparent';
     } else {
-      el.style.backgroundImage = 'none';
+      el.classList.remove('av-glyph');   // or ::after keeps drawing over the initial
       el.textContent = initial;
       el.style.backgroundColor = color;
       el.style.color = _avatarInk(color);
@@ -5146,14 +5193,15 @@ function _renderAvatarPicker() {
   const wrap = document.getElementById('avatar-picker-wrap');
   if (!wrap) return;
   const { emoji: curEmoji, color: curColor } = getAvatarPrefs();
-  // The picker draws from the same sheet the avatar does, on the same tinted paper, so
-  // what you tap is exactly what everyone else will see. It used to render the raw
-  // characters, which showed a system emoji here and a drawing everywhere else.
-  const paper = _avatarPaper(curColor);
+  // The picker draws from the same sheet, on the same disc colour and with the same
+  // ink, so what you tap is exactly what everyone else will see. It used to render the
+  // raw characters, which showed a system emoji here and a drawing everywhere else.
+  const disc = _avatarDiscColor(curColor);
+  const ink = _avatarGlyphInk(curColor);
   const emojiHTML = _AVATAR_EMOJIS.map(e =>
-    `<button class="avatar-emoji-btn${avatarKey(e)===avatarKey(curEmoji)?' active':''}"` +
+    `<button class="avatar-emoji-btn av-glyph${avatarKey(e)===avatarKey(curEmoji)?' active':''}"` +
     ` onclick="pickAvatarEmoji('${e}')" aria-label="${escapeHtml(avatarKey(e) || e)}"` +
-    ` style="background-color:${paper};${_glyphStyle(e)}"></button>`
+    ` style="background-color:${disc};--av-ink:${ink};${_glyphStyle(e)}"></button>`
   ).join('');
   const colorHTML = _AVATAR_COLORS.map(c =>
     `<div class="avatar-color-dot${c===curColor?' active':''}" style="background:${c}" onclick="pickAvatarColor('${c}')"></div>`
@@ -5200,9 +5248,10 @@ function _avatarMarkup(userId, fallbackName, size, cls) {
   const sprite = _glyphStyle(p.emoji);
   const label = sprite ? '' : escapeHtml((p.name || fallbackName || '?').charAt(0).toUpperCase());
   const surface = sprite
-    ? `background-color:${_avatarPaper(color)};${sprite}`
+    ? `background-color:${_avatarDiscColor(color)};--av-ink:${_avatarGlyphInk(color)};${sprite}`
     : `background:${color};color:${_avatarInk(color)};`;
-  return `<div class="${cls || ''}" style="width:${size}px;height:${size}px;border-radius:50%;${surface}display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.5)}px;line-height:1;flex-shrink:0">${label}</div>`;
+  const klass = ((cls || '') + (sprite ? ' av-glyph' : '')).trim();
+  return `<div class="${klass}" style="width:${size}px;height:${size}px;border-radius:50%;${surface}display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.5)}px;line-height:1;flex-shrink:0">${label}</div>`;
 }
 
 // ── Lightbox ──────────────────────────────────────────────────────────────────
