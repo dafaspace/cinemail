@@ -165,6 +165,12 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .inv-card.is-pressed, .stats-bar-row.is-pressed { filter: brightness(1.18); }
 @media (prefers-reduced-motion: reduce) { .is-pressed { transition: filter 90ms ease-out; transform: none !important; } }
 
+/* Vector interface icons. Sit on the text baseline and never squash in flex rows. */
+.ic { vertical-align: -0.15em; flex-shrink: 0; }
+/* Tab bar: icon above the word, the way every native bottom bar reads. */
+.tab-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.tab-btn .ic { vertical-align: 0; }
+
 /* ── Accessibility: honor transparency & contrast preferences (apple-design §14) ── */
 @media (prefers-reduced-transparency: reduce) {
   *, *::before, *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
@@ -2291,10 +2297,10 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 
   <!-- Tab bar -->
   <div class="tabbar">
-    <button class="tab-btn active" id="tab-btn-search" onclick="switchTab('search')" data-i18n="tab_search">🔍 Search</button>
-    <button class="tab-btn" id="tab-btn-recs" onclick="switchTab('recs')" data-i18n="tab_picks">✨ Picks</button>
-    <button class="tab-btn" id="tab-btn-history" onclick="switchTab('history')" data-i18n="tab_lists">📋 Lists</button>
-    <button class="tab-btn" id="tab-btn-inbox" onclick="switchTab('inbox')"><span style="position:relative;display:inline-block">📬<span id="inbox-badge" class="inbox-badge">0</span></span> <span data-i18n="tab_inbox_label">Inbox</span></button>
+    <button class="tab-btn active" id="tab-btn-search" onclick="switchTab('search')"><span data-ic="search"></span><span data-i18n="tab_search">Search</span></button>
+    <button class="tab-btn" id="tab-btn-recs" onclick="switchTab('recs')"><span data-ic="sparkles"></span><span data-i18n="tab_picks">Picks</span></button>
+    <button class="tab-btn" id="tab-btn-history" onclick="switchTab('history')"><span data-ic="list-checks"></span><span data-i18n="tab_lists">Lists</span></button>
+    <button class="tab-btn" id="tab-btn-inbox" onclick="switchTab('inbox')"><span style="position:relative;display:inline-block"><span data-ic="inbox"></span><span id="inbox-badge" class="inbox-badge">0</span></span><span data-i18n="tab_inbox_label">Inbox</span></button>
   </div>
 
   <!-- ── TAB: Search ──────────────────────────────────────────────────── -->
@@ -2578,7 +2584,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.36.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.37.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -2675,7 +2681,7 @@ const I18N = {
     email_sent:"We sent a confirmation link to your email.<br>Click it to activate your account.",
     check_spam:"Didn't get it? Check your spam folder.",
     sign_in:"Sign In", sign_up:"Create Account", close:"Close", sign_out:"Sign Out",
-    tab_search:"🔍 Search", tab_picks:"✨ Picks", tab_lists:"📋 Lists", tab_inbox:"📬 Inbox", tab_inbox_label:"Inbox",
+    tab_search:"Search", tab_picks:"Picks", tab_lists:"Lists", tab_inbox:"Inbox", tab_inbox_label:"Inbox",
     tab_watched:"✓ Watched", new_list_tab:"+ New",
     stat_watched:"Watched", stat_to_watch:"To watch", stat_avg:"Avg ★", stat_time:"Watch time · tap",
     cp_title:"Your Cinema Profile", cp_dir:"Top Directors", cp_cine:"Top Cinematographers", cp_comp:"Top Composers", cp_act:"Top Actors",
@@ -2726,7 +2732,7 @@ const I18N = {
     email_sent:"Мы отправили ссылку на вашу почту.<br>Нажмите на неё, чтобы активировать аккаунт.",
     check_spam:"Не пришло? Проверьте папку Спам.",
     sign_in:"Войти", sign_up:"Создать аккаунт", close:"Закрыть", sign_out:"Выйти",
-    tab_search:"🔍 Поиск", tab_picks:"✨ Подборки", tab_lists:"📋 Списки", tab_inbox:"📬 Входящие", tab_inbox_label:"Входящие",
+    tab_search:"Поиск", tab_picks:"Подборки", tab_lists:"Списки", tab_inbox:"Входящие", tab_inbox_label:"Входящие",
     tab_watched:"✓ Просмотрено", new_list_tab:"+ Создать",
     stat_watched:"Просмотрено", stat_to_watch:"К просмотру", stat_avg:"Ср. ★", stat_time:"Время просмотра · тап",
     cp_title:"Твой кинопрофиль", cp_dir:"Топ режиссёров", cp_cine:"Топ операторов", cp_comp:"Топ композиторов", cp_act:"Топ актёров",
@@ -2777,7 +2783,7 @@ const I18N = {
     email_sent:"Ми надіслали посилання для підтвердження на твою пошту.<br>Натисни його, щоб активувати акаунт.",
     check_spam:"Не отримав? Перевір папку «Спам».",
     sign_in:"Увійти", sign_up:"Створити акаунт", close:"Закрити", sign_out:"Вийти",
-    tab_search:"🔍 Пошук", tab_picks:"✨ Поради", tab_lists:"📋 Списки", tab_inbox:"📬 Вхідні", tab_inbox_label:"Вхідні",
+    tab_search:"Пошук", tab_picks:"Поради", tab_lists:"Списки", tab_inbox:"Вхідні", tab_inbox_label:"Вхідні",
     tab_watched:"✓ Переглянуто", new_list_tab:"+ Новий",
     stat_watched:"Переглянуто", stat_to_watch:"До перегляду", stat_avg:"Сер. ★", stat_time:"Час перегляду · тап",
     cp_title:"Твій кінопрофіль", cp_dir:"Топ режисерів", cp_cine:"Топ операторів", cp_comp:"Топ композиторів", cp_act:"Топ акторів",
@@ -2828,7 +2834,7 @@ const I18N = {
     email_sent:"დადასტურების ბმული გამოგზავნილია შენს ელფოსტაზე.<br>დააჭირე ანგარიშის გასააქტიურებლად.",
     check_spam:"ვერ მიიღე? შეამოწმე სპამის საქაღალდე.",
     sign_in:"შესვლა", sign_up:"ანგარიშის შექმნა", close:"დახურვა", sign_out:"გასვლა",
-    tab_search:"🔍 ძებნა", tab_picks:"✨ რჩევები", tab_lists:"📋 სიები", tab_inbox:"📬 შემოსული", tab_inbox_label:"შემოსული",
+    tab_search:"ძებნა", tab_picks:"რჩევები", tab_lists:"სიები", tab_inbox:"შემოსული", tab_inbox_label:"შემოსული",
     tab_watched:"✓ ნანახი", new_list_tab:"+ ახალი",
     stat_watched:"ნანახი", stat_to_watch:"სანახავი", stat_avg:"საშ. ★", stat_time:"ნახვის დრო · შეხება",
     cp_title:"შენი კინოპროფილი", cp_dir:"ტოპ რეჟისორები", cp_cine:"ტოპ ოპერატორები", cp_comp:"ტოპ კომპოზიტორები", cp_act:"ტოპ მსახიობები",
@@ -2879,7 +2885,7 @@ const I18N = {
     email_sent:"Te enviamos un enlace de confirmación a tu correo.<br>Haz clic para activar tu cuenta.",
     check_spam:"¿No llegó? Revisa tu carpeta de spam.",
     sign_in:"Iniciar sesión", sign_up:"Crear cuenta", close:"Cerrar", sign_out:"Cerrar sesión",
-    tab_search:"🔍 Buscar", tab_picks:"✨ Sugerencias", tab_lists:"📋 Listas", tab_inbox:"📬 Bandeja", tab_inbox_label:"Bandeja",
+    tab_search:"Buscar", tab_picks:"Sugerencias", tab_lists:"Listas", tab_inbox:"Bandeja", tab_inbox_label:"Bandeja",
     tab_watched:"✓ Vistas", new_list_tab:"+ Nueva",
     stat_watched:"Vistas", stat_to_watch:"Por ver", stat_avg:"Prom. ★", stat_time:"Tiempo visto · toca",
     cp_title:"Tu perfil de cine", cp_dir:"Top directores", cp_cine:"Top dir. de fotografía", cp_comp:"Top compositores", cp_act:"Top actores",
@@ -2930,7 +2936,7 @@ const I18N = {
     email_sent:"Nous avons envoyé un lien de confirmation à votre e-mail.<br>Cliquez dessus pour activer votre compte.",
     check_spam:"Rien reçu ? Vérifiez vos spams.",
     sign_in:"Se connecter", sign_up:"Créer un compte", close:"Fermer", sign_out:"Se déconnecter",
-    tab_search:"🔍 Recherche", tab_picks:"✨ Suggestions", tab_lists:"📋 Listes", tab_inbox:"📬 Boîte", tab_inbox_label:"Boîte",
+    tab_search:"Recherche", tab_picks:"Suggestions", tab_lists:"Listes", tab_inbox:"Boîte", tab_inbox_label:"Boîte",
     tab_watched:"✓ Vus", new_list_tab:"+ Nouvelle",
     stat_watched:"Vus", stat_to_watch:"À voir", stat_avg:"Moy. ★", stat_time:"Temps vu · touchez",
     cp_title:"Votre profil ciné", cp_dir:"Top réalisateurs", cp_cine:"Top chefs opérateurs", cp_comp:"Top compositeurs", cp_act:"Top acteurs",
@@ -2981,7 +2987,7 @@ const I18N = {
     email_sent:"Wir haben einen Bestätigungslink an deine E-Mail gesendet.<br>Klicke darauf, um dein Konto zu aktivieren.",
     check_spam:"Nichts erhalten? Schau in deinem Spam-Ordner nach.",
     sign_in:"Anmelden", sign_up:"Konto erstellen", close:"Schließen", sign_out:"Abmelden",
-    tab_search:"🔍 Suche", tab_picks:"✨ Tipps", tab_lists:"📋 Listen", tab_inbox:"📬 Postfach", tab_inbox_label:"Postfach",
+    tab_search:"Suche", tab_picks:"Tipps", tab_lists:"Listen", tab_inbox:"Postfach", tab_inbox_label:"Postfach",
     tab_watched:"✓ Gesehen", new_list_tab:"+ Neu",
     stat_watched:"Gesehen", stat_to_watch:"Geplant", stat_avg:"Ø ★", stat_time:"Sehzeit · tippen",
     cp_title:"Dein Kinoprofil", cp_dir:"Top-Regisseure", cp_cine:"Top-Kameraleute", cp_comp:"Top-Komponisten", cp_act:"Top-Schauspieler",
@@ -3032,7 +3038,7 @@ const I18N = {
     email_sent:"Abbiamo inviato un link di conferma alla tua e-mail.<br>Cliccaci sopra per attivare il tuo account.",
     check_spam:"Non l'hai ricevuto? Controlla la cartella spam.",
     sign_in:"Accedi", sign_up:"Crea un account", close:"Chiudi", sign_out:"Esci",
-    tab_search:"🔍 Cerca", tab_picks:"✨ Consigli", tab_lists:"📋 Liste", tab_inbox:"📬 Posta", tab_inbox_label:"Posta",
+    tab_search:"Cerca", tab_picks:"Consigli", tab_lists:"Liste", tab_inbox:"Posta", tab_inbox_label:"Posta",
     tab_watched:"✓ Visti", new_list_tab:"+ Nuova",
     stat_watched:"Visti", stat_to_watch:"Da vedere", stat_avg:"Media ★", stat_time:"Tempo visione · tocca",
     cp_title:"Il tuo profilo cinema", cp_dir:"Top registi", cp_cine:"Top direttori della fotografia", cp_comp:"Top compositori", cp_act:"Top attori",
@@ -7448,6 +7454,49 @@ function _renderInvThread(inv) {
   </div>`;
 }
 
+// ── Icons (Lucide, ISC licence) ───────────────────────────────────────────────
+// Emoji were doing the work of interface icons - search, close, inbox, link - which
+// is the loudest "hobby project" tell there is, and they render differently on every
+// platform, so the same button looked unlike itself across devices. These are real
+// vector glyphs: one stroke weight, one optical size, identical everywhere, and they
+// inherit currentColor so they follow the theme without extra rules.
+const ICONS = {
+  "camera": '<path d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z" /><circle cx="12" cy="13" r="3" />',
+  "check": '<path d="M20 6 9 17l-5-5" />',
+  "film": '<rect width="18" height="18" x="3" y="3" rx="2" /><path d="M7 3v18" /><path d="M3 7.5h4" /><path d="M3 12h18" /><path d="M3 16.5h4" /><path d="M17 3v18" /><path d="M17 7.5h4" /><path d="M17 16.5h4" />',
+  "globe": '<circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /><path d="M2 12h20" />',
+  "inbox": '<polyline points="22 12 16 12 14 15 10 15 8 12 2 12" /><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />',
+  "key": '<path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4" /><path d="m21 2-9.6 9.6" /><circle cx="7.5" cy="15.5" r="5.5" />',
+  "link": '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />',
+  "list-checks": '<path d="M13 5h8" /><path d="M13 12h8" /><path d="M13 19h8" /><path d="m3 17 2 2 4-4" /><path d="m3 7 2 2 4-4" />',
+  "message-circle": '<path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" />',
+  "moon": '<path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />',
+  "music": '<path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" />',
+  "pencil": '<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /><path d="m15 5 4 4" />',
+  "popcorn": '<path d="M18 8a2 2 0 0 0 0-4 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0 0 4" /><path d="M10 22 9 8" /><path d="m14 22 1-14" /><path d="M20 8c.5 0 .9.4.8 1l-2.6 12c-.1.5-.7 1-1.2 1H7c-.6 0-1.1-.4-1.2-1L3.2 9c-.1-.6.3-1 .8-1Z" />',
+  "refresh-cw": '<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 16H3v5" />',
+  "search": '<path d="m21 21-4.34-4.34" /><circle cx="11" cy="11" r="8" />',
+  "send": '<path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" /><path d="m21.854 2.147-10.94 10.939" />',
+  "sparkles": '<path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" /><path d="M20 2v4" /><path d="M22 4h-4" /><circle cx="4" cy="20" r="2" />',
+  "triangle-alert": '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" /><path d="M12 9v4" /><path d="M12 17h.01" />',
+  "user": '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />',
+  "users": '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><path d="M16 3.128a4 4 0 0 1 0 7.744" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><circle cx="9" cy="7" r="4" />',
+  "x": '<path d="M18 6 6 18" /><path d="m6 6 12 12" />'
+};
+function icon(name, size = 16) {
+  const d = ICONS[name];
+  if (!d) return '';
+  return `<svg class="ic" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+}
+// Fills every <span data-ic="name"> in static markup, so the HTML stays readable
+// instead of carrying inline SVG. Safe to call repeatedly.
+function _paintIcons(root) {
+  (root || document).querySelectorAll('[data-ic]').forEach(el => {
+    const size = Number(el.dataset.icSize) || 18;
+    el.innerHTML = icon(el.dataset.ic, size);
+  });
+}
+
 function escapeHtml(s) {
   return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
 }
@@ -9435,6 +9484,7 @@ function initUI() {
   if(session){await onSignedIn(session.user);}
   else{ if(!_maybeShowOnboarding()) showScreen("signin"); }
   _applyI18n(); // apply stored language preference to static elements
+  _paintIcons(); // swap data-ic placeholders for real vector glyphs
   _checkJoinToken(); // capture ?join= before anything else
   _checkFriendInvite(); // capture ?friend= referral before anything else
   sbClient.auth.onAuthStateChange(async(event,session)=>{
