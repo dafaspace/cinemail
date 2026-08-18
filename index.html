@@ -12,6 +12,7 @@
 <meta name="theme-color" content="#0d0d1a">
 <link rel="apple-touch-icon" href="icon.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./emoji.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -2584,7 +2585,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.37.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.38.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -5114,8 +5115,13 @@ function _avatarMarkup(userId, fallbackName, size, cls) {
   const p = _profileCache[userId] || {};
   const rawColor = p.color || '#7c3aed';
   const color = /^#[0-9a-fA-F]{3,8}$/.test(rawColor) ? rawColor : '#7c3aed'; // reject CSS/attr injection via profile color
-  const label = p.emoji || (p.name || fallbackName || '?').charAt(0).toUpperCase();
-  return `<div class="${cls || ''}" style="width:${size}px;height:${size}px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.5)}px;line-height:1;flex-shrink:0;color:${_avatarInk(color)}">${escapeHtml(label)}</div>`;
+  // Draw the bundled glyph when we have one. System emoji are a different picture on
+  // every platform, which is the wrong property for something that identifies a person.
+  const em = p.emoji;
+  const label = (em && typeof EMOJI_SVG !== 'undefined' && EMOJI_SVG[em])
+    ? `<svg viewBox="0 0 36 36" width="${Math.round(size*0.62)}" height="${Math.round(size*0.62)}" aria-hidden="true">${EMOJI_SVG[em]}</svg>`
+    : escapeHtml(em || (p.name || fallbackName || '?').charAt(0).toUpperCase());
+  return `<div class="${cls || ''}" style="width:${size}px;height:${size}px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.5)}px;line-height:1;flex-shrink:0;color:${_avatarInk(color)}">${label}</div>`;
 }
 
 // ── Lightbox ──────────────────────────────────────────────────────────────────

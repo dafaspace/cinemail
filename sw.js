@@ -1,5 +1,5 @@
 // ── Cache version — bump this string on every deploy to force refresh ──────────
-const CACHE_VERSION = "v153";
+const CACHE_VERSION = "v154";
 const CACHE_NAME = "cinemail-" + CACHE_VERSION;
 
 // Files to cache for offline use
@@ -9,6 +9,7 @@ const PRECACHE = [
   "./manifest.json",
   "./logo.png",
   "./exceljs.min.js",
+  "./emoji.js",
 ];
 
 // Minimal branded offline page — last-resort fallback so a home-screen launch with
