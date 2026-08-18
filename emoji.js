@@ -7,7 +7,11 @@
 // Order is row-major, six per row, and must match the sheet exactly - a wrong index
 // silently shows the neighbouring character rather than failing, so ORDER below is the
 // single source of truth for both the picker and the avatar.
-const AVATAR_SPRITE = "./avatars.webp?v=0.44.0";
+const AVATAR_SPRITE = "./avatars.webp?v=0.45.0";     // the ink
+// The subject's filled shape. With a sheet of paper under the drawing the card can be
+// the exact palette colour: the ink stays dark and legible on top of the paper, so the
+// colour never has to be lightened to carry it, and it never has to be inverted either.
+const AVATAR_FILL = "./avatars-fill.webp?v=0.45.0";
 const AVATAR_COLS = 6;
 // Grouped, not arbitrary: the picker is 62 circles now, and it reads as sections -
 // animals, then creatures, then monsters, then magic folk, then people, then the
@@ -101,5 +105,7 @@ function avatarSpriteStyle(key) {
 // One place holds the sprite URL for CSS, so the versioned filename is not repeated
 // into every element's inline style.
 if (typeof document !== "undefined") {
-  document.documentElement.style.setProperty("--av-sprite", `url(${AVATAR_SPRITE})`);
+  const root = document.documentElement.style;
+  root.setProperty("--av-sprite", `url(${AVATAR_SPRITE})`);
+  root.setProperty("--av-fill", `url(${AVATAR_FILL})`);
 }

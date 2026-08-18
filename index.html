@@ -14,9 +14,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- Versioned on purpose. index.html is served network-first while assets are
      cache-first, so without the query a fresh page could load a cached older
-     emoji.js - which is exactly what emptied the avatar picker after v0.44.0.
+     emoji.js - which is exactly what emptied the avatar picker after v0.45.0.
      Bump this with the release; sw.js precaches the same URL. -->
-<script src="./emoji.js?v=0.44.0"></script>
+<script src="./emoji.js?v=0.45.0"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1725,13 +1725,18 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
    disc used to be lightened to 74% - and why white and dark grey came out identical.
    -webkit-mask carries WKWebView and older Safari; the unprefixed form is the standard. */
 .av-glyph { position:relative; overflow:hidden; }
-.av-glyph::after {
-  content:''; position:absolute; inset:0; background:var(--av-ink,#141420);
-  -webkit-mask-image:var(--av-sprite); mask-image:var(--av-sprite);
+.av-glyph::before, .av-glyph::after {
+  content:''; position:absolute; inset:0;
   -webkit-mask-size:var(--av-size); mask-size:var(--av-size);
   -webkit-mask-position:var(--av-pos); mask-position:var(--av-pos);
   -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
 }
+/* Paper first, ink on top. Two layers rather than one is what lets the card below stay
+   the exact colour that was picked. */
+.av-glyph::before { background:var(--av-paper,#EEECE4);
+  -webkit-mask-image:var(--av-fill); mask-image:var(--av-fill); }
+.av-glyph::after  { background:var(--av-ink,#141420);
+  -webkit-mask-image:var(--av-sprite); mask-image:var(--av-sprite); }
 
 /* Round, not the old 8px square: the picker now draws the same disc the avatar does,
    so what you tap is exactly what other people will see. */
@@ -2605,7 +2610,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.44.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.45.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -5121,29 +5126,22 @@ function _hslToHex(h, s, l) {
   return '#' + [r, g, b].map(v => Math.round((v + m) * 255).toString(16).padStart(2, '0')).join('');
 }
 
-// The card carries the chosen palette colour, lifted in lightness ONLY as far as it
-// must be to hold near-black ink - and not one step further.
+// The card is the chosen palette colour, exactly as it appears in the picker dots.
 //
-// Two earlier attempts got this wrong in opposite directions. Forcing every colour to
+// Getting here took three wrong turns worth remembering. Forcing every colour to
 // hsl(h, s, 74%) threw away its own lightness, so #EDEDF2 and #3A3A4A rendered as the
-// same pale tone: two of the eight choices were indistinguishable. Leaving the colours
-// at full strength and flipping the ink to white instead produced a photographic
-// negative rather than a chalk drawing - these are pen-and-ink pieces, so their darks
-// are eyes and shadows, and painting the darks white made every animal's eyes glow.
+// same pale tone. Leaving the colours at full strength and flipping the ink to white
+// produced a photographic negative rather than a chalk drawing - these are pen-and-ink
+// pieces, so their darks are pupils and hatching, and painting the darks white made
+// every animal's eyes glow. Lifting each colour only as far as it needed to carry dark
+// ink fixed the legibility but still washed six of the eight out, and turned the near
+// black into a muddy lavender that read as neither black nor white.
 //
-// Lifting per-colour keeps both properties: gold and white are already bright enough
-// and are returned untouched, while the dark entries keep their own hue and stay apart
-// from each other.
+// The drawing now sits on its own sheet of paper - a second sprite holding the
+// subject's filled silhouette - so the ink never touches the card at all. That removes
+// the constraint entirely: the colour can be anything, including the true near-black.
 function _avatarDiscColor(hex) {
-  if (!/^#[0-9a-fA-F]{6}$/.test(hex)) hex = '#F5C518';
-  if (_relLum(hex) >= _AV_TARGET_LUM) return hex;
-  const [h, s] = _hexToHsl(hex);
-  let lo = 0, hi = 1;
-  for (let i = 0; i < 24; i++) {
-    const mid = (lo + hi) / 2;
-    if (_relLum(_hslToHex(h, s, mid)) < _AV_TARGET_LUM) lo = mid; else hi = mid;
-  }
-  return _hslToHex(h, s, hi);
+  return /^#[0-9a-fA-F]{6}$/.test(hex) ? hex : '#F5C518';
 }
 // Always the dark ink: the drawings are ink on paper, and there is no inversion of them
 // that reads as chalk. See _avatarDiscColor for why the card moves instead.
