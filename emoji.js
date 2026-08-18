@@ -7,7 +7,7 @@
 // Order is row-major, six per row, and must match the sheet exactly - a wrong index
 // silently shows the neighbouring character rather than failing, so ORDER below is the
 // single source of truth for both the picker and the avatar.
-const AVATAR_SPRITE = "./avatars.webp";
+const AVATAR_SPRITE = "./avatars.webp?v=0.43.1";
 const AVATAR_COLS = 6;
 // Grouped, not arbitrary: the picker is 62 circles now, and it reads as sections -
 // animals, then creatures, then monsters, then magic folk, then people, then the

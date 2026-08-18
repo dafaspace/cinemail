@@ -12,7 +12,11 @@
 <meta name="theme-color" content="#0d0d1a">
 <link rel="apple-touch-icon" href="icon.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./emoji.js"></script>
+<!-- Versioned on purpose. index.html is served network-first while assets are
+     cache-first, so without the query a fresh page could load a cached older
+     emoji.js - which is exactly what emptied the avatar picker after v0.43.1.
+     Bump this with the release; sw.js precaches the same URL. -->
+<script src="./emoji.js?v=0.43.1"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -2587,7 +2591,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.43.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.43.1</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3110,7 +3114,7 @@ const _I18N_EXTRA = {
     continue_as_guest:"Start without an account", guest_label:"Guest", guest_banner:"Saved on this device only", guest_join_btn:"Join Cinemail", guest_save_sub:"Keep your films safe across devices and share them with friends - free forever.", guest_join_free:"Join free", guest_maybe_later:"Maybe later", guest_already_acct:"Already have an account?",
   },
   ru: {
-    empty_search_title:"Найди свой следующий фильм", recs_ph:"Настроение, жанр, что угодно…", empty_search_sub:"Введи название и нажми Поиск",
+    empty_search_title:"Найди свой следующий фильм", recs_ph:"Настроение, жанр, что угодно…", empty_search_sub:"Введи название и нажми «Найти»",
     list_rename:"Переименовать", list_invite:"Пригласить", list_link:"Ссылка", list_delete:"Удалить", list_leave:"Покинуть",
     list_members_title:"Участники", list_remove:"Убрать", you_label:"(вы)", role_owner:"владелец", role_member:"участник",
     list_invite_to:"Пригласить в", list_invite_link_for:"Ссылка-приглашение в", list_select_friend:"Выбери друга:",
@@ -3158,7 +3162,7 @@ const _I18N_EXTRA = {
     continue_as_guest:"Почати без акаунта", guest_label:"Гість", guest_banner:"Зберігається лише на цьому пристрої", guest_join_btn:"Створити акаунт", guest_save_sub:"Збережи фільми на всіх пристроях і ділись з друзями - безкоштовно назавжди.", guest_join_free:"Зареєструватися безкоштовно", guest_maybe_later:"Пізніше", guest_already_acct:"Вже є акаунт?",
   },
   ka: {
-    empty_search_title:"იპოვე შენი შემდეგი ფილმი", recs_ph:"განწყობა, ჟანრი ან ნებისმიერი…", empty_search_sub:"აკრიფე სათაური და დააჭირე ძიებას",
+    empty_search_title:"იპოვე შენი შემდეგი ფილმი", recs_ph:"განწყობა, ჟანრი ან ნებისმიერი…", empty_search_sub:"აკრიფე სათაური და დააჭირე „ძებნას“",
     list_rename:"გადარქმევა", list_invite:"მოწვევა", list_link:"ბმული", list_delete:"წაშლა", list_leave:"დატოვება",
     list_members_title:"წევრები", list_remove:"ამოშლა", you_label:"(შენ)", role_owner:"მფლობელი", role_member:"წევრი",
     list_invite_to:"მოწვევა სიაში", list_invite_link_for:"მოსაწვევი ბმული", list_select_friend:"აირჩიე მეგობარი:",
@@ -5033,6 +5037,13 @@ function closeDetail() {
 // picker reads straight from the sprite's own order and cannot drift out of sync
 // with it - which is what a parallel list of 36 emoji was always at risk of doing.
 const _AVATAR_EMOJIS = (typeof AVATAR_ORDER !== 'undefined') ? AVATAR_ORDER : [];
+if (!_AVATAR_EMOJIS.length) {
+  // emoji.js failed to load or is an older copy without AVATAR_ORDER. Silently this
+  // renders a picker with a colour row and no drawings at all - which is exactly how
+  // it looked after v0.43.0 paired a fresh index.html with a cached older emoji.js.
+  // Say so, so the next occurrence is one console line rather than a hunt.
+  console.error('[avatars] emoji.js missing or stale: AVATAR_ORDER is empty, the picker will have no drawings');
+}
 const _AVATAR_COLORS = [
   '#F5C518', // brand gold (default)
   '#EDEDF2', // brand white
@@ -7931,6 +7942,19 @@ async function openAccount() {
     return;
   }
 
+  // Paint the name we already hold BEFORE touching the network. The static markup
+  // carries the literal "User", and the real name used to be written only after the
+  // awaited profile query below - so opening the panel showed "User" for the length of
+  // a round-trip, then swapped, and the row's height change shifted everything under
+  // it. currentUser already has a usable name; the query only refines it.
+  const known = currentUser.displayName || currentUser.email?.split("@")[0] || "";
+  if (known) {
+    document.getElementById("acc-name-display").textContent = known;
+    document.getElementById("acc-name-input").value = known;
+  }
+  document.getElementById("acc-email-display").textContent = currentUser.email || "";
+  _applyAvatar();
+
   // Always re-fetch display name from DB to avoid stale cache
   try {
     const { data: pd } = await sbClient.from("profiles").select("display_name").eq("id", currentUser.id).limit(1);
@@ -7939,10 +7963,11 @@ async function openAccount() {
 
   const name = currentUser.displayName || currentUser.email?.split("@")[0] || "User";
   const initial = name.charAt(0).toUpperCase();
-  _applyAvatar();
-  document.getElementById("acc-name-display").textContent = name;
-  document.getElementById("acc-email-display").textContent = currentUser.email || "";
-  document.getElementById("acc-name-input").value = name;
+  if (name !== known) {
+    _applyAvatar();
+    document.getElementById("acc-name-display").textContent = name;
+    document.getElementById("acc-name-input").value = name;
+  }
 
   // Render IMMEDIATELY from current cache — no layout jump while history fetches.
   _updateAccountStats();
