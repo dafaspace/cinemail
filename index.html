@@ -14,9 +14,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- Versioned on purpose. index.html is served network-first while assets are
      cache-first, so without the query a fresh page could load a cached older
-     emoji.js - which is exactly what emptied the avatar picker after v0.47.1.
+     emoji.js - which is exactly what emptied the avatar picker after v0.47.2.
      Bump this with the release; sw.js precaches the same URL. -->
-<script src="./emoji.js?v=0.47.1"></script>
+<script src="./emoji.js?v=0.47.2"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -262,7 +262,9 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 
 /* ── Avatar button — yellow as requested ───────────────────────────── */
 .avatar-btn {
-  width: 32px; height: 32px;
+  /* On screen at all times, and it stayed at 32 while every other avatar grew. The
+     topbar is 52px, so 38 still leaves 7px of clearance above and below. */
+  width: 38px; height: 38px;
   border-radius: 50%;
   background: var(--primary);
   border: none;
@@ -1728,9 +1730,13 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
    dark one. Drawing the sprite as a picture forces near-black ink, which is why the
    disc used to be lightened to 74% - and why white and dark grey came out identical.
    -webkit-mask carries WKWebView and older Safari; the unprefixed form is the standard. */
-.av-glyph { position:relative; overflow:hidden; }
+/* The two layers clip themselves to the circle. overflow:hidden on the element did
+   the same job but also cut off anything positioned outside it - the friend-request
+   badge sits at top:-4px right:-4px on the nav avatar and vanished the moment a
+   drawing was chosen, while the initials version kept it. */
+.av-glyph { position:relative; }
 .av-glyph::before, .av-glyph::after {
-  content:''; position:absolute; inset:0;
+  content:''; position:absolute; inset:0; border-radius:inherit;
   -webkit-mask-size:var(--av-size); mask-size:var(--av-size);
   -webkit-mask-position:var(--av-pos); mask-position:var(--av-pos);
   -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
@@ -2620,7 +2626,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.47.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.47.2</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -5189,7 +5195,7 @@ function _applyAvatar() {
   const navAv = document.getElementById('btn-avatar');
   if (navAv) {
     const badge = navAv.querySelector('.friend-req-badge');
-    paint(navAv, '15px');
+    paint(navAv, '17px');
     if (badge) navAv.appendChild(badge);   // paint() clears the node, so re-attach it
     navAv.style.transition = 'background-color 0.2s';
   }
