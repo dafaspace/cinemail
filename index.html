@@ -14,9 +14,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- Versioned on purpose. index.html is served network-first while assets are
      cache-first, so without the query a fresh page could load a cached older
-     emoji.js - which is exactly what emptied the avatar picker after v0.47.0.
+     emoji.js - which is exactly what emptied the avatar picker after v0.47.1.
      Bump this with the release; sw.js precaches the same URL. -->
-<script src="./emoji.js?v=0.47.0"></script>
+<script src="./emoji.js?v=0.47.1"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1016,7 +1016,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 
 /* ── Account modal ──────────────────────────────────────────────────── */
 .acc-avatar {
-  width: 68px; height: 68px;
+  width: 76px; height: 76px;
   border-radius: 50%;
   background: var(--primary);
   border: none;
@@ -1875,7 +1875,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     <div class="ob-slide">
       <div class="ob-mock">
         <div class="ob-mock-search">
-          <span style="opacity:0.4;font-size:13px">🔍</span>
+          <span style="opacity:0.4;display:flex" data-ic="search" data-ic-size="13"></span>
           <span style="color:var(--text);font-size:13px">The Phoenician Scheme</span>
         </div>
         <div style="display:flex;gap:11px;margin-top:11px">
@@ -1884,7 +1884,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
             <div class="hist-title">The Phoenician Scheme</div>
             <div class="hist-meta">2025 · Comedy</div>
             <div class="rating-badge" style="font-size:14px;margin-top:3px">★ 6.5 <span>/ 10 TMDB</span></div>
-            <div class="crew-label" style="margin-top:7px">🎬 Director</div>
+            <div class="crew-label" style="margin-top:7px"><span data-ic="film" data-ic-size="13"></span> Director</div>
             <div class="crew-val" style="margin-bottom:0">Wes Anderson</div>
           </div>
         </div>
@@ -1975,7 +1975,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
             <div class="hist-meta">1976 · Drama</div>
           </div>
         </div>
-        <div class="crew-label">🎵 Composer</div>
+        <div class="crew-label"><span data-ic="music" data-ic-size="13"></span> Composer</div>
         <div class="crew-val" style="margin-bottom:8px">Bernard Herrmann</div>
         <div class="ob-mock-stream-row">
           <div class="ob-mock-stream-btn spotify">
@@ -2008,11 +2008,11 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
             <div class="hist-meta">2017 · Sci-Fi · ★ 7.6</div>
           </div>
         </div>
-        <div class="crew-label">🎬 Director</div>
+        <div class="crew-label"><span data-ic="film" data-ic-size="13"></span> Director</div>
         <div class="crew-val" style="margin-bottom:7px"><span style="color:#ddd;border-bottom:1px dotted rgba(255,255,255,0.25)">Denis Villeneuve</span></div>
         <div class="crew-label"><span data-ic="camera" data-ic-size="13"></span> Cinematography</div>
         <div class="crew-val" style="margin-bottom:7px"><span style="color:#ddd;border-bottom:1px dotted rgba(255,255,255,0.25)">Roger Deakins</span></div>
-        <div class="crew-label">🎵 Composer</div>
+        <div class="crew-label"><span data-ic="music" data-ic-size="13"></span> Composer</div>
         <div class="crew-val" style="margin-bottom:0"><span style="color:#ddd;border-bottom:1px dotted rgba(255,255,255,0.25)">Hans Zimmer</span></div>
       </div>
       <div class="ob-arr">
@@ -2056,7 +2056,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     <div class="ob-slide">
       <div class="ob-mock">
         <div class="ob-mock-acc-hd" style="margin-bottom:10px">
-          <div class="ob-mock-acc-av">🦊</div>
+          <div class="ob-mock-acc-av av-glyph" id="ob-mock-av"></div>
           <div style="flex:1;min-width:0">
             <div style="font-size:13px;font-weight:600;color:var(--text)">Felicity</div>
             <div style="font-size:11px;color:var(--muted)">fantastic_felicity@gmail.com</div>
@@ -2586,7 +2586,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <button class="lang-btn" data-lang="it" onclick="setLang('it')">IT</button>
       </div>
 
-      <button onclick="replayOnboarding()" data-i18n="replay_onboarding" style="width:100%;padding:9px;border-radius:9px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;margin-bottom:14px;transition:all 0.15s" onmouseover="this.style.borderColor='var(--accent-border)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">🎬 Replay Welcome Tour</button>
+      <button onclick="replayOnboarding()" style="width:100%;padding:9px;border-radius:9px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;margin-bottom:14px;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:7px" onmouseover="this.style.borderColor='var(--accent-border)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"><span data-ic="film" data-ic-size="14"></span><span data-i18n="replay_onboarding">Replay Welcome Tour</span></button>
 
       <!-- Support Cinemail -->
       <div style="margin-bottom:14px;padding:12px 14px;background:rgba(255,140,40,0.06);border:1px solid rgba(255,140,40,0.22);border-radius:10px;font-size:12px;line-height:1.55">
@@ -2620,7 +2620,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.47.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.47.1</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -2749,7 +2749,7 @@ const I18N = {
     friend_search_ph:"Search by name to add…",
     invite_to_app:"✨ Invite friends to Cinemail",
     delete_account:"Delete account",
-    replay_onboarding:"🎬 Replay Welcome Tour",
+    replay_onboarding:"Replay Welcome Tour",
     support_title:"Support Cinemail",
     support_text:"Early supporters get lifetime Pro features free when Cinemail goes paid on the App Store &amp; Google Play.",
     support_button:"Support on Ko-fi →",
@@ -2800,7 +2800,7 @@ const I18N = {
     friend_search_ph:"Поиск по имени…",
     invite_to_app:"✨ Пригласить друзей в Cinemail",
     delete_account:"Удалить аккаунт",
-    replay_onboarding:"🎬 Пройти тур заново",
+    replay_onboarding:"Пройти тур заново",
     support_title:"Поддержать Cinemail",
     support_text:"Поддержавшие на этом этапе получат пожизненный Pro бесплатно, когда Cinemail станет платным в App Store и Google Play.",
     support_button:"Поддержать на Ko-fi →",
@@ -2851,7 +2851,7 @@ const I18N = {
     friend_search_ph:"Шукай за ім'ям…",
     invite_to_app:"✨ Запросити друзів у Cinemail",
     delete_account:"Видалити акаунт",
-    replay_onboarding:"🎬 Повторити знайомство",
+    replay_onboarding:"Повторити знайомство",
     support_title:"Підтримати Cinemail",
     support_text:"Ранні прихильники отримають Pro назавжди безкоштовно, коли Cinemail стане платним в App Store та Google Play.",
     support_button:"Підтримати на Ko-fi →",
@@ -2902,7 +2902,7 @@ const I18N = {
     friend_search_ph:"მოძებნე სახელით…",
     invite_to_app:"✨ მოიწვიე მეგობრები Cinemail-ში",
     delete_account:"ანგარიშის წაშლა",
-    replay_onboarding:"🎬 გაცნობის გამეორება",
+    replay_onboarding:"გაცნობის გამეორება",
     support_title:"დაუჭირე მხარი Cinemail-ს",
     support_text:"ადრეული მხარდამჭერები მიიღებენ Pro-ს სამუდამოდ უფასოდ, როცა Cinemail გახდება ფასიანი App Store-სა და Google Play-ში.",
     support_button:"მხარდაჭერა Ko-fi-ზე →",
@@ -2953,7 +2953,7 @@ const I18N = {
     friend_search_ph:"Busca por nombre…",
     invite_to_app:"✨ Invita a amigos a Cinemail",
     delete_account:"Eliminar cuenta",
-    replay_onboarding:"🎬 Repetir introducción",
+    replay_onboarding:"Repetir introducción",
     support_title:"Apoya a Cinemail",
     support_text:"Quienes apoyen ahora tendrán las funciones Pro gratis de por vida cuando Cinemail sea de pago en App Store y Google Play.",
     support_button:"Apoyar en Ko-fi →",
@@ -3004,7 +3004,7 @@ const I18N = {
     friend_search_ph:"Rechercher par nom…",
     invite_to_app:"✨ Inviter des amis sur Cinemail",
     delete_account:"Supprimer le compte",
-    replay_onboarding:"🎬 Revoir l'introduction",
+    replay_onboarding:"Revoir l'introduction",
     support_title:"Soutenir Cinemail",
     support_text:"Les premiers soutiens obtiennent les fonctions Pro gratuites à vie lorsque Cinemail deviendra payant sur l'App Store et Google Play.",
     support_button:"Soutenir sur Ko-fi →",
@@ -3055,7 +3055,7 @@ const I18N = {
     friend_search_ph:"Nach Namen suchen…",
     invite_to_app:"✨ Lade Freunde zu Cinemail ein",
     delete_account:"Konto löschen",
-    replay_onboarding:"🎬 Tour erneut ansehen",
+    replay_onboarding:"Tour erneut ansehen",
     support_title:"Cinemail unterstützen",
     support_text:"Frühe Unterstützer erhalten lebenslang kostenlose Pro-Funktionen, wenn Cinemail im App Store &amp; bei Google Play kostenpflichtig wird.",
     support_button:"Auf Ko-fi unterstützen →",
@@ -3106,7 +3106,7 @@ const I18N = {
     friend_search_ph:"Cerca per nome…",
     invite_to_app:"✨ Invita amici su Cinemail",
     delete_account:"Elimina account",
-    replay_onboarding:"🎬 Rivedi l'introduzione",
+    replay_onboarding:"Rivedi l'introduzione",
     support_title:"Sostieni Cinemail",
     support_text:"I primi sostenitori ottengono le funzioni Pro gratis a vita quando Cinemail diventerà a pagamento su App Store e Google Play.",
     support_button:"Sostieni su Ko-fi →",
@@ -4673,9 +4673,9 @@ function posterHTML(src, title, w=56, h=80, lightbox=false) {
     const safeTitle = (title||'').replace(/\\/g,'\\\\').replace(/'/g, "\\'").replace(/"/g,'&quot;');
     const imgClass = lightbox ? 'class="poster-zoomable"' : '';
     const imgClick = lightbox ? `onclick="event.stopPropagation();openLightbox('${src}','${safeTitle}')"` : '';
-    return `<div style="${s}"><img src="${src}" alt="${escapeHtml(title||'')}" ${imgClass} ${imgClick} style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.parentNode.innerHTML='🎬'"></div>`;
+    return `<div style="${s}"><img src="${src}" alt="${escapeHtml(title||'')}" ${imgClass} ${imgClick} style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.parentNode.innerHTML=icon('film',26)"></div>`;
   }
-  return `<div style="${s}">🎬</div>`;
+  return `<div style="${s}">${icon('film',26)}</div>`;
 }
 function starsHTML(n, size=13) {
   const v = Number(n) || 0;
@@ -5653,7 +5653,7 @@ function renderHistory() {
     if (isWatchedTab) {
       emptyMsg = `<div class="empty-state"><div class="empty-state-icon">🍿</div><div class="empty-state-title">${t('nothing_yet')}</div><p>${t('mark_seen')}</p></div>`;
     } else if (activeList) {
-      emptyMsg = `<div class="empty-state"><div class="empty-state-icon">🎬</div><div class="empty-state-title">${escapeHtml(activeList.name)}</div><p>${t('empty_shared_sub')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
+      emptyMsg = `<div class="empty-state"><div class="empty-state-icon">${icon('film',34)}</div><div class="empty-state-title">${escapeHtml(activeList.name)}</div><p>${t('empty_shared_sub')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
     } else {
       emptyMsg = `<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">${t('nothing_yet')}</div><p>${t('save_to_list')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
     }
@@ -5698,7 +5698,7 @@ function renderHistory() {
         return `
         <div class="hist-card ${item.status==='plan'?'plan':''}" data-movie-id="${item.id}" onclick="${item.tmdbID?`openDetail('${item.tmdbID}','${item.mediaType||"movie"}')`:''}">
           <div style="display:flex;gap:11px;width:100%">
-            <div class="hist-poster">${item.poster&&item.poster!=="N/A"?`<img src="${item.poster}" alt="" class="poster-zoomable" onclick="event.stopPropagation();openLightbox('${item.poster}','${(item.title||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;')}${item.year?' ('+item.year+')':''}')" onerror="this.parentNode.innerHTML='🎬'"`+`>`:"🎬"}</div>
+            <div class="hist-poster">${item.poster&&item.poster!=="N/A"?`<img src="${item.poster}" alt="" class="poster-zoomable" onclick="event.stopPropagation();openLightbox('${item.poster}','${(item.title||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;')}${item.year?' ('+item.year+')':''}')" onerror="this.parentNode.innerHTML=icon('film',26)"`+`>`:icon('film',22)}</div>
             <div style="flex:1;min-width:0">
               <div class="hist-title">${escapeHtml(item.title)}</div>
               <div class="hist-meta">${item.year} · ${item.date}</div>
@@ -5968,7 +5968,7 @@ function renderFriendsSection() {
     for (const f of _friendRequestsCache) {
       const name = f.user_name || "?";
       html += `<div class="friend-row">
-        ${_avatarMarkup(f.user_id, name, 30)}
+        ${_avatarMarkup(f.user_id, name, 36)}
         <div style="flex:1;font-size:13px">${escapeHtml(name)} <span style="color:var(--muted);font-size:11px">${t('friend_wants')}</span></div>
         <button onclick="respondFriendRequest('${f.id}','accepted')" style="background:var(--accent);border:none;color:#fff;border-radius:6px;padding:4px 10px;font-size:11px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${t('accept')}</button>
         <button onclick="respondFriendRequest('${f.id}','declined')" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#666;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;margin-left:4px">✕</button>
@@ -6004,7 +6004,7 @@ function renderFriendsSection() {
         </div>`;
       } else {
         html += `<div class="friend-row">
-          ${_avatarMarkup(id, name, 30)}
+          ${_avatarMarkup(id, name, 36)}
           <div style="flex:1;font-size:13px">${escapeHtml(name)}</div>
           <button onclick="event.stopPropagation();_friendDeleteConfirmFid='${fid}';renderFriendsSection()"
             style="background:none;border:none;color:#555;font-size:18px;line-height:1;cursor:pointer;padding:6px 8px;margin:-6px -4px" title="${t('list_remove')}">×</button>
@@ -6584,7 +6584,7 @@ function renderListManageStrip() {
       const canKick = isOwner && !isMe && m.role !== 'owner';
       return `<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
         <div style="display:flex;align-items:center;gap:8px">
-          ${_avatarMarkup(m.user_id, m.name, 28)}
+          ${_avatarMarkup(m.user_id, m.name, 34)}
           <div>
             <div style="font-size:13px;color:var(--text)">${escapeHtml(m.name)}${isMe ? ' <span style="color:var(--muted);font-size:11px">'+t('you_label')+'</span>' : ''}</div>
             <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">${m.role === 'owner' ? t('role_owner') : t('role_member')}</div>
@@ -7216,7 +7216,7 @@ function _renderShareFriendsList() {
     const { id, name } = _friendInfo(f);
     const sel = currentShareToUsers.some(u => u.id === id);
     return `<div class="friend-pick-row${sel ? " selected" : ""}" onclick="selectFriendForShare('${id}','${name.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">
-      ${_avatarMarkup(id, name, 30)}
+      ${_avatarMarkup(id, name, 36)}
       <div style="flex:1;font-size:14px">${escapeHtml(name)}</div>
       <span style="color:${sel ? 'var(--accent-text)' : 'var(--border)'};font-size:15px">${sel ? '☑' : '☐'}</span>
     </div>`;
@@ -7431,7 +7431,7 @@ function _renderChatList() {
       : "";
 
     return `<div class="inv-chat-row${hasUnread ? " inv-chat-unread" : ""}" onclick="openChat('${p.id}')">
-      ${_avatarMarkup(p.id, p.name, 40)}
+      ${_avatarMarkup(p.id, p.name, 46)}
       <div style="flex:1;min-width:0">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
           <div style="font-weight:600;font-size:15px">${escapeHtml(p.name)}</div>
@@ -7460,7 +7460,7 @@ function _renderChatDetail(partnerId) {
   el.innerHTML = `
     <div style="display:flex;align-items:center;gap:10px;padding:4px 0 14px">
       <button class="inv-chat-back" onclick="closeChat()">←</button>
-      ${_avatarMarkup(_chatViewPartnerId, partnerName, 32)}
+      ${_avatarMarkup(_chatViewPartnerId, partnerName, 38)}
       <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:18px;letter-spacing:1px">${escapeHtml(partnerName)}</div>
     </div>
     <div class="card-list">${sorted.map(inv => _renderInvCard(inv)).join("")}</div>`;
@@ -7659,6 +7659,16 @@ function icon(name, size = 16) {
 }
 // Fills every <span data-ic="name"> in static markup, so the HTML stays readable
 // instead of carrying inline SVG. Safe to call repeatedly.
+// The onboarding mock shows an account card; its avatar is the real drawing rather
+// than a stand-in, so the tour matches what the picker will actually offer.
+function _paintMockAvatar() {
+  const el = document.getElementById('ob-mock-av');
+  if (!el || typeof avatarMaskVars !== 'function') return;
+  el.style.cssText += ';' + avatarMaskVars('fox');
+  el.style.setProperty('--av-ink', _avatarGlyphInk('#C8693B'));
+  el.style.backgroundColor = _avatarDiscColor('#C8693B');
+}
+
 function _paintIcons(root) {
   (root || document).querySelectorAll('[data-ic]').forEach(el => {
     const size = Number(el.dataset.icSize) || 18;
@@ -9678,6 +9688,7 @@ function initUI() {
   else{ if(!_maybeShowOnboarding()) showScreen("signin"); }
   _applyI18n(); // apply stored language preference to static elements
   _paintIcons(); // swap data-ic placeholders for real vector glyphs
+  _paintMockAvatar(); // the tour's mock account avatar, drawn from the real sprite
   _checkJoinToken(); // capture ?join= before anything else
   _checkFriendInvite(); // capture ?friend= referral before anything else
   sbClient.auth.onAuthStateChange(async(event,session)=>{
