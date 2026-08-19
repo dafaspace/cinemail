@@ -14,9 +14,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- Versioned on purpose. index.html is served network-first while assets are
      cache-first, so without the query a fresh page could load a cached older
-     emoji.js - which is exactly what emptied the avatar picker after v0.46.2.
+     emoji.js - which is exactly what emptied the avatar picker after v0.47.0.
      Bump this with the release; sw.js precaches the same URL. -->
-<script src="./emoji.js?v=0.46.2"></script>
+<script src="./emoji.js?v=0.47.0"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -588,7 +588,11 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   cursor: pointer;
   background: rgba(245,197,24,0.04);
 }
-.stats-block-title { font-size: 11px; color: var(--primary); font-weight: 600; letter-spacing: 0.5px; }
+/* The icon is quiet support, the label carries the colour. Both in gold made them one
+   gold smear, and an inline SVG in a plain div sat flush against the first letter with
+   nothing but a text space between them. */
+.stats-block-title { display: flex; align-items: center; gap: 9px; font-size: 11px; color: var(--primary); font-weight: 600; letter-spacing: 0.5px; }
+.stats-block-title .ic { color: var(--muted); flex-shrink: 0; }
 .stats-block-arrow { color: var(--primary); font-size: 10px; }
 .stats-block-body { display: none; padding: 11px 13px 4px; }
 .stats-bar-row {
@@ -782,7 +786,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   border-radius: 10px;
   border: 1px solid var(--border);
 }
-.crew-label { color: var(--muted); font-size: 11px; font-weight: 600; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+.crew-label { display:flex; align-items:center; gap:6px; color: var(--muted); font-size: 11px; font-weight: 600; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
 .crew-val { color: #ddd; font-size: 13px; margin-bottom: 10px; }
 .awards-box {
   margin-bottom: 14px;
@@ -1612,7 +1616,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 }
 .ob-mock-msg-from { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .ob-mock-av {
-  width: 26px; height: 26px; border-radius: 50%; background: #7c3aed;
+  width: 26px; height: 26px; border-radius: 50%; background: #4F6BB0;
   display: flex; align-items: center; justify-content: center;
   font-size: 12px; color: #fff; font-weight: 700; flex-shrink: 0;
 }
@@ -1743,13 +1747,15 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .avatar-emoji-btn {
   width:100%; aspect-ratio:1; border-radius:50%;
   border:1.5px solid transparent;
-  background:rgba(255,255,255,0.04);
+  /* Set once on the wrap, so changing colour repaints 62 buttons without rebuilding
+     any of them. */
+  background:var(--av-btn-bg, rgba(255,255,255,0.04));
   font-size:19px; cursor:pointer;
   display:flex; align-items:center; justify-content:center;
   transition:border-color 0.13s, background 0.13s; line-height:1;
 }
-.avatar-emoji-btn:hover { background:rgba(255,255,255,0.09); }
-.avatar-emoji-btn.active { border-color:var(--primary); background:var(--primary-soft); }
+.avatar-emoji-btn:hover { filter:brightness(1.08); }
+.avatar-emoji-btn.active { border-color:var(--primary); box-shadow:0 0 0 2px var(--primary-soft); }
 .avatar-color-row { display:flex; gap:8px; flex-wrap:wrap; }
 .avatar-color-dot {
   width:26px; height:26px; border-radius:50%; cursor:pointer;
@@ -1940,7 +1946,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         </div>
         <div class="stats-block">
           <div class="stats-block-header">
-            <div class="stats-block-title">🎬 <span data-i18n="cp_dir">Top Directors</span></div>
+            <div class="stats-block-title"><span data-ic="film" data-ic-size="13"></span> <span data-i18n="cp_dir">Top Directors</span></div>
             <span class="stats-block-arrow">▲</span>
           </div>
           <div class="stats-block-body" style="display:block">
@@ -2501,7 +2507,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <div style="text-align:center;padding:8px 0 20px">
         <div class="avatar-wrap" onclick="toggleAvatarPicker()">
           <div class="acc-avatar" id="acc-modal-avatar" style="margin:0">U</div>
-          <div class="avatar-edit-badge">✏️</div>
+          <div class="avatar-edit-badge"><span data-ic="pencil" data-ic-size="11"></span></div>
         </div>
         <div id="avatar-picker-wrap" class="avatar-picker-wrap"></div>
         <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:24px;letter-spacing:0.5px;color:var(--text)" id="acc-name-display">User</div>
@@ -2585,13 +2591,13 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <!-- Support Cinemail -->
       <div style="margin-bottom:14px;padding:12px 14px;background:rgba(255,140,40,0.06);border:1px solid rgba(255,140,40,0.22);border-radius:10px;font-size:12px;line-height:1.55">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-          <span style="font-size:14px">🧡</span>
+          <span style="display:flex;color:var(--primary)" data-ic="heart" data-ic-size="14"></span>
           <span style="color:var(--text);font-weight:600;font-size:12px;letter-spacing:0.3px" data-i18n="support_title">Support Cinemail</span>
         </div>
         <div data-i18n="support_text" data-i18n-html="1" style="color:var(--muted);margin-bottom:9px">
           Early supporters get lifetime Pro features free when Cinemail goes paid on the App Store &amp; Google Play.
         </div>
-        <a id="support-kofi" href="https://ko-fi.com/dafaspace" target="_blank" rel="noopener" style="display:inline-block;padding:7px 13px;border-radius:7px;background:rgba(255,140,40,0.18);border:1px solid rgba(255,140,40,0.35);color:var(--text);text-decoration:none;font-size:12px;font-weight:600;transition:all 0.15s" data-i18n="support_button">☕ Support on Ko-fi →</a>
+        <a id="support-kofi" href="https://ko-fi.com/dafaspace" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:7px;background:rgba(255,140,40,0.18);border:1px solid rgba(255,140,40,0.35);color:var(--text);text-decoration:none;font-size:12px;font-weight:600;transition:all 0.15s"><span data-ic="coffee" data-ic-size="13"></span><span data-i18n="support_button">Support on Ko-fi →</span></a>
         <div style="margin-top:9px;display:flex;align-items:center;gap:7px">
           <button onclick="copyUSDT(event)" style="display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:7px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--muted);font-size:11px;font-weight:500;cursor:pointer;transition:all 0.15s" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--accent-border)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">
             <span style="font-size:12px">◈</span><span id="usdt-acc-label">USDT (TRC20)</span>
@@ -2614,7 +2620,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.46.2</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.47.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -2651,9 +2657,9 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:19px;margin-bottom:14px;line-height:1.2">Share a thought or report a bug</div>
         <div class="add-label">Type</div>
         <div style="display:flex;gap:8px;margin-bottom:14px">
-          <button id="fb-type-bug" onclick="setFbType('bug')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s">🐛 Bug</button>
-          <button id="fb-type-idea" onclick="setFbType('idea')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s">💡 Idea</button>
-          <button id="fb-type-other" onclick="setFbType('other')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s">💬 Other</button>
+          <button id="fb-type-bug" onclick="setFbType('bug')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px"><span data-ic="bug" data-ic-size="13"></span>Bug</button>
+          <button id="fb-type-idea" onclick="setFbType('idea')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px"><span data-ic="lightbulb" data-ic-size="13"></span>Idea</button>
+          <button id="fb-type-other" onclick="setFbType('other')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px"><span data-ic="message-circle" data-ic-size="13"></span>Other</button>
         </div>
         <div class="add-label">Message</div>
         <textarea id="fb-message" placeholder="Tell me what's on your mind..." style="min-height:70px;margin-bottom:10px;width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:13px;padding:10px 12px;outline:none;resize:vertical;transition:border-color .2s"></textarea>
@@ -2746,7 +2752,7 @@ const I18N = {
     replay_onboarding:"🎬 Replay Welcome Tour",
     support_title:"Support Cinemail",
     support_text:"Early supporters get lifetime Pro features free when Cinemail goes paid on the App Store &amp; Google Play.",
-    support_button:"☕ Support on Ko-fi →",
+    support_button:"Support on Ko-fi →",
     about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Privacy Policy</a>",
     about_tmdb:"Film data, posters and crew info from <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail uses the TMDB API but is not endorsed or certified by TMDB.",
     about_author:"Made by <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
@@ -2797,7 +2803,7 @@ const I18N = {
     replay_onboarding:"🎬 Пройти тур заново",
     support_title:"Поддержать Cinemail",
     support_text:"Поддержавшие на этом этапе получат пожизненный Pro бесплатно, когда Cinemail станет платным в App Store и Google Play.",
-    support_button:"☕ Поддержать на Ko-fi →",
+    support_button:"Поддержать на Ko-fi →",
     about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Политика конфиденциальности</a>",
     about_tmdb:"Данные о фильмах, постеры и creative crew - из <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail использует TMDB API, но не сертифицирован TMDB.",
     about_author:"Сделано <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
@@ -2848,7 +2854,7 @@ const I18N = {
     replay_onboarding:"🎬 Повторити знайомство",
     support_title:"Підтримати Cinemail",
     support_text:"Ранні прихильники отримають Pro назавжди безкоштовно, коли Cinemail стане платним в App Store та Google Play.",
-    support_button:"☕ Підтримати на Ko-fi →",
+    support_button:"Підтримати на Ko-fi →",
     about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Політика конфіденційності</a>",
     about_tmdb:"Дані про фільми, постери та crew - з <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail використовує TMDB API, але не сертифікований TMDB.",
     about_author:"Зроблено <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
@@ -2899,7 +2905,7 @@ const I18N = {
     replay_onboarding:"🎬 გაცნობის გამეორება",
     support_title:"დაუჭირე მხარი Cinemail-ს",
     support_text:"ადრეული მხარდამჭერები მიიღებენ Pro-ს სამუდამოდ უფასოდ, როცა Cinemail გახდება ფასიანი App Store-სა და Google Play-ში.",
-    support_button:"☕ მხარდაჭერა Ko-fi-ზე →",
+    support_button:"მხარდაჭერა Ko-fi-ზე →",
     about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>კონფიდენციალურობის პოლიტიკა</a>",
     about_tmdb:"ფილმების მონაცემები, პოსტერები და crew - <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>-დან. Cinemail იყენებს TMDB API-ს, მაგრამ არ არის TMDB-ის მიერ სერტიფიცირებული.",
     about_author:"შექმნა <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>-მა.",
@@ -2950,7 +2956,7 @@ const I18N = {
     replay_onboarding:"🎬 Repetir introducción",
     support_title:"Apoya a Cinemail",
     support_text:"Quienes apoyen ahora tendrán las funciones Pro gratis de por vida cuando Cinemail sea de pago en App Store y Google Play.",
-    support_button:"☕ Apoyar en Ko-fi →",
+    support_button:"Apoyar en Ko-fi →",
     about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Política de privacidad</a>",
     about_tmdb:"Datos de películas, pósters e información del equipo de <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail usa la API de TMDB pero no está avalada ni certificada por TMDB.",
     about_author:"Hecho por <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
@@ -3001,7 +3007,7 @@ const I18N = {
     replay_onboarding:"🎬 Revoir l'introduction",
     support_title:"Soutenir Cinemail",
     support_text:"Les premiers soutiens obtiennent les fonctions Pro gratuites à vie lorsque Cinemail deviendra payant sur l'App Store et Google Play.",
-    support_button:"☕ Soutenir sur Ko-fi →",
+    support_button:"Soutenir sur Ko-fi →",
     about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Politique de confidentialité</a>",
     about_tmdb:"Données de films, affiches et équipe via <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail utilise l'API TMDB mais n'est ni approuvé ni certifié par TMDB.",
     about_author:"Créé par <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
@@ -3052,7 +3058,7 @@ const I18N = {
     replay_onboarding:"🎬 Tour erneut ansehen",
     support_title:"Cinemail unterstützen",
     support_text:"Frühe Unterstützer erhalten lebenslang kostenlose Pro-Funktionen, wenn Cinemail im App Store &amp; bei Google Play kostenpflichtig wird.",
-    support_button:"☕ Auf Ko-fi unterstützen →",
+    support_button:"Auf Ko-fi unterstützen →",
     about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Datenschutzerklärung</a>",
     about_tmdb:"Filmdaten, Poster und Crew-Infos von <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail nutzt die TMDB-API, ist aber nicht von TMDB unterstützt oder zertifiziert.",
     about_author:"Erstellt von <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
@@ -3103,7 +3109,7 @@ const I18N = {
     replay_onboarding:"🎬 Rivedi l'introduzione",
     support_title:"Sostieni Cinemail",
     support_text:"I primi sostenitori ottengono le funzioni Pro gratis a vita quando Cinemail diventerà a pagamento su App Store e Google Play.",
-    support_button:"☕ Sostieni su Ko-fi →",
+    support_button:"Sostieni su Ko-fi →",
     about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Informativa sulla privacy</a>",
     about_tmdb:"Dati dei film, locandine e info sulla troupe da <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail usa l'API di TMDB ma non è approvato né certificato da TMDB.",
     about_author:"Creato da <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
@@ -4082,10 +4088,13 @@ async function onSignedIn(user) {
     if (!profileName && metaName) { try { await sbClient.from("profiles").upsert({ id: user.id, display_name: metaName }); } catch(e2) {} }
   } catch(e) { console.warn("[profile]", e.message); }
   // Cross-device avatar: load chosen emoji+color from profile (defensive — harmless if columns not yet migrated)
-  if (!isGuest) try {
+  // Skipped while a choice made on this device is still being written. This function
+  // also runs on token refresh, and adopting the row mid-write put the previous avatar
+  // back over the one just picked.
+  if (!isGuest && !_avatarWritePending) try {
     const { data: ad } = await sbClient.from("profiles").select("avatar_emoji,avatar_color").eq("id", user.id).limit(1);
     const a = ad?.[0];
-    if (a) {
+    if (a && !_avatarWritePending) {   // re-check: the await above is long enough for a tap to land inside it
       if (a.avatar_emoji) localStorage.setItem('avEmoji', a.avatar_emoji); else localStorage.removeItem('avEmoji');
       if (a.avatar_color) localStorage.setItem('avColor', a.avatar_color);
     }
@@ -4865,7 +4874,7 @@ function personRowHTML(p) {
   const knownFor = (p.known_for || []).map(k => k.title || k.name).filter(Boolean).slice(0, 2).join(", ");
   const avatar = photo
     ? `<div style="width:48px;height:48px;border-radius:50%;flex-shrink:0;background:var(--surface2) url('${photo}') center top/cover no-repeat"></div>`
-    : `<div style="width:48px;height:48px;border-radius:50%;flex-shrink:0;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:22px">👤</div>`;
+    : `<div style="width:48px;height:48px;border-radius:50%;flex-shrink:0;background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--muted)">${icon('user',22)}</div>`;
   return `<div class="card" style="align-items:center;cursor:pointer" onclick="openPerson('${safe}', ${p.id})">
     ${avatar}
     <div class="card-body" style="flex:1;min-width:0">
@@ -4977,11 +4986,11 @@ async function openDetail(id, type) {
     const status = getEntryStatus(id);
     const chips = d.Genre.split(", ").filter(Boolean).map(g => `<span class="chip">${g}</span>`).join("");
     const crew = [
-      d.Director        ? `<div class="crew-label">🎬 Director</div><div class="crew-val">${clickableNames(d.Director, true)}</div>` : "",
-      d.Cinematographer ? `<div class="crew-label"><span data-ic="camera" data-ic-size="13"></span> Cinematography</div><div class="crew-val">${clickableNames(d.Cinematographer, true)}</div>` : "",
-      d.Composer        ? `<div class="crew-label">🎵 Composer</div><div class="crew-val">${clickableNames(d.Composer, true)}${streamingLinks(`${d.Title} soundtrack`)}</div>` : "",
-      d.Writers         ? `<div class="crew-label">✍️ Screenplay</div><div class="crew-val">${clickableNames(d.Writers, true)}</div>` : "",
-      d.Cast            ? `<div class="crew-label">🌟 Cast</div><div class="crew-val">${clickableNames(d.Cast, true)}</div>` : "",
+      d.Director        ? `<div class="crew-label">${icon('film',13)} Director</div><div class="crew-val">${clickableNames(d.Director, true)}</div>` : "",
+      d.Cinematographer ? `<div class="crew-label">${icon('camera',13)} Cinematography</div><div class="crew-val">${clickableNames(d.Cinematographer, true)}</div>` : "",
+      d.Composer        ? `<div class="crew-label">${icon('music',13)} Composer</div><div class="crew-val">${clickableNames(d.Composer, true)}${streamingLinks(`${d.Title} soundtrack`)}</div>` : "",
+      d.Writers         ? `<div class="crew-label">${icon('pen-line',13)} Screenplay</div><div class="crew-val">${clickableNames(d.Writers, true)}</div>` : "",
+      d.Cast            ? `<div class="crew-label">${icon('star',13)} Cast</div><div class="crew-val">${clickableNames(d.Cast, true)}</div>` : "",
     ].join("");
     const tvInfo = d.Seasons ? `<div class="crew-label">Seasons / Episodes</div><div class="crew-val">${d.Seasons} seasons · ${d.Episodes} episodes${d.Networks ? ` · ${d.Networks}` : ""}</div>` : "";
 
@@ -5199,32 +5208,67 @@ function _renderAvatarPicker() {
   // The picker draws from the same sheet, on the same disc colour and with the same
   // ink, so what you tap is exactly what everyone else will see. It used to render the
   // raw characters, which showed a system emoji here and a drawing everywhere else.
-  const disc = _avatarDiscColor(curColor);
-  const ink = _avatarGlyphInk(curColor);
+  // The disc colour and ink live on the wrap, not on each of the 62 buttons, so
+  // changing colour is one property write instead of rebuilding the grid.
   const emojiHTML = _AVATAR_EMOJIS.map(e =>
-    `<button class="avatar-emoji-btn av-glyph${avatarKey(e)===avatarKey(curEmoji)?' active':''}"` +
+    `<button class="avatar-emoji-btn av-glyph" data-av="${escapeHtml(e)}"` +
     ` onclick="pickAvatarEmoji('${e}')" aria-label="${escapeHtml(avatarKey(e) || e)}"` +
-    ` style="background-color:${disc};--av-ink:${ink};${_glyphStyle(e)}"></button>`
+    ` style="${_glyphStyle(e)}"></button>`
   ).join('');
   const colorHTML = _AVATAR_COLORS.map(c =>
-    `<div class="avatar-color-dot${c===curColor?' active':''}" style="background:${c}" onclick="pickAvatarColor('${c}')"></div>`
+    `<div class="avatar-color-dot" data-col="${c}" style="background:${c}" onclick="pickAvatarColor('${c}')"></div>`
   ).join('');
   wrap.innerHTML = `
     <div class="avatar-picker-label">Emoji</div>
     <div class="avatar-emoji-grid">${emojiHTML}</div>
     <div class="avatar-picker-label">Color</div>
     <div class="avatar-color-row">${colorHTML}</div>
-    ${curEmoji ? `<button onclick="clearAvatarEmoji()" style="margin-top:10px;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:2px 0;font-family:'DM Sans','Noto Sans Georgian',sans-serif">✕ Remove emoji</button>` : ''}
+    <button id="avatar-clear-btn" onclick="clearAvatarEmoji()" style="margin-top:10px;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:2px 0;font-family:'DM Sans','Noto Sans Georgian',sans-serif">✕ Remove emoji</button>
   `;
+  _markAvatarPicker();
 }
-function pickAvatarEmoji(e) { localStorage.setItem('avEmoji', e); _applyAvatar(); _renderAvatarPicker(); _syncAvatarToDB(); }
-function pickAvatarColor(c) { localStorage.setItem('avColor', c); _applyAvatar(); _renderAvatarPicker(); _syncAvatarToDB(); }
-function clearAvatarEmoji() { localStorage.removeItem('avEmoji'); _applyAvatar(); _renderAvatarPicker(); _syncAvatarToDB(); }
+// Reflect the current choice without touching the DOM structure. Every pick used to
+// rebuild all 62 buttons, which destroyed the very node the finger was on - between
+// touchstart and click the element no longer existed, so a tap could land on nothing.
+function _markAvatarPicker() {
+  const wrap = document.getElementById('avatar-picker-wrap');
+  if (!wrap) return;
+  const { emoji: curEmoji, color: curColor } = getAvatarPrefs();
+  wrap.style.setProperty('--av-btn-bg', _avatarDiscColor(curColor));
+  wrap.style.setProperty('--av-ink', _avatarGlyphInk(curColor));
+  const key = avatarKey(curEmoji);
+  wrap.querySelectorAll('.avatar-emoji-btn').forEach(b =>
+    b.classList.toggle('active', !!key && avatarKey(b.dataset.av) === key));
+  wrap.querySelectorAll('.avatar-color-dot').forEach(d =>
+    d.classList.toggle('active', d.dataset.col === curColor));
+  const clear = document.getElementById('avatar-clear-btn');
+  if (clear) clear.style.display = curEmoji ? '' : 'none';
+}
+function pickAvatarEmoji(e) { localStorage.setItem('avEmoji', e); _applyAvatar(); _markAvatarPicker(); _syncAvatarToDB(); }
+function pickAvatarColor(c) { localStorage.setItem('avColor', c); _applyAvatar(); _markAvatarPicker(); _syncAvatarToDB(); }
+function clearAvatarEmoji() { localStorage.removeItem('avEmoji'); _applyAvatar(); _markAvatarPicker(); _syncAvatarToDB(); }
+// True from the moment a choice is made until its write lands. onSignedIn refreshes the
+// avatar from the profile row, and Supabase re-fires SIGNED_IN on every token refresh -
+// so a refresh landing between the tap and the write read the OLD row and put it back
+// over the new choice. That is why a pick sometimes appeared not to take, seemingly at
+// random: it did take, and was then overwritten by a stale read.
+let _avatarWritePending = false;
+
 function _syncAvatarToDB() {
   if (!currentUser) return;
   const { emoji, color } = getAvatarPrefs();
-  // fire-and-forget; harmless 400 if avatar columns not yet migrated
-  try { sbClient.from('profiles').upsert({ id: currentUser.id, avatar_emoji: emoji || null, avatar_color: color || null }).then(() => {}, () => {}); } catch(e) {}
+  _avatarWritePending = true;
+  const done = () => { _avatarWritePending = false; };
+  try {
+    sbClient.from('profiles')
+      .upsert({ id: currentUser.id, avatar_emoji: emoji || null, avatar_color: color || null })
+      .then(({ error }) => {
+        // Errors used to be swallowed entirely, so a failed write looked exactly like a
+        // successful one until the next sign-in silently reverted the avatar.
+        if (error) console.warn('[avatar] could not save the choice:', error.message);
+        done();
+      }, err => { console.warn('[avatar] could not save the choice:', err); done(); });
+  } catch (e) { console.warn('[avatar]', e); done(); }
 }
 
 // ── Other users' avatars (emoji + colour as they chose) ───────────────────────
@@ -5234,8 +5278,8 @@ async function _fetchProfileAvatars(userIds, rerender) {
   if (!missing.length) { return; }
   try {
     const { data } = await sbClient.from('profiles').select('id,display_name,avatar_emoji,avatar_color').in('id', missing);
-    (data || []).forEach(p => { _profileCache[p.id] = { name: p.display_name || '', emoji: p.avatar_emoji || '', color: p.avatar_color || '#7c3aed' }; });
-    missing.forEach(id => { if (!_profileCache[id]) _profileCache[id] = { name: '', emoji: '', color: '#7c3aed' }; }); // mark resolved to avoid refetch loops
+    (data || []).forEach(p => { _profileCache[p.id] = { name: p.display_name || '', emoji: p.avatar_emoji || '', color: p.avatar_color || '#F5C518' }; });
+    missing.forEach(id => { if (!_profileCache[id]) _profileCache[id] = { name: '', emoji: '', color: '#F5C518' }; }); // mark resolved to avoid refetch loops
     if (typeof rerender === 'function') rerender();
   } catch(e) {}
 }
@@ -5351,7 +5395,7 @@ async function openPerson(name, personId) {
       <div style="display:flex;gap:14px;margin-bottom:16px;align-items:flex-start">
         ${photo
           ? `<div style="width:72px;height:100px;flex-shrink:0;border-radius:8px;background:var(--surface2) url('${photo}') center top/cover no-repeat"></div>`
-          : `<div style="width:72px;height:100px;flex-shrink:0;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:28px">👤</div>`}
+          : `<div style="width:72px;height:100px;flex-shrink:0;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--muted)">${icon('user',28)}</div>`}
         <div style="flex:1;min-width:0">
           <div class="modal-title">${name}</div>
           ${dept ? `<div style="color:#666;font-size:12px;margin-top:2px">${dept}</div>` : ""}
@@ -5635,26 +5679,6 @@ function renderHistory() {
     const map = {};
     entries.forEach(h => { if (!h[field]) return; h[field].split(", ").forEach(name => { name = name.trim(); if (name) map[name] = (map[name]||0)+1; }); });
     return Object.entries(map).filter(([,c])=>c>=minCount).sort((a,b)=>b[1]-a[1]).slice(0,maxItems);
-  }
-  function collapsibleStatsBlock(id, icon, label, items) {
-    if (!items.length) return "";
-    const maxCount = items[0][1];
-    const rows = items.map(([name, count]) => {
-      const pct = Math.round((count/maxCount)*100);
-      const safe = name.replace(/'/g, "\\'");
-      return `<div class="stats-bar-row" onclick="openPerson('${safe}')">
-        <div class="stats-bar-name">${name}</div>
-        <div class="stats-bar-track"><div class="stats-bar-fill" style="width:${pct}%"></div></div>
-        <div class="stats-bar-count">${count} film${count>1?"s":""}</div>
-      </div>`;
-    }).join("");
-    return `<div class="stats-block">
-      <div class="stats-block-header" onclick="toggleStatsBlock('${id}')">
-        <div class="stats-block-title">${glyph} ${label}</div>
-        <span class="stats-block-arrow" id="stats-arrow-${id}">▼</span>
-      </div>
-      <div class="stats-block-body" id="stats-body-${id}">${rows}</div>
-    </div>`;
   }
   // Contextual header per tab
   let headerHTML;
@@ -6111,7 +6135,7 @@ async function loadListsCache() {
       const nameMap = {};
       if (memberIds.length) {
         const { data: profs } = await sbClient.from('profiles').select('id,display_name,avatar_emoji,avatar_color').in('id', memberIds);
-        (profs || []).forEach(p => { nameMap[p.id] = p.display_name; _profileCache[p.id] = { name: p.display_name || '', emoji: p.avatar_emoji || '', color: p.avatar_color || '#7c3aed' }; });
+        (profs || []).forEach(p => { nameMap[p.id] = p.display_name; _profileCache[p.id] = { name: p.display_name || '', emoji: p.avatar_emoji || '', color: p.avatar_color || '#F5C518' }; });
       }
       const memberMap = {}; // list_id → [{user_id, role, name}]
       (members || []).forEach(m => {
@@ -7611,6 +7635,12 @@ const ICONS = {
   "message-circle": '<path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" />',
   "moon": '<path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />',
   "music": '<path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" />',
+  "pen-line": '<path d="M13 21h8" /><path d="m15 5 4 4" /><path d="M20.707 5.293a1 1 0 0 0-1.414-1.414L4.293 18.879a1 1 0 0 0-.242.39l-1.02 3.4a.5.5 0 0 0 .622.622l3.4-1.02a1 1 0 0 0 .39-.242z" />',
+  "star": '<path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.12 2.12 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.12 2.12 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.12 2.12 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.12 2.12 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.12 2.12 0 0 0 1.597-1.16z" />',
+  "coffee": '<path d="M10 2v2" /><path d="M14 2v2" /><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1" /><path d="M6 2v2" />',
+  "bug": '<path d="M12 20v-9" /><path d="M14 4a2 2 0 0 0-4 0" /><path d="M14.973 8H9.027a2 2 0 0 1-1.874-2.7l.51-1.359A2 2 0 0 1 9.536 2.75h4.928a2 2 0 0 1 1.873 1.191l.51 1.359A2 2 0 0 1 14.973 8" /><path d="M17 15h4" /><path d="m19 5-2.5 2" /><path d="M20 20a3 3 0 0 0-3-3" /><path d="M3 15h4" /><path d="M4 20a3 3 0 0 1 3-3" /><path d="m5 5 2.5 2" /><path d="M6.026 11h11.948a1 1 0 0 1 .995 1.1l-.4 4A3 3 0 0 1 15.585 19H8.415a3 3 0 0 1-2.985-2.7l-.4-4A1 1 0 0 1 6.026 11" />',
+  "lightbulb": '<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" /><path d="M9 18h6" /><path d="M10 22h4" />',
+  "heart": '<path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 0L5 15c-1.5-1.5-3-3.2-3-5.5" />',
   "pencil": '<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /><path d="m15 5 4 4" />',
   "popcorn": '<path d="M18 8a2 2 0 0 0 0-4 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0-4 0 2 2 0 0 0 0 4" /><path d="M10 22 9 8" /><path d="m14 22 1-14" /><path d="M20 8c.5 0 .9.4.8 1l-2.6 12c-.1.5-.7 1-1.2 1H7c-.6 0-1.1-.4-1.2-1L3.2 9c-.1-.6.3-1 .8-1Z" />',
   "refresh-cw": '<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 16H3v5" />',
@@ -9520,12 +9550,12 @@ async function loadFeedbackReplies() {
     const unreadReplies=data.filter(f=>f.reply&&!f.read_by_user);
     if(unreadReplies.length)await sbClient.from("feedback").update({read_by_user:true}).in("id",unreadReplies.map(f=>f.id));
     setFeedbackUnread(false);
-    const typeEmoji={bug:"🐛",idea:"💡",other:"💬"};
+    const typeIcon={bug:icon("bug",12),idea:icon("lightbulb",12),other:icon("message-circle",12)};
     el.style.display="block";
     el.innerHTML=`<div style="color:var(--muted);font-size:11px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Your previous messages</div>
       ${data.map(f=>`<div style="margin-bottom:10px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--border)">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-          <div style="font-size:11px;color:var(--muted)">${typeEmoji[f.type]||"💬"} ${_fmtDT(f.created_at)}</div>
+          <div style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px">${typeIcon[f.type]||typeIcon.other} ${_fmtDT(f.created_at)}</div>
           <button data-del-id="${f.id}" onclick="deleteFeedback('${f.id}')" style="background:none;border:none;color:#888;cursor:pointer;font-size:18px;line-height:1;padding:6px 8px;border-radius:6px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='none'">×</button>
         </div>
         <div style="font-size:13px;color:#ccc">${escapeHtml(f.message)}</div>
