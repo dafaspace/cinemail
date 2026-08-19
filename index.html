@@ -14,9 +14,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- Versioned on purpose. index.html is served network-first while assets are
      cache-first, so without the query a fresh page could load a cached older
-     emoji.js - which is exactly what emptied the avatar picker after v0.49.0.
+     emoji.js - which is exactly what emptied the avatar picker after v0.50.0.
      Bump this with the release; sw.js precaches the same URL. -->
-<script src="./emoji.js?v=0.49.0"></script>
+<script src="./emoji.js?v=0.50.0"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -141,7 +141,7 @@ body {
 .form-group textarea { resize: vertical; min-height: 72px; }
 
 /* ── Buttons ────────────────────────────────────────────────────────── */
-.btn {
+.btn { min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -164,6 +164,32 @@ body {
    does not fire :active reliably on non-button elements. Dragged elements
    (.list-tab) use brightness, never transform, so the reorder drag stays 1:1. */
 .is-pressed { transition: transform 90ms ease-out, filter 90ms ease-out; }
+/* ── Buttons ───────────────────────────────────────────────────────────────────
+   Measured before this rule: 13 of 15 button classes rendered under 44px, the
+   platform minimum for a touch target, the smallest at 14px - and not one of them
+   set line-height, so every label was centred on a line box carrying descender
+   space rather than on its own ink. Height comes from padding; a fixed height and
+   a line box fight each other. */
+button {
+  display: inline-flex; align-items: center; justify-content: center;
+  font: inherit; line-height: 1;
+  box-sizing: border-box;
+  -webkit-appearance: none; appearance: none;
+  text-box: trim-both cap alphabetic;   /* trims to cap height, so the ink is centred */
+}
+/* An invisible 44x44 floor around any control that is visually smaller. Layout does
+   not move: the pseudo-element is absolutely positioned and centred on the button, so
+   a dense row keeps its spacing while every target becomes reachable.
+   .av-glyph is excluded - it already uses both pseudo-elements to draw the avatar's
+   paper and its ink. */
+button:not(.av-glyph) { position: relative; }
+button:not(.av-glyph)::after {
+  content: ''; position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%; height: 100%;
+  min-width: 44px; min-height: 44px;
+}
+
 button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { transform: scale(0.95); }
 .card.is-pressed, .list-row.is-pressed, .list-tab.is-pressed, .friend-row.is-pressed,
 .friend-pick-row.is-pressed, .list-check-row.is-pressed, .list-picker-opt.is-pressed,
@@ -807,7 +833,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .modal-actions { display: flex; flex-direction: column; gap: 9px; margin-top: 18px; }
 /* Detail action buttons: both ghost, same size/typography. Brand-yellow outline
    for the main action (Watched/Edit), brand-purple for Share. Priority = order. */
-.btn-modal-primary, .btn-modal-secondary {
+.btn-modal-primary, .btn-modal-secondary { min-height: 44px;
   width: 100%; padding: 13px; border-radius: 11px;
   background: transparent; color: var(--text); border: 1px solid var(--border);
   font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
@@ -858,7 +884,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   transform: translateY(-50%);
 }
 @keyframes coach-in { from { opacity: 0; transform: translateX(6px); } to { opacity: 1; transform: none; } }
-.btn-modal-close {
+.btn-modal-close { min-height: 44px;
   flex: 1; min-width: 80px; padding: 10px;
   border-radius: 9px; background: rgba(255,255,255,0.05);
   border: 1px solid var(--border); color: #777;
@@ -871,7 +897,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   font-size: 14px; letter-spacing: 1px; cursor: pointer; transition: all 0.15s;
 }
 .btn-modal-add-watched:hover { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
-.btn-modal-save {
+.btn-modal-save { min-height: 44px;
   flex: 2; padding: 10px; border-radius: 9px;
   background: var(--primary); border: none;
   color: #111; font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
@@ -1427,7 +1453,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   gap: 8px;
   margin-bottom: 10px;
 }
-.btn-backup {
+.btn-backup { min-height: 44px;
   flex: 1;
   padding: 9px 10px;
   border-radius: 9px;
@@ -1544,14 +1570,14 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 }
 .ob-dot.active { background: var(--primary); width: 18px; border-radius: 3px; }
 .ob-btn-row { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 424px; gap: 12px; }
-.ob-btn-skip {
+.ob-btn-skip { min-height: 44px;
   background: none; border: 1px solid var(--border); border-radius: 9px;
   color: var(--muted); font-size: 14px; cursor: pointer;
   width: 112px; flex-shrink: 0; padding: 10px 0; text-align: center;
   font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif; transition: all 0.15s;
 }
 .ob-btn-skip:hover { border-color: var(--primary-border); color: var(--text); }
-.ob-btn-next {
+.ob-btn-next { min-height: 44px;
   flex: 1; padding: 14px; border-radius: 14px; border: none;
   background: var(--accent); color: var(--accent-text);
   font-size: 15px; font-weight: 600; cursor: pointer;
@@ -2631,7 +2657,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.49.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.50.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
