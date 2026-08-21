@@ -2677,7 +2677,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.51.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.51.1</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -6031,6 +6031,7 @@ let _friendRequestsCache = [];  // pending incoming requests
 let _friendAddTarget = null;       // { id, name } — selected user to add as friend
 let _friendDeleteConfirmFid = null; // fid pending confirm before delete
 let _friendFilter = '';             // text filter for the friends list (shown when many)
+let _friendsListOpen = false;       // accepted friends start collapsed: the same people are the conversations below
 
 // ── Lists globals ──────────────────────────────────────────────────────────────
 let _listsCache = [];          // { id, name, owner_id, role, memberCount }
@@ -6095,8 +6096,20 @@ function renderFriendsSection() {
     html += `</div>`;
   }
 
-  // Accepted friends — sorted alphabetically; searchable + scroll-capped when there are many
+  // Accepted friends are COLLAPSED by default, because every one of them already appears
+  // below as a conversation - this tab lists the same people twice otherwise, five faces
+  // as "friends" and the same five as "inbox". What is left uncollapsed is the part the
+  // conversation list cannot do: answer a request, add someone, remove someone.
   if (_friendsCache.length) {
+    const n = _friendsCache.length;
+    html += `<div class="friend-row" style="cursor:pointer" onclick="_friendsListOpen=!_friendsListOpen;renderFriendsSection()">
+      <div style="flex:1;font-size:13px;color:var(--muted)">${n} ${_friendsWord(n)}</div>
+      <span style="color:var(--muted);font-size:11px">${_friendsListOpen ? '▲' : '▼'}</span>
+    </div>`;
+  }
+
+  // Accepted friends — sorted alphabetically; searchable + scroll-capped when there are many
+  if (_friendsCache.length && _friendsListOpen) {
     const sorted = [..._friendsCache].sort((a, b) =>
       _friendInfo(a).name.localeCompare(_friendInfo(b).name, undefined, { sensitivity: 'base' }));
     const many = sorted.length > 8;
