@@ -154,7 +154,7 @@
     </nav>
 
     <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: 19 May 2026</p>
+    <p class="updated">Last updated: 21 August 2026</p>
 
     <div class="intro">
       Cinemail is built by one independent developer who cares deeply about user privacy. This policy explains, in plain language, what data the app collects, why, and what your rights are. No legalese, no dark patterns.
@@ -230,7 +230,10 @@
 
     <h3>5.2 Anthropic (AI picks)</h3>
     <p>
-      When you ask for an AI recommendation, we send anonymised film preferences (titles, genres, ratings - not your name, email or personal identifiers) to <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener">Anthropic</a>'s Claude model via API. Anthropic does not train on customer API data by default.
+      When you ask for a recommendation, we send a sample of your library to <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener">Anthropic</a>'s Claude model via API: film titles and years, your star ratings, <strong>the notes you wrote about them</strong>, and the names that come up most often in your watch history (directors, cinematographers, composers, actors). Your name, email and account id are not sent. Anthropic does not train on customer API data by default.
+    </p>
+    <p>
+      The notes are the part worth stating plainly, because the app calls them private and they can contain anything you chose to write. They are sent because they are what makes a recommendation read like it knows you rather than like a genre filter. If you would rather they stayed on your device, leave the note field empty - ratings alone still work.
     </p>
 
     <h3>5.3 Music links</h3>
@@ -247,9 +250,9 @@
     <p>Regardless of where you live, you have the right to:</p>
     <ul>
       <li><strong>Access</strong> - request a copy of all the data we hold about you</li>
-      <li><strong>Export</strong> - you can export your watchlist as CSV or JSON anytime from the app (Settings → Backup)</li>
+      <li><strong>Export</strong> - tap your avatar and use <strong>Download</strong> for an Excel file of your films, lists and members, or <strong>JSON backup</strong> for the full structured export. Both restore into another account.</li>
       <li><strong>Correct</strong> - fix any inaccurate data through the app or by emailing us</li>
-      <li><strong>Delete</strong> - delete your account and all associated data. Email <a href="mailto:hello@dafaspace.com">hello@dafaspace.com</a> with the subject line "Delete my account" and we will process it within 7 days</li>
+      <li><strong>Delete</strong> - tap your avatar, scroll to <strong>Delete my account</strong>, confirm. Your films, ratings, notes, lists, friendships and sent messages go with the account, in one step, immediately. No email to us is needed; if the button ever fails, write to <a href="mailto:support@dafaspace.com">support@dafaspace.com</a> and it is done by hand.</li>
       <li><strong>Object / restrict</strong> - ask us to stop processing your data in any specific way</li>
       <li><strong>Withdraw consent</strong> - revoke any consents by deleting your account</li>
       <li><strong>Lodge a complaint</strong> - with your local data protection authority if you believe we've handled your data unlawfully</li>
@@ -257,7 +260,7 @@
 
     <h2>8. Data retention</h2>
     <p>
-      We keep your account data for as long as your account exists. If you delete your account, all your personal data is removed from our active databases within 7 days. Anonymised backups may be retained for up to 30 days after that for disaster recovery, then permanently deleted.
+      We keep your account data for as long as your account exists. Deleting your account removes it from the live database at once, in a single transaction - not marked inactive, not queued. Anonymised backups may be retained for up to 30 days after that for disaster recovery, then permanently deleted.
     </p>
     <p>
       Feedback messages may be kept indefinitely as part of our product improvement records, but we remove any personally identifying details on request.
