@@ -17,6 +17,7 @@
      emoji.js - which is exactly what emptied the avatar picker after v0.50.0.
      Bump this with the release; sw.js precaches the same URL. -->
 <script src="./emoji.js?v=0.50.0"></script>
+<script src="./qr.js?v=0.52.0"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -2677,7 +2678,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.51.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.52.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -6857,9 +6858,30 @@ async function _shareOrCopy(url, title, text) {
   try { await navigator.clipboard.writeText(url); showToast('Link copied!'); }
   catch(e) { showToast(url); }
 }
+// Drawn here, by qr.js, rather than fetched. This used to point at api.qrserver.com,
+// which meant handing a third party the user's own id - the encoded link is
+// `?friend=<uuid>` - together with their IP, every time the panel opened. Nothing in the
+// app said so, and PrivacyInfo.xcprivacy declares no third-party sharing.
+// Dark modules on a light card, which is what the standard assumes and what every
+// scanner supports. The hosted version asked for the opposite - bgcolor=0d0d1a,
+// color=ffffff - so it would blend into the panel. jsQR reads an inverted code, but jsQR
+// is not a phone in a dim room, and inversion is the one thing a simple reader is
+// entitled to refuse. Blending is not worth a code that sometimes does not scan.
 function _qrURL(url, size) {
-  // Match the app background (#0d0d1a) so the QR blends into the dark card
-  return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&margin=8&bgcolor=0d0d1a&color=ffffff&data=${encodeURIComponent(url)}`;
+  return qrDataURI(url, { size, level: 'H', dark: '#111111', light: '#ffffff' });
+}
+
+// The code with the Cinemail mark in the middle. The modules under the mark are lost and
+// come back only through error correction, so this runs at level H. Measured with a
+// decoder across 69 strings: a centre square up to 30% of the side still reads, 35% does
+// not. This uses 22%, half the failing size.
+function _qrHTML(url, size) {
+  const logo = Math.round(size * 0.22);
+  return `<div style="position:relative;width:${size}px;height:${size}px;margin:0 auto 10px">
+    <img src="${_qrURL(url, size)}" width="${size}" height="${size}" style="border-radius:10px;display:block" alt="">
+    <img src="icon.png" alt="" width="${logo}" height="${logo}"
+      style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:7px;background:#ffffff;padding:2px;box-sizing:border-box">
+  </div>`;
 }
 
 // ── Invite a friend to the whole app (referral that auto-connects) ────────────
@@ -6883,7 +6905,7 @@ async function toggleAppInvite() {
   const myName = await _freshDisplayName();
   const msg = `${myName} invited you to Cinemail. Track films, get personalised picks and share with friends.`;
   panel.innerHTML = `
-    <img src="${_qrURL(url,150)}" width="150" height="150" style="border-radius:10px;margin:0 auto 8px;display:block">
+    ${_qrHTML(url, 180)}
     <div style="font-size:11px;color:var(--muted);margin-bottom:10px">${t('invite_connect_hint')}</div>
     <div style="display:flex;gap:8px">
       <button onclick='_shareOrCopy(${JSON.stringify(url)}, "Cinemail", ${JSON.stringify(msg)})'
@@ -7042,7 +7064,7 @@ async function _loadInviteLink(listId) {
     const myName = await _freshDisplayName();
     const msg = `${myName} shared the "${listName}" list with you on Cinemail. Open it to see what's inside.`;
     el.innerHTML = `
-      <img src="${_qrURL(url,160)}" style="border-radius:10px;margin-bottom:10px;display:block;margin-left:auto;margin-right:auto" width="160" height="160">
+      ${_qrHTML(url, 180)}
       <div style="font-size:10px;color:var(--muted);margin-bottom:10px">${t('invite_valid_48')}</div>
       <div style="display:flex;gap:8px">
         <button onclick='_shareOrCopy(${JSON.stringify(url)}, "Cinemail", ${JSON.stringify(msg)})'

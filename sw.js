@@ -1,5 +1,5 @@
 // ── Cache version — bump this string on every deploy to force refresh ──────────
-const CACHE_VERSION = "v184";
+const CACHE_VERSION = "v185";
 const CACHE_NAME = "cinemail-" + CACHE_VERSION;
 
 // Files to cache for offline use
@@ -11,6 +11,7 @@ const PRECACHE = [
   "./icon.png",          // shown on the splash and all four auth screens, not just as the home-screen icon
   "./exceljs.min.js",
   "./emoji.js?v=0.50.0",
+  "./qr.js?v=0.52.0",
   "./avatars.webp?v=0.50.0",
   "./avatars-fill.webp?v=0.50.0",
 ];
