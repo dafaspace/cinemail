@@ -2695,7 +2695,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.53.4</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.53.5</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -6018,7 +6018,21 @@ async function loadRecs() {
       const whyRule = hasQ
         ? `Each "why" MUST first state how the film satisfies the request "${q}" (name the explicit connection), then it may add how it fits their taste.`
         : `Each "why" explains in one sentence why it fits their taste.`;
-      const prompt = `You are a film expert helping someone find what to watch.\n\n${requestBlock}\n\n${watched?`The person has watched these (use ONLY as a secondary tie-breaker for tone/quality — and DO NOT suggest any of them):\n${watched}`:"No watch history yet."}${planned?`\nOn their watchlist — DO NOT suggest: ${planned}`:""}${tasteCtx?`\n${tasteCtx}`:""}\n\nSuggest exactly 7 films or TV shows.\nRules:\n- CRITICAL: none may appear in the watched or watchlist lists above.\n- ${whyRule}\n- Vary genres/eras only when the request does not imply a specific style.${_recLangRule()}\n\nReply ONLY with a JSON array, no other text:\n[{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
+      // Never let it name the crew of the film it is RECOMMENDING. Checked against TMDB on
+      // a real account, all three crew claims in one round of picks were invented: Holy
+      // Spider was credited to Kasper Tuxen (it is Nadim Carlsen), The Eternal Memory to
+      // Óscar Fuentes and Álvaro Díaz de la Iguera (Miguel Miranda and José Miguel Tobar),
+      // Strange Days to Elliot Goldenthal (Graeme Revell). They were not random - Kasper
+      // Tuxen sits in this user's own top cinematographers, so the model was borrowing
+      // names from the taste profile to make the connection sound earned.
+      //
+      // The card directly underneath prints the real director, cinematographer and
+      // composer from TMDB, so an invented name contradicts the app on the same screen -
+      // in the one area the app exists to be trusted about. There is nothing to verify
+      // against at generation time, because the crew is only fetched after the titles come
+      // back, so the fix is to forbid the claim rather than to check it.
+      const crewRule = `NEVER name the director, cinematographer, composer, or any crew member OF A FILM YOU ARE SUGGESTING - you do not have their credits and any name you produce will be wrong. Describe what the film does instead. You MAY name people from the person's own watched list, because those credits are given to you above.`;
+      const prompt = `You are a film expert helping someone find what to watch.\n\n${requestBlock}\n\n${watched?`The person has watched these (use ONLY as a secondary tie-breaker for tone/quality — and DO NOT suggest any of them):\n${watched}`:"No watch history yet."}${planned?`\nOn their watchlist — DO NOT suggest: ${planned}`:""}${tasteCtx?`\n${tasteCtx}`:""}\n\nSuggest exactly 7 films or TV shows.\nRules:\n- CRITICAL: none may appear in the watched or watchlist lists above.\n- ${whyRule}\n- ${crewRule}\n- Vary genres/eras only when the request does not imply a specific style.${_recLangRule()}\n\nReply ONLY with a JSON array, no other text:\n[{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
       try { suggestions = await proxyFetchWithRetry({ model:"claude-haiku-4-5-20251001", max_tokens:1400, messages:[{role:"user",content:prompt}] }); }
       catch(e) { if (e.message==="rate_limited") { el.innerHTML=""; btn.disabled=false; btn.textContent=t('find_btn'); return; } throw e; }
     } else {
