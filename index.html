@@ -141,6 +141,11 @@ body {
 .form-group input,
 .form-group textarea,
 .form-group select {
+  /* 40px before this: 14px of text between 10px paddings. The base button rule's 44px
+     floor is written for `button` and never reached a field. A field is a touch target
+     like any other, and unlike a button it cannot carry an invisible pseudo-element floor
+     - a replaced element has no ::after - so the height has to be real. */
+  min-height: 44px;
   width: 100%;
   background: rgba(255,255,255,0.04);
   border: 1px solid var(--border);
@@ -203,6 +208,19 @@ button {
    .av-glyph is excluded - it already uses both pseudo-elements to draw the avatar's
    paper and its ink. */
 button:not(.av-glyph) { position: relative; }
+/* A link with an onclick and no href is a control, not a link - the eight of them are
+   the auth actions and the modal escapes - and it needs the same 44px floor the buttons
+   got. Written as one rule rather than on each, and safe as a blanket because none of
+   the eight sits inline inside a sentence, where a 44px floor would reach across the
+   words around it. Real links, the ones with href, are untouched. */
+a[onclick]:not([href]) { position: relative; display: inline-block; }
+a[onclick]:not([href])::after {
+  content: ''; position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%; height: 100%;
+  min-width: 44px; min-height: 44px;
+}
+
 button:not(.av-glyph)::after {
   content: ''; position: absolute; left: 50%; top: 50%;
   transform: translate(-50%, -50%);
@@ -2241,7 +2259,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     <div class="auth-footer" style="margin-top:20px;font-size:14px">
       <span data-i18n="new_here">New to Cinemail?</span> <a onclick="showScreen('signup')" data-i18n="create_acct_link" style="font-weight:700;font-size:15px">Create account</a>
     </div>
-    <div style="margin-top:18px;text-align:center">
+    <div style="margin-top:34px;text-align:center">
       <a id="guest-signin-btn" onclick="doGuestSignIn()" data-i18n="continue_as_guest" style="font-size:13px;color:var(--muted);cursor:pointer;text-decoration:none;border-bottom:1px dashed rgba(255,255,255,0.2);padding-bottom:1px">Continue as guest</a>
     </div>
   </div>
@@ -2277,7 +2295,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     <div class="auth-footer">
       <span data-i18n="have_acct">Already have an account?</span> <a onclick="showScreen('signin')" data-i18n="sign_in_link">Sign in</a>
     </div>
-    <div style="margin-top:18px;text-align:center">
+    <div style="margin-top:34px;text-align:center">
       <a id="guest-signup-btn" onclick="doGuestSignIn()" data-i18n="continue_as_guest" style="font-size:13px;color:var(--muted);cursor:pointer;text-decoration:none;border-bottom:1px dashed rgba(255,255,255,0.2);padding-bottom:1px">Continue as guest</a>
     </div>
   </div>
@@ -2710,7 +2728,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.54.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.54.2</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
