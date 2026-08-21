@@ -321,7 +321,12 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .topbar-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  /* Both of these are 44px targets now and neither has a bezel, so HIG asks for about 24
+     points of clear space rather than the 12 a framed control gets. At 8 the two hit areas
+     sat 8px apart: no overlap, but a missed tap landed on the neighbour instead of on
+     nothing. The gap is between the HIT areas - the avatar's disc is inset 3px inside its
+     own 44, so the space you see is 3px wider than the number here. */
+  gap: 24px;
 }
 
 /* ── Avatar button — yellow as requested ───────────────────────────── */
@@ -2420,7 +2425,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   </div>
 
   <!-- Guest banner (hidden for real users) -->
-  <div id="guest-banner" style="display:none;background:linear-gradient(90deg,rgba(90,147,255,0.14),rgba(90,147,255,0.08));border-bottom:1px solid rgba(90,147,255,0.22);padding:9px 16px;align-items:center;justify-content:space-between;gap:12px">
+  <div id="guest-banner" style="display:none;background:linear-gradient(90deg,rgba(90,147,255,0.14),rgba(90,147,255,0.08));border-bottom:1px solid rgba(90,147,255,0.22);padding:18px 16px;align-items:center;justify-content:space-between;gap:12px">
     <span id="guest-banner-text" style="font-size:13px;color:var(--accent-text)" data-i18n="guest_banner">You're browsing as guest</span>
     <button onclick="showGuestConvertModal()" data-i18n="guest_join_btn" style="padding:6px 16px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif;white-space:nowrap;flex-shrink:0">Join Cinemail</button>
   </div>
@@ -2728,7 +2733,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.54.2</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.54.3</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
