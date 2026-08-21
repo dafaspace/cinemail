@@ -35,10 +35,24 @@ html, body { height: 100%; overflow-x: clip; overscroll-behavior-x: none; }
   --primary-dark:    #d4a900;
   --primary-soft:    rgba(245,197,24,0.1);
   --primary-border:  rgba(245,197,24,0.3);
-  --accent:          #7c3aed;
-  --accent-soft:     rgba(124,58,237,0.1);
-  --accent-border:   rgba(124,58,237,0.3);
-  --accent-text:     #a78bfa;
+  /* The secondary accent marks the social side of the app - shared lists, invites, the
+     onboarding's own buttons. It used to be #7c3aed, a violet unrelated to anything else
+     in the product, and it was failing twice over: as text on the page it measured
+     3.38:1, under the 4.5:1 floor, and --accent-text (#a78bfa) sitting ON an --accent
+     button measured 2.09:1, which fails even the large-text minimum.
+     The root of the second one is a variable doing two jobs: --accent-text served both as
+     text on the page and as text on top of the accent, and those want opposite colours.
+     They are split now, --on-accent being the second.
+     The colour is the indigo already in the avatar palette, set perceptually at L62 with
+     the highest chroma sRGB holds at that hue, so the app and the avatars share one
+     measured set instead of two unrelated ones. Measured: indigo as text on the page
+     6.47:1, --on-accent on an indigo button 6.47:1. Never white on it (2.98:1) and never
+     gold on it (1.83:1). */
+  --accent:          #5A93FF;
+  --accent-soft:     rgba(90,147,255,0.1);
+  --accent-border:   rgba(90,147,255,0.3);
+  --accent-text:     #5A93FF;
+  --on-accent:       #0d0d1a;   /* text placed ON --accent; see the note above */
   --text:            #f0f0f0;
   --muted:           #666;
   --border:          rgba(255,255,255,0.08);
@@ -224,7 +238,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   color: #fff;
   width: 100%;
 }
-.btn-accent:hover { background: rgba(124,58,237,0.85); }
+.btn-accent:hover { background: rgba(90,147,255,0.85); }
 
 .btn-secondary {
   background: transparent;
@@ -447,7 +461,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   justify-content: center;
 }
 .btn-watchlist {
-  border: 1px solid rgba(124,58,237,0.45);
+  border: 1px solid rgba(90,147,255,0.45);
   color: #aaa;
 }
 .btn-watched {
@@ -554,8 +568,8 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   color: #111;
   font-weight: 600;
 }
-.filter-pill.list-pill { border-color: rgba(124,58,237,0.3); color: #888; }
-.filter-pill.list-pill.active { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+.filter-pill.list-pill { border-color: rgba(90,147,255,0.3); color: #888; }
+.filter-pill.list-pill.active { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 600; }
 
 /* ── History cards ──────────────────────────────────────────────────── */
 .hist-card {
@@ -862,9 +876,9 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 /* One-time coach bubble (first-run hint pointing at the action icons) */
 .coach-bubble {
   position: fixed; z-index: 9500; max-width: 220px;
-  background: rgba(124,58,237,0.18); color: #fff;
+  background: rgba(90,147,255,0.18); color: #fff;
   -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
-  border: 1.5px solid rgba(124,58,237,0.55);
+  border: 1.5px solid rgba(90,147,255,0.55);
   padding: 12px 14px; border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.5);
   font-size: 13px; animation: coach-in 0.2s ease;
@@ -921,7 +935,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .picks-banner {
   margin-bottom: 12px;
   padding: 10px 14px;
-  background: rgba(124,58,237,0.08);
+  background: rgba(90,147,255,0.08);
   border: 1px solid var(--accent-border);
   border-radius: var(--radius);
 }
@@ -1255,8 +1269,8 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 }
 @media (hover: hover) { .list-check-row:hover { background: rgba(255,255,255,0.05); } }
 .list-check-row.checked {
-  border-color: rgba(124,58,237,0.25);
-  background: rgba(124,58,237,0.07);
+  border-color: rgba(90,147,255,0.25);
+  background: rgba(90,147,255,0.07);
 }
 .list-check-row.checked-personal {
   border-color: rgba(245,197,24,0.2);
@@ -1391,7 +1405,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .list-tab.active {
   background: var(--accent);
   border-color: var(--accent);
-  color: var(--accent-text);
+  color: var(--on-accent);
   font-weight: 600;
 }
 .list-tab.personal.active {
@@ -1440,7 +1454,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   display: inline-flex; align-items: center;
   padding: 2px 8px; border-radius: 4px;
   font-size: 10px; font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; letter-spacing: 0.5px;
-  background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.25);
+  background: rgba(90,147,255,0.12); border: 1px solid rgba(90,147,255,0.25);
   color: var(--accent-text); white-space: nowrap;
 }
 .list-picker-opt {
@@ -1560,8 +1574,8 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   50%{box-shadow:0 0 0 7px rgba(245,197,24,0)}
 }
 @keyframes ob-pulse-v {
-  0%,100%{box-shadow:0 0 0 0 rgba(124,58,237,0.4)}
-  50%{box-shadow:0 0 0 8px rgba(124,58,237,0)}
+  0%,100%{box-shadow:0 0 0 0 rgba(90,147,255,0.4)}
+  50%{box-shadow:0 0 0 8px rgba(90,147,255,0)}
 }
 /* Bottom controls */
 .ob-bottom {
@@ -1586,7 +1600,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .ob-btn-skip:hover { border-color: var(--primary-border); color: var(--text); }
 .ob-btn-next { min-height: 44px;
   flex: 1; padding: 14px; border-radius: 14px; border: none;
-  background: var(--accent); color: var(--accent-text);
+  background: var(--accent); color: var(--on-accent);
   font-size: 15px; font-weight: 600; cursor: pointer;
   font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif; transition: opacity 0.15s;
 }
@@ -1633,7 +1647,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 }
 .ob-mock-surprise {
   padding: 13px 24px; border-radius: 12px; border: none;
-  background: var(--accent); color: var(--accent-text);
+  background: var(--accent); color: var(--on-accent);
   font-size: 15px; font-weight: 600; width: 100%; cursor: default;
   animation: ob-pulse-v 2s ease-in-out infinite;
 }
@@ -1900,7 +1914,10 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 
     <!-- Slide 0: Welcome -->
     <div class="ob-slide">
-      <img src="icon.png" alt="Cinemail" style="width:96px;height:96px;border-radius:22px;margin-bottom:16px;filter:drop-shadow(0 0 30px rgba(245,197,24,0.22))">
+      <!-- logo.png, not icon.png: the icon is opaque, so drop-shadow traced its square
+           and the glow read as a rectangle behind the mark rather than light coming off
+           it. The logo carries an alpha channel, so the glow follows the envelope. -->
+      <img src="logo.png" alt="Cinemail" style="width:108px;height:108px;margin-bottom:16px;filter:drop-shadow(0 0 26px rgba(245,197,24,0.28))">
       <div class="ob-title" style="font-size:40px;letter-spacing:3px;margin-bottom:8px"><span>CINE</span>MAIL</div>
       <div class="ob-body" data-i18n="ob0_body" style="margin-bottom:28px">Films. Music. Friends.</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:240px">
@@ -2370,9 +2387,9 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   </div>
 
   <!-- Guest banner (hidden for real users) -->
-  <div id="guest-banner" style="display:none;background:linear-gradient(90deg,rgba(124,58,237,0.14),rgba(124,58,237,0.08));border-bottom:1px solid rgba(124,58,237,0.22);padding:9px 16px;align-items:center;justify-content:space-between;gap:12px">
+  <div id="guest-banner" style="display:none;background:linear-gradient(90deg,rgba(90,147,255,0.14),rgba(90,147,255,0.08));border-bottom:1px solid rgba(90,147,255,0.22);padding:9px 16px;align-items:center;justify-content:space-between;gap:12px">
     <span id="guest-banner-text" style="font-size:13px;color:var(--accent-text)" data-i18n="guest_banner">You're browsing as guest</span>
-    <button onclick="showGuestConvertModal()" data-i18n="guest_join_btn" style="padding:6px 16px;border-radius:20px;background:var(--accent);border:none;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif;white-space:nowrap;flex-shrink:0">Join Cinemail</button>
+    <button onclick="showGuestConvertModal()" data-i18n="guest_join_btn" style="padding:6px 16px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif;white-space:nowrap;flex-shrink:0">Join Cinemail</button>
   </div>
 
   <!-- Tab bar -->
@@ -2405,7 +2422,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <input id="rec-input" type="text" data-i18n-ph="recs_ph" placeholder="Mood, genre, or anything…">
       <button class="btn btn-primary btn-sm" style="width:auto;min-width:104px" id="rec-btn" onclick="loadRecs()" data-i18n="find_btn">Find</button>
     </div>
-    <button onclick="surpriseMe()" data-i18n="surprise" style="width:100%;margin-top:0;margin-bottom:12px;padding:11px;border-radius:11px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.5);color:#c4b5fd;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:1.5px;cursor:pointer;transition:all .18s;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)" onmouseover="this.style.background='rgba(124,58,237,0.22)';this.style.borderColor='rgba(124,58,237,0.85)';this.style.boxShadow='0 4px 18px rgba(124,58,237,0.28)';this.style.color='#ddd6fe'" onmouseout="this.style.background='rgba(124,58,237,0.12)';this.style.borderColor='rgba(124,58,237,0.5)';this.style.boxShadow='none';this.style.color='#c4b5fd'">✨ Surprise Me</button>
+    <button onclick="surpriseMe()" data-i18n="surprise" style="width:100%;margin-top:0;margin-bottom:12px;padding:11px;border-radius:11px;background:rgba(90,147,255,0.12);border:1px solid rgba(90,147,255,0.5);color:#c4b5fd;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:1.5px;cursor:pointer;transition:all .18s;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)" onmouseover="this.style.background='rgba(90,147,255,0.22)';this.style.borderColor='rgba(90,147,255,0.85)';this.style.boxShadow='0 4px 18px rgba(90,147,255,0.28)';this.style.color='#ddd6fe'" onmouseout="this.style.background='rgba(90,147,255,0.12)';this.style.borderColor='rgba(90,147,255,0.5)';this.style.boxShadow='none';this.style.color='#c4b5fd'">✨ Surprise Me</button>
     <div id="picks-hint" style="display:none;margin-bottom:12px;padding:11px 13px;background:rgba(245,197,24,0.07);border:1px solid rgba(245,197,24,0.22);border-radius:10px;font-size:12px;line-height:1.5;color:var(--text)">
       <div data-i18n="picks_random_hint" style="margin-bottom:9px;color:#cfcfcf">Without watched films, picks are random. Mark 5-10 films as Watched and they become personal to your taste.</div>
       <button onclick="dismissPicksHint()" data-i18n="picks_hint_got" style="padding:5px 14px;border-radius:8px;background:rgba(245,197,24,0.15);border:1px solid rgba(245,197,24,0.3);color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">Got it</button>
@@ -2546,7 +2563,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <textarea id="share-message" data-i18n-ph="share_msg_ph" placeholder="Why you'd love this…" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:55px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--accent-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" onclick="closeShare()" data-i18n="cancel">Cancel</button>
-        <button id="share-confirm-btn" onclick="confirmShare()" style="flex:2;padding:10px;border-radius:9px;background:var(--accent);border:none;color:#fff;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer" data-i18n="send_btn">Send</button>
+        <button id="share-confirm-btn" onclick="confirmShare()" style="flex:2;padding:10px;border-radius:9px;background:var(--accent);border:none;color:var(--on-accent);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer" data-i18n="send_btn">Send</button>
       </div>
       <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">
         <div class="add-label" data-i18n="share_outside_lbl">Not on Cinemail?</div>
@@ -2575,7 +2592,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <!-- Guest card (shown only in guest mode) -->
       <div id="acc-guest-card" style="display:none;text-align:center;padding:0 0 8px">
         <p style="color:var(--muted);font-size:13px;line-height:1.55;margin-bottom:18px" data-i18n="guest_save_sub">Save films, get personal picks and share with friends - free forever.</p>
-        <button onclick="closeAccount();showGuestConvertModal()" data-i18n="guest_join_btn" style="width:100%;padding:12px;border-radius:10px;background:var(--accent);border:none;color:#fff;font-size:15px;font-weight:600;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;margin-bottom:8px">Join Cinemail</button>
+        <button onclick="closeAccount();showGuestConvertModal()" data-i18n="guest_join_btn" style="width:100%;padding:12px;border-radius:10px;background:var(--accent);border:none;color:var(--on-accent);font-size:15px;font-weight:600;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;margin-bottom:8px">Join Cinemail</button>
       </div>
 
       <!-- Member-only block: stats, name, backup, friends (hidden for guests) -->
@@ -2678,7 +2695,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.52.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.53.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -5772,7 +5789,7 @@ function renderHistory() {
     filtered = watchHistory.filter(h => h.status === 'plan' && h.listId === _activeListId);
   }
   if (!watchHistory.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">${t('empty_list_title')}</div><p>${t('empty_list_sub')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">${t('empty_list_title')}</div><p>${t('empty_list_sub')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
     return;
   }
   if (!filtered.length) {
@@ -5781,9 +5798,9 @@ function renderHistory() {
     if (isWatchedTab) {
       emptyMsg = `<div class="empty-state"><div class="empty-state-icon">🍿</div><div class="empty-state-title">${t('nothing_yet')}</div><p>${t('mark_seen')}</p></div>`;
     } else if (activeList) {
-      emptyMsg = `<div class="empty-state"><div class="empty-state-icon">${icon('film',34)}</div><div class="empty-state-title">${escapeHtml(activeList.name)}</div><p>${t('empty_shared_sub')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
+      emptyMsg = `<div class="empty-state"><div class="empty-state-icon">${icon('film',34)}</div><div class="empty-state-title">${escapeHtml(activeList.name)}</div><p>${t('empty_shared_sub')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
     } else {
-      emptyMsg = `<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">${t('nothing_yet')}</div><p>${t('save_to_list')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
+      emptyMsg = `<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">${t('nothing_yet')}</div><p>${t('save_to_list')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
     }
     el.innerHTML = emptyMsg;
     return;
@@ -5938,7 +5955,7 @@ async function surpriseMe() {
       <div class="empty-state-icon">✨</div>
       <div class="empty-state-title">${escapeHtml(t('surprise_need_title'))}</div>
       <p>${escapeHtml(t('surprise_need_sub').replace('{n}', seen).replace('{need}', SURPRISE_MIN_WATCHED))}</p>
-      <button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${escapeHtml(t('empty_list_btn'))}</button>
+      <button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${escapeHtml(t('empty_list_btn'))}</button>
     </div>`;
     return;
   }
@@ -6090,7 +6107,7 @@ function renderFriendsSection() {
       html += `<div class="friend-row">
         ${_avatarMarkup(f.user_id, name, 36)}
         <div style="flex:1;font-size:13px">${escapeHtml(name)} <span style="color:var(--muted);font-size:11px">${t('friend_wants')}</span></div>
-        <button onclick="respondFriendRequest('${f.id}','accepted')" style="background:var(--accent);border:none;color:#fff;border-radius:6px;padding:4px 10px;font-size:11px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${t('accept')}</button>
+        <button onclick="respondFriendRequest('${f.id}','accepted')" style="background:var(--accent);border:none;color:var(--on-accent);border-radius:6px;padding:4px 10px;font-size:11px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${t('accept')}</button>
         <button onclick="respondFriendRequest('${f.id}','declined')" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#666;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;margin-left:4px">✕</button>
       </div>`;
     }
@@ -6359,7 +6376,7 @@ function renderListTabs() {
 
   if (_listTabCreating) {
     html += `<input id="list-tab-input" type="text" placeholder="List name…"
-      style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:rgba(124,58,237,0.1);color:var(--text);font-size:12px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;width:110px;flex-shrink:0"
+      style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:rgba(90,147,255,0.1);color:var(--text);font-size:12px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;width:110px;flex-shrink:0"
       enterkeyhint="done"
       onkeydown="if(event.key==='Enter'){event.preventDefault();_confirmNewListTab()}if(event.key==='Escape')_cancelNewListTab()"
       onblur="_blurNewListTab()">
@@ -6683,9 +6700,9 @@ function renderListManageStrip() {
     el.innerHTML = `
       <div style="display:flex;gap:8px;align-items:center">
         <input id="list-rename-input" type="text" value="${list.name.replace(/"/g,'&quot;')}"
-          style="flex:1;padding:7px 12px;border-radius:9px;border:1px solid var(--accent-border);background:rgba(124,58,237,0.08);color:var(--text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none"
+          style="flex:1;padding:7px 12px;border-radius:9px;border:1px solid var(--accent-border);background:rgba(90,147,255,0.08);color:var(--text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none"
           onkeydown="if(event.key==='Enter')renameList('${list.id}');if(event.key==='Escape'){_listManageMode=null;renderListManageStrip();}">
-        <button onclick="renameList('${list.id}')" style="padding:7px 14px;border-radius:9px;background:var(--accent);border:none;color:var(--accent-text);font-size:13px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${t('save')}</button>
+        <button onclick="renameList('${list.id}')" style="padding:7px 14px;border-radius:9px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${t('save')}</button>
         <button onclick="_listManageMode=null;renderListManageStrip()" style="padding:7px 10px;border-radius:9px;background:none;border:1px solid var(--border);color:#666;font-size:13px;cursor:pointer">✕</button>
       </div>`;
     setTimeout(() => { const i = document.getElementById('list-rename-input'); if(i){i.focus();i.select();} }, 50);
@@ -6695,7 +6712,7 @@ function renderListManageStrip() {
   if (_listManageMode === 'invite') {
     const friends = _friendsCache;
     el.innerHTML = `
-      <div style="padding:10px;background:rgba(124,58,237,0.05);border-radius:10px;border:1px solid rgba(124,58,237,0.15);margin-bottom:4px">
+      <div style="padding:10px;background:rgba(90,147,255,0.05);border-radius:10px;border:1px solid rgba(90,147,255,0.15);margin-bottom:4px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <span style="font-size:12px;color:var(--muted)">${t('list_invite_to')} <strong style="color:var(--text)">${escapeHtml(list.name)}</strong></span>
           <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;line-height:1;padding:2px 4px">×</button>
@@ -6736,7 +6753,7 @@ function renderListManageStrip() {
   }
 
   if (_listManageMode === 'link') {
-    el.innerHTML = `<div style="padding:10px;background:rgba(124,58,237,0.05);border-radius:10px;border:1px solid rgba(124,58,237,0.15)">
+    el.innerHTML = `<div style="padding:10px;background:rgba(90,147,255,0.05);border-radius:10px;border:1px solid rgba(90,147,255,0.15)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
         <span style="font-size:12px;color:var(--muted)">${t('list_invite_link_for')} <strong style="color:var(--text)">${escapeHtml(list.name)}</strong></span>
         <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;padding:2px 4px">×</button>
@@ -6755,9 +6772,9 @@ function renderListManageStrip() {
       ${isOwner ? `<button onclick="_listManageMode='rename';renderListManageStrip()"
         style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:none;color:#888;font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${t('list_rename')}</button>` : ''}
       ${isOwner ? `<button onclick="_listManageMode='invite';renderListManageStrip()"
-        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(124,58,237,0.3);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">+ ${t('list_invite')}</button>` : ''}
+        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(90,147,255,0.3);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">+ ${t('list_invite')}</button>` : ''}
       ${isOwner ? `<button onclick="_listManageMode='link';renderListManageStrip()"
-        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(124,58,237,0.3);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" style="vertical-align:middle;margin-right:3px"><circle cx="11" cy="2.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="11" cy="11.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="3" cy="7" r="1.8" stroke="currentColor" stroke-width="1.4"/><line x1="4.7" y1="6.1" x2="9.3" y2="3.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="4.7" y1="7.9" x2="9.3" y2="10.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>${t('list_link')}</button>` : ''}
+        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(90,147,255,0.3);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" style="vertical-align:middle;margin-right:3px"><circle cx="11" cy="2.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="11" cy="11.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="3" cy="7" r="1.8" stroke="currentColor" stroke-width="1.4"/><line x1="4.7" y1="6.1" x2="9.3" y2="3.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="4.7" y1="7.9" x2="9.3" y2="10.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>${t('list_link')}</button>` : ''}
       <button onclick="_listManageMode='confirm-delete';renderListManageStrip()"
         style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:none;color:#666;font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${isOwner ? t('list_delete') : t('list_leave')}</button>
       ${list.memberCount > 0 ? `<button onclick="_listManageMode='members';renderListManageStrip()"
@@ -6790,7 +6807,7 @@ function renderListsSection() {
       </div>`;
     } else if (_listInviteTargetId === list.id) {
       const avail = _friendsCache;
-      html += `<div class="list-row" style="flex-direction:column;align-items:flex-start;background:rgba(124,58,237,0.05);border-radius:8px;padding:10px;gap:6px">
+      html += `<div class="list-row" style="flex-direction:column;align-items:flex-start;background:rgba(90,147,255,0.05);border-radius:8px;padding:10px;gap:6px">
         <div style="display:flex;align-items:center;gap:8px;width:100%">
           <span style="font-size:13px;font-weight:600;flex:1">${escapeHtml(list.name)}</span>
           <button onclick="event.stopPropagation();_listInviteTargetId=null;renderListsSection()" style="background:none;border:none;color:#555;font-size:18px;line-height:1;cursor:pointer;padding:4px 6px">×</button>
@@ -6811,7 +6828,7 @@ function renderListsSection() {
           <div style="font-size:11px;color:var(--muted)">${sub}</div>
         </div>
         ${isOwner ? `<button onclick="event.stopPropagation();_listInviteTargetId='${list.id}';_listDeleteConfirmId=null;renderListsSection()"
-          style="background:none;border:1px solid rgba(124,58,237,0.3);color:var(--accent-text);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">+ ${t('list_invite')}</button>` : ''}
+          style="background:none;border:1px solid rgba(90,147,255,0.3);color:var(--accent-text);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">+ ${t('list_invite')}</button>` : ''}
         <button onclick="event.stopPropagation();_listDeleteConfirmId='${list.id}';_listInviteTargetId=null;renderListsSection()"
           style="background:none;border:none;color:#555;font-size:18px;line-height:1;cursor:pointer;padding:6px 8px;margin:-6px -4px" title="${isOwner ? 'Delete list' : 'Leave list'}">${isOwner ? '×' : '↩'}</button>
       </div>`;
@@ -6876,7 +6893,7 @@ function _qrURL(url, size) {
 // decoder across 69 strings: a centre square up to 30% of the side still reads, 35% does
 // not. This uses 22%, half the failing size.
 function _qrHTML(url, size) {
-  const logo = Math.round(size * 0.22);
+  const logo = Math.round(size * 0.17);   // 2.9% of the area; decoding tolerates up to 30% of the side
   return `<div style="position:relative;width:${size}px;height:${size}px;margin:0 auto 10px">
     <img src="${_qrURL(url, size)}" width="${size}" height="${size}" style="border-radius:10px;display:block" alt="">
     <img src="icon.png" alt="" width="${logo}" height="${logo}"
@@ -7068,7 +7085,7 @@ async function _loadInviteLink(listId) {
       <div style="font-size:10px;color:var(--muted);margin-bottom:10px">${t('invite_valid_48')}</div>
       <div style="display:flex;gap:8px">
         <button onclick='_shareOrCopy(${JSON.stringify(url)}, "Cinemail", ${JSON.stringify(msg)})'
-          style="flex:2;padding:9px;border-radius:8px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer">${t('share_invite')}</button>
+          style="flex:2;padding:9px;border-radius:8px;background:var(--accent);border:none;color:var(--on-accent);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer">${t('share_invite')}</button>
         <button onclick='navigator.clipboard.writeText(${JSON.stringify(url)}).then(()=>showToast("Link copied!"))'
           style="flex:1;padding:9px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${t('copy')}</button>
       </div>`;
@@ -7114,7 +7131,7 @@ function _showJoinConfirm(token, listId, listName) {
     <div style="font-size:13px;color:var(--muted);margin-bottom:22px">${t('join_invited_sub')}</div>
     <div style="display:flex;gap:10px">
       <button onclick="_confirmJoin('${encodeURIComponent(token)}','${listId}','${safeName}')"
-        style="flex:1;padding:13px;border-radius:10px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:16px;cursor:pointer;letter-spacing:1px">${t('inv_join_list')}</button>
+        style="flex:1;padding:13px;border-radius:10px;background:var(--accent);border:none;color:var(--on-accent);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:16px;cursor:pointer;letter-spacing:1px">${t('inv_join_list')}</button>
       <button onclick="document.getElementById('join-confirm-overlay').remove()"
         style="flex:1;padding:13px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--muted);font-size:14px;cursor:pointer">${t('inv_decline')}</button>
     </div>
@@ -7259,12 +7276,12 @@ function openListPicker(movie, status, callback = null) {
   _listPickerCallback = callback || null;
   const opts = document.getElementById('list-picker-options');
   const isPersonalActive = _activeListId === 'personal' || _activeListId === null;
-  const activeStyle = 'border-color:var(--accent);background:rgba(124,58,237,0.08);';
+  const activeStyle = 'border-color:var(--accent);background:rgba(90,147,255,0.08);';
   if (opts) opts.innerHTML = `
     <button class="list-picker-opt" style="${isPersonalActive && !callback ? activeStyle : ''}" onclick="_onListPicked(null)">
       <div style="display:flex;align-items:center;gap:6px">
         <div style="font-size:14px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">${(currentUser?.displayName||currentUser?.email?.split('@')[0]||'My')+"'s List"}</div>
-        ${isPersonalActive && !callback ? '<span style="font-size:10px;color:var(--accent-text);background:rgba(124,58,237,0.15);padding:1px 7px;border-radius:10px">active</span>' : ''}
+        ${isPersonalActive && !callback ? '<span style="font-size:10px;color:var(--accent-text);background:rgba(90,147,255,0.15);padding:1px 7px;border-radius:10px">active</span>' : ''}
       </div>
       <div style="font-size:11px;color:var(--muted);margin-top:2px">Personal</div>
     </button>
@@ -7273,7 +7290,7 @@ function openListPicker(movie, status, callback = null) {
       return `<button class="list-picker-opt" style="${isActive ? activeStyle : ''}" onclick="_onListPicked('${l.id}')">
         <div style="display:flex;align-items:center;gap:6px">
           <div style="font-size:14px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">${escapeHtml(l.name)}</div>
-          ${isActive ? '<span style="font-size:10px;color:var(--accent-text);background:rgba(124,58,237,0.15);padding:1px 7px;border-radius:10px">active</span>' : ''}
+          ${isActive ? '<span style="font-size:10px;color:var(--accent-text);background:rgba(90,147,255,0.15);padding:1px 7px;border-radius:10px">active</span>' : ''}
         </div>
         <div style="font-size:11px;color:var(--muted);margin-top:2px">${l.memberCount ? l.memberCount + ' member' + (l.memberCount !== 1 ? 's' : '') : l.role}</div>
       </button>`;
@@ -7292,9 +7309,9 @@ function _renderListPickerNewRow() {
     row.innerHTML = `
       <div style="display:flex;gap:6px">
         <input id="list-picker-new-input" type="text" placeholder="New list name…" maxlength="40"
-          style="flex:1;padding:9px 11px;border-radius:8px;border:1px solid var(--accent-border);background:rgba(124,58,237,0.08);color:var(--text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none"
+          style="flex:1;padding:9px 11px;border-radius:8px;border:1px solid var(--accent-border);background:rgba(90,147,255,0.08);color:var(--text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none"
           onkeydown="if(event.key==='Enter')_createListFromPicker();if(event.key==='Escape'){_listPickerNewMode=false;_renderListPickerNewRow()}">
-        <button onclick="_createListFromPicker()" style="padding:9px 14px;border-radius:8px;border:none;background:var(--accent);color:var(--accent-text);font-size:12px;cursor:pointer;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">Create</button>
+        <button onclick="_createListFromPicker()" style="padding:9px 14px;border-radius:8px;border:none;background:var(--accent);color:var(--on-accent);font-size:12px;cursor:pointer;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">Create</button>
       </div>`;
     setTimeout(() => document.getElementById('list-picker-new-input')?.focus(), 30);
   } else {
@@ -7720,12 +7737,12 @@ function _renderListInvCard(inv) {
 
   return `<div class="inv-card${isCardUnread ? ' inv-unread' : ''}" id="inv-card-${inv.id}">
     <div style="display:flex;gap:11px;align-items:center">
-      <div style="width:46px;height:66px;border-radius:10px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">📋</div>
+      <div style="width:46px;height:66px;border-radius:10px;background:rgba(90,147,255,0.1);border:1px solid rgba(90,147,255,0.25);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">📋</div>
       <div style="flex:1;min-width:0">
         <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;line-height:1.2">${escapeHtml(inv.title || 'Shared List')}</div>
         <div style="font-size:11px;margin-top:3px">${statusLine}</div>
         ${isPending ? `<div style="display:flex;gap:8px;margin-top:8px;position:relative;z-index:2" onclick="event.stopPropagation()">
-          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','accepted')" style="padding:6px 14px;border-radius:6px;background:var(--accent);border:none;color:var(--accent-text);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">${t('inv_join_list')}</button>
+          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','accepted')" style="padding:6px 14px;border-radius:6px;background:var(--accent);border:none;color:var(--on-accent);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">${t('inv_join_list')}</button>
           <button onclick="event.stopPropagation();respondInviteById('${inv.id}','declined')" style="padding:6px 14px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">✕ ${t('inv_decline')}</button>
         </div>` : ''}
       </div>
@@ -9066,7 +9083,7 @@ const ImportProgress = {
         </div>
       </div>
       <div id="ip-actions" style="margin-top:18px;display:none">
-        <button onclick="ImportProgress.close()" style="width:100%;padding:11px;border-radius:10px;background:var(--accent);border:none;color:var(--accent-text);font-size:14px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer">OK</button>
+        <button onclick="ImportProgress.close()" style="width:100%;padding:11px;border-radius:10px;background:var(--accent);border:none;color:var(--on-accent);font-size:14px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer">OK</button>
       </div>
       <div id="ip-cancel-wrap" style="margin-top:14px">
         <button onclick="ImportProgress.cancel()" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${escapeHtml(t('cancel'))}</button>
