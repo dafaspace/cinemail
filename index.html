@@ -2695,7 +2695,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.53.3</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.53.4</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -6018,8 +6018,8 @@ async function loadRecs() {
       const whyRule = hasQ
         ? `Each "why" MUST first state how the film satisfies the request "${q}" (name the explicit connection), then it may add how it fits their taste.`
         : `Each "why" explains in one sentence why it fits their taste.`;
-      const prompt = `You are a film expert helping someone find what to watch.\n\n${requestBlock}\n\n${watched?`The person has watched these (use ONLY as a secondary tie-breaker for tone/quality — and DO NOT suggest any of them):\n${watched}`:"No watch history yet."}${planned?`\nOn their watchlist — DO NOT suggest: ${planned}`:""}${tasteCtx?`\n${tasteCtx}`:""}\n\nSuggest exactly 5 films or TV shows.\nRules:\n- CRITICAL: none may appear in the watched or watchlist lists above.\n- ${whyRule}\n- Vary genres/eras only when the request does not imply a specific style.${_recLangRule()}\n\nReply ONLY with a JSON array, no other text:\n[{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
-      try { suggestions = await proxyFetchWithRetry({ model:"claude-haiku-4-5-20251001", max_tokens:1000, messages:[{role:"user",content:prompt}] }); }
+      const prompt = `You are a film expert helping someone find what to watch.\n\n${requestBlock}\n\n${watched?`The person has watched these (use ONLY as a secondary tie-breaker for tone/quality — and DO NOT suggest any of them):\n${watched}`:"No watch history yet."}${planned?`\nOn their watchlist — DO NOT suggest: ${planned}`:""}${tasteCtx?`\n${tasteCtx}`:""}\n\nSuggest exactly 7 films or TV shows.\nRules:\n- CRITICAL: none may appear in the watched or watchlist lists above.\n- ${whyRule}\n- Vary genres/eras only when the request does not imply a specific style.${_recLangRule()}\n\nReply ONLY with a JSON array, no other text:\n[{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
+      try { suggestions = await proxyFetchWithRetry({ model:"claude-haiku-4-5-20251001", max_tokens:1400, messages:[{role:"user",content:prompt}] }); }
       catch(e) { if (e.message==="rate_limited") { el.innerHTML=""; btn.disabled=false; btn.textContent=t('find_btn'); return; } throw e; }
     } else {
       el.innerHTML=`<div class="empty-state"><div class="empty-state-icon">🔑</div><div class="empty-state-title">${t('recs_unavail_title')}</div><p>${t('recs_unavail_sub')}</p></div>`;
@@ -6031,8 +6031,24 @@ async function loadRecs() {
       const pick = found.find(r=>s.type==="tv"?r.type==="tv":r.type==="movie")||found[0];
       return pick ? {...pick,why:s.why} : {Title:s.title,Year:s.year||"",Poster:"",tmdbID:null,type:s.type||"movie",why:s.why};
     }));
-    el.innerHTML = details.length
-      ? `<div class="card-list">${details.map(m=>movieCardHTML(m,m.why)).join("")}</div>`
+    // Drop anything already in the library. The prompt does say "none may appear in the
+    // watched or watchlist lists above", and the model obeys it - but it is only ever
+    // SHOWN a sample: _tasteSample sends 12 of the watched films and the watchlist is
+    // trimmed to the last 6. A film it never saw can therefore come back as a
+    // recommendation, which is how Felicity's picks returned The Power of the Dog, a film
+    // she had watched and rated 4 stars. Nothing in the prompt can fix that; the check has
+    // to happen here, against the whole library.
+    //
+    // Matched on the resolved TMDB id, which is exact where a title match is not. Seven
+    // are requested so that five survive the filter.
+    const _norm = t => String(t||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+    const knownIds = new Set(watchHistory.map(h=>String(h.tmdbID)).filter(Boolean));
+    const knownTitles = new Set(watchHistory.map(h=>_norm(h.title)).filter(Boolean));
+    const fresh = details.filter(m =>
+      !(m.tmdbID && knownIds.has(String(m.tmdbID))) && !knownTitles.has(_norm(m.Title))
+    ).slice(0, 5);
+    el.innerHTML = fresh.length
+      ? `<div class="card-list">${fresh.map(m=>movieCardHTML(m,m.why)).join("")}</div>`
       : `<div class="empty-state"><div class="empty-state-icon">🤷</div><div class="empty-state-title">${t('recs_none_title')}</div><p>${t('recs_none_sub')}</p></div>`;
   } catch(e) {
     if (e.message==="timeout_or_cancelled") el.innerHTML=`<div class="empty-state"><div class="empty-state-icon">⏱</div><div class="empty-state-title">${t('err_took_long_title')}</div><p>${t('err_took_long_sub')}</p></div>`;
