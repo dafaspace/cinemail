@@ -2695,7 +2695,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.53.5</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.53.6</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -5287,6 +5287,15 @@ function _avatarDiscColor(hex) {
 // Always the dark ink: the drawings are ink on paper, and there is no inversion of them
 // that reads as chalk. See _avatarDiscColor for why the card moves instead.
 function _avatarGlyphInk() { return _AV_INK; }
+// The version the user is actually running, read from the one place that already shows
+// it. This used to be the literal "1.0.0" in the feedback payload, so every report ever
+// filed claimed the same build - the field exists to answer "which version broke?" and
+// was answering it wrongly for all of them.
+function _appVersion() {
+  const el = document.getElementById('app-version');
+  return (el && el.textContent.trim()) || 'unknown';
+}
+
 function getAvatarPrefs() {
   // The cached avatar belongs to whoever last signed in on this device, and localStorage
   // is per-browser, not per-account. Without the owner stamp, signing in as someone else
@@ -9763,7 +9772,7 @@ async function submitFeedback() {
       type: _fbType,
       message,
       screenshot_url: screenshotUrl,
-      app_version: "1.0.0",
+      app_version: _appVersion(),
       user_agent: navigator.userAgent
     }).select();
 
