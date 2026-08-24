@@ -49,8 +49,8 @@ html, body { height: 100%; overflow-x: clip; overscroll-behavior-x: none; }
      6.47:1, --on-accent on an indigo button 6.47:1. Never white on it (2.98:1) and never
      gold on it (1.83:1). */
   --accent:          #5A93FF;
-  --accent-soft:     rgba(90,147,255,0.1);
-  --accent-border:   rgba(90,147,255,0.3);
+  --accent-soft:     color-mix(in srgb, var(--accent) 10%, transparent);
+  --accent-border:   color-mix(in srgb, var(--accent) 30%, transparent);
   --accent-text:     #5A93FF;
   --on-accent:       #0d0d1a;   /* text placed ON --accent; see the note above */
   --text:            #f0f0f0;
@@ -261,7 +261,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   color: #fff;
   width: 100%;
 }
-.btn-accent:hover { background: rgba(90,147,255,0.85); }
+.btn-accent:hover { background: color-mix(in srgb, var(--accent) 85%, transparent); }
 
 .btn-secondary {
   background: transparent;
@@ -476,7 +476,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   line-height: 1.2;
 }
 .card-meta { color: var(--muted); font-size: 11px; margin-top: 2px; }
-.card-hint { color: #444; font-size: 11px; margin-top: 5px; }
+.card-hint { color: var(--muted); font-size: 11px; margin-top: 5px; }
 
 /* ── Card action buttons ────────────────────────────────────────────── */
 .card-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; margin-left: 6px; align-items: flex-end; }
@@ -498,7 +498,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   justify-content: center;
 }
 .btn-watchlist {
-  border: 1px solid rgba(90,147,255,0.45);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
   color: #aaa;
 }
 .btn-watched {
@@ -605,7 +605,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   color: #111;
   font-weight: 600;
 }
-.filter-pill.list-pill { border-color: rgba(90,147,255,0.3); color: #888; }
+.filter-pill.list-pill { border-color: var(--accent-border); color: #888; }
 .filter-pill.list-pill.active { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 600; }
 
 /* ── History cards ──────────────────────────────────────────────────── */
@@ -621,17 +621,20 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   transition: background 0.15s;
 }
 .hist-card:hover { background: rgba(255,255,255,0.07); }
-.hist-card.plan { border-color: rgba(255,255,255,0.05); opacity: 0.85; }
+/* Group opacity dims the text and its own ground together, so it costs contrast on
+   everything inside: at 0.85 the --muted meta line measured 4.10:1. 0.92 measures
+   4.60:1 and still reads as the lighter of the two card states. */
+.hist-card.plan { border-color: rgba(255,255,255,0.05); opacity: 0.92; }
 
 .hist-top { display: flex; justify-content: space-between; align-items: flex-start; }
 .hist-title { font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; font-size: 15px; letter-spacing: 0.5px; }
 .hist-meta { color: var(--muted); font-size: 10px; }
 .hist-del {
-  background: none; border: none; color: #444;
+  background: none; border: none; color: var(--muted);
   cursor: pointer; font-size: 18px; line-height: 1;
   padding: 0 0 0 8px;
 }
-.hist-del:hover { color: #888; }
+.hist-del:hover { color: var(--text); }
 .hist-note { color: #999; font-size: 12px; margin-top: 3px; font-style: italic; }
 
 .status-tag {
@@ -643,7 +646,10 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   margin-top: 4px;
 }
 .status-tag.watched { background: rgba(245,197,24,0.12); color: var(--primary); }
-.status-tag.plan { background: rgba(255,255,255,0.06); color: #777; }
+/* The tag's own translucent panel lifts the ground under the label, so the ratio has to
+   be read against the composite, not against --bg: at 0.06 white the label measured
+   4.46:1 even with --muted on it. 0.03 keeps the pill visible and clears the floor. */
+.status-tag.plan { background: rgba(255,255,255,0.03); color: var(--muted); }
 
 /* ── Stars ──────────────────────────────────────────────────────────── */
 .stars-row { display: flex; gap: 4px; margin-bottom: 14px; touch-action: none; -webkit-user-select: none; user-select: none; padding: 4px 0; width: max-content; }
@@ -727,7 +733,9 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   padding: 40px 24px;
   color: var(--muted);
 }
-.empty-state-icon { font-size: 44px; margin-bottom: 10px; opacity: 0.6; }
+/* One of these holds a real icon() glyph rather than an emoji, and that one is a UI
+   graphic with a 3:1 floor: --muted at 0.6 measured 2.75:1, at 0.8 it measures 4.00:1. */
+.empty-state-icon { font-size: 44px; margin-bottom: 10px; opacity: 0.8; }
 .search-logo {
   width: 96px; height: 96px; margin: 0 auto 14px; display: block;
   cursor: pointer; -webkit-tap-highlight-color: transparent;
@@ -900,7 +908,11 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .detail-status-line {
   display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
   padding: 10px 12px; margin-top: 4px; border-radius: 10px;
-  background: var(--primary-soft); border: 1px solid var(--primary-border);
+  /* Not --primary-soft. That token is a wash under --primary text, where it costs nothing;
+     this strip also carries a --muted date, and 10% gold lifted the ground enough to put
+     that date at 4.47:1. At 6% the date reads 4.87:1 and --primary is still 10.18:1. */
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+  border: 1px solid var(--primary-border);
   color: var(--primary); font-size: 13px;
 }
 /* Inline "tap to confirm" delete in list rows */
@@ -913,9 +925,9 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 /* One-time coach bubble (first-run hint pointing at the action icons) */
 .coach-bubble {
   position: fixed; z-index: 9500; max-width: 220px;
-  background: rgba(90,147,255,0.18); color: #fff;
+  background: color-mix(in srgb, var(--accent) 18%, transparent); color: #fff;
   -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
-  border: 1.5px solid rgba(90,147,255,0.55);
+  border: 1.5px solid color-mix(in srgb, var(--accent) 55%, transparent);
   padding: 12px 14px; border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.5);
   font-size: 13px; animation: coach-in 0.2s ease;
@@ -924,11 +936,11 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .coach-row svg { flex-shrink: 0; }
 .coach-got {
   margin-top: 2px; width: 100%; padding: 7px; border-radius: 8px;
-  background: transparent; border: 1px solid rgba(167,139,250,0.6); color: rgba(167,139,250,1);
+  background: transparent; border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent); color: var(--accent-text);
   font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
   transition: background 0.15s;
 }
-.coach-got:hover { background: rgba(167,139,250,0.12); }
+.coach-got:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); }
 .coach-arrow {
   position: absolute; right: -10px;
   width: 10px; height: 20px;
@@ -939,7 +951,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .btn-modal-close { min-height: 44px;
   flex: 1; min-width: 80px; padding: 10px;
   border-radius: 9px; background: rgba(255,255,255,0.05);
-  border: 1px solid var(--border); color: #777;
+  border: 1px solid var(--border); color: var(--muted);
   cursor: pointer; font-size: 13px; font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
 }
 .btn-modal-add-watched {
@@ -972,7 +984,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .picks-banner {
   margin-bottom: 12px;
   padding: 10px 14px;
-  background: rgba(90,147,255,0.08);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
   border: 1px solid var(--accent-border);
   border-radius: var(--radius);
 }
@@ -1306,8 +1318,8 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 }
 @media (hover: hover) { .list-check-row:hover { background: rgba(255,255,255,0.05); } }
 .list-check-row.checked {
-  border-color: rgba(90,147,255,0.25);
-  background: rgba(90,147,255,0.07);
+  border-color: color-mix(in srgb, var(--accent) 25%, transparent);
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
 }
 .list-check-row.checked-personal {
   border-color: rgba(245,197,24,0.2);
@@ -1352,7 +1364,10 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   -webkit-touch-callout: none;
   pointer-events: none;
   cursor: grab;
-  opacity: 0.5;
+  /* No opacity at all. --muted at 0.5 composited to 2.26:1 on --bg, and 0.85 still only
+     reached 4.38:1 - balancing the alpha kept landing just under the floor, so the
+     constraint is removed instead: the glyph now inherits the tab's own colour at 5.65:1
+     and stays subordinate by being 5 hairline dots next to a word. */
   font-size: 12px;
   margin-right: 1px;
   padding: 6px 5px;
@@ -1413,7 +1428,9 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   width: 3px; height: 3px;
   background: var(--muted);
   border-radius: 50%;
-  opacity: 0.32;
+  /* Ten 3px dots are the only sign the card can be dragged: a UI component, 3:1 floor.
+     0.32 measured 1.60:1 against the card; 0.7 measures 3.16:1. */
+  opacity: 0.7;
   display: block;
 }
 .hist-card.movie-dragging {
@@ -1465,7 +1482,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   border-radius: 20px;
   border: 1px dashed rgba(255,255,255,0.15);
   background: transparent;
-  color: #555;
+  color: var(--muted);
   font-size: 12px;
   cursor: pointer;
   transition: all 0.15s;
@@ -1475,7 +1492,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 }
 @media (hover: hover) {
   .list-tab:not(.active):hover { color: var(--text); border-color: rgba(255,255,255,0.25); }
-  .list-tab-add:hover { color: #aaa; border-color: rgba(255,255,255,0.3); }
+  .list-tab-add:hover { color: var(--text); border-color: rgba(255,255,255,0.3); }
 }
 
 /* ── Lists section ──────────────────────────────────────────────────── */
@@ -1491,7 +1508,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   display: inline-flex; align-items: center;
   padding: 2px 8px; border-radius: 4px;
   font-size: 10px; font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; letter-spacing: 0.5px;
-  background: rgba(90,147,255,0.12); border: 1px solid rgba(90,147,255,0.25);
+  background: color-mix(in srgb, var(--accent) 12%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
   color: var(--accent-text); white-space: nowrap;
 }
 .list-picker-opt {
@@ -1611,8 +1628,8 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   50%{box-shadow:0 0 0 7px rgba(245,197,24,0)}
 }
 @keyframes ob-pulse-v {
-  0%,100%{box-shadow:0 0 0 0 rgba(90,147,255,0.4)}
-  50%{box-shadow:0 0 0 8px rgba(90,147,255,0)}
+  0%,100%{box-shadow:0 0 0 0 color-mix(in srgb, var(--accent) 40%, transparent)}
+  50%{box-shadow:0 0 0 8px color-mix(in srgb, var(--accent) 0%, transparent)}
 }
 /* Bottom controls */
 .ob-bottom {
@@ -2394,7 +2411,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <span data-i18n="guest_already_acct">Already have an account?</span> <a onclick="closeGuestConvertModal();signOut().then(()=>showScreen('signin'))" style="color:var(--primary);cursor:pointer;font-weight:600" data-i18n="sign_in_link">Sign in</a>
     </div>
     <div style="text-align:center;margin-top:14px">
-      <a onclick="closeGuestConvertModal()" style="font-size:12px;color:var(--muted);cursor:pointer;opacity:0.7" data-i18n="guest_maybe_later">Maybe later</a>
+      <a onclick="closeGuestConvertModal()" style="font-size:12px;color:var(--muted);cursor:pointer" data-i18n="guest_maybe_later">Maybe later</a>
     </div>
   </div>
 </div>
@@ -2425,7 +2442,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   </div>
 
   <!-- Guest banner (hidden for real users) -->
-  <div id="guest-banner" style="display:none;background:linear-gradient(90deg,rgba(90,147,255,0.14),rgba(90,147,255,0.08));border-bottom:1px solid rgba(90,147,255,0.22);padding:21px 16px;align-items:center;justify-content:space-between;gap:12px">
+  <div id="guest-banner" style="display:none;background:linear-gradient(90deg,color-mix(in srgb, var(--accent) 14%, transparent),color-mix(in srgb, var(--accent) 8%, transparent));border-bottom:1px solid color-mix(in srgb, var(--accent) 22%, transparent);padding:21px 16px;align-items:center;justify-content:space-between;gap:12px">
     <span id="guest-banner-text" style="font-size:13px;color:var(--accent-text)" data-i18n="guest_banner">You're browsing as guest</span>
     <button onclick="showGuestConvertModal()" data-i18n="guest_join_btn" style="padding:6px 16px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif;white-space:nowrap;flex-shrink:0">Join Cinemail</button>
   </div>
@@ -2460,13 +2477,13 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <input id="rec-input" type="text" data-i18n-ph="recs_ph" placeholder="Mood, genre, or anything…">
       <button class="btn btn-primary btn-sm" style="width:auto;min-width:104px" id="rec-btn" onclick="loadRecs()" data-i18n="find_btn">Find</button>
     </div>
-    <button onclick="surpriseMe()" data-i18n="surprise" style="width:100%;margin-top:0;margin-bottom:12px;padding:11px;border-radius:11px;background:rgba(90,147,255,0.12);border:1px solid rgba(90,147,255,0.5);color:#c4b5fd;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:1.5px;cursor:pointer;transition:all .18s;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)" onmouseover="this.style.background='rgba(90,147,255,0.22)';this.style.borderColor='rgba(90,147,255,0.85)';this.style.boxShadow='0 4px 18px rgba(90,147,255,0.28)';this.style.color='#ddd6fe'" onmouseout="this.style.background='rgba(90,147,255,0.12)';this.style.borderColor='rgba(90,147,255,0.5)';this.style.boxShadow='none';this.style.color='#c4b5fd'">✨ Surprise Me</button>
+    <button onclick="surpriseMe()" data-i18n="surprise" style="width:100%;margin-top:0;margin-bottom:12px;padding:11px;border-radius:11px;background:color-mix(in srgb, var(--accent) 12%, transparent);border:1px solid color-mix(in srgb, var(--accent) 50%, transparent);color:var(--accent-text);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:1.5px;cursor:pointer;transition:all .18s;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)" onmouseover="this.style.background='color-mix(in srgb, var(--accent) 22%, transparent)';this.style.borderColor='color-mix(in srgb, var(--accent) 85%, transparent)';this.style.boxShadow='0 4px 18px color-mix(in srgb, var(--accent) 28%, transparent)';this.style.color='var(--text)'" onmouseout="this.style.background='color-mix(in srgb, var(--accent) 12%, transparent)';this.style.borderColor='color-mix(in srgb, var(--accent) 50%, transparent)';this.style.boxShadow='none';this.style.color='var(--accent-text)'">✨ Surprise Me</button>
     <div id="picks-hint" style="display:none;margin-bottom:12px;padding:11px 13px;background:rgba(245,197,24,0.07);border:1px solid rgba(245,197,24,0.22);border-radius:10px;font-size:12px;line-height:1.5;color:var(--text)">
       <div data-i18n="picks_random_hint" style="margin-bottom:9px;color:#cfcfcf">Without watched films, picks are random. Mark 5-10 films as Watched and they become personal to your taste.</div>
       <button onclick="dismissPicksHint()" data-i18n="picks_hint_got" style="padding:5px 14px;border-radius:8px;background:rgba(245,197,24,0.15);border:1px solid rgba(245,197,24,0.3);color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">Got it</button>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-      <div id="rec-history-hint" style="color:#444;font-size:11px"></div>
+      <div id="rec-history-hint" style="color:var(--muted);font-size:11px"></div>
       <div id="ai-counter" style="color:var(--muted);font-size:11px"></div>
     </div>
     <div id="rec-results">
@@ -2673,13 +2690,13 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <button class="btn-backup" onclick="backupImportXLSX()" data-i18n="backup_btn_restore" title="Restore from an Excel (.xlsx) backup or legacy .csv">↑ Restore</button>
         <input type="file" id="backup-import-input" accept=".xlsx,.csv" style="display:none">
       </div>
-      <div class="backup-hint" data-i18n="backup_hint" style="font-size:11px;color:var(--muted);line-height:1.4;margin-top:6px;opacity:0.8">Save an Excel backup of your lists, or restore them from a backup file.</div>
+      <div class="backup-hint" data-i18n="backup_hint" style="font-size:11px;color:var(--muted);line-height:1.4;margin-top:6px">Save an Excel backup of your lists, or restore them from a backup file.</div>
       <button class="btn-backup" onclick="backupImportLetterboxd()" data-i18n="lb_import_btn" title="Coming from Letterboxd? On Letterboxd: Settings → Data → Export Your Data, unzip, then pick a .csv (e.g. watched.csv or ratings.csv)." style="width:100%;margin-top:8px">↑ Import from Letterboxd</button>
       <button class="btn-backup" onclick="backupImportIMDb()" data-i18n="imdb_import_btn" title="Coming from IMDb? On your phone: open imdb.com in Safari → aA menu → Request Desktop Website → sign in → your profile → Your Ratings (or Watchlist) → Export → save the .csv, then pick it here. (Also works on a desktop browser.)" style="width:100%;margin-top:8px">↑ Import from IMDb</button>
-      <button onclick="backupExportJSON()" data-i18n="backup_json_nerd" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;opacity:0.5;padding:4px 0 0;margin-top:2px;text-decoration:underline;font-family:'DM Sans','Noto Sans Georgian',sans-serif">JSON backup (advanced)</button>
+      <button onclick="backupExportJSON()" data-i18n="backup_json_nerd" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:4px 0 0;margin-top:2px;text-decoration:underline;font-family:'DM Sans','Noto Sans Georgian',sans-serif">JSON backup (advanced)</button>
       <div id="backup-status" style="display:none;font-size:11px;line-height:1.45;margin-top:8px"></div>
       <div id="btn-backfill-crew-row" style="display:none;margin-top:8px">
-        <button id="btn-backfill-crew" onclick="backfillCrewData()" data-i18n="backfill_crew" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;opacity:0.6;padding:4px 0;text-decoration:underline;font-family:'DM Sans','Noto Sans Georgian',sans-serif">Update film details</button>
+        <button id="btn-backfill-crew" onclick="backfillCrewData()" data-i18n="backfill_crew" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:4px 0;text-decoration:underline;font-family:'DM Sans','Noto Sans Georgian',sans-serif">Update film details</button>
       </div>
 
       <!-- Friends moved out of here and into the Inbox tab. This is an app for sending
@@ -2712,7 +2729,10 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         </div>
         <a id="support-kofi" href="https://ko-fi.com/dafaspace" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:7px;background:rgba(255,140,40,0.18);border:1px solid rgba(255,140,40,0.35);color:var(--text);text-decoration:none;font-size:12px;font-weight:600;transition:all 0.15s"><span data-ic="coffee" data-ic-size="13"></span><span data-i18n="support_button">Support on Ko-fi →</span></a>
         <div style="margin-top:9px;display:flex;align-items:center;gap:7px">
-          <button onclick="copyUSDT(event)" style="display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:7px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--muted);font-size:11px;font-weight:500;cursor:pointer;transition:all 0.15s" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--accent-border)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">
+          <!-- Dark chip, not a light one: this button sits on the warm support panel, and
+               lifting its ground with 4% white took --muted down to 4.48:1. 20% black on the
+               same panel measures 5.28:1 and the chip still reads as its own control. -->
+          <button onclick="copyUSDT(event)" style="display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:7px;background:rgba(0,0,0,0.2);border:1px solid var(--border);color:var(--muted);font-size:11px;font-weight:500;cursor:pointer;transition:all 0.15s" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--accent-border)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">
             <span style="font-size:12px">◈</span><span id="usdt-acc-label">USDT (TRC20)</span>
           </button>
         </div>
@@ -2733,7 +2753,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted);opacity:0.7">Cinemail <span id="app-version">v0.55.2</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.55.4</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -2741,7 +2761,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <button class="btn-modal-close" id="acc-signout-btn" data-i18n="sign_out" onclick="closeAccount();signOut();" style="color:#f87171;border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.05)">Sign Out</button>
       </div>
       <div style="margin-top:24px;text-align:center" id="acc-delete-row">
-        <button onclick="confirmDeleteAccount()" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;opacity:0.6;font-family:'DM Sans','Noto Sans Georgian',sans-serif" data-i18n="delete_account">Delete account</button>
+        <button onclick="confirmDeleteAccount()" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;font-family:'DM Sans','Noto Sans Georgian',sans-serif" data-i18n="delete_account">Delete account</button>
       </div>
     </div>
   </div>
@@ -3254,6 +3274,7 @@ const _I18N_EXTRA = {
     list_picker_title:"Add to List", filter_friends:"Filter friends…", searching:"Searching…", not_found:"Not found", friends_empty:"No friends yet. Use the invite link below to add the people you watch with.", friend_remove_suffix:"— remove from friends?", friends_no_match:"No friends match", edit_modal_title:"EDIT REVIEW", share_modal_title:"RECOMMEND A FILM", send_btn:"Send", note_ph:"What did you think?", share_msg_ph:"Why you'd love this…", add_modal_seen:"MARK AS WATCHED", add_modal_list:"ADD TO LIST", ob8_picks:"✨ Personal picks for you", err_bad_login:"Wrong email or password.", signin_create_cta:"New here? Create an account", recs_empty_title:"Get Personal Picks", recs_empty_sub:"Enter a prompt, or leave it blank and tap Find", recs_thinking:"Thinking…", recs_still_thinking:"Still thinking, hang tight…", based_on_label:"Based on watched films", recs_hint_empty:"Add watched films for personalised picks", picks_left_today:"personal picks left today", picks_random:"Random Picks", picks_tonight:"Picks For Tonight", picks_for_you:"Picks For You", where_to_watch:"Where to watch", watch_attrib:"Streaming data by JustWatch",
     loading_lbl:"Loading…", err_no_results_title:"No Results", err_no_results_sub:"Try just the title without the year", err_connection:"Connection Error", err_generic:"Error", report:"Report", report_prefill:"Reporting a message from {name}. What happened:", err_not_found_title:"Not Found", err_no_results_for:"No results for", err_took_long_title:"Took Too Long", err_took_long_sub:"Try again in a moment", recs_none_title:"No Picks Found", recs_none_sub:"Try a different prompt", recs_unavail_title:"Picks Unavailable", recs_unavail_sub:"Please try again later", inbox_empty_title:"No Chats Yet", inbox_empty_sub:"Share a film from search results or your list to start a conversation",
     continue_as_guest:"Start without an account", guest_label:"Guest", guest_banner:"Saved on this device only", guest_join_btn:"Join Cinemail", guest_save_sub:"Keep your films safe across devices and share them with friends - free forever.", guest_join_free:"Join free", guest_maybe_later:"Maybe later", guest_already_acct:"Already have an account?",
+    del_acct_q:"Delete account?", del_acct_warn:"This will permanently delete your watch history, all lists, friends and account data. This cannot be undone.", del_acct_confirm:"Delete my account", del_acct_working:"Deleting…", del_acct_done:"Account deleted.", del_acct_failed:"Could not delete account",
   },
   ru: {
     empty_search_title:"Найди свой следующий фильм", recs_ph:"Настроение, жанр, что угодно…", empty_search_sub:"Введи название и нажми «Найти»",
@@ -3278,6 +3299,7 @@ const _I18N_EXTRA = {
     list_picker_title:"В список", filter_friends:"Фильтр друзей…", searching:"Поиск…", not_found:"Не найдено", friends_empty:"Друзей пока нет. Используй ссылку-приглашение ниже, чтобы добавить тех, с кем смотришь.", friend_remove_suffix:"— убрать из друзей?", friends_no_match:"Нет друзей по запросу", edit_modal_title:"РЕДАКТИРОВАТЬ ОТЗЫВ", share_modal_title:"ПОСОВЕТОВАТЬ ФИЛЬМ", send_btn:"Отправить", note_ph:"Что думаешь?", share_msg_ph:"Почему тебе это понравится…", add_modal_seen:"ОТМЕТИТЬ ПРОСМОТРЕННЫМ", add_modal_list:"ДОБАВИТЬ В СПИСОК", ob8_picks:"✨ Персональные подборки для тебя", err_bad_login:"Неверный email или пароль.", signin_create_cta:"Впервые здесь? Создать аккаунт", recs_empty_title:"Персональные подборки", recs_empty_sub:"Введи запрос или оставь пустым и нажми «Найти»", recs_thinking:"Думаю…", recs_still_thinking:"Ещё думаю, секунду…", based_on_label:"На основе просмотренных фильмов", recs_hint_empty:"Добавь просмотренные фильмы для персональных подборок", picks_left_today:"персональных подборок осталось сегодня", picks_random:"Случайные подборки", picks_tonight:"Подборка на вечер", picks_for_you:"Подборка для тебя", where_to_watch:"Где смотреть", watch_attrib:"Данные о стримингах: JustWatch",
     loading_lbl:"Загрузка…", err_no_results_title:"Ничего не найдено", err_no_results_sub:"Попробуй только название, без года", err_connection:"Ошибка соединения", err_generic:"Ошибка", report:"Пожаловаться", report_prefill:"Жалоба на {name}. Что произошло:", err_not_found_title:"Не найдено", err_no_results_for:"Нет результатов по", err_took_long_title:"Слишком долго", err_took_long_sub:"Попробуй через мгновение", recs_none_title:"Подборок не нашлось", recs_none_sub:"Попробуй другой запрос", recs_unavail_title:"Подборки недоступны", recs_unavail_sub:"Попробуй позже", inbox_empty_title:"Пока нет чатов", inbox_empty_sub:"Поделись фильмом из поиска или списка, чтобы начать разговор",
     continue_as_guest:"Начать без аккаунта", guest_label:"Гость", guest_banner:"Сохраняется только на этом устройстве", guest_join_btn:"Создать аккаунт", guest_save_sub:"Сохрани фильмы на всех устройствах и делись с друзьями - бесплатно навсегда.", guest_join_free:"Зарегистрироваться бесплатно", guest_maybe_later:"Позже", guest_already_acct:"Уже есть аккаунт?",
+    del_acct_q:"Удалить аккаунт?", del_acct_warn:"Это навсегда удалит историю просмотров, все списки, друзей и данные аккаунта. Отменить будет нельзя.", del_acct_confirm:"Удалить мой аккаунт", del_acct_working:"Удаляем…", del_acct_done:"Аккаунт удалён.", del_acct_failed:"Не удалось удалить аккаунт",
   },
   uk: {
     empty_search_title:"Знайди свій наступний фільм", recs_ph:"Настрій, жанр, будь-що…", empty_search_sub:"Введи назву і натисни Пошук",
@@ -3302,6 +3324,7 @@ const _I18N_EXTRA = {
     list_picker_title:"До списку", filter_friends:"Фільтр друзів…", searching:"Пошук…", not_found:"Не знайдено", friends_empty:"Друзів поки немає. Скористайся посиланням нижче, щоб додати тих, з ким дивишся.", friend_remove_suffix:"— прибрати з друзів?", friends_no_match:"Немає друзів за запитом", edit_modal_title:"РЕДАГУВАТИ ВІДГУК", share_modal_title:"ПОРАДИТИ ФІЛЬМ", send_btn:"Надіслати", note_ph:"Що думаєш?", share_msg_ph:"Чому тобі це сподобається…", add_modal_seen:"ПОЗНАЧИТИ ПЕРЕГЛЯНУТИМ", add_modal_list:"ДОДАТИ ДО СПИСКУ", ob8_picks:"✨ Персональні добірки для тебе", err_bad_login:"Невірний email або пароль.", signin_create_cta:"Вперше тут? Створити акаунт", recs_empty_title:"Персональні добірки", recs_empty_sub:"Введи запит або залиш порожнім і натисни «Знайти»", recs_thinking:"Думаю…", recs_still_thinking:"Ще думаю, секунду…", based_on_label:"На основі переглянутих фільмів", recs_hint_empty:"Додай переглянуті фільми для персональних добірок", picks_left_today:"персональних добірок залишилось сьогодні", picks_random:"Випадкові добірки", picks_tonight:"Добірка на вечір", picks_for_you:"Добірка для тебе", where_to_watch:"Де дивитися", watch_attrib:"Дані про стримінги: JustWatch",
     loading_lbl:"Завантаження…", err_no_results_title:"Нічого не знайдено", err_no_results_sub:"Спробуй лише назву, без року", err_connection:"Помилка з'єднання", err_generic:"Помилка", report:"Поскаржитися", report_prefill:"Скарга на {name}. Що сталося:", err_not_found_title:"Не знайдено", err_no_results_for:"Немає результатів за", err_took_long_title:"Занадто довго", err_took_long_sub:"Спробуй за мить", recs_none_title:"Добірок не знайшлося", recs_none_sub:"Спробуй інший запит", recs_unavail_title:"Добірки недоступні", recs_unavail_sub:"Спробуй пізніше", inbox_empty_title:"Поки немає чатів", inbox_empty_sub:"Поділись фільмом з пошуку або списку, щоб почати розмову",
     continue_as_guest:"Почати без акаунта", guest_label:"Гість", guest_banner:"Зберігається лише на цьому пристрої", guest_join_btn:"Створити акаунт", guest_save_sub:"Збережи фільми на всіх пристроях і ділись з друзями - безкоштовно назавжди.", guest_join_free:"Зареєструватися безкоштовно", guest_maybe_later:"Пізніше", guest_already_acct:"Вже є акаунт?",
+    del_acct_q:"Видалити акаунт?", del_acct_warn:"Це назавжди видалить історію переглядів, усі списки, друзів і дані акаунта. Скасувати буде неможливо.", del_acct_confirm:"Видалити мій акаунт", del_acct_working:"Видаляємо…", del_acct_done:"Акаунт видалено.", del_acct_failed:"Не вдалося видалити акаунт",
   },
   ka: {
     empty_search_title:"იპოვე შენი შემდეგი ფილმი", recs_ph:"განწყობა, ჟანრი ან ნებისმიერი…", empty_search_sub:"აკრიფე სათაური და დააჭირე „ძებნას“",
@@ -3326,6 +3349,7 @@ const _I18N_EXTRA = {
     list_picker_title:"სიაში დამატება", filter_friends:"გაფილტრე მეგობრები…", searching:"ძიება…", not_found:"ვერ მოიძებნა", friends_empty:"ჯერ მეგობრები არ არის. გამოიყენე ქვემოთ მოცემული ბმული, რომ დაამატო ისინი, ვისთანაც უყურებ.", friend_remove_suffix:"— ამოშალო მეგობრებიდან?", friends_no_match:"ვერ მოიძებნა მეგობარი", edit_modal_title:"შეფასების რედაქტირება", share_modal_title:"ფილმის რეკომენდაცია", send_btn:"გაგზავნა", note_ph:"რას ფიქრობ?", share_msg_ph:"რატომ მოგეწონება…", add_modal_seen:"მონიშნე ნანახად", add_modal_list:"სიაში დამატება", ob8_picks:"✨ პერსონალური რჩევები შენთვის", err_bad_login:"არასწორი email ან პაროლი.", signin_create_cta:"ახალი ხარ? შექმენი ანგარიში", recs_empty_title:"პერსონალური რჩევები", recs_empty_sub:"შეიყვანე მოთხოვნა ან დატოვე ცარიელი და დააჭირე „მოძებნას“", recs_thinking:"ვფიქრობ…", recs_still_thinking:"ჯერ კიდევ ვფიქრობ, მოითმინე…", based_on_label:"ნანახი ფილმების მიხედვით", recs_hint_empty:"დაამატე ნანახი ფილმები პერსონალური რჩევებისთვის", picks_left_today:"პერსონალური რჩევა დარჩა დღეს", picks_random:"შემთხვევითი რჩევები", picks_tonight:"რჩევები საღამოსთვის", picks_for_you:"რჩევები შენთვის", where_to_watch:"სად ვუყუროთ", watch_attrib:"სტრიმინგის მონაცემები: JustWatch",
     loading_lbl:"იტვირთება…", err_no_results_title:"ვერაფერი მოიძებნა", err_no_results_sub:"სცადე მხოლოდ სათაური, წლის გარეშე", err_connection:"კავშირის შეცდომა", err_generic:"შეცდომა", report:"საჩივარი", report_prefill:"საჩივარი {name}-ზე. რა მოხდა:", err_not_found_title:"ვერ მოიძებნა", err_no_results_for:"ვერაფერი მოიძებნა:", err_took_long_title:"ძალიან დიდხანს", err_took_long_sub:"სცადე ცოტა ხანში", recs_none_title:"რჩევები ვერ მოიძებნა", recs_none_sub:"სცადე სხვა მოთხოვნა", recs_unavail_title:"რჩევები მიუწვდომელია", recs_unavail_sub:"სცადე მოგვიანებით", inbox_empty_title:"ჩატები ჯერ არ არის", inbox_empty_sub:"გააზიარე ფილმი ძიებიდან ან სიიდან, რომ დაიწყო საუბარი",
     continue_as_guest:"დაიწყე ანგარიშის გარეშე", guest_label:"სტუმარი", guest_banner:"ინახება მხოლოდ ამ მოწყობილობაზე", guest_join_btn:"შემოუერთდი Cinemail-ს", guest_save_sub:"შეინახე ფილმები ყველა მოწყობილობაზე და გაუზიარე მეგობრებს - უფასოდ, სამუდამოდ.", guest_join_free:"უფასოდ შემოუერთდი", guest_maybe_later:"მოგვიანებით", guest_already_acct:"უკვე გაქვს ანგარიში?",
+    del_acct_q:"წავშალოთ ანგარიში?", del_acct_warn:"სამუდამოდ წაიშლება ნანახის ისტორია, ყველა სია, მეგობრები და ანგარიშის მონაცემები. დაბრუნება შეუძლებელია.", del_acct_confirm:"წაშალე ჩემი ანგარიში", del_acct_working:"იშლება…", del_acct_done:"ანგარიში წაიშალა.", del_acct_failed:"ანგარიშის წაშლა ვერ მოხერხდა",
   },
   es: {
     empty_search_title:"Encuentra tu próxima película", recs_ph:"Estado de ánimo, género o lo que sea…", empty_search_sub:"Escribe un título y pulsa Buscar",
@@ -3350,6 +3374,7 @@ const _I18N_EXTRA = {
     list_picker_title:"Añadir a lista", filter_friends:"Filtrar amigos…", searching:"Buscando…", not_found:"No encontrado", friends_empty:"Aún no tienes amigos. Usa el enlace de invitación de abajo para añadir a quienes ves películas.", friend_remove_suffix:"— ¿quitar de amigos?", friends_no_match:"Sin coincidencias", edit_modal_title:"EDITAR RESEÑA", share_modal_title:"RECOMENDAR UNA PELÍCULA", send_btn:"Enviar", note_ph:"¿Qué te pareció?", share_msg_ph:"Por qué te encantará…", add_modal_seen:"MARCAR COMO VISTA", add_modal_list:"AÑADIR A LISTA", ob8_picks:"✨ Selección personal para ti", err_bad_login:"Email o contraseña incorrectos.", signin_create_cta:"¿Eres nuevo? Crea una cuenta", recs_empty_title:"Recomendaciones personales", recs_empty_sub:"Escribe una idea o déjalo vacío y toca Buscar", recs_thinking:"Pensando…", recs_still_thinking:"Sigo pensando, un momento…", based_on_label:"Según tus películas vistas", recs_hint_empty:"Añade películas vistas para recomendaciones personales", picks_left_today:"selecciones personales restantes hoy", picks_random:"Selección al azar", picks_tonight:"Para esta noche", picks_for_you:"Para ti", where_to_watch:"Dónde ver", watch_attrib:"Datos de streaming por JustWatch",
     loading_lbl:"Cargando…", err_no_results_title:"Sin resultados", err_no_results_sub:"Prueba solo el título, sin el año", err_connection:"Error de conexión", err_generic:"Error", report:"Denunciar", report_prefill:"Denuncia sobre un mensaje de {name}. Qué ha pasado:", err_not_found_title:"No encontrado", err_no_results_for:"Sin resultados para", err_took_long_title:"Tardó demasiado", err_took_long_sub:"Inténtalo en un momento", recs_none_title:"Sin recomendaciones", recs_none_sub:"Prueba otra pista", recs_unavail_title:"Recomendaciones no disponibles", recs_unavail_sub:"Inténtalo más tarde", inbox_empty_title:"Aún no hay chats", inbox_empty_sub:"Comparte una película desde la búsqueda o tu lista para iniciar una conversación",
     continue_as_guest:"Empezar sin cuenta", guest_label:"Invitado", guest_banner:"Se guarda solo en este dispositivo", guest_join_btn:"Unirse a Cinemail", guest_save_sub:"Guarda tus películas en todos tus dispositivos y compártelas con amigos - gratis para siempre.", guest_join_free:"Unirse gratis", guest_maybe_later:"Quizás luego", guest_already_acct:"¿Ya tienes cuenta?",
+    del_acct_q:"¿Eliminar la cuenta?", del_acct_warn:"Se borrarán para siempre tu historial de películas vistas, todas tus listas, tus amigos y los datos de la cuenta. No se puede deshacer.", del_acct_confirm:"Eliminar mi cuenta", del_acct_working:"Eliminando…", del_acct_done:"Cuenta eliminada.", del_acct_failed:"No se pudo eliminar la cuenta",
   },
   fr: {
     empty_search_title:"Trouvez votre prochain film", recs_ph:"Humeur, genre ou autre…", empty_search_sub:"Saisissez un titre et appuyez sur Rechercher",
@@ -3374,6 +3399,7 @@ const _I18N_EXTRA = {
     list_picker_title:"Ajouter à la liste", filter_friends:"Filtrer les amis…", searching:"Recherche…", not_found:"Introuvable", friends_empty:"Pas encore d'amis. Utilise le lien d'invitation ci-dessous pour ajouter tes compagnons de visionnage.", friend_remove_suffix:"— retirer des amis ?", friends_no_match:"Aucun ami trouvé", edit_modal_title:"MODIFIER L'AVIS", share_modal_title:"RECOMMANDER UN FILM", send_btn:"Envoyer", note_ph:"Qu'en as-tu pensé ?", share_msg_ph:"Pourquoi tu vas adorer…", add_modal_seen:"MARQUER COMME VU", add_modal_list:"AJOUTER À LA LISTE", ob8_picks:"✨ Sélections personnelles pour toi", err_bad_login:"Email ou mot de passe incorrect.", signin_create_cta:"Nouveau ? Crée un compte", recs_empty_title:"Sélections personnelles", recs_empty_sub:"Saisis une idée ou laisse vide et appuie sur Trouver", recs_thinking:"Réflexion…", recs_still_thinking:"Je réfléchis encore, un instant…", based_on_label:"D'après tes films vus", recs_hint_empty:"Ajoute des films vus pour des recommandations personnelles", picks_left_today:"sélections personnelles restantes aujourd'hui", picks_random:"Au hasard", picks_tonight:"Pour ce soir", picks_for_you:"Pour toi", where_to_watch:"Où regarder", watch_attrib:"Données de streaming par JustWatch",
     loading_lbl:"Chargement…", err_no_results_title:"Aucun résultat", err_no_results_sub:"Essaie juste le titre, sans l'année", err_connection:"Erreur de connexion", err_generic:"Erreur", report:"Signaler", report_prefill:"Signalement d'un message de {name}. Que s'est-il passé :", err_not_found_title:"Introuvable", err_no_results_for:"Aucun résultat pour", err_took_long_title:"Trop long", err_took_long_sub:"Réessaie dans un instant", recs_none_title:"Aucune sélection", recs_none_sub:"Essaie une autre idée", recs_unavail_title:"Sélections indisponibles", recs_unavail_sub:"Réessaie plus tard", inbox_empty_title:"Pas encore de discussions", inbox_empty_sub:"Partage un film depuis la recherche ou ta liste pour démarrer une conversation",
     continue_as_guest:"Commencer sans compte", guest_label:"Invité", guest_banner:"Enregistré uniquement sur cet appareil", guest_join_btn:"Rejoindre Cinemail", guest_save_sub:"Garde tes films sur tous tes appareils et partage-les avec tes amis - gratuit pour toujours.", guest_join_free:"Rejoindre gratuitement", guest_maybe_later:"Plus tard", guest_already_acct:"Tu as deja un compte ?",
+    del_acct_q:"Supprimer le compte ?", del_acct_warn:"Cela supprimera définitivement ton historique de films, toutes tes listes, tes amis et les données du compte. C'est irréversible.", del_acct_confirm:"Supprimer mon compte", del_acct_working:"Suppression…", del_acct_done:"Compte supprimé.", del_acct_failed:"Impossible de supprimer le compte",
   },
   de: {
     empty_search_title:"Finde deinen nächsten Film", recs_ph:"Stimmung, Genre, alles…", empty_search_sub:"Gib einen Titel ein und drücke Suchen",
@@ -3398,6 +3424,7 @@ const _I18N_EXTRA = {
     list_picker_title:"Zur Liste", filter_friends:"Freunde filtern…", searching:"Suche…", not_found:"Nicht gefunden", friends_empty:"Noch keine Freunde. Nutze den Einladungslink unten, um die Leute hinzuzufügen, mit denen du schaust.", friend_remove_suffix:"— aus Freunden entfernen?", friends_no_match:"Keine passenden Freunde", edit_modal_title:"BEWERTUNG BEARBEITEN", share_modal_title:"FILM EMPFEHLEN", send_btn:"Senden", note_ph:"Wie fandest du ihn?", share_msg_ph:"Warum du ihn lieben wirst…", add_modal_seen:"ALS GESEHEN MARKIEREN", add_modal_list:"ZUR LISTE HINZUFÜGEN", ob8_picks:"✨ Persönliche Tipps für dich", err_bad_login:"Falsche E-Mail oder Passwort.", signin_create_cta:"Neu hier? Konto erstellen", recs_empty_title:"Persönliche Tipps", recs_empty_sub:"Gib eine Idee ein oder lass es leer und tippe auf Finden", recs_thinking:"Denke nach…", recs_still_thinking:"Denke noch nach, einen Moment…", based_on_label:"Basierend auf gesehenen Filmen", recs_hint_empty:"Füge gesehene Filme für persönliche Tipps hinzu", picks_left_today:"persönliche Tipps heute übrig", picks_random:"Zufällige Tipps", picks_tonight:"Tipps für heute Abend", picks_for_you:"Tipps für dich", where_to_watch:"Wo zu sehen", watch_attrib:"Streaming-Daten von JustWatch",
     loading_lbl:"Lädt…", err_no_results_title:"Keine Ergebnisse", err_no_results_sub:"Versuch nur den Titel, ohne Jahr", err_connection:"Verbindungsfehler", err_generic:"Fehler", report:"Melden", report_prefill:"Meldung zu einer Nachricht von {name}. Was ist passiert:", err_not_found_title:"Nicht gefunden", err_no_results_for:"Keine Ergebnisse für", err_took_long_title:"Hat zu lange gedauert", err_took_long_sub:"Versuch es gleich nochmal", recs_none_title:"Keine Tipps gefunden", recs_none_sub:"Versuch eine andere Idee", recs_unavail_title:"Tipps nicht verfügbar", recs_unavail_sub:"Bitte versuch es später", inbox_empty_title:"Noch keine Chats", inbox_empty_sub:"Teile einen Film aus der Suche oder deiner Liste, um ein Gespräch zu starten",
     continue_as_guest:"Ohne Konto starten", guest_label:"Gast", guest_banner:"Nur auf diesem Gerät gespeichert", guest_join_btn:"Cinemail beitreten", guest_save_sub:"Sichere deine Filme auf allen Geräten und teile sie mit Freunden - für immer kostenlos.", guest_join_free:"Kostenlos beitreten", guest_maybe_later:"Vielleicht später", guest_already_acct:"Hast du schon ein Konto?",
+    del_acct_q:"Konto löschen?", del_acct_warn:"Damit werden dein Filmverlauf, alle Listen, Freunde und Kontodaten endgültig gelöscht. Das lässt sich nicht rückgängig machen.", del_acct_confirm:"Mein Konto löschen", del_acct_working:"Wird gelöscht…", del_acct_done:"Konto gelöscht.", del_acct_failed:"Konto konnte nicht gelöscht werden",
   },
   it: {
     empty_search_title:"Trova il tuo prossimo film", recs_ph:"Umore, genere o qualsiasi cosa…", empty_search_sub:"Scrivi un titolo e premi Cerca",
@@ -3422,6 +3449,7 @@ const _I18N_EXTRA = {
     list_picker_title:"Alla lista", filter_friends:"Filtra amici…", searching:"Ricerca…", not_found:"Non trovato", friends_empty:"Ancora nessun amico. Usa il link d'invito qui sotto per aggiungere le persone con cui guardi i film.", friend_remove_suffix:"— rimuovere dagli amici?", friends_no_match:"Nessun amico corrisponde", edit_modal_title:"MODIFICA RECENSIONE", share_modal_title:"CONSIGLIA UN FILM", send_btn:"Invia", note_ph:"Cosa ne pensi?", share_msg_ph:"Perché ti piacerà…", add_modal_seen:"SEGNA COME VISTO", add_modal_list:"AGGIUNGI ALLA LISTA", ob8_picks:"✨ Consigli personali per te", err_bad_login:"Email o password errati.", signin_create_cta:"Nuovo qui? Crea un account", recs_empty_title:"Consigli personali", recs_empty_sub:"Inserisci un'idea o lascia vuoto e tocca Trova", recs_thinking:"Sto pensando…", recs_still_thinking:"Sto ancora pensando, un attimo…", based_on_label:"In base ai film visti", recs_hint_empty:"Aggiungi film visti per consigli personali", picks_left_today:"consigli personali rimasti oggi", picks_random:"Consigli casuali", picks_tonight:"Per stasera", picks_for_you:"Per te", where_to_watch:"Dove vederlo", watch_attrib:"Dati streaming da JustWatch",
     loading_lbl:"Caricamento…", err_no_results_title:"Nessun risultato", err_no_results_sub:"Prova solo il titolo, senza l'anno", err_connection:"Errore di connessione", err_generic:"Errore", report:"Segnala", report_prefill:"Segnalazione di un messaggio di {name}. Che cosa è successo:", err_not_found_title:"Non trovato", err_no_results_for:"Nessun risultato per", err_took_long_title:"Ha impiegato troppo", err_took_long_sub:"Riprova tra un attimo", recs_none_title:"Nessun consiglio trovato", recs_none_sub:"Prova un'altra idea", recs_unavail_title:"Consigli non disponibili", recs_unavail_sub:"Riprova più tardi", inbox_empty_title:"Ancora nessuna chat", inbox_empty_sub:"Condividi un film dalla ricerca o dalla tua lista per iniziare una conversazione",
     continue_as_guest:"Inizia senza account", guest_label:"Ospite", guest_banner:"Salvato solo su questo dispositivo", guest_join_btn:"Unisciti a Cinemail", guest_save_sub:"Conserva i tuoi film su tutti i dispositivi e condividili con gli amici - gratis per sempre.", guest_join_free:"Unisciti gratis", guest_maybe_later:"Forse più tardi", guest_already_acct:"Hai già un account?",
+    del_acct_q:"Eliminare l'account?", del_acct_warn:"Verranno eliminati per sempre la cronologia dei film, tutte le liste, gli amici e i dati dell'account. L'operazione è irreversibile.", del_acct_confirm:"Elimina il mio account", del_acct_working:"Eliminazione…", del_acct_done:"Account eliminato.", del_acct_failed:"Impossibile eliminare l'account",
   },
 };
 Object.keys(_I18N_EXTRA).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_EXTRA[l]); });
@@ -4262,12 +4290,15 @@ function confirmDeleteAccount() {
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
   overlay.innerHTML = `
     <div style="background:#1a1a2a;border-radius:16px;padding:28px 24px;max-width:320px;width:100%;text-align:center">
-      <div style="margin-bottom:12px;color:var(--amber,#FBBF24)"><span data-ic="triangle-alert" data-ic-size="26"></span></div>
-      <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:10px">Delete account?</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:22px">This will permanently delete your watch history, all lists, friends and account data. This cannot be undone.</div>
-      <div style="display:flex;flex-direction:column;gap:9px">
-        <button onclick="deleteAccount()" style="background:#f87171;border:none;color:#fff;font-size:14px;font-weight:700;font-family:'DM Sans','Noto Sans Georgian',sans-serif;padding:12px;border-radius:10px;cursor:pointer">Delete my account</button>
-        <button onclick="document.getElementById('delete-account-overlay').remove();openAccount();" style="background:none;border:1px solid rgba(255,255,255,0.12);color:var(--muted);font-size:14px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;padding:11px;border-radius:10px;cursor:pointer">Cancel</button>
+      <!-- icon() inline, not a data-ic placeholder: _paintIcons() runs once at startup and
+           this overlay is built long afterwards, so a placeholder here paints nothing and
+           measured 0x0. Same defect the crew labels had. -->
+      <div style="margin-bottom:12px;color:var(--amber,#FBBF24);display:flex;justify-content:center">${icon('triangle-alert', 26)}</div>
+      <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:10px">${t('del_acct_q')}</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:22px">${t('del_acct_warn')}</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <button onclick="deleteAccount()" style="background:#c93b3b;border:none;color:#fff;font-size:14px;font-weight:700;font-family:'DM Sans','Noto Sans Georgian',sans-serif;padding:12px;border-radius:10px;cursor:pointer">${t('del_acct_confirm')}</button>
+        <button onclick="document.getElementById('delete-account-overlay').remove();openAccount();" style="background:none;border:1px solid rgba(255,255,255,0.12);color:var(--muted);font-size:14px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;padding:11px;border-radius:10px;cursor:pointer">${t('cancel')}</button>
       </div>
     </div>
   `;
@@ -4277,7 +4308,7 @@ function confirmDeleteAccount() {
 async function deleteAccount() {
   const overlay = document.getElementById('delete-account-overlay');
   const btn = overlay.querySelector('button');
-  btn.textContent = 'Deleting...';
+  btn.textContent = t('del_acct_working');
   btn.disabled = true;
   try {
     // The data goes first, in one server-side transaction, and only then the auth user.
@@ -4297,6 +4328,22 @@ async function deleteAccount() {
     // removes everything in foreign-key order in a single transaction.
     //
     // Apple 5.1.1(v) requires the data to go with the account.
+    // Storage first, and from the client on purpose. storage.objects has no foreign key
+    // to auth.users, so nothing cascades: before this, deleting an account left every
+    // feedback screenshot sitting in the bucket, still fetchable. Deleting the row from
+    // storage.objects in SQL is also not enough on Supabase - it does not necessarily
+    // remove the backing file - so the removal goes through the storage API, which does.
+    // Failure here must not block the account deletion itself, so it is reported and the
+    // SQL function sweeps up anything left behind.
+    try {
+      const dir = currentUser.id;
+      const { data: files } = await sbClient.storage.from('feedback-screenshots').list(dir, { limit: 1000 });
+      if (files && files.length) {
+        await sbClient.storage.from('feedback-screenshots')
+          .remove(files.map(f => `${dir}/${f.name}`));
+      }
+    } catch (e) { console.warn('screenshot cleanup failed, the SQL sweep will catch it:', e); }
+
     const { error: dataErr } = await sbClient.rpc('delete_account_data');
     if (dataErr) throw new Error(dataErr.message);
     // Delete auth user via edge function or RPC
@@ -4313,14 +4360,14 @@ async function deleteAccount() {
     showScreen("signin");
     document.getElementById("signin-email").value = "";
     document.getElementById("signin-password").value = "";
-    showToast('Account deleted.');
+    showToast(t('del_acct_done'));
   } catch(e) {
     console.error('[delete-account]', e);
-    btn.textContent = 'Delete my account';
+    btn.textContent = t('del_acct_confirm');
     btn.disabled = false;
     // Name the step that failed. A bare "please try again" on an irreversible action the
     // user has already confirmed tells them nothing, and hid a permanent failure before.
-    showToast('Could not delete account - ' + (e.message || 'unknown error'), true);
+    showToast(t('del_acct_failed') + ' - ' + (e.message || t('err_generic')), true);
   }
 }
 
@@ -4483,7 +4530,7 @@ function showLimitExplainer(data, resetStr) {
         <div class="sheet-label" style="color:var(--primary)">DAILY PICKS LIMIT REACHED</div>
         <div class="sheet-title">You've used all ${data.limit||20} personal picks for today</div>
         <div style="color:#bbb;font-size:13px;line-height:1.6;margin-bottom:14px">Resets ${resetStr}. Search and watchlist still work — only personal picks are paused.</div>
-        <div style="color:#666;font-size:12px;line-height:1.6;margin-bottom:18px;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--border)">I'm building this solo and each personal pick costs real money. The daily cap keeps the app free and sustainable — thanks for understanding.</div>
+        <div style="color:var(--muted);font-size:12px;line-height:1.6;margin-bottom:18px;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--border)">I'm building this solo and each personal pick costs real money. The daily cap keeps the app free and sustainable — thanks for understanding.</div>
         <button class="btn-modal-save" style="width:100%" onclick="this.closest('.overlay').remove()">Got It</button>
       </div>
     </div>`;
@@ -4617,7 +4664,7 @@ function _whereToWatchInner(wp) {
   return `<div style="margin-bottom:14px">
     <div class="crew-label" style="display:flex;align-items:center;gap:8px">${t('where_to_watch')} ${sel}</div>
     <div ${open} style="display:flex;gap:8px;flex-wrap:wrap;margin-top:7px;cursor:${data.link?'pointer':'default'}">${logos}</div>
-    <div style="font-size:9px;color:var(--muted);opacity:0.55;margin-top:6px">${t('watch_attrib')}</div>
+    <div style="font-size:9px;color:var(--muted);margin-top:6px">${t('watch_attrib')}</div>
   </div>`;
 }
 async function tmdbFetch(path) {
@@ -4792,7 +4839,7 @@ function _maybeShowSearchCoach() {
       const arrow = document.createElement('span');
       arrow.className = 'coach-arrow';
       arrow.style.top = Math.max(10, Math.min(br.top + br.height / 2 - top, bh - 10)) + 'px';
-      arrow.innerHTML = '<svg width="8" height="14" viewBox="0 0 8 14" xmlns="http://www.w3.org/2000/svg"><polygon points="0,0 8,7 0,14" fill="rgba(167,139,250,0.9)"/></svg>';
+      arrow.innerHTML = '<svg width="8" height="14" viewBox="0 0 8 14" xmlns="http://www.w3.org/2000/svg"><polygon points="0,0 8,7 0,14" style="fill:color-mix(in srgb, var(--accent) 90%, transparent)"/></svg>';
       bub.appendChild(arrow);
     });
     const dismiss = () => {
@@ -5178,7 +5225,7 @@ async function openDetail(id, type) {
         <div style="flex:1;min-width:0">
           <div class="modal-title">${d.Title}</div>
           ${d.OriginalTitle && d.OriginalTitle !== d.Title ? `<div style="color:var(--muted);font-size:11px;margin-top:1px">${d.OriginalTitle}</div>` : ""}
-          <div style="color:#666;font-size:12px;margin-top:3px">${d.Year}${d.Runtime ? ` · ${d.Runtime}` : ""}</div>
+          <div style="color:var(--muted);font-size:12px;margin-top:3px">${d.Year}${d.Runtime ? ` · ${d.Runtime}` : ""}</div>
           ${d.Rating ? `<div class="rating-badge">★ ${d.Rating} <span>/ 10 TMDB</span></div>` : ""}
           ${d.Tagline ? `<div class="tagline">"${d.Tagline}"</div>` : ""}
           <div class="chips">${chips}</div>
@@ -5584,10 +5631,10 @@ async function openPerson(name, personId) {
           : `<div style="width:72px;height:100px;flex-shrink:0;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--muted)">${icon('user',28)}</div>`}
         <div style="flex:1;min-width:0">
           <div class="modal-title">${name}</div>
-          ${dept ? `<div style="color:#666;font-size:12px;margin-top:2px">${dept}</div>` : ""}
+          ${dept ? `<div style="color:var(--muted);font-size:12px;margin-top:2px">${dept}</div>` : ""}
           ${knownFor ? `<div style="color:#888;font-size:11px;margin-top:4px">Known for: ${knownFor}</div>` : ""}
           ${dept === "Sound" || dept === "Music" ? streamingLinks(name, true) : ""}
-          ${bio ? `<div style="color:#777;font-size:11px;margin-top:6px;line-height:1.5">${bio}</div>` : ""}
+          ${bio ? `<div style="color:var(--muted);font-size:11px;margin-top:6px;line-height:1.5">${bio}</div>` : ""}
         </div>
       </div>
       <div style="color:var(--muted);font-size:11px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Filmography · ${works.length} titles</div>
@@ -6186,7 +6233,7 @@ function renderFriendsSection() {
         ${_avatarMarkup(f.user_id, name, 36)}
         <div style="flex:1;font-size:13px">${escapeHtml(name)} <span style="color:var(--muted);font-size:11px">${t('friend_wants')}</span></div>
         <button onclick="respondFriendRequest('${f.id}','accepted')" style="background:var(--accent);border:none;color:var(--on-accent);border-radius:6px;padding:4px 10px;font-size:11px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${t('accept')}</button>
-        <button onclick="respondFriendRequest('${f.id}','declined')" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#666;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;margin-left:4px">✕</button>
+        <button onclick="respondFriendRequest('${f.id}','declined')" style="background:none;border:1px solid rgba(255,255,255,0.15);color:var(--muted);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;margin-left:4px">✕</button>
       </div>`;
     }
     html += `</div>`;
@@ -6234,7 +6281,7 @@ function renderFriendsSection() {
           ${_avatarMarkup(id, name, 36)}
           <div style="flex:1;font-size:13px">${escapeHtml(name)}</div>
           <button onclick="event.stopPropagation();_friendDeleteConfirmFid='${fid}';renderFriendsSection()"
-            style="background:none;border:none;color:#555;font-size:18px;line-height:1;cursor:pointer;padding:6px 8px;margin:-6px -4px" title="${t('list_remove')}">×</button>
+            style="background:none;border:none;color:var(--muted);font-size:18px;line-height:1;cursor:pointer;padding:6px 8px;margin:-6px -4px" title="${t('list_remove')}">×</button>
         </div>`;
       }
     }
@@ -6454,7 +6501,7 @@ function renderListTabs() {
 
   if (_listTabCreating) {
     html += `<input id="list-tab-input" type="text" placeholder="List name…"
-      style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:rgba(90,147,255,0.1);color:var(--text);font-size:12px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;width:110px;flex-shrink:0"
+      style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--text);font-size:12px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;width:110px;flex-shrink:0"
       enterkeyhint="done"
       onkeydown="if(event.key==='Enter'){event.preventDefault();_confirmNewListTab()}if(event.key==='Escape')_cancelNewListTab()"
       onblur="_blurNewListTab()">
@@ -6778,10 +6825,10 @@ function renderListManageStrip() {
     el.innerHTML = `
       <div style="display:flex;gap:8px;align-items:center">
         <input id="list-rename-input" type="text" value="${list.name.replace(/"/g,'&quot;')}"
-          style="flex:1;padding:7px 12px;border-radius:9px;border:1px solid var(--accent-border);background:rgba(90,147,255,0.08);color:var(--text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none"
+          style="flex:1;padding:7px 12px;border-radius:9px;border:1px solid var(--accent-border);background:color-mix(in srgb, var(--accent) 8%, transparent);color:var(--text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none"
           onkeydown="if(event.key==='Enter')renameList('${list.id}');if(event.key==='Escape'){_listManageMode=null;renderListManageStrip();}">
         <button onclick="renameList('${list.id}')" style="padding:7px 14px;border-radius:9px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${t('save')}</button>
-        <button onclick="_listManageMode=null;renderListManageStrip()" style="padding:7px 10px;border-radius:9px;background:none;border:1px solid var(--border);color:#666;font-size:13px;cursor:pointer">✕</button>
+        <button onclick="_listManageMode=null;renderListManageStrip()" style="padding:7px 10px;border-radius:9px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;cursor:pointer">✕</button>
       </div>`;
     setTimeout(() => { const i = document.getElementById('list-rename-input'); if(i){i.focus();i.select();} }, 50);
     return;
@@ -6790,10 +6837,10 @@ function renderListManageStrip() {
   if (_listManageMode === 'invite') {
     const friends = _friendsCache;
     el.innerHTML = `
-      <div style="padding:10px;background:rgba(90,147,255,0.05);border-radius:10px;border:1px solid rgba(90,147,255,0.15);margin-bottom:4px">
+      <div style="padding:10px;background:color-mix(in srgb, var(--accent) 5%, transparent);border-radius:10px;border:1px solid color-mix(in srgb, var(--accent) 15%, transparent);margin-bottom:4px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <span style="font-size:12px;color:var(--muted)">${t('list_invite_to')} <strong style="color:var(--text)">${escapeHtml(list.name)}</strong></span>
-          <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;line-height:1;padding:2px 4px">×</button>
+          <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;line-height:1;padding:2px 4px">×</button>
         </div>
         ${friends.length ? `<div style="font-size:11px;color:var(--muted);margin-bottom:6px">${t('list_select_friend')}</div>` + friends.map(f => {
           const fi = _friendInfo(f);
@@ -6823,7 +6870,7 @@ function renderListManageStrip() {
     el.innerHTML = `<div style="padding:10px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid var(--border)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <span style="font-size:12px;color:var(--muted)">${t('list_members_title')} · <strong style="color:var(--text)">${escapeHtml(list.name)}</strong></span>
-        <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;padding:2px 4px">×</button>
+        <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:2px 4px">×</button>
       </div>
       ${rows || `<div style="font-size:12px;color:var(--muted);padding:4px 0">${t('no_members')}</div>`}
     </div>`;
@@ -6831,10 +6878,10 @@ function renderListManageStrip() {
   }
 
   if (_listManageMode === 'link') {
-    el.innerHTML = `<div style="padding:10px;background:rgba(90,147,255,0.05);border-radius:10px;border:1px solid rgba(90,147,255,0.15)">
+    el.innerHTML = `<div style="padding:10px;background:color-mix(in srgb, var(--accent) 5%, transparent);border-radius:10px;border:1px solid color-mix(in srgb, var(--accent) 15%, transparent)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
         <span style="font-size:12px;color:var(--muted)">${t('list_invite_link_for')} <strong style="color:var(--text)">${escapeHtml(list.name)}</strong></span>
-        <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:#555;font-size:16px;cursor:pointer;padding:2px 4px">×</button>
+        <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:2px 4px">×</button>
       </div>
       <div id="invite-link-content" style="text-align:center;padding:8px 0">
         <div style="font-size:12px;color:var(--muted)">${t('list_generating')}</div>
@@ -6850,13 +6897,13 @@ function renderListManageStrip() {
       ${isOwner ? `<button onclick="_listManageMode='rename';renderListManageStrip()"
         style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:none;color:#888;font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${t('list_rename')}</button>` : ''}
       ${isOwner ? `<button onclick="_listManageMode='invite';renderListManageStrip()"
-        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(90,147,255,0.3);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">+ ${t('list_invite')}</button>` : ''}
+        style="padding:4px 12px;border-radius:20px;border:1px solid var(--accent-border);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">+ ${t('list_invite')}</button>` : ''}
       ${isOwner ? `<button onclick="_listManageMode='link';renderListManageStrip()"
-        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(90,147,255,0.3);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" style="vertical-align:middle;margin-right:3px"><circle cx="11" cy="2.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="11" cy="11.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="3" cy="7" r="1.8" stroke="currentColor" stroke-width="1.4"/><line x1="4.7" y1="6.1" x2="9.3" y2="3.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="4.7" y1="7.9" x2="9.3" y2="10.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>${t('list_link')}</button>` : ''}
+        style="padding:4px 12px;border-radius:20px;border:1px solid var(--accent-border);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" style="vertical-align:middle;margin-right:3px"><circle cx="11" cy="2.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="11" cy="11.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="3" cy="7" r="1.8" stroke="currentColor" stroke-width="1.4"/><line x1="4.7" y1="6.1" x2="9.3" y2="3.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="4.7" y1="7.9" x2="9.3" y2="10.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>${t('list_link')}</button>` : ''}
       <button onclick="_listManageMode='confirm-delete';renderListManageStrip()"
-        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:none;color:#666;font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${isOwner ? t('list_delete') : t('list_leave')}</button>
+        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--muted);font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${isOwner ? t('list_delete') : t('list_leave')}</button>
       ${list.memberCount > 0 ? `<button onclick="_listManageMode='members';renderListManageStrip()"
-        style="padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);background:none;color:#555;font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">
+        style="padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);background:none;color:var(--muted);font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">
         ${icon('users',13)} ${list.memberCount} ${_membersWord(list.memberCount)}
       </button>` : ''}
     </div>`;
@@ -6885,10 +6932,10 @@ function renderListsSection() {
       </div>`;
     } else if (_listInviteTargetId === list.id) {
       const avail = _friendsCache;
-      html += `<div class="list-row" style="flex-direction:column;align-items:flex-start;background:rgba(90,147,255,0.05);border-radius:8px;padding:10px;gap:6px">
+      html += `<div class="list-row" style="flex-direction:column;align-items:flex-start;background:color-mix(in srgb, var(--accent) 5%, transparent);border-radius:8px;padding:10px;gap:6px">
         <div style="display:flex;align-items:center;gap:8px;width:100%">
           <span style="font-size:13px;font-weight:600;flex:1">${escapeHtml(list.name)}</span>
-          <button onclick="event.stopPropagation();_listInviteTargetId=null;renderListsSection()" style="background:none;border:none;color:#555;font-size:18px;line-height:1;cursor:pointer;padding:4px 6px">×</button>
+          <button onclick="event.stopPropagation();_listInviteTargetId=null;renderListsSection()" style="background:none;border:none;color:var(--muted);font-size:18px;line-height:1;cursor:pointer;padding:4px 6px">×</button>
         </div>
         <div style="font-size:11px;color:var(--muted)">${t('select_friend_invite')}</div>
         ${avail.length ? avail.map(f => {
@@ -6906,9 +6953,9 @@ function renderListsSection() {
           <div style="font-size:11px;color:var(--muted)">${sub}</div>
         </div>
         ${isOwner ? `<button onclick="event.stopPropagation();_listInviteTargetId='${list.id}';_listDeleteConfirmId=null;renderListsSection()"
-          style="background:none;border:1px solid rgba(90,147,255,0.3);color:var(--accent-text);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">+ ${t('list_invite')}</button>` : ''}
+          style="background:none;border:1px solid var(--accent-border);color:var(--accent-text);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">+ ${t('list_invite')}</button>` : ''}
         <button onclick="event.stopPropagation();_listDeleteConfirmId='${list.id}';_listInviteTargetId=null;renderListsSection()"
-          style="background:none;border:none;color:#555;font-size:18px;line-height:1;cursor:pointer;padding:6px 8px;margin:-6px -4px" title="${isOwner ? 'Delete list' : 'Leave list'}">${isOwner ? '×' : '↩'}</button>
+          style="background:none;border:none;color:var(--muted);font-size:18px;line-height:1;cursor:pointer;padding:6px 8px;margin:-6px -4px" title="${isOwner ? 'Delete list' : 'Leave list'}">${isOwner ? '×' : '↩'}</button>
       </div>`;
     }
   }
@@ -7354,12 +7401,12 @@ function openListPicker(movie, status, callback = null) {
   _listPickerCallback = callback || null;
   const opts = document.getElementById('list-picker-options');
   const isPersonalActive = _activeListId === 'personal' || _activeListId === null;
-  const activeStyle = 'border-color:var(--accent);background:rgba(90,147,255,0.08);';
+  const activeStyle = 'border-color:var(--accent);background:color-mix(in srgb, var(--accent) 8%, transparent);';
   if (opts) opts.innerHTML = `
     <button class="list-picker-opt" style="${isPersonalActive && !callback ? activeStyle : ''}" onclick="_onListPicked(null)">
       <div style="display:flex;align-items:center;gap:6px">
         <div style="font-size:14px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">${(currentUser?.displayName||currentUser?.email?.split('@')[0]||'My')+"'s List"}</div>
-        ${isPersonalActive && !callback ? '<span style="font-size:10px;color:var(--accent-text);background:rgba(90,147,255,0.15);padding:1px 7px;border-radius:10px">active</span>' : ''}
+        ${isPersonalActive && !callback ? '<span style="font-size:10px;color:var(--accent-text);background:color-mix(in srgb, var(--accent) 8%, transparent);padding:1px 7px;border-radius:10px">active</span>' : ''}
       </div>
       <div style="font-size:11px;color:var(--muted);margin-top:2px">Personal</div>
     </button>
@@ -7368,7 +7415,7 @@ function openListPicker(movie, status, callback = null) {
       return `<button class="list-picker-opt" style="${isActive ? activeStyle : ''}" onclick="_onListPicked('${l.id}')">
         <div style="display:flex;align-items:center;gap:6px">
           <div style="font-size:14px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">${escapeHtml(l.name)}</div>
-          ${isActive ? '<span style="font-size:10px;color:var(--accent-text);background:rgba(90,147,255,0.15);padding:1px 7px;border-radius:10px">active</span>' : ''}
+          ${isActive ? '<span style="font-size:10px;color:var(--accent-text);background:color-mix(in srgb, var(--accent) 8%, transparent);padding:1px 7px;border-radius:10px">active</span>' : ''}
         </div>
         <div style="font-size:11px;color:var(--muted);margin-top:2px">${l.memberCount ? l.memberCount + ' member' + (l.memberCount !== 1 ? 's' : '') : l.role}</div>
       </button>`;
@@ -7387,7 +7434,7 @@ function _renderListPickerNewRow() {
     row.innerHTML = `
       <div style="display:flex;gap:6px">
         <input id="list-picker-new-input" type="text" placeholder="New list name…" maxlength="40"
-          style="flex:1;padding:9px 11px;border-radius:8px;border:1px solid var(--accent-border);background:rgba(90,147,255,0.08);color:var(--text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none"
+          style="flex:1;padding:9px 11px;border-radius:8px;border:1px solid var(--accent-border);background:color-mix(in srgb, var(--accent) 8%, transparent);color:var(--text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none"
           onkeydown="if(event.key==='Enter')_createListFromPicker();if(event.key==='Escape'){_listPickerNewMode=false;_renderListPickerNewRow()}">
         <button onclick="_createListFromPicker()" style="padding:9px 14px;border-radius:8px;border:none;background:var(--accent);color:var(--on-accent);font-size:12px;cursor:pointer;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">Create</button>
       </div>`;
@@ -7765,8 +7812,8 @@ function _sentStatusHTML(inv) {
     return `${to}<span style="color:#4ade80">${addedLabel}</span>`;
   }
   if (inv.status === "declined") return `${to}<span style="color:#f87171">${t('inv_declined')}</span>`;
-  if (inv.read_at) return `${to}<span style="color:#777">${t('inv_pending')}</span>`;
-  return `${to}<span style="color:#555">${icon('send',12)} ${t('inv_sent')}</span>`;
+  if (inv.read_at) return `${to}<span style="color:var(--muted)">${t('inv_pending')}</span>`;
+  return `${to}<span style="color:var(--muted)">${icon('send',12)} ${t('inv_sent')}</span>`;
 }
 
 function _receivedStatusHTML(inv) {
@@ -7813,18 +7860,18 @@ function _renderListInvCard(inv) {
   } else {
     if (inv.status === 'accepted') statusLine = `<span style="color:var(--accent-text)">↑ ${t('inv_to')} ${escapeHtml(inv.to_name || '?')}</span><span style="display:inline-block;width:8px"></span><span style="color:#4ade80">${t('inv_accepted')}</span>`;
     else if (inv.status === 'declined') statusLine = `<span style="color:var(--accent-text)">↑ ${t('inv_to')} ${escapeHtml(inv.to_name || '?')}</span><span style="display:inline-block;width:8px"></span><span style="color:#f87171">${t('inv_declined')}</span>`;
-    else statusLine = `<span style="color:var(--accent-text)">↑ ${t('inv_to')} ${escapeHtml(inv.to_name || '?')}</span><span style="display:inline-block;width:8px"></span><span style="color:#555">${icon('send',12)} ${t('inv_sent')}</span>`;
+    else statusLine = `<span style="color:var(--accent-text)">↑ ${t('inv_to')} ${escapeHtml(inv.to_name || '?')}</span><span style="display:inline-block;width:8px"></span><span style="color:var(--muted)">${icon('send',12)} ${t('inv_sent')}</span>`;
   }
 
   return `<div class="inv-card${isCardUnread ? ' inv-unread' : ''}" id="inv-card-${inv.id}">
     <div style="display:flex;gap:11px;align-items:center">
-      <div style="width:46px;height:66px;border-radius:10px;background:rgba(90,147,255,0.1);border:1px solid rgba(90,147,255,0.25);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">📋</div>
+      <div style="width:46px;height:66px;border-radius:10px;background:var(--accent-soft);border:1px solid color-mix(in srgb, var(--accent) 25%, transparent);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">📋</div>
       <div style="flex:1;min-width:0">
         <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;line-height:1.2">${escapeHtml(inv.title || 'Shared List')}</div>
         <div style="font-size:11px;margin-top:3px">${statusLine}</div>
         ${isPending ? `<div style="display:flex;gap:8px;margin-top:8px;position:relative;z-index:2" onclick="event.stopPropagation()">
           <button onclick="event.stopPropagation();respondInviteById('${inv.id}','accepted')" style="padding:6px 14px;border-radius:6px;background:var(--accent);border:none;color:var(--on-accent);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">${t('inv_join_list')}</button>
-          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','declined')" style="padding:6px 14px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">✕ ${t('inv_decline')}</button>
+          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','declined')" style="padding:6px 14px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--muted);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">✕ ${t('inv_decline')}</button>
         </div>` : ''}
       </div>
       <button onclick="event.stopPropagation();_armDeleteInvite('${inv.id}', this)" class="hist-del" style="flex-shrink:0;padding:6px 8px;align-self:flex-start;margin-top:2px">×</button>
@@ -7870,7 +7917,7 @@ function _renderInvCard(inv) {
         ${inv.message ? `<div style="color:#aaa;font-size:12px;font-style:italic;margin-top:4px">"${escapeHtml(inv.message)}"</div>` : ""}
         ${isPending ? `<div style="display:flex;gap:8px;margin-top:8px;position:relative;z-index:2" onclick="event.stopPropagation()">
           <button onclick="event.stopPropagation();acceptFilmInvite('${inv.id}')" style="padding:6px 14px;border-radius:6px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">+ ${t('inv_add_to_list')}</button>
-          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','declined')" style="padding:6px 14px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#666;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">✕ ${t('inv_decline')}</button>
+          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','declined')" style="padding:6px 14px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--muted);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">✕ ${t('inv_decline')}</button>
         </div>` : ""}
       </div>
     </div>
@@ -9037,7 +9084,7 @@ async function backupImportLetterboxd() {
     if (!main) { statusEl.style.display = "none"; statusEl.innerHTML = ""; return; }
     statusEl.style.display = "block";
     statusEl.innerHTML = `<div style="color:var(--accent)">${main}</div>`
-      + `<div style="color:var(--muted);opacity:0.85;margin-top:3px">${t('backup_safe_hint')}</div>`;
+      + `<div style="color:var(--muted);margin-top:3px">${t('backup_safe_hint')}</div>`;
   };
   try {
     const file = await new Promise((res, rej) => {
@@ -9219,7 +9266,7 @@ async function backupImportIMDb() {
     if (!main) { statusEl.style.display = "none"; statusEl.innerHTML = ""; return; }
     statusEl.style.display = "block";
     statusEl.innerHTML = `<div style="color:var(--accent)">${main}</div>`
-      + `<div style="color:var(--muted);opacity:0.85;margin-top:3px">${t('backup_safe_hint')}</div>`;
+      + `<div style="color:var(--muted);margin-top:3px">${t('backup_safe_hint')}</div>`;
   };
   try {
     const file = await new Promise((res, rej) => {
@@ -9592,7 +9639,7 @@ async function backupImportXLSX() {
     if (!main) { statusEl.style.display = "none"; statusEl.innerHTML = ""; return; }
     statusEl.style.display = "block";
     statusEl.innerHTML = `<div style="color:var(--accent)">${main}</div>`
-      + `<div style="color:var(--muted);opacity:0.85;margin-top:3px">${t('backup_safe_hint')}</div>`;
+      + `<div style="color:var(--muted);margin-top:3px">${t('backup_safe_hint')}</div>`;
   };
   const setBusy = (on) => { [importBtn, exportBtn].forEach(b => { if (b) b.disabled = on; }); };
   const setLabel = (txt) => setStatus(txt); // keep call-sites below tidy
@@ -9812,9 +9859,43 @@ async function _uploadFbScreenshot(file) {
     cacheControl: '3600', upsert: false, contentType: file.type
   });
   if (error) throw new Error('Screenshot upload failed: ' + error.message);
-  const { data: pub } = sbClient.storage.from('feedback-screenshots').getPublicUrl(path);
-  return pub?.publicUrl || null;
+  // The PATH, not a public URL. Measured on the live bucket before this change: any
+  // signed-in user could list the bucket root and read back every other user's folder
+  // name - which is their auth uuid - then list that folder and fetch the file through
+  // getPublicUrl with no credentials at all (HTTP 200, a real 39 KB screenshot). A
+  // feedback screenshot is a picture of somebody's own screen: their library, their
+  // name, their messages. The bucket is private now and this is read back through a
+  // short-lived signed URL, so the stored value must be a path.
+  return path;
 }
+// Rows written before the bucket was made private hold a full public URL; rows written
+// after hold a bare path. Accept both and always end up with a path.
+function _fbShotPath(v) {
+  if (!v) return '';
+  const marker = '/feedback-screenshots/';
+  const i = String(v).indexOf(marker);
+  return i === -1 ? String(v) : String(v).slice(i + marker.length);
+}
+
+// Signed URLs cannot go straight into the markup: they are async. The markup carries the
+// path, and this fills the real src in afterwards - so a failure leaves a missing image
+// rather than a broken page.
+async function _signFeedbackShots(root) {
+  const nodes = [...root.querySelectorAll('[data-shot-img]')];
+  for (const img of nodes) {
+    const path = img.getAttribute('data-shot-img');
+    if (!path) continue;
+    try {
+      const { data, error } = await sbClient.storage
+        .from('feedback-screenshots').createSignedUrl(path, 300);
+      if (error || !data?.signedUrl) { img.remove(); continue; }
+      img.src = data.signedUrl;
+      const a = img.closest('a[data-shot]');
+      if (a) a.href = data.signedUrl;
+    } catch (e) { img.remove(); }
+  }
+}
+
 function setFeedbackUnread(has) {
   const icon=document.getElementById("feedback-icon");
   if(icon)icon.classList.toggle("unread",!!has);
@@ -9928,9 +10009,10 @@ async function loadFeedbackReplies() {
           <button data-del-id="${f.id}" onclick="deleteFeedback('${f.id}')" style="background:none;border:none;color:#888;cursor:pointer;font-size:18px;line-height:1;padding:6px 8px;border-radius:6px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='none'">×</button>
         </div>
         <div style="font-size:13px;color:#ccc">${escapeHtml(f.message)}</div>
-        ${f.screenshot_url?`<a href="${escapeHtml(f.screenshot_url)}" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px"><img src="${escapeHtml(f.screenshot_url)}" style="max-width:120px;max-height:80px;border-radius:6px;border:1px solid var(--border);object-fit:cover" alt="Screenshot"/></a>`:""}
+        ${f.screenshot_url?`<a data-shot="${escapeHtml(_fbShotPath(f.screenshot_url))}" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px"><img data-shot-img="${escapeHtml(_fbShotPath(f.screenshot_url))}" style="max-width:120px;max-height:80px;border-radius:6px;border:1px solid var(--border);object-fit:cover" alt="Screenshot"/></a>`:""}
         ${f.reply?`<div class="fb-reply-card"><div class="fb-reply-label">↩ Reply${f.replied_at?` · ${_fmtDT(f.replied_at)}`:""}</div><div class="fb-reply-text">${escapeHtml(f.reply)}</div></div>`:""}
       </div>`).join("")}`;
+    _signFeedbackShots(el);
   } catch(e){
     el.style.display="block";
     el.innerHTML=`<div style="color:var(--muted);font-size:12px;padding:8px 0;text-align:center">
