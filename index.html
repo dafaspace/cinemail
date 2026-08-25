@@ -2753,7 +2753,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.55.4</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.55.5</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -7230,18 +7230,28 @@ async function checkPendingJoinToken() {
   if (!token || !currentUser) return;
   sessionStorage.removeItem('pendingJoinToken');
   try {
-    const { data, error } = await sbClient.from('invite_tokens')
-      .select('id,list_id,expires_at,uses,max_uses,lists(name)').eq('token', token).single();
+    // Through an RPC, not a select. invite_tokens was world-readable: with the anon key
+    // and no session at all it returned every live token plus created_by, a real auth
+    // uuid - so anyone could read a token and join a stranger's list, since
+    // join_list_by_token checks only that the token is valid, not that you were invited.
+    //
+    // The table is closed now, and closing it is what forced this change: the owner can
+    // still list their own tokens, but the person JOINING is not the owner, so a select
+    // by token value is exactly what RLS can no longer allow. preview_invite_token()
+    // reads past RLS and returns only what this dialog shows. Holding the token is the
+    // authorisation - it is the secret.
+    const { data: rows, error } = await sbClient.rpc('preview_invite_token', { p_token: token });
+    const data = Array.isArray(rows) ? rows[0] : rows;
     if (error || !data) { showToast('Invite link is invalid', true); return; }
-    if (new Date(data.expires_at) < new Date()) { showToast('Invite link has expired', true); return; }
-    if (data.uses >= data.max_uses) { showToast('Invite link limit reached', true); return; }
+    if (data.expired)   { showToast('Invite link has expired', true); return; }
+    if (data.exhausted) { showToast('Invite link limit reached', true); return; }
     const { data: already } = await sbClient.from('list_members')
       .select('id').eq('list_id', data.list_id).eq('user_id', currentUser.id).maybeSingle();
-    if (already) { showToast(`You're already in "${data.lists.name}"`); return; }
+    if (already) { showToast(`You're already in "${data.list_name}"`); return; }
     // Carry the token itself, not its row id: joining is done by the server, which
     // re-checks expiry and the use count for real. The checks above are only there to
     // give a useful message before the confirm dialog.
-    _showJoinConfirm(token, data.list_id, data.lists?.name || 'Shared List');
+    _showJoinConfirm(token, data.list_id, data.list_name || 'Shared List');
   } catch(e) { console.error('join token:', e); }
 }
 
