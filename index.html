@@ -2809,7 +2809,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.56.2</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.56.3</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -7561,12 +7561,18 @@ async function _sharedImport() {
   try {
     watchHistory = await loadHistoryFromDB();
     await loadListsCache();
-    renderListTabs();
     switchTab('history');
-    renderHistory();
+    // Open the list that was just created, not whichever happened to be selected. Landing
+    // on the Lists tab with an old list showing gives no sign the import worked - the
+    // films are one tap away and invisible, which is how the previous version read as a
+    // failure. switchListTab rather than setting _activeListId by hand: it also clears the
+    // create and manage modes and redraws the manage strip, which a bare assignment leaves
+    // pointing at the list that WAS selected.
+    switchListTab(listId);
   } catch (e) {
+    // The rows ARE saved; only the redraw failed. Say so once, below, rather than here -
+    // a toast in both places would fire twice on the path that already went wrong.
     console.error('post-import refresh failed:', e);
-    showToast(t('shared_done'));   // the rows ARE saved; only the redraw failed
   }
   showToast(added === items.length ? t('shared_done') : `${added} / ${items.length}`);
 }
@@ -9390,7 +9396,7 @@ async function backupExportJSON() {
 async function backfillCrewData() {
   const btn = document.getElementById("btn-backfill-crew");
   // Find entries missing any crew field (cinematographer / composer / director)
-  // Not only MISSING fields. Until v0.56.2 only the first 6 cast names were stored, and
+  // Not only MISSING fields. Until v0.56.3 only the first 6 cast names were stored, and
   // the cinema profile counts actors from exactly this string - so on an ensemble film
   // everyone past sixth billing was invisible to it for good. On The Grand Budapest Hotel
   // that silently excluded Goldblum, Keitel, Jude Law, Bill Murray, Edward Norton,
