@@ -1339,6 +1339,15 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   padding-bottom: 2px;
   margin-bottom: 12px;
   scrollbar-width: none;
+  /* A vertical scrollbar appeared on a row that only ever scrolls sideways. Two things
+     combined: setting overflow-x alone makes the OTHER axis compute to `auto` rather than
+     staying `visible`, and each pill carries a 44px ::after hit floor that stands taller
+     than the ~33px pill it sits on. So the row had content it considered overflowing.
+     min-height contains the floor instead of clipping it - overflow-y:hidden would have
+     hidden the scrollbar by cutting the hit area back below 44px, which is the opposite
+     of what the floor is for. */
+  min-height: 46px;
+  align-items: center;
 }
 .list-tabs-row::-webkit-scrollbar { display: none; }
 .list-tab {
@@ -2800,7 +2809,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.56.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.56.1</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -4302,9 +4311,13 @@ async function onSignedIn(user) {
   }
   // Reload lists non-blocking after friends (so invite picker has fresh data)
   loadListsCache().then(() => { loadHistoryFromDB().then(h => { if(h.length) watchHistory = h; renderHistory(); }).catch(()=>{}); }).catch(()=>{});
+  // Before the badge check, not after: this is the thing the person came for, and it was
+  // queued behind unrelated network calls. Measured on the live app, the sheet appeared
+  // 4408 ms after load - long enough that it read as "nothing happened", and long enough
+  // to switch tabs while waiting and think the tab was what summoned it.
+  checkPendingSharedList();
   await checkFeedbackBadge();
   checkPendingJoinToken(); // process ?join= token if present
-  checkPendingSharedList();
   checkPendingFilmLink(); // open a film someone shared via an external /f/ link
   startInboxPolling();
   _pushSyncOnLogin(); // native-only, non-prompting: refresh push token if already granted
@@ -7423,7 +7436,7 @@ async function checkPendingSharedList() {
     if (error || !row) { showToast(t('shared_list_gone'), true); return; }
     const items = Array.isArray(row.items) ? row.items : [];
     if (!items.length) { showToast(t('shared_list_gone'), true); return; }
-    setTimeout(() => _showSharedListSheet(row.list_name || 'Shared list', row.sender || '', items), 400);
+    _showSharedListSheet(row.list_name || 'Shared list', row.sender || '', items);
   } catch (e) { showToast(t('shared_list_gone'), true); }
 }
 
@@ -7523,7 +7536,21 @@ async function _sharedImport() {
     } catch (e) { /* one bad row must not lose the rest */ }
   }
   document.getElementById('shared-list-overlay')?.remove();
-  try { watchHistory = await loadHistoryFromDB(); await loadLists(); renderListTabs(); switchTab('history'); renderHistory(); } catch (e) {}
+  // loadListsCache, not loadLists - there is no loadLists, and the first version of this
+  // line called it. The ReferenceError went straight into an empty catch, so NOTHING after
+  // it ran: no tab list, no history, no switch. The films were in the database and the
+  // screen simply never asked again, which reads exactly like "it did not work".
+  // A catch that swallows without saying so is how a real failure looks like a no-op.
+  try {
+    watchHistory = await loadHistoryFromDB();
+    await loadListsCache();
+    renderListTabs();
+    switchTab('history');
+    renderHistory();
+  } catch (e) {
+    console.error('post-import refresh failed:', e);
+    showToast(t('shared_done'));   // the rows ARE saved; only the redraw failed
+  }
   showToast(added === items.length ? t('shared_done') : `${added} / ${items.length}`);
 }
 
@@ -9346,7 +9373,7 @@ async function backupExportJSON() {
 async function backfillCrewData() {
   const btn = document.getElementById("btn-backfill-crew");
   // Find entries missing any crew field (cinematographer / composer / director)
-  // Not only MISSING fields. Until v0.56.0 only the first 6 cast names were stored, and
+  // Not only MISSING fields. Until v0.56.1 only the first 6 cast names were stored, and
   // the cinema profile counts actors from exactly this string - so on an ensemble film
   // everyone past sixth billing was invisible to it for good. On The Grand Budapest Hotel
   // that silently excluded Goldblum, Keitel, Jude Law, Bill Murray, Edward Norton,
