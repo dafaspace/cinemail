@@ -7,6 +7,8 @@
 // Order is row-major, six per row, and must match the sheet exactly - a wrong index
 // silently shows the neighbouring character rather than failing, so ORDER below is the
 // single source of truth for both the picker and the avatar.
+const AVATAR_CELL_DIR = "./av/";
+const AVATAR_CELL_V = "0.55.8";
 const AVATAR_SPRITE = "./avatars.webp?v=0.53.3";     // the ink
 // The subject's filled shape. With a sheet of paper under the drawing the card can be
 // the exact palette colour: the ink stays dark and legible on top of the paper, so the
@@ -88,9 +90,19 @@ function _avatarCellPos(key) {
 // away the chosen colour's own lightness and made white and dark grey land on the same
 // pale tone.
 function avatarMaskVars(key) {
-  const pos = _avatarCellPos(key);
-  if (!pos) return "";
-  return `--av-pos:${pos};--av-size:${AVATAR_COLS * 100}% ${AVATAR_ROWS * 100}%;`;
+  // One file per avatar, not a cell of the big sheet.
+  //
+  // The sheets are 547 KB and 224 KB - 771 KB downloaded before a single 44px disc in
+  // the header can draw, because the glyph is a CSS mask and a mask cannot paint until
+  // its image arrives. Cut into cells, one avatar costs 13 KB: 61 times less for the
+  // case that happens on every load.
+  //
+  // The picker still costs the full set, but only when someone opens it, which is once
+  // in the life of an account rather than once per launch.
+  if (AVATAR_ORDER.indexOf(key) < 0) return "";
+  return `--av-sprite:url(${AVATAR_CELL_DIR}${key}-ink.webp?v=${AVATAR_CELL_V});` +
+         `--av-fill:url(${AVATAR_CELL_DIR}${key}-fill.webp?v=${AVATAR_CELL_V});` +
+         `--av-pos:0 0;--av-size:100% 100%;`;
 }
 
 // Kept for anything that still wants the flat picture (the ink is near-black there).
@@ -106,6 +118,9 @@ function avatarSpriteStyle(key) {
 // into every element's inline style.
 if (typeof document !== "undefined") {
   const root = document.documentElement.style;
-  root.setProperty("--av-sprite", `url(${AVATAR_SPRITE})`);
-  root.setProperty("--av-fill", `url(${AVATAR_FILL})`);
+  // Deliberately NOT set to the big sheets any more. Every element that draws an avatar
+  // sets both vars itself from avatarMaskVars(); a global default here would make the
+  // browser fetch 771 KB for the fallback that is never used.
+  root.setProperty("--av-sprite", "none");
+  root.setProperty("--av-fill", "none");
 }

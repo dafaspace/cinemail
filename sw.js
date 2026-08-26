@@ -1,5 +1,5 @@
 // ── Cache version — bump this string on every deploy to force refresh ──────────
-const CACHE_VERSION = "v206";
+const CACHE_VERSION = "v207";
 const CACHE_NAME = "cinemail-" + CACHE_VERSION;
 
 // Files to cache for offline use
@@ -12,8 +12,11 @@ const PRECACHE = [
   "./exceljs.min.js",
   "./emoji.js?v=0.53.3",
   "./qr.js?v=0.52.0",
-  "./avatars.webp?v=0.53.3",
-  "./avatars-fill.webp?v=0.53.3",
+  // The 547 KB and 224 KB avatar SHEETS are deliberately not here any more. Avatars are
+  // cut into one file per character now (./av/<key>-ink.webp and -fill.webp, about 13 KB
+  // the pair), so precaching the sheets would download 771 KB at install for images
+  // nothing asks for. The individual cells are picked up by the runtime cache-first
+  // handler on first use.
 ];
 
 // Minimal branded offline page — last-resort fallback so a home-screen launch with
@@ -68,10 +71,17 @@ self.addEventListener("fetch", event => {
   // `undefined`, which crashes the request ("Failed to convert value to 'Response'").
   if (event.request.method !== "GET" || url.origin !== self.location.origin) return;
 
-  // Always fetch HTML fresh from network (never serve stale app shell)
+  // Always fetch HTML fresh from network (never serve stale app shell).
+  //
+  // `cache: "reload"` is what makes that sentence true. The browser's HTTP cache sits
+  // UNDERNEATH the service worker, so a plain fetch() in here is answered from it
+  // without the network being touched - and GitHub Pages serves our HTML with
+  // `cache-control: max-age=600`. For ten minutes after any load this handler was
+  // network-first in name only. Tunemail, on the same host, measured the result: the
+  // running page was build v56 while sw.js said v57 and the server was serving v57.
   if (event.request.mode === "navigate" || url.pathname.endsWith(".html")) {
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request, { cache: "reload" })
         .then(response => {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
