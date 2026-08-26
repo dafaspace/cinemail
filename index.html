@@ -2800,7 +2800,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.55.9</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.56.0</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3300,7 +3300,7 @@ const I18N = {
 const _I18N_EXTRA = {
   en: {
     empty_search_title:"Find Your Next Film", recs_ph:"Mood, genre, or anything…", empty_search_sub:"Type a title and press Search",
-    list_share_out:"Share", share_list_copied:"Link copied", share_list_empty:"This list is empty", share_list_failed:"Could not create the link", share_needs_account:"Sign in to share a list", list_rename:"Rename", list_invite:"Invite", list_link:"Link", list_delete:"Delete", list_leave:"Leave",
+    shared_list_from:"shared this list", shared_all:"Select all", shared_none:"Clear all", shared_add:"Add to my lists", shared_adding:"Adding…", shared_done:"Added", shared_failed:"Could not add", shared_list_gone:"That link is no longer available", list_share_out:"Share", share_list_copied:"Link copied", share_list_empty:"This list is empty", share_list_failed:"Could not create the link", share_needs_account:"Sign in to share a list", list_rename:"Rename", list_invite:"Invite", list_link:"Link", list_delete:"Delete", list_leave:"Leave",
     list_members_title:"Members", list_remove:"Remove", you_label:"(you)", role_owner:"owner", role_member:"member",
     list_invite_to:"Invite to", list_invite_link_for:"Invite link for", list_select_friend:"Select a friend:",
     list_generating:"Generating…", list_cancel:"Cancel",
@@ -3325,7 +3325,7 @@ const _I18N_EXTRA = {
   },
   ru: {
     empty_search_title:"Найди свой следующий фильм", recs_ph:"Настроение, жанр, что угодно…", empty_search_sub:"Введи название и нажми «Найти»",
-    list_share_out:"Поделиться", share_list_copied:"Ссылка скопирована", share_list_empty:"Список пуст", share_list_failed:"Не удалось создать ссылку", share_needs_account:"Войдите, чтобы поделиться списком", list_rename:"Переименовать", list_invite:"Пригласить", list_link:"Ссылка", list_delete:"Удалить", list_leave:"Покинуть",
+    shared_list_from:"поделился этим списком", shared_all:"Выбрать все", shared_none:"Снять все", shared_add:"Добавить к себе", shared_adding:"Добавляю…", shared_done:"Добавлено", shared_failed:"Не удалось добавить", shared_list_gone:"Ссылка больше недоступна", list_share_out:"Поделиться", share_list_copied:"Ссылка скопирована", share_list_empty:"Список пуст", share_list_failed:"Не удалось создать ссылку", share_needs_account:"Войдите, чтобы поделиться списком", list_rename:"Переименовать", list_invite:"Пригласить", list_link:"Ссылка", list_delete:"Удалить", list_leave:"Покинуть",
     list_members_title:"Участники", list_remove:"Убрать", you_label:"(вы)", role_owner:"владелец", role_member:"участник",
     list_invite_to:"Пригласить в", list_invite_link_for:"Ссылка-приглашение в", list_select_friend:"Выбери друга:",
     list_generating:"Создаём…", list_cancel:"Отмена",
@@ -3350,7 +3350,7 @@ const _I18N_EXTRA = {
   },
   uk: {
     empty_search_title:"Знайди свій наступний фільм", recs_ph:"Настрій, жанр, будь-що…", empty_search_sub:"Введи назву і натисни Пошук",
-    list_share_out:"Поділитися", share_list_copied:"Посилання скопійовано", share_list_empty:"Список порожній", share_list_failed:"Не вдалося створити посилання", share_needs_account:"Увійдіть, щоб поділитися списком", list_rename:"Перейменувати", list_invite:"Запросити", list_link:"Посилання", list_delete:"Видалити", list_leave:"Покинути",
+    shared_list_from:"поділився цим списком", shared_all:"Вибрати всі", shared_none:"Зняти всі", shared_add:"Додати до себе", shared_adding:"Додаю…", shared_done:"Додано", shared_failed:"Не вдалося додати", shared_list_gone:"Посилання більше недоступне", list_share_out:"Поділитися", share_list_copied:"Посилання скопійовано", share_list_empty:"Список порожній", share_list_failed:"Не вдалося створити посилання", share_needs_account:"Увійдіть, щоб поділитися списком", list_rename:"Перейменувати", list_invite:"Запросити", list_link:"Посилання", list_delete:"Видалити", list_leave:"Покинути",
     list_members_title:"Учасники", list_remove:"Прибрати", you_label:"(ви)", role_owner:"власник", role_member:"учасник",
     list_invite_to:"Запросити до", list_invite_link_for:"Посилання-запрошення до", list_select_friend:"Обери друга:",
     list_generating:"Створюємо…", list_cancel:"Скасувати",
@@ -3375,7 +3375,7 @@ const _I18N_EXTRA = {
   },
   ka: {
     empty_search_title:"იპოვე შენი შემდეგი ფილმი", recs_ph:"განწყობა, ჟანრი ან ნებისმიერი…", empty_search_sub:"აკრიფე სათაური და დააჭირე „ძებნას“",
-    list_share_out:"გაზიარება", share_list_copied:"ბმული დაკოპირდა", share_list_empty:"სია ცარიელია", share_list_failed:"ბმულის შექმნა ვერ მოხერხდა", share_needs_account:"შედით სიის გასაზიარებლად", list_rename:"გადარქმევა", list_invite:"მოწვევა", list_link:"ბმული", list_delete:"წაშლა", list_leave:"დატოვება",
+    shared_list_from:"გააზიარა ეს სია", shared_all:"ყველას მონიშვნა", shared_none:"მონიშვნის მოხსნა", shared_add:"ჩემთან დამატება", shared_adding:"ემატება…", shared_done:"დაემატა", shared_failed:"დამატება ვერ მოხერხდა", shared_list_gone:"ბმული აღარ არის ხელმისაწვდომი", list_share_out:"გაზიარება", share_list_copied:"ბმული დაკოპირდა", share_list_empty:"სია ცარიელია", share_list_failed:"ბმულის შექმნა ვერ მოხერხდა", share_needs_account:"შედით სიის გასაზიარებლად", list_rename:"გადარქმევა", list_invite:"მოწვევა", list_link:"ბმული", list_delete:"წაშლა", list_leave:"დატოვება",
     list_members_title:"წევრები", list_remove:"ამოშლა", you_label:"(შენ)", role_owner:"მფლობელი", role_member:"წევრი",
     list_invite_to:"მოწვევა სიაში", list_invite_link_for:"მოსაწვევი ბმული", list_select_friend:"აირჩიე მეგობარი:",
     list_generating:"იქმნება…", list_cancel:"გაუქმება",
@@ -3400,7 +3400,7 @@ const _I18N_EXTRA = {
   },
   es: {
     empty_search_title:"Encuentra tu próxima película", recs_ph:"Estado de ánimo, género o lo que sea…", empty_search_sub:"Escribe un título y pulsa Buscar",
-    list_share_out:"Compartir", share_list_copied:"Enlace copiado", share_list_empty:"Esta lista está vacía", share_list_failed:"No se pudo crear el enlace", share_needs_account:"Inicia sesión para compartir una lista", list_rename:"Renombrar", list_invite:"Invitar", list_link:"Enlace", list_delete:"Eliminar", list_leave:"Salir",
+    shared_list_from:"compartió esta lista", shared_all:"Seleccionar todo", shared_none:"Quitar todo", shared_add:"Añadir a mis listas", shared_adding:"Añadiendo…", shared_done:"Añadido", shared_failed:"No se pudo añadir", shared_list_gone:"Ese enlace ya no está disponible", list_share_out:"Compartir", share_list_copied:"Enlace copiado", share_list_empty:"Esta lista está vacía", share_list_failed:"No se pudo crear el enlace", share_needs_account:"Inicia sesión para compartir una lista", list_rename:"Renombrar", list_invite:"Invitar", list_link:"Enlace", list_delete:"Eliminar", list_leave:"Salir",
     list_members_title:"Miembros", list_remove:"Quitar", you_label:"(tú)", role_owner:"propietario", role_member:"miembro",
     list_invite_to:"Invitar a", list_invite_link_for:"Enlace de invitación a", list_select_friend:"Elige un amigo:",
     list_generating:"Generando…", list_cancel:"Cancelar",
@@ -3425,7 +3425,7 @@ const _I18N_EXTRA = {
   },
   fr: {
     empty_search_title:"Trouvez votre prochain film", recs_ph:"Humeur, genre ou autre…", empty_search_sub:"Saisissez un titre et appuyez sur Rechercher",
-    list_share_out:"Partager", share_list_copied:"Lien copié", share_list_empty:"Cette liste est vide", share_list_failed:"Impossible de créer le lien", share_needs_account:"Connecte-toi pour partager une liste", list_rename:"Renommer", list_invite:"Inviter", list_link:"Lien", list_delete:"Supprimer", list_leave:"Quitter",
+    shared_list_from:"a partagé cette liste", shared_all:"Tout sélectionner", shared_none:"Tout désélectionner", shared_add:"Ajouter à mes listes", shared_adding:"Ajout…", shared_done:"Ajouté", shared_failed:"Impossible d\u2019ajouter", shared_list_gone:"Ce lien n\u2019est plus disponible", list_share_out:"Partager", share_list_copied:"Lien copié", share_list_empty:"Cette liste est vide", share_list_failed:"Impossible de créer le lien", share_needs_account:"Connecte-toi pour partager une liste", list_rename:"Renommer", list_invite:"Inviter", list_link:"Lien", list_delete:"Supprimer", list_leave:"Quitter",
     list_members_title:"Membres", list_remove:"Retirer", you_label:"(vous)", role_owner:"propriétaire", role_member:"membre",
     list_invite_to:"Inviter à", list_invite_link_for:"Lien d'invitation à", list_select_friend:"Choisis un ami :",
     list_generating:"Génération…", list_cancel:"Annuler",
@@ -3450,7 +3450,7 @@ const _I18N_EXTRA = {
   },
   de: {
     empty_search_title:"Finde deinen nächsten Film", recs_ph:"Stimmung, Genre, alles…", empty_search_sub:"Gib einen Titel ein und drücke Suchen",
-    list_share_out:"Teilen", share_list_copied:"Link kopiert", share_list_empty:"Diese Liste ist leer", share_list_failed:"Link konnte nicht erstellt werden", share_needs_account:"Melde dich an, um eine Liste zu teilen", list_rename:"Umbenennen", list_invite:"Einladen", list_link:"Link", list_delete:"Löschen", list_leave:"Verlassen",
+    shared_list_from:"hat diese Liste geteilt", shared_all:"Alle auswählen", shared_none:"Alle abwählen", shared_add:"Zu meinen Listen", shared_adding:"Wird hinzugefügt…", shared_done:"Hinzugefügt", shared_failed:"Konnte nicht hinzugefügt werden", shared_list_gone:"Dieser Link ist nicht mehr verfügbar", list_share_out:"Teilen", share_list_copied:"Link kopiert", share_list_empty:"Diese Liste ist leer", share_list_failed:"Link konnte nicht erstellt werden", share_needs_account:"Melde dich an, um eine Liste zu teilen", list_rename:"Umbenennen", list_invite:"Einladen", list_link:"Link", list_delete:"Löschen", list_leave:"Verlassen",
     list_members_title:"Mitglieder", list_remove:"Entfernen", you_label:"(du)", role_owner:"Besitzer", role_member:"Mitglied",
     list_invite_to:"Einladen zu", list_invite_link_for:"Einladungslink für", list_select_friend:"Wähle einen Freund:",
     list_generating:"Wird erstellt…", list_cancel:"Abbrechen",
@@ -3475,7 +3475,7 @@ const _I18N_EXTRA = {
   },
   it: {
     empty_search_title:"Trova il tuo prossimo film", recs_ph:"Umore, genere o qualsiasi cosa…", empty_search_sub:"Scrivi un titolo e premi Cerca",
-    list_share_out:"Condividi", share_list_copied:"Link copiato", share_list_empty:"Questa lista è vuota", share_list_failed:"Impossibile creare il link", share_needs_account:"Accedi per condividere una lista", list_rename:"Rinomina", list_invite:"Invita", list_link:"Link", list_delete:"Elimina", list_leave:"Esci",
+    shared_list_from:"ha condiviso questa lista", shared_all:"Seleziona tutto", shared_none:"Deseleziona tutto", shared_add:"Aggiungi alle mie liste", shared_adding:"Aggiungo…", shared_done:"Aggiunto", shared_failed:"Impossibile aggiungere", shared_list_gone:"Questo link non è più disponibile", list_share_out:"Condividi", share_list_copied:"Link copiato", share_list_empty:"Questa lista è vuota", share_list_failed:"Impossibile creare il link", share_needs_account:"Accedi per condividere una lista", list_rename:"Rinomina", list_invite:"Invita", list_link:"Link", list_delete:"Elimina", list_leave:"Esci",
     list_members_title:"Membri", list_remove:"Rimuovi", you_label:"(tu)", role_owner:"proprietario", role_member:"membro",
     list_invite_to:"Invita a", list_invite_link_for:"Link d'invito per", list_select_friend:"Scegli un amico:",
     list_generating:"Generazione…", list_cancel:"Annulla",
@@ -4304,6 +4304,7 @@ async function onSignedIn(user) {
   loadListsCache().then(() => { loadHistoryFromDB().then(h => { if(h.length) watchHistory = h; renderHistory(); }).catch(()=>{}); }).catch(()=>{});
   await checkFeedbackBadge();
   checkPendingJoinToken(); // process ?join= token if present
+  checkPendingSharedList();
   checkPendingFilmLink(); // open a film someone shared via an external /f/ link
   startInboxPolling();
   _pushSyncOnLogin(); // native-only, non-prompting: refresh push token if already granted
@@ -7395,6 +7396,137 @@ async function shareFilmLink(id, type, note) {
 // A shared film link (/f/{id}) sends people here as ?film={id}&friend={senderId}.
 // Both params must be captured in ONE pass: each of these checkers strips the query
 // string, so whichever ran first would otherwise throw the other one away.
+// ── A shared list arriving from outside ──────────────────────────────────────
+// Read at startup, kept in localStorage rather than sessionStorage so it survives the
+// email-confirmation hop a brand-new account makes - the same reason ?film= is stored
+// that way. A person who follows a link, signs up, confirms by email and lands back in
+// a fresh tab must still get the list they were sent.
+function _checkListLink() {
+  const p = new URLSearchParams(location.search);
+  const code = p.get('list');
+  // Validated before storing: it comes straight off an editable URL and is later sent to
+  // Postgres. _shareCode() makes 7 characters from a fixed alphabet.
+  if (!code || !/^[A-Za-z0-9]{4,16}$/.test(code)) return;
+  localStorage.setItem('pendingSharedList', code);
+  history.replaceState({}, '', location.pathname);
+}
+
+async function checkPendingSharedList() {
+  const code = localStorage.getItem('pendingSharedList');
+  if (!code || !currentUser || !sbClient) return;
+  localStorage.removeItem('pendingSharedList');
+  try {
+    // Through an RPC: share_lists is readable only by its owner, and the recipient is not
+    // the owner. Holding the code is the authorisation.
+    const { data, error } = await sbClient.rpc('preview_shared_list', { p_code: code });
+    const row = Array.isArray(data) ? data[0] : data;
+    if (error || !row) { showToast(t('shared_list_gone'), true); return; }
+    const items = Array.isArray(row.items) ? row.items : [];
+    if (!items.length) { showToast(t('shared_list_gone'), true); return; }
+    setTimeout(() => _showSharedListSheet(row.list_name || 'Shared list', row.sender || '', items), 400);
+  } catch (e) { showToast(t('shared_list_gone'), true); }
+}
+
+let _sharedPick = new Set();
+
+function _showSharedListSheet(listName, sender, items) {
+  // Everything starts ticked. The person followed a link to this list on purpose, so the
+  // default is "all of it"; unticking is the deliberate act, not ticking.
+  _sharedPick = new Set(items.map((_, i) => i));
+  window._sharedItems = items;
+  window._sharedListName = listName;
+  const ov = document.createElement('div');
+  ov.id = 'shared-list-overlay';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:flex-end;justify-content:center';
+  ov.innerHTML = `
+    <div style="background:var(--surface2);border-radius:18px 18px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom));width:100%;max-width:520px;max-height:86vh;display:flex;flex-direction:column">
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">${sender ? escapeHtml(sender) + ' · ' : ''}${t('shared_list_from')}</div>
+      <div class="modal-title" style="margin-bottom:2px">${escapeHtml(listName)}</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px">
+        <span id="shared-count">${items.length}</span> / ${items.length}
+        <button onclick="_sharedToggleAll()" id="shared-all-btn"
+          style="margin-left:10px;background:none;border:1px solid var(--border);border-radius:20px;color:var(--accent-text);font-size:11px;padding:.35em .8em;cursor:pointer;font-family:inherit;position:relative">${t('shared_none')}</button>
+      </div>
+      <div id="shared-list-body" style="overflow-y:auto;flex:1;margin:0 -4px 12px;padding:0 4px">
+        ${items.map((it, i) => `
+          <div onclick="_sharedToggle(${i})" data-si="${i}"
+               style="display:flex;gap:11px;align-items:center;padding:7px 8px;border-radius:10px;cursor:pointer;min-height:44px">
+            <span class="shared-tick" style="flex-shrink:0;width:22px;height:22px;border-radius:6px;border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;background:var(--accent)">${icon('check',14)}</span>
+            ${posterHTML(it.poster, it.title, 34, 50, false)}
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;line-height:1.3">${escapeHtml(it.title || '')}</div>
+              <div style="font-size:11px;color:var(--muted)">${escapeHtml(it.year || '')}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button onclick="_sharedImport()" id="shared-import-btn" class="btn-accent"
+          style="width:100%;padding:13px;border-radius:11px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">${t('shared_add')}</button>
+        <button onclick="document.getElementById('shared-list-overlay').remove()"
+          style="width:100%;padding:13px;border-radius:11px;background:none;border:1px solid var(--border);color:var(--muted);font-size:14px;cursor:pointer;font-family:inherit">${t('cancel')}</button>
+      </div>
+    </div>`;
+  document.body.appendChild(ov);
+}
+
+function _sharedPaint() {
+  document.querySelectorAll('#shared-list-body [data-si]').forEach(row => {
+    const on = _sharedPick.has(+row.dataset.si);
+    const tick = row.querySelector('.shared-tick');
+    tick.style.background = on ? 'var(--accent)' : 'transparent';
+    tick.style.borderColor = on ? 'var(--accent)' : 'var(--border)';
+    tick.style.opacity = on ? '1' : '.45';
+    row.style.opacity = on ? '1' : '.55';
+  });
+  const c = document.getElementById('shared-count');
+  if (c) c.textContent = _sharedPick.size;
+  const b = document.getElementById('shared-all-btn');
+  if (b) b.textContent = _sharedPick.size ? t('shared_none') : t('shared_all');
+  const imp = document.getElementById('shared-import-btn');
+  if (imp) imp.disabled = _sharedPick.size === 0;
+}
+function _sharedToggle(i) { _sharedPick.has(i) ? _sharedPick.delete(i) : _sharedPick.add(i); _sharedPaint(); }
+function _sharedToggleAll() {
+  if (_sharedPick.size) _sharedPick.clear();
+  else (window._sharedItems || []).forEach((_, i) => _sharedPick.add(i));
+  _sharedPaint();
+}
+
+async function _sharedImport() {
+  const items = (window._sharedItems || []).filter((_, i) => _sharedPick.has(i));
+  if (!items.length) return;
+  const btn = document.getElementById('shared-import-btn');
+  if (btn) { btn.disabled = true; btn.textContent = t('shared_adding'); }
+  // Into a list of their own named after the shared one, not into their personal list.
+  // Someone else's selection should arrive as someone else's selection, separable and
+  // removable in one go, rather than mixed irreversibly into what they already keep.
+  let listId = null;
+  try {
+    const name = String(window._sharedListName || 'Shared list').slice(0, 60);
+    const { data, error } = await sbClient.from('lists')
+      .insert({ name, owner_id: currentUser.id }).select('id').single();
+    if (error) throw new Error(error.message);
+    listId = data.id;
+  } catch (e) {
+    if (btn) { btn.disabled = false; btn.textContent = t('shared_add'); }
+    showToast(t('shared_failed') + ': ' + e.message, true);
+    return;
+  }
+  let added = 0;
+  for (const it of items) {
+    try {
+      await saveEntryToDB({
+        tmdbID: String(it.tmdb_id), title: it.title, year: it.year, poster: it.poster,
+        stars: 0, comment: '', status: 'plan', mediaType: it.media_type || 'movie', listId
+      });
+      added++;
+    } catch (e) { /* one bad row must not lose the rest */ }
+  }
+  document.getElementById('shared-list-overlay')?.remove();
+  try { watchHistory = await loadHistoryFromDB(); await loadLists(); renderListTabs(); switchTab('history'); renderHistory(); } catch (e) {}
+  showToast(added === items.length ? t('shared_done') : `${added} / ${items.length}`);
+}
+
 // Stored in localStorage so it survives the email-confirmation hop for new signups.
 function _checkFilmLink() {
   const p = new URLSearchParams(location.search);
@@ -9214,7 +9346,7 @@ async function backupExportJSON() {
 async function backfillCrewData() {
   const btn = document.getElementById("btn-backfill-crew");
   // Find entries missing any crew field (cinematographer / composer / director)
-  // Not only MISSING fields. Until v0.55.9 only the first 6 cast names were stored, and
+  // Not only MISSING fields. Until v0.56.0 only the first 6 cast names were stored, and
   // the cinema profile counts actors from exactly this string - so on an ensemble film
   // everyone past sixth billing was invisible to it for good. On The Grand Budapest Hotel
   // that silently excluded Goldblum, Keitel, Jude Law, Bill Murray, Edward Norton,
@@ -10415,6 +10547,7 @@ function initUI() {
   // Capture a shared film link BEFORE the session resolves: onSignedIn runs the
   // pending-link handlers, so anything captured after it would sit unprocessed
   // until the next sign-in.
+  _checkListLink();
   _checkFilmLink();
   const {data:{session}}=await sbClient.auth.getSession();
   if(session){await onSignedIn(session.user);}
