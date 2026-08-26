@@ -1929,6 +1929,34 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .poster-zoomable:hover { filter: brightness(1.12); opacity: 0.92; }
 /* Hide the Ko-fi support button inside the native app (App Store 3.1.1 + no monetization at launch). Stays visible on the web. */
 .native-app #support-kofi { display: none !important; }
+/* Person filmography groups. The heading is what does the work: a reader must be able to
+   tell at a glance that "Mentions and small credits" is a different kind of thing from
+   "Acting", otherwise grouping buys nothing over the flat list it replaced. */
+.person-group { margin-bottom: 18px; }
+.person-group-head {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--text); margin: 0 0 8px;
+  padding-bottom: 6px; border-bottom: 1px solid var(--border);
+}
+.person-group-n {
+  font-size: 10px; color: var(--muted); letter-spacing: 0;
+  background: rgba(255,255,255,0.06); border-radius: 999px; padding: 1px 7px;
+}
+.names-more {
+  display: inline-flex; align-items: center; justify-content: center;
+  font: inherit; font-size: 11px; line-height: 1;
+  margin-left: 6px; padding: .35em .7em;
+  border: 1px solid var(--border); border-radius: 999px;
+  background: none; color: var(--muted); cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+  position: relative;
+}
+.names-more::after {
+  content: ''; position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%); width: 100%; height: 100%;
+  min-width: 44px; min-height: 44px;
+}
 </style>
 </head>
 <body>
@@ -2753,7 +2781,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.55.5</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.55.6</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -4711,11 +4739,28 @@ async function tmdbDetail(id, type) {
     if (altDetail.title || altDetail.name) { detail = altDetail; type = alt; }
   }
   const credits = await tmdbFetch(`/${type}/${id}/credits?language=${_tmdbLang()}`);
-  const director = credits.crew?.filter(c => c.job === "Director").map(c => c.name).join(", ") || "";
-  const cast = credits.cast?.slice(0,6).map(c => c.name).join(", ") || "";
-  const writers = credits.crew?.filter(c => ["Screenplay","Writer","Story"].includes(c.job)).slice(0,3).map(c => c.name).join(", ") || "";
-  const composer = credits.crew?.filter(c => ["Original Music Composer","Music","Composer"].includes(c.job)).map(c => c.name).filter((v,i,a)=>a.indexOf(v)===i).join(", ") || "";
-  const cinematographer = credits.crew?.filter(c => ["Director of Photography","Cinematography"].includes(c.job)).map(c => c.name).filter((v,i,a)=>a.indexOf(v)===i).join(", ") || "";
+  // TMDB lists a person once PER JOB, so anyone credited twice arrives twice: Wes Anderson
+  // is both "Screenplay" and "Story" on The Phoenician Scheme, and the card read
+  // "Wes Anderson, Roman Coppola, Wes Anderson". v0.51.1 fixed exactly this - but only on
+  // composer and cinematographer, leaving director, writers and cast untouched. Half a
+  // system is worse than none, so all five now share one helper.
+  //
+  // Order matters and is why the writers line was doubly wrong: it sliced to 3 BEFORE
+  // removing duplicates, so deduping afterwards would have left two names where three
+  // were wanted. Dedupe, then slice.
+  const _uniqNames = arr => (arr || []).filter((v, i, a) => a.indexOf(v) === i);
+  const director = _uniqNames(credits.crew?.filter(c => c.job === "Director").map(c => c.name)).join(", ") || "";
+  // 15, not 6. The stored value feeds the cinema profile's "top actors", and at 6 an
+  // ensemble film silently drops the people you actually came for: on The Grand Budapest
+  // Hotel, positions 7-16 are Goldblum, Keitel, Jude Law, Bill Murray, Edward Norton,
+  // Saoirse Ronan, Schwartzman, Seydoux, Tilda Swinton and Wilkinson. Edward Norton's
+  // popularity is 7.6 against Ralph Fiennes's 5.8 at position 1 - billing order and
+  // prominence come apart completely in an ensemble. How many are SHOWN is decided at
+  // render time by what fits; that is a layout question and does not belong here.
+  const cast = _uniqNames(credits.cast?.map(c => c.name)).slice(0,15).join(", ") || "";
+  const writers = _uniqNames(credits.crew?.filter(c => ["Screenplay","Writer","Story"].includes(c.job)).map(c => c.name)).slice(0,6).join(", ") || "";
+  const composer = _uniqNames(credits.crew?.filter(c => ["Original Music Composer","Music","Composer"].includes(c.job)).map(c => c.name)).join(", ") || "";
+  const cinematographer = _uniqNames(credits.crew?.filter(c => ["Director of Photography","Cinematography"].includes(c.job)).map(c => c.name)).join(", ") || "";
   return {
     tmdbID: String(id), type,
     Title: detail.title || detail.name || "",
@@ -5138,6 +5183,60 @@ function clickableNames(str, closeModal) {
   }).join('<span style="color:var(--muted)">, </span>');
 }
 
+// Hide the names that do not fit, rather than a fixed count of them. Name lengths vary
+// enormously - "Iggy Pop" against "Philip Seymour Hoffman" - so any constant is wrong on
+// most films: too tight for short names, spilling for long ones.
+//
+// This measures instead. Every name is rendered, then the first one whose top edge sits
+// below the allowed number of lines marks the cut, and everything from there is hidden
+// behind a count. offsetTop is the real wrapped position, so it accounts for the actual
+// font, the actual width, and a reader who has enlarged their text.
+const _CLAMP_LINES = 2;
+function clampNameRows(root) {
+  (root || document).querySelectorAll('[data-clamp-names]').forEach(box => {
+    if (box.dataset.clamped === '1') return;
+    const kids = [...box.children];
+    if (kids.length < 3) return;                    // nothing worth hiding
+    box.querySelector('.names-more')?.remove();
+    kids.forEach(k => k.style.display = '');
+    const firstTop = kids[0].offsetTop;
+    const lineH = parseFloat(getComputedStyle(box).lineHeight) || 18;
+    const limit = firstTop + lineH * (_CLAMP_LINES - 0.5);   // half a line of tolerance
+    let cut = -1;
+    for (let i = 0; i < kids.length; i++) {
+      if (kids[i].offsetTop > limit) { cut = i; break; }
+    }
+    if (cut === -1) { box.dataset.clamped = '1'; return; }
+    // Step back over the separator so a row never ends on a dangling comma.
+    if (cut > 0 && !kids[cut - 1].hasAttribute('onclick')) cut -= 1;
+    const hidden = kids.slice(cut).filter(k => k.hasAttribute('onclick')).length;
+    if (hidden < 1) { box.dataset.clamped = '1'; return; }
+    const more = document.createElement('button');
+    more.className = 'names-more';
+    more.onclick = e => {
+      e.stopPropagation();
+      kids.forEach(k => k.style.display = '');
+      more.remove();
+    };
+    box.appendChild(more);
+
+    // The button takes room too, and on a full last line it wraps onto the next one -
+    // which is why some films used two rows and others three. Judge it the same way the
+    // names are judged, by where it actually lands: if its top edge falls past the last
+    // allowed line, give back one name and look again.
+    const lastLineTop = firstTop + lineH * (_CLAMP_LINES - 1);
+    for (let guard = 0; guard < kids.length + 2; guard++) {
+      kids.slice(cut).forEach(k => k.style.display = 'none');
+      more.textContent = '+' + kids.slice(cut).filter(k => k.hasAttribute('onclick')).length + ' more';
+      if (more.offsetTop <= lastLineTop + lineH * 0.5) break;   // fits on an allowed line
+      if (cut <= 1) break;
+      cut -= 1;
+      if (cut > 0 && !kids[cut - 1].hasAttribute('onclick')) cut -= 1;
+    }
+    box.dataset.clamped = '1';
+  });
+}
+
 // ── Modal navigation stack (detail ↔ person back navigation) ─────────────────
 let _modalStack = [];        // history of previous modal states
 let _currentModal = null;    // current state: {type:'detail',id,mediaType} or {type:'person',name}
@@ -5179,7 +5278,7 @@ async function openDetail(id, type) {
       d.Cinematographer ? `<div class="crew-label">${icon('camera',13)} Cinematography</div><div class="crew-val">${clickableNames(d.Cinematographer, true)}</div>` : "",
       d.Composer        ? `<div class="crew-label">${icon('music',13)} Composer</div><div class="crew-val">${clickableNames(d.Composer, true)}${streamingLinks(`${d.Title} soundtrack`)}</div>` : "",
       d.Writers         ? `<div class="crew-label">${icon('pen-line',13)} Screenplay</div><div class="crew-val">${clickableNames(d.Writers, true)}</div>` : "",
-      d.Cast            ? `<div class="crew-label">${icon('star',13)} Cast</div><div class="crew-val">${clickableNames(d.Cast, true)}</div>` : "",
+      d.Cast            ? `<div class="crew-label">${icon('star',13)} Cast</div><div class="crew-val" data-clamp-names>${clickableNames(d.Cast, true)}</div>` : "",
     ].join("");
     const tvInfo = d.Seasons ? `<div class="crew-label">Seasons / Episodes</div><div class="crew-val">${d.Seasons} seasons · ${d.Episodes} episodes${d.Networks ? ` · ${d.Networks}` : ""}</div>` : "";
 
@@ -5240,6 +5339,9 @@ async function openDetail(id, type) {
       <div class="modal-actions">${actionBtns}</div>
       <button onclick="shareFilmLink('${escapeJsAttr(id)}','${escapeJsAttr(type || 'movie')}')" style="width:100%;margin-top:10px;padding:11px;border-radius:11px;background:none;border:1px solid var(--border);color:var(--text);font-size:13px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px">${icon('link', 15)}<span>${escapeHtml(t('share_outside_btn'))}</span></button>`;
     window._detailMovie = d;
+    // After paint, not during: the pass reads offsetTop, which is meaningless until the
+    // browser has laid the names out.
+    requestAnimationFrame(() => clampNameRows(document.getElementById("detail-content")));
   } catch(e) {
     document.getElementById("detail-content").innerHTML = `<div class="empty-state"><div class="empty-state-title">${t('err_generic')}</div><p>${e.message}</p></div>`;
   }
@@ -5614,14 +5716,69 @@ async function openPerson(name, personId) {
     }
     const credits = await tmdbFetch(`/person/${person.id}/combined_credits?language=${_tmdbLang()}`);
     const photo = person.profile_path ? `https://image.tmdb.org/t/p/w300${person.profile_path}` : "";
-    const allWorks = [...(credits.cast || []), ...(credits.crew || [])];
-    const seen = new Set();
-    const works = allWorks.filter(r => {
-      if ((r.media_type !== "movie" && r.media_type !== "tv") || seen.has(r.id)) return false;
-      if (!r.poster_path || (r.vote_count || 0) < 10) return false;
-      seen.add(r.id); return true;
-    }).sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
-    const knownFor = [...works].sort((a,b)=>(b.vote_count||0)-(a.vote_count||0)).slice(0,3).map(r=>r.title||r.name).join(", ");
+    // GROUPED, the way IMDb and TMDB both do it - because a flat list sorted by one number
+    // cannot work here, and measuring showed exactly how badly.
+    //
+    // Measured before this change, Sacha Baron Cohen's first fifteen entries: fourteen were
+    // talk-show appearances as himself (Tonight Show, Daily Show, Ellen, Kimmel, Conan,
+    // Golden Globes as nominee) and the fifteenth was Django Unchained under Crew/Thanks.
+    // Not one film he acted in. Borat, The Dictator and Chicago 7 were far below.
+    //
+    // The cause was NOT the Thanks credits - he has exactly one. It was sorting by
+    // `popularity`, which measures how much a TITLE is being viewed right now: a daily
+    // talk show with thousands of episodes buries any film. vote_count measures a title's
+    // standing instead, and it behaved on all five people tested.
+    //
+    // A weighted "relevance" score was tried first and rejected on the evidence: giving
+    // billing position real weight put Tilda Swinton's The Beach above Doctor Strange.
+    // One bad case is enough when the simpler rule has none.
+    const SELF_ROLE = /^(self|himself|herself|themselves)\b|^self\s*[-\u2014\u2013]/i;
+    const MENTION_JOBS = new Set(["Thanks","Special Thanks","In Memory Of","Dedication"]);
+    const CREATIVE_FIRST = ["Directing","Writing","Camera","Sound","Production","Editing","Art","Creator"];
+
+    // A person can hold several credits on one film, and only one row should appear. Taking
+    // the FIRST one is what a plain `seen` set does, and it is wrong: TMDB returns Greta
+    // Gerwig's Executive Producer credit on Barbie before her Director credit, so she came
+    // out with no Directing group at all - three films she directed filed under Producer
+    // and Writer. Rank the roles and keep the most significant.
+    const ROLE_RANK = { Directing: 6, Creator: 5, Writing: 4, Camera: 4, Sound: 4, Editing: 3,
+                        Art: 3, Acting: 3, Production: 2, self: 1, mentions: 0 };
+    const bucketOf = r => {
+      if (MENTION_JOBS.has(r.job)) return "mentions";
+      if (r.character !== undefined) return SELF_ROLE.test(String(r.character).trim()) ? "self" : "Acting";
+      return CREATIVE_FIRST.includes(r.department) ? r.department : "mentions";
+    };
+    const best = new Map();
+    for (const r of [...(credits.cast || []), ...(credits.crew || [])]) {
+      if (r.media_type !== "movie" && r.media_type !== "tv") continue;
+      if (!r.poster_path || (r.vote_count || 0) < 10) continue;
+      const bucket = bucketOf(r);
+      // The person's own trade breaks ties: an actor billed in a film they also produced
+      // should read as acting, a director as directing.
+      const rank = (ROLE_RANK[bucket] || 0) + (bucket === (person.known_for_department || "") ? 0.5 : 0);
+      const prev = best.get(r.id);
+      if (!prev || rank > prev._rank) best.set(r.id, { ...r, _bucket: bucket, _rank: rank });
+    }
+    const kept = [...best.values()];
+    kept.sort((a, b) => (b.vote_count || 0) - (a.vote_count || 0));
+
+    // The person's own department leads, the rest follow by size, and the two soft
+    // buckets always sit last in a fixed order so they never surprise anyone.
+    const dept0 = person.known_for_department || "";
+    const byBucket = {};
+    kept.forEach(r => (byBucket[r._bucket] = byBucket[r._bucket] || []).push(r));
+    const softLast = ["self", "mentions"];
+    const groupOrder = Object.keys(byBucket)
+      .filter(k => !softLast.includes(k))
+      .sort((a, b) => (a === dept0 ? -1 : b === dept0 ? 1 : byBucket[b].length - byBucket[a].length))
+      .concat(softLast.filter(k => byBucket[k]));
+
+    const GROUP_LABEL = { Acting:"Acting", Directing:"Director", Writing:"Writer", Camera:"Cinematography",
+                          Sound:"Music", Production:"Producer", Editing:"Editor", Art:"Art department",
+                          Creator:"Creator", self:"As themselves", mentions:"Mentions and small credits" };
+
+    const works = kept.filter(r => !softLast.includes(r._bucket));
+    const knownFor = works.slice(0,3).map(r=>r.title||r.name).join(", ");
     const dept = person.known_for_department || "";
     const bio = person.biography ? person.biography.slice(0, 220) + (person.biography.length > 220 ? "…" : "") : "";
     el.innerHTML = `
@@ -5638,8 +5795,11 @@ async function openPerson(name, personId) {
         </div>
       </div>
       <div style="color:var(--muted);font-size:11px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Filmography · ${works.length} titles</div>
+      ${groupOrder.map(g => `
+      <div class="person-group">
+        <div class="person-group-head">${GROUP_LABEL[g] || g} <span class="person-group-n">${byBucket[g].length}</span></div>
       <div class="card-list">
-        ${works.map(r => {
+        ${byBucket[g].map(r => {
           const m = { id: r.id, tmdbID: String(r.id), type: r.media_type, Title: r.title||r.name,
             Year: (r.release_date||r.first_air_date||"").slice(0,4),
             Poster: r.poster_path ? `https://image.tmdb.org/t/p/w300${r.poster_path}` : "",
@@ -5668,6 +5828,7 @@ async function openPerson(name, personId) {
           </div>`;
         }).join("")}
       </div>
+      </div>`).join("")}
       <div style="margin-top:16px"><button class="btn-modal-close w-full" onclick="navModalBack()">${t('close')}</button></div>`;
   } catch(e) {
     el.innerHTML = `<div class="empty-state"><div class="empty-state-title">${t('err_generic')}</div><p>${e.message}</p></div>
@@ -8945,8 +9106,20 @@ async function backupExportJSON() {
 async function backfillCrewData() {
   const btn = document.getElementById("btn-backfill-crew");
   // Find entries missing any crew field (cinematographer / composer / director)
+  // Not only MISSING fields. Until v0.55.6 only the first 6 cast names were stored, and
+  // the cinema profile counts actors from exactly this string - so on an ensemble film
+  // everyone past sixth billing was invisible to it for good. On The Grand Budapest Hotel
+  // that silently excluded Goldblum, Keitel, Jude Law, Bill Murray, Edward Norton,
+  // Saoirse Ronan, Schwartzman, Seydoux, Tilda Swinton and Wilkinson.
+  //
+  // A film whose stored list is already at the cap is left alone; anything shorter is
+  // re-fetched, and only replaced if TMDB actually has more, since plenty of films
+  // genuinely have small casts.
+  const _CAST_CAP = 15;
+  const _nameCount = str => String(str || "").split(",").filter(x => x.trim()).length;
   const targets = (watchHistory || []).filter(h =>
-    h.tmdbID && (!h.cinematographer || !h.composer || !h.director || !h.actors || !h.runtime)
+    h.tmdbID && (!h.cinematographer || !h.composer || !h.director || !h.actors || !h.runtime
+                 || _nameCount(h.actors) < _CAST_CAP)
   );
   if (!targets.length) { showToast("All films already have crew data ✓"); return; }
   if (btn) { btn.disabled = true; }
@@ -8960,7 +9133,8 @@ async function backfillCrewData() {
       if (!h.cinematographer && d.Cinematographer) patch.cinematographer = d.Cinematographer;
       if (!h.composer        && d.Composer)        patch.composer        = d.Composer;
       if (!h.director        && d.Director)        patch.director        = d.Director;
-      if (!h.actors          && d.Cast)            patch.actors          = d.Cast;
+      if (!h.actors && d.Cast) patch.actors = d.Cast;
+      else if (d.Cast && _nameCount(d.Cast) > _nameCount(h.actors)) patch.actors = d.Cast;
       if (!h.runtime         && (d.RuntimeMin || d.Runtime)) patch.runtime = _parseRuntimeMin(d.RuntimeMin ?? d.Runtime);
       if (Object.keys(patch).length) { await updateEntryInDB(h.id, patch); updated++; }
     } catch(e) { /* skip individual failures, keep going */ }
