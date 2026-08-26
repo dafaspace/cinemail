@@ -2800,7 +2800,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.55.8</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.55.9</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3300,7 +3300,7 @@ const I18N = {
 const _I18N_EXTRA = {
   en: {
     empty_search_title:"Find Your Next Film", recs_ph:"Mood, genre, or anything…", empty_search_sub:"Type a title and press Search",
-    list_rename:"Rename", list_invite:"Invite", list_link:"Link", list_delete:"Delete", list_leave:"Leave",
+    list_share_out:"Share", share_list_copied:"Link copied", share_list_empty:"This list is empty", share_list_failed:"Could not create the link", share_needs_account:"Sign in to share a list", list_rename:"Rename", list_invite:"Invite", list_link:"Link", list_delete:"Delete", list_leave:"Leave",
     list_members_title:"Members", list_remove:"Remove", you_label:"(you)", role_owner:"owner", role_member:"member",
     list_invite_to:"Invite to", list_invite_link_for:"Invite link for", list_select_friend:"Select a friend:",
     list_generating:"Generating…", list_cancel:"Cancel",
@@ -3325,7 +3325,7 @@ const _I18N_EXTRA = {
   },
   ru: {
     empty_search_title:"Найди свой следующий фильм", recs_ph:"Настроение, жанр, что угодно…", empty_search_sub:"Введи название и нажми «Найти»",
-    list_rename:"Переименовать", list_invite:"Пригласить", list_link:"Ссылка", list_delete:"Удалить", list_leave:"Покинуть",
+    list_share_out:"Поделиться", share_list_copied:"Ссылка скопирована", share_list_empty:"Список пуст", share_list_failed:"Не удалось создать ссылку", share_needs_account:"Войдите, чтобы поделиться списком", list_rename:"Переименовать", list_invite:"Пригласить", list_link:"Ссылка", list_delete:"Удалить", list_leave:"Покинуть",
     list_members_title:"Участники", list_remove:"Убрать", you_label:"(вы)", role_owner:"владелец", role_member:"участник",
     list_invite_to:"Пригласить в", list_invite_link_for:"Ссылка-приглашение в", list_select_friend:"Выбери друга:",
     list_generating:"Создаём…", list_cancel:"Отмена",
@@ -3350,7 +3350,7 @@ const _I18N_EXTRA = {
   },
   uk: {
     empty_search_title:"Знайди свій наступний фільм", recs_ph:"Настрій, жанр, будь-що…", empty_search_sub:"Введи назву і натисни Пошук",
-    list_rename:"Перейменувати", list_invite:"Запросити", list_link:"Посилання", list_delete:"Видалити", list_leave:"Покинути",
+    list_share_out:"Поділитися", share_list_copied:"Посилання скопійовано", share_list_empty:"Список порожній", share_list_failed:"Не вдалося створити посилання", share_needs_account:"Увійдіть, щоб поділитися списком", list_rename:"Перейменувати", list_invite:"Запросити", list_link:"Посилання", list_delete:"Видалити", list_leave:"Покинути",
     list_members_title:"Учасники", list_remove:"Прибрати", you_label:"(ви)", role_owner:"власник", role_member:"учасник",
     list_invite_to:"Запросити до", list_invite_link_for:"Посилання-запрошення до", list_select_friend:"Обери друга:",
     list_generating:"Створюємо…", list_cancel:"Скасувати",
@@ -3375,7 +3375,7 @@ const _I18N_EXTRA = {
   },
   ka: {
     empty_search_title:"იპოვე შენი შემდეგი ფილმი", recs_ph:"განწყობა, ჟანრი ან ნებისმიერი…", empty_search_sub:"აკრიფე სათაური და დააჭირე „ძებნას“",
-    list_rename:"გადარქმევა", list_invite:"მოწვევა", list_link:"ბმული", list_delete:"წაშლა", list_leave:"დატოვება",
+    list_share_out:"გაზიარება", share_list_copied:"ბმული დაკოპირდა", share_list_empty:"სია ცარიელია", share_list_failed:"ბმულის შექმნა ვერ მოხერხდა", share_needs_account:"შედით სიის გასაზიარებლად", list_rename:"გადარქმევა", list_invite:"მოწვევა", list_link:"ბმული", list_delete:"წაშლა", list_leave:"დატოვება",
     list_members_title:"წევრები", list_remove:"ამოშლა", you_label:"(შენ)", role_owner:"მფლობელი", role_member:"წევრი",
     list_invite_to:"მოწვევა სიაში", list_invite_link_for:"მოსაწვევი ბმული", list_select_friend:"აირჩიე მეგობარი:",
     list_generating:"იქმნება…", list_cancel:"გაუქმება",
@@ -3400,7 +3400,7 @@ const _I18N_EXTRA = {
   },
   es: {
     empty_search_title:"Encuentra tu próxima película", recs_ph:"Estado de ánimo, género o lo que sea…", empty_search_sub:"Escribe un título y pulsa Buscar",
-    list_rename:"Renombrar", list_invite:"Invitar", list_link:"Enlace", list_delete:"Eliminar", list_leave:"Salir",
+    list_share_out:"Compartir", share_list_copied:"Enlace copiado", share_list_empty:"Esta lista está vacía", share_list_failed:"No se pudo crear el enlace", share_needs_account:"Inicia sesión para compartir una lista", list_rename:"Renombrar", list_invite:"Invitar", list_link:"Enlace", list_delete:"Eliminar", list_leave:"Salir",
     list_members_title:"Miembros", list_remove:"Quitar", you_label:"(tú)", role_owner:"propietario", role_member:"miembro",
     list_invite_to:"Invitar a", list_invite_link_for:"Enlace de invitación a", list_select_friend:"Elige un amigo:",
     list_generating:"Generando…", list_cancel:"Cancelar",
@@ -3425,7 +3425,7 @@ const _I18N_EXTRA = {
   },
   fr: {
     empty_search_title:"Trouvez votre prochain film", recs_ph:"Humeur, genre ou autre…", empty_search_sub:"Saisissez un titre et appuyez sur Rechercher",
-    list_rename:"Renommer", list_invite:"Inviter", list_link:"Lien", list_delete:"Supprimer", list_leave:"Quitter",
+    list_share_out:"Partager", share_list_copied:"Lien copié", share_list_empty:"Cette liste est vide", share_list_failed:"Impossible de créer le lien", share_needs_account:"Connecte-toi pour partager une liste", list_rename:"Renommer", list_invite:"Inviter", list_link:"Lien", list_delete:"Supprimer", list_leave:"Quitter",
     list_members_title:"Membres", list_remove:"Retirer", you_label:"(vous)", role_owner:"propriétaire", role_member:"membre",
     list_invite_to:"Inviter à", list_invite_link_for:"Lien d'invitation à", list_select_friend:"Choisis un ami :",
     list_generating:"Génération…", list_cancel:"Annuler",
@@ -3450,7 +3450,7 @@ const _I18N_EXTRA = {
   },
   de: {
     empty_search_title:"Finde deinen nächsten Film", recs_ph:"Stimmung, Genre, alles…", empty_search_sub:"Gib einen Titel ein und drücke Suchen",
-    list_rename:"Umbenennen", list_invite:"Einladen", list_link:"Link", list_delete:"Löschen", list_leave:"Verlassen",
+    list_share_out:"Teilen", share_list_copied:"Link kopiert", share_list_empty:"Diese Liste ist leer", share_list_failed:"Link konnte nicht erstellt werden", share_needs_account:"Melde dich an, um eine Liste zu teilen", list_rename:"Umbenennen", list_invite:"Einladen", list_link:"Link", list_delete:"Löschen", list_leave:"Verlassen",
     list_members_title:"Mitglieder", list_remove:"Entfernen", you_label:"(du)", role_owner:"Besitzer", role_member:"Mitglied",
     list_invite_to:"Einladen zu", list_invite_link_for:"Einladungslink für", list_select_friend:"Wähle einen Freund:",
     list_generating:"Wird erstellt…", list_cancel:"Abbrechen",
@@ -3475,7 +3475,7 @@ const _I18N_EXTRA = {
   },
   it: {
     empty_search_title:"Trova il tuo prossimo film", recs_ph:"Umore, genere o qualsiasi cosa…", empty_search_sub:"Scrivi un titolo e premi Cerca",
-    list_rename:"Rinomina", list_invite:"Invita", list_link:"Link", list_delete:"Elimina", list_leave:"Esci",
+    list_share_out:"Condividi", share_list_copied:"Link copiato", share_list_empty:"Questa lista è vuota", share_list_failed:"Impossibile creare il link", share_needs_account:"Accedi per condividere una lista", list_rename:"Rinomina", list_invite:"Invita", list_link:"Link", list_delete:"Elimina", list_leave:"Esci",
     list_members_title:"Membri", list_remove:"Rimuovi", you_label:"(tu)", role_owner:"proprietario", role_member:"membro",
     list_invite_to:"Invita a", list_invite_link_for:"Link d'invito per", list_select_friend:"Scegli un amico:",
     list_generating:"Generazione…", list_cancel:"Annulla",
@@ -7118,6 +7118,8 @@ function renderListManageStrip() {
         style="padding:4px 12px;border-radius:20px;border:1px solid var(--accent-border);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">+ ${t('list_invite')}</button>` : ''}
       ${isOwner ? `<button onclick="_listManageMode='link';renderListManageStrip()"
         style="padding:4px 12px;border-radius:20px;border:1px solid var(--accent-border);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif"><svg width="11" height="11" viewBox="0 0 14 14" fill="none" style="vertical-align:middle;margin-right:3px"><circle cx="11" cy="2.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="11" cy="11.5" r="1.8" stroke="currentColor" stroke-width="1.4"/><circle cx="3" cy="7" r="1.8" stroke="currentColor" stroke-width="1.4"/><line x1="4.7" y1="6.1" x2="9.3" y2="3.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="4.7" y1="7.9" x2="9.3" y2="10.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>${t('list_link')}</button>` : ''}
+      <button onclick="shareListOutward('${escapeJsAttr(list.id)}')"
+        style="padding:4px 12px;border-radius:20px;border:1px solid var(--accent-border);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif;display:inline-flex;align-items:center;gap:5px">${icon('send',12)} ${t('list_share_out')}</button>
       <button onclick="_listManageMode='confirm-delete';renderListManageStrip()"
         style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--muted);font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${isOwner ? t('list_delete') : t('list_leave')}</button>
       ${list.memberCount > 0 ? `<button onclick="_listManageMode='members';renderListManageStrip()"
@@ -7300,6 +7302,55 @@ function shareFromModal() {
 
 // 7 chars from an unambiguous alphabet (no 0/O/1/l) — ~35 bits, plenty for a table
 // this size, and readable if someone ever types one by hand.
+// Share a whole list outward, to someone who does not have Cinemail.
+//
+// A SNAPSHOT, not a live view. The row carries the films themselves, so the public page
+// never reads the list and cannot show anything added after the link was made. That is
+// deliberate: a link that has been forwarded cannot be recalled, and a live one would
+// quietly publish every later addition to whoever still has the address.
+async function shareListOutward(listId) {
+  if (!currentUser || !sbClient) { showToast(t('share_needs_account') || 'Sign in to share a list', true); return; }
+  const list = _listsCache.find(l => l.id === listId);
+  const listName = listId === 'personal'
+    ? ((currentUser.displayName || 'My') + "'s List")
+    : (list ? list.name : 'Shared List');
+
+  const films = (watchHistory || []).filter(h =>
+    listId === 'personal' ? (!h.listId && h.addedBy === currentUser.id) : h.listId === listId);
+  if (!films.length) { showToast(t('share_list_empty') || 'This list is empty', true); return; }
+
+  // Only what the public page draws. No ratings, no notes, no who-added-what: those are
+  // the owner's, and a link handed to a stranger is not the place for them.
+  const items = films.slice(0, 100).map(h => ({
+    tmdb_id: String(h.tmdbID || ''), media_type: h.mediaType || 'movie',
+    title: h.title || '', year: h.year || '', poster: h.poster || ''
+  })).filter(x => x.tmdb_id && x.title);
+
+  try {
+    const code = _shareCode();
+    const { error } = await sbClient.from('share_lists').insert({
+      code, from_user_id: currentUser.id,
+      list_name: String(listName).slice(0, 80),
+      items, item_count: items.length
+    });
+    if (error) throw new Error(error.message);
+    const url = `https://cinemail.app/l/${code}`;
+    const text = `${listName} - ${items.length} film${items.length === 1 ? '' : 's'}`;
+    if (navigator.share) {
+      try { await navigator.share({ title: listName, text, url }); return; } catch (e) { /* cancelled: fall through to copy */ }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast(t('share_list_copied') || 'Link copied');
+    } catch (e) {
+      // Copying can fail without throwing anywhere the user can see, so show the link.
+      showToast(url);
+    }
+  } catch (e) {
+    showToast((t('share_list_failed') || 'Could not create the link') + ': ' + e.message, true);
+  }
+}
+
 function _shareCode() {
   const A = '23456789abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
   const b = crypto.getRandomValues(new Uint8Array(7));
@@ -9163,7 +9214,7 @@ async function backupExportJSON() {
 async function backfillCrewData() {
   const btn = document.getElementById("btn-backfill-crew");
   // Find entries missing any crew field (cinematographer / composer / director)
-  // Not only MISSING fields. Until v0.55.8 only the first 6 cast names were stored, and
+  // Not only MISSING fields. Until v0.55.9 only the first 6 cast names were stored, and
   // the cinema profile counts actors from exactly this string - so on an ensemble film
   // everyone past sixth billing was invisible to it for good. On The Grand Budapest Hotel
   // that silently excluded Goldblum, Keitel, Jude Law, Bill Murray, Edward Norton,
