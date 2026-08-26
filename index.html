@@ -2809,7 +2809,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.56.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.56.2</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -4274,6 +4274,23 @@ async function onSignedIn(user) {
     const cachedHist = _cacheLoadHistory();
     if (cachedHist.length) { watchHistory = cachedHist; renderHistory(); }
   } catch(e) {}
+  // Five sequential round trips used to run here before anything appeared: lists, then
+  // history, then profiles for the name, sometimes an upsert, then profiles AGAIN for the
+  // avatar. Measured on the live app, the last of them landed 2.8 seconds after the app
+  // already knew who the user was at 181 ms. That is the three seconds Dafa reported as
+  // "the profile icon took about three seconds" - not the sprite sheets, which were a
+  // real disproportion but a different one.
+  //
+  // The two profiles reads are the same table by the same key for different columns, so
+  // they are one read. And it does not depend on lists or history, so it starts WITH them
+  // rather than after them.
+  const _profilePromise = (!isGuest && !_avatarWritePending)
+    ? sbClient.from("profiles").select("display_name,avatar_emoji,avatar_color").eq("id", user.id).limit(1)
+    : (!isGuest ? sbClient.from("profiles").select("display_name").eq("id", user.id).limit(1) : null);
+
+  // Nothing this needs is loaded yet, and nothing it does depends on lists or history.
+  checkPendingSharedList();
+
   try { await loadListsCache(); } catch(e) { console.warn('[lists]', e); }
   // Protected history load: don't wipe existing cache with empty result on transient failures
   try {
@@ -4282,7 +4299,7 @@ async function onSignedIn(user) {
   } catch(e) { console.warn(e); }
   if (!isGuest) try {
     const metaName = user.user_metadata?.display_name || "";
-    const { data: pd } = await sbClient.from("profiles").select("display_name").eq("id", user.id).limit(1);
+    const { data: pd } = await _profilePromise;
     const profileName = pd?.[0]?.display_name || "";
     // Only update displayName if we got a real name; never downgrade to email prefix
     const resolved = profileName || metaName || preservedName || user.email?.split("@")[0] || "";
@@ -4294,7 +4311,8 @@ async function onSignedIn(user) {
   // also runs on token refresh, and adopting the row mid-write put the previous avatar
   // back over the one just picked.
   if (!isGuest && !_avatarWritePending) try {
-    const { data: ad } = await sbClient.from("profiles").select("avatar_emoji,avatar_color").eq("id", user.id).limit(1);
+    // Already in flight since before the lists load; awaiting a settled promise is free.
+    const { data: ad } = await _profilePromise;
     const a = ad?.[0];
     if (a && !_avatarWritePending) {   // re-check: the await above is long enough for a tap to land inside it
       if (a.avatar_emoji) localStorage.setItem('avEmoji', a.avatar_emoji); else localStorage.removeItem('avEmoji');
@@ -4315,7 +4333,6 @@ async function onSignedIn(user) {
   // queued behind unrelated network calls. Measured on the live app, the sheet appeared
   // 4408 ms after load - long enough that it read as "nothing happened", and long enough
   // to switch tabs while waiting and think the tab was what summoned it.
-  checkPendingSharedList();
   await checkFeedbackBadge();
   checkPendingJoinToken(); // process ?join= token if present
   checkPendingFilmLink(); // open a film someone shared via an external /f/ link
@@ -9373,7 +9390,7 @@ async function backupExportJSON() {
 async function backfillCrewData() {
   const btn = document.getElementById("btn-backfill-crew");
   // Find entries missing any crew field (cinematographer / composer / director)
-  // Not only MISSING fields. Until v0.56.1 only the first 6 cast names were stored, and
+  // Not only MISSING fields. Until v0.56.2 only the first 6 cast names were stored, and
   // the cinema profile counts actors from exactly this string - so on an ensemble film
   // everyone past sixth billing was invisible to it for good. On The Grand Budapest Hotel
   // that silently excluded Goldblum, Keitel, Jude Law, Bill Murray, Edward Norton,
