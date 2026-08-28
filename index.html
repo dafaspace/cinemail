@@ -2848,7 +2848,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.1</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -4668,7 +4668,7 @@ function handleRateLimitHit(data) {
   }
   const seen = localStorage.getItem("seenLimitExplainer") === "1";
   if (!seen) { showLimitExplainer(data, resetStr); localStorage.setItem("seenLimitExplainer", "1"); }
-  else showToast(`Picks limit reached (${data.limit||25} per week). Resets ${resetStr}.`);
+  else showToast(`Picks limit reached (${data.limit||10} per week). Resets ${resetStr}.`);
 }
 
 function showLimitExplainer(data, resetStr) {
@@ -4679,7 +4679,7 @@ function showLimitExplainer(data, resetStr) {
     <div style="padding:20px;width:100%;display:flex;justify-content:center" onclick="event.stopPropagation()">
       <div class="modal-sheet" style="max-width:340px">
         <div class="sheet-label" style="color:var(--primary)">PICKS LIMIT REACHED</div>
-        <div class="sheet-title">You've used all ${data.limit||25} personal picks this week</div>
+        <div class="sheet-title">You've used all ${data.limit||10} personal picks this week</div>
         <div style="color:#bbb;font-size:13px;line-height:1.6;margin-bottom:14px">Resets ${resetStr}. Search and watchlist still work, only personal picks are paused.</div>
         <div style="color:var(--muted);font-size:12px;line-height:1.6;margin-bottom:18px;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--border)">The weekly budget is what keeps Cinemail free for everyone.</div>
         <button class="btn-modal-save" style="width:100%" onclick="this.closest('.overlay').remove()">Got It</button>
