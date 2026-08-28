@@ -182,7 +182,21 @@
       <li>Lists you've created and people you've shared them with</li>
       <li>Friend connections within Cinemail</li>
       <li>Feedback messages and optional screenshots you submit</li>
+      <li>Share links you create for a single film or for a whole list</li>
     </ul>
+    <p>
+      A screenshot you attach to feedback is a picture of your own screen, so it may show
+      your films, your display name or a message. It is stored in a private bucket that
+      only you and the developer can read, it is served through short-lived links rather
+      than a public address, and it is deleted along with your account.
+    </p>
+    <p>
+      A share link is different in kind, because you make it to hand to someone else.
+      It carries a snapshot of the film or list at the moment you created it, together
+      with your display name, and anyone holding the link can open it without a Cinemail
+      account. It does not update afterwards - anything you add later is not in it - and
+      you can delete the link at any time, which stops it working immediately.
+    </p>
 
     <h3>2.3 Technical data</h3>
     <p>For security and basic functioning, we may process:</p>
@@ -263,7 +277,10 @@
       We keep your account data for as long as your account exists. Deleting your account removes it from the live database at once, in a single transaction - not marked inactive, not queued. Anonymised backups may be retained for up to 30 days after that for disaster recovery, then permanently deleted.
     </p>
     <p>
-      Feedback messages may be kept indefinitely as part of our product improvement records, but we remove any personally identifying details on request.
+      Feedback messages and their screenshots are deleted with your account, along with
+      everything else. An earlier version of this policy said feedback might be kept
+      indefinitely for product records; that was never what the code did, and the wording
+      has been corrected to match it.
     </p>
 
     <h2>9. Security</h2>
