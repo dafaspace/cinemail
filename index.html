@@ -1939,7 +1939,11 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .poster-zoomable { cursor: zoom-in; transition: filter 0.15s, opacity 0.15s; }
 .poster-zoomable:hover { filter: brightness(1.12); opacity: 0.92; }
 /* Hide the Ko-fi support button inside the native app (App Store 3.1.1 + no monetization at launch). Stays visible on the web. */
-.native-app #support-kofi { display: none !important; }
+/* Nothing hides the support block any more - sync-web.sh CUTS it out of the native
+   bundles, along with the USDT constant and the support_* translation keys, and fails the
+   build if any of the three survives. A display:none rule here would be worse than
+   useless: it would quietly mask a strip that had stopped working, and the whole point is
+   that a reviewer can open the bundle and find nothing rather than find it hidden. */
 /* Person filmography groups. The heading is what does the work: a reader must be able to
    tell at a glance that "Mentions and small credits" is a different kind of thing from
    "Acting", otherwise grouping buys nothing over the flat list it replaced. */
@@ -2774,8 +2778,13 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 
       <button onclick="replayOnboarding()" style="width:100%;padding:9px;border-radius:9px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;margin-bottom:14px;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:7px" onmouseover="this.style.borderColor='var(--accent-border)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"><span data-ic="film" data-ic-size="14"></span><span data-i18n="replay_onboarding">Replay Welcome Tour</span></button>
 
-      <!-- Support Cinemail -->
-      <div style="margin-bottom:14px;padding:12px 14px;background:rgba(255,140,40,0.06);border:1px solid rgba(255,140,40,0.22);border-radius:10px;font-size:12px;line-height:1.55">
+      <!-- SUPPORT-BLOCK-START
+           Everything between these markers is CUT OUT of the native bundles by
+           sync-web.sh - not hidden, removed. display:none would still ship the USDT
+           address and the sentence about unlocking Pro features to anyone who opens the
+           bundle, and a reviewer can open the bundle. The markers exist so the cut is a
+           delimited region rather than a regex guessing at markup. -->
+      <div id="support-block" style="margin-bottom:14px;padding:12px 14px;background:rgba(255,140,40,0.06);border:1px solid rgba(255,140,40,0.22);border-radius:10px;font-size:12px;line-height:1.55">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
           <span style="display:flex;color:var(--primary)" data-ic="heart" data-ic-size="14"></span>
           <span style="color:var(--text);font-weight:600;font-size:12px;letter-spacing:0.3px" data-i18n="support_title">Support Cinemail</span>
@@ -2793,6 +2802,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
           </button>
         </div>
       </div>
+      <!-- SUPPORT-BLOCK-END -->
 
       <!-- About / Attribution -->
       <div style="margin-top:8px;margin-bottom:18px;padding:12px 14px;background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:10px;font-size:11px;line-height:1.6;color:var(--muted)">
@@ -2809,7 +2819,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.56.4</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.56.5</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -9144,6 +9154,9 @@ function closeAccount(){
   ov.style.display="none";
   ov.scrollTop = 0;
 }
+// SUPPORT-JS-START - cut out of native bundles by sync-web.sh, along with the markup.
+// The markup region alone was not enough: the address lives here too, and a strip that
+// removed only the block still shipped it in the file.
 const USDT_ADDRESS = "TJ5kerJVe92YZDpqoyEKPqix2MWMmsr5bk";
 function copyUSDT(e) {
   if (e) e.preventDefault();
@@ -9155,6 +9168,7 @@ function copyUSDT(e) {
     setTimeout(() => { lbl.textContent = orig; }, 2500);
   }).catch(() => { prompt("Copy USDT (TRC20) address:", USDT_ADDRESS); });
 }
+// SUPPORT-JS-END
 async function saveDisplayName() {
   const newName=document.getElementById("acc-name-input").value.trim();
   if(!newName){showToast("Name cannot be empty",true);return;}
@@ -9432,7 +9446,7 @@ async function backupExportJSON() {
 async function backfillCrewData() {
   const btn = document.getElementById("btn-backfill-crew");
   // Find entries missing any crew field (cinematographer / composer / director)
-  // Not only MISSING fields. Until v0.56.4 only the first 6 cast names were stored, and
+  // Not only MISSING fields. Until v0.56.5 only the first 6 cast names were stored, and
   // the cinema profile counts actors from exactly this string - so on an ensemble film
   // everyone past sixth billing was invisible to it for good. On The Grand Budapest Hotel
   // that silently excluded Goldblum, Keitel, Jude Law, Bill Murray, Edward Norton,
