@@ -1,5 +1,5 @@
 // ── Cache version — bump this string on every deploy to force refresh ──────────
-const CACHE_VERSION = "v216";
+const CACHE_VERSION = "v217";
 const CACHE_NAME = "cinemail-" + CACHE_VERSION;
 
 // Files to cache for offline use
