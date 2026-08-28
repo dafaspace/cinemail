@@ -1,5 +1,5 @@
 // ── Cache version — bump this string on every deploy to force refresh ──────────
-const CACHE_VERSION = "v214";
+const CACHE_VERSION = "v215";
 const CACHE_NAME = "cinemail-" + CACHE_VERSION;
 
 // Files to cache for offline use
@@ -12,6 +12,7 @@ const PRECACHE = [
   "./exceljs.min.js",
   "./emoji.js?v=0.53.3",
   "./qr.js?v=0.52.0",
+  "./supabase.js?v=2.112.4",   // the app cannot start without it - see the comment in index.html
   // The 547 KB and 224 KB avatar SHEETS are deliberately not here any more. Avatars are
   // cut into one file per character now (./av/<key>-ink.webp and -fill.webp, about 13 KB
   // the pair), so precaching the sheets would download 771 KB at install for images

@@ -11,7 +11,14 @@
 <meta name="apple-mobile-web-app-title" content="Cinemail">
 <meta name="theme-color" content="#0d0d1a">
 <link rel="apple-touch-icon" href="icon.png">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Local, not a CDN. Loading this from jsdelivr meant the app could not START without a
+     network: createClient is called during init, so an unreachable CDN threw before any
+     screen was shown. Measured with the CDN blocked - blank body, no screens, no offline
+     fallback, because sw.js's fallback runs after the failure rather than before it. That
+     is also what a reviewer would see in airplane mode, and one jsdelivr outage would take
+     every user down at once. Pinned to 2.112.4 rather than the @2 range: the range meant the
+     app could change under us without a deploy. -->
+<script src="./supabase.js?v=2.112.4"></script>
 <!-- Versioned on purpose. index.html is served network-first while assets are
      cache-first, so without the query a fresh page could load a cached older
      emoji.js - which is exactly what emptied the avatar picker after v0.50.0.
@@ -2819,7 +2826,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.56.5</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.56.6</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -5388,7 +5395,7 @@ async function openDetail(id, type) {
     const crew = [
       d.Director        ? `<div class="crew-label">${icon('film',13)} Director</div><div class="crew-val">${clickableNames(d.Director, true)}</div>` : "",
       d.Cinematographer ? `<div class="crew-label">${icon('camera',13)} Cinematography</div><div class="crew-val">${clickableNames(d.Cinematographer, true)}</div>` : "",
-      d.Composer        ? `<div class="crew-label">${icon('music',13)} Composer</div><div class="crew-val">${clickableNames(d.Composer, true)}${streamingLinks(`${d.Title} soundtrack`)}</div>` : "",
+      d.Composer        ? `<div class="crew-label">${icon('music',13)} Composer</div><div class="crew-val">${clickableNames(d.Composer, true)}${streamingLinks(`${escapeHtml(d.Title)} soundtrack`)}</div>` : "",
       d.Writers         ? `<div class="crew-label">${icon('pen-line',13)} Screenplay</div><div class="crew-val">${clickableNames(d.Writers, true)}</div>` : "",
       d.Cast            ? `<div class="crew-label">${icon('star',13)} Cast</div><div class="crew-val" data-clamp-names>${clickableNames(d.Cast, true)}</div>` : "",
     ].join("");
@@ -5407,7 +5414,7 @@ async function openDetail(id, type) {
       if (isNaN(when)) return "";
       const dd = when.toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
       const ep = (d.NextSeason != null && d.NextEpisode != null)
-        ? `S${d.NextSeason}E${d.NextEpisode}` : "";
+        ? `S${escapeHtml(d.NextSeason)}E${escapeHtml(d.NextEpisode)}` : "";
       const days = Math.ceil((when - new Date()) / 86400000);
       const soon = days >= 0 && days <= 60 ? ` · ${days === 0 ? t('tv_today') : days === 1 ? t('tv_tomorrow') : t('tv_in_days').replace('{n}', days)}` : "";
       return `<div class="crew-label">${icon('film',13)} ${t('tv_next_episode')}</div>
@@ -5418,7 +5425,7 @@ async function openDetail(id, type) {
       ? `<div class="crew-label">${t('tv_status')}</div><div class="crew-val">${escapeHtml(d.TvStatus)}${d.LastAirDate ? ` · ${t('tv_last_aired')} ${escapeHtml(String(d.LastAirDate).slice(0,4))}` : ""}</div>`
       : "";
 
-    const tvInfo = d.Seasons ? `<div class="crew-label">Seasons / Episodes</div><div class="crew-val">${d.Seasons} ${d.Seasons === 1 ? t('tv_season') : t('tv_seasons')} · ${d.Episodes} ${d.Episodes === 1 ? t('tv_episode') : t('tv_episodes')}${d.Networks ? ` · ${d.Networks}` : ""}</div>${_tvNext}${_tvState}` : "";
+    const tvInfo = d.Seasons ? `<div class="crew-label">Seasons / Episodes</div><div class="crew-val">${escapeHtml(d.Seasons)} ${d.Seasons === 1 ? t('tv_season') : t('tv_seasons')} · ${escapeHtml(d.Episodes)} ${d.Episodes === 1 ? t('tv_episode') : t('tv_episodes')}${d.Networks ? ` · ${escapeHtml(d.Networks)}` : ""}</div>${_tvNext}${_tvState}` : "";
 
     const existing = watchHistory.find(h => h.tmdbID === String(id));
     if (existing) {
@@ -5460,17 +5467,17 @@ async function openDetail(id, type) {
       <div style="display:flex;gap:14px;margin-bottom:16px">
         ${posterHTML(d.Poster, d.Title, 90, 134, true)}
         <div style="flex:1;min-width:0">
-          <div class="modal-title">${d.Title}</div>
-          ${d.OriginalTitle && d.OriginalTitle !== d.Title ? `<div style="color:var(--muted);font-size:11px;margin-top:1px">${d.OriginalTitle}</div>` : ""}
-          <div style="color:var(--muted);font-size:12px;margin-top:3px">${d.Year}${d.Runtime ? ` · ${d.Runtime}` : ""}</div>
-          ${d.Rating ? `<div class="rating-badge">★ ${d.Rating} <span>/ 10 TMDB</span></div>` : ""}
-          ${d.Tagline ? `<div class="tagline">"${d.Tagline}"</div>` : ""}
+          <div class="modal-title">${escapeHtml(d.Title)}</div>
+          ${d.OriginalTitle && d.OriginalTitle !== d.Title ? `<div style="color:var(--muted);font-size:11px;margin-top:1px">${escapeHtml(d.OriginalTitle)}</div>` : ""}
+          <div style="color:var(--muted);font-size:12px;margin-top:3px">${escapeHtml(d.Year)}${d.Runtime ? ` · ${escapeHtml(d.Runtime)}` : ""}</div>
+          ${d.Rating ? `<div class="rating-badge">★ ${escapeHtml(d.Rating)} <span>/ 10 TMDB</span></div>` : ""}
+          ${d.Tagline ? `<div class="tagline">"${escapeHtml(d.Tagline)}"</div>` : ""}
           <div class="chips">${chips}</div>
         </div>
       </div>
-      ${d.Plot ? `<div class="detail-plot">${d.Plot}</div>` : ""}
+      ${d.Plot ? `<div class="detail-plot">${escapeHtml(d.Plot)}</div>` : ""}
       ${crew}${tvInfo}
-      ${d.Country ? `<div style="margin-bottom:14px"><div class="crew-label">Country / Language</div><div class="crew-val">${d.Country} · ${d.Language}</div></div>` : ""}
+      ${d.Country ? `<div style="margin-bottom:14px"><div class="crew-label">Country / Language</div><div class="crew-val">${escapeHtml(d.Country)} · ${escapeHtml(d.Language)}</div></div>` : ""}
       <div id="where-to-watch">${_whereToWatchInner(d.WatchAll || {})}</div>
       ${watchedStatusLine}
       ${checklistSection}
@@ -5922,14 +5929,14 @@ async function openPerson(name, personId) {
     el.innerHTML = `
       <div style="display:flex;gap:14px;margin-bottom:16px;align-items:flex-start">
         ${photo
-          ? `<div style="width:72px;height:100px;flex-shrink:0;border-radius:8px;background:var(--surface2) url('${photo}') center top/cover no-repeat"></div>`
+          ? `<div style="width:72px;height:100px;flex-shrink:0;border-radius:8px;background:var(--surface2) url('${escapeHtml(photo)}') center top/cover no-repeat"></div>`
           : `<div style="width:72px;height:100px;flex-shrink:0;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--muted)">${icon('user',28)}</div>`}
         <div style="flex:1;min-width:0">
-          <div class="modal-title">${name}</div>
-          ${dept ? `<div style="color:var(--muted);font-size:12px;margin-top:2px">${dept}</div>` : ""}
-          ${knownFor ? `<div style="color:#888;font-size:11px;margin-top:4px">Known for: ${knownFor}</div>` : ""}
+          <div class="modal-title">${escapeHtml(name)}</div>
+          ${dept ? `<div style="color:var(--muted);font-size:12px;margin-top:2px">${escapeHtml(dept)}</div>` : ""}
+          ${knownFor ? `<div style="color:#888;font-size:11px;margin-top:4px">Known for: ${escapeHtml(knownFor)}</div>` : ""}
           ${dept === "Sound" || dept === "Music" ? streamingLinks(name, true) : ""}
-          ${bio ? `<div style="color:var(--muted);font-size:11px;margin-top:6px;line-height:1.5">${bio}</div>` : ""}
+          ${bio ? `<div style="color:var(--muted);font-size:11px;margin-top:6px;line-height:1.5">${escapeHtml(bio)}</div>` : ""}
         </div>
       </div>
       <div style="color:var(--muted);font-size:11px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Filmography · ${works.length} titles</div>
@@ -9446,7 +9453,7 @@ async function backupExportJSON() {
 async function backfillCrewData() {
   const btn = document.getElementById("btn-backfill-crew");
   // Find entries missing any crew field (cinematographer / composer / director)
-  // Not only MISSING fields. Until v0.56.5 only the first 6 cast names were stored, and
+  // Not only MISSING fields. Until v0.56.6 only the first 6 cast names were stored, and
   // the cinema profile counts actors from exactly this string - so on an ensemble film
   // everyone past sixth billing was invisible to it for good. On The Grand Budapest Hotel
   // that silently excluded Goldblum, Keitel, Jude Law, Bill Murray, Edward Norton,
