@@ -2848,7 +2848,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.2</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.3</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3584,14 +3584,14 @@ const _I18N_BACKUP_JSON = {
 Object.keys(_I18N_BACKUP_JSON).forEach(l => { if (I18N[l]) I18N[l].backup_json_nerd = _I18N_BACKUP_JSON[l]; });
 // Import progress + "safe to leave" reassurance shown under the backup buttons
 const _I18N_BACKUP_BUSY = {
-  en:{ backup_restoring:"Restoring your backup…", backup_saving:"Saving…", backup_safe_hint:"You can keep using the app - a message will appear when it's done. Just don't close the app." },
-  ru:{ backup_restoring:"Восстанавливаю копию…", backup_saving:"Сохраняю…", backup_safe_hint:"Можешь продолжать пользоваться приложением - сообщение появится, когда всё загрузится. Только не закрывай приложение." },
-  uk:{ backup_restoring:"Відновлюю копію…", backup_saving:"Зберігаю…", backup_safe_hint:"Можеш користуватися застосунком далі - повідомлення з'явиться, коли все завантажиться. Тільки не закривай застосунок." },
-  ka:{ backup_restoring:"ვაღდგენ ასლს…", backup_saving:"ვინახავ…", backup_safe_hint:"შეგიძლია გააგრძელო აპით სარგებლობა - შეტყობინება გამოჩნდება დასრულებისას. უბრალოდ არ დახურო აპი." },
-  es:{ backup_restoring:"Restaurando tu copia…", backup_saving:"Guardando…", backup_safe_hint:"Puedes seguir usando la app - aparecerá un aviso al terminar. Solo no cierres la app." },
-  fr:{ backup_restoring:"Restauration de ta sauvegarde…", backup_saving:"Enregistrement…", backup_safe_hint:"Tu peux continuer à utiliser l'appli - un message s'affichera à la fin. Ne ferme juste pas l'appli." },
-  de:{ backup_restoring:"Backup wird wiederhergestellt…", backup_saving:"Speichern…", backup_safe_hint:"Du kannst die App weiter nutzen - eine Meldung erscheint, wenn es fertig ist. Schließe nur die App nicht." },
-  it:{ backup_restoring:"Ripristino il backup…", backup_saving:"Salvataggio…", backup_safe_hint:"Puoi continuare a usare l'app - apparirà un messaggio al termine. Non chiudere l'app." },
+  en:{ backup_restoring:"Restoring your backup…", backup_err_lists:"Could not read your lists, so nothing was changed. Check your connection and try again.", backup_saving:"Saving…", backup_safe_hint:"You can keep using the app - a message will appear when it's done. Just don't close the app." },
+  ru:{ backup_restoring:"Восстанавливаю копию…", backup_err_lists:"Не удалось прочитать твои списки, поэтому ничего не изменено. Проверь связь и попробуй ещё раз.", backup_saving:"Сохраняю…", backup_safe_hint:"Можешь продолжать пользоваться приложением - сообщение появится, когда всё загрузится. Только не закрывай приложение." },
+  uk:{ backup_restoring:"Відновлюю копію…", backup_err_lists:"Не вдалося прочитати твої списки, тому нічого не змінено. Перевір зв'язок і спробуй ще раз.", backup_saving:"Зберігаю…", backup_safe_hint:"Можеш користуватися застосунком далі - повідомлення з'явиться, коли все завантажиться. Тільки не закривай застосунок." },
+  ka:{ backup_restoring:"ვაღდგენ ასლს…", backup_err_lists:"სიების წაკითხვა ვერ მოხერხდა, ამიტომ არაფერი შეცვლილა. შეამოწმე კავშირი და სცადე თავიდან.", backup_saving:"ვინახავ…", backup_safe_hint:"შეგიძლია გააგრძელო აპით სარგებლობა - შეტყობინება გამოჩნდება დასრულებისას. უბრალოდ არ დახურო აპი." },
+  es:{ backup_restoring:"Restaurando tu copia…", backup_err_lists:"No se pudieron leer tus listas, así que no se cambió nada. Comprueba tu conexión e inténtalo de nuevo.", backup_saving:"Guardando…", backup_safe_hint:"Puedes seguir usando la app - aparecerá un aviso al terminar. Solo no cierres la app." },
+  fr:{ backup_restoring:"Restauration de ta sauvegarde…", backup_err_lists:"Impossible de lire tes listes, donc rien n'a été modifié. Vérifie ta connexion et réessaie.", backup_saving:"Enregistrement…", backup_safe_hint:"Tu peux continuer à utiliser l'appli - un message s'affichera à la fin. Ne ferme juste pas l'appli." },
+  de:{ backup_restoring:"Backup wird wiederhergestellt…", backup_err_lists:"Deine Listen konnten nicht gelesen werden, daher wurde nichts geändert. Prüfe deine Verbindung und versuch es noch einmal.", backup_saving:"Speichern…", backup_safe_hint:"Du kannst die App weiter nutzen - eine Meldung erscheint, wenn es fertig ist. Schließe nur die App nicht." },
+  it:{ backup_restoring:"Ripristino il backup…", backup_err_lists:"Non è stato possibile leggere le tue liste, quindi non è stato modificato nulla. Controlla la connessione e riprova.", backup_saving:"Salvataggio…", backup_safe_hint:"Puoi continuare a usare l'app - apparirà un messaggio al termine. Non chiudere l'app." },
 };
 Object.keys(_I18N_BACKUP_BUSY).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_BACKUP_BUSY[l]); });
 // Letterboxd import (en/ru; other languages fall back to en via t())
@@ -5341,17 +5341,25 @@ async function doSearch() {
     if (!year) {
       const pqs = [q];
       if (hasCyrillic(title) && q !== title) pqs.push(title);
+      // Rank WITHIN each query, then keep the queries in order - which is what the film
+      // half already does by appending the second query's results after the first.
+      //
+      // Sorting the merged pile by popularity alone loses which question a person answered.
+      // Measured on "Рук": translateQuery sends "Fist" to TMDB, the original Cyrillic goes
+      // too, and Shah Rukh Khan - matched only through his Russian alias, popularity far
+      // above anyone in the "Fist" results - took first place over the people who matched
+      // what was actually being searched for.
       const seenP = new Set(), merged = [];
       for (const pq of pqs) {
         try {
           const r = await tmdbFetch(`/search/person?query=${encodeURIComponent(pq)}&include_adult=false&language=${_tmdbLang()}`);
-          (r.results || []).forEach(p => { if (p.id && !seenP.has(p.id)) { seenP.add(p.id); merged.push(p); } });
+          (r.results || [])
+            .filter(p => p.id && !seenP.has(p.id) && p.known_for_department && ((p.known_for || []).length || p.profile_path))
+            .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+            .forEach(p => { seenP.add(p.id); merged.push(p); });
         } catch(e) {}
       }
-      people = merged
-        .filter(p => p.known_for_department && ((p.known_for || []).length || p.profile_path))
-        .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
-        .slice(0, 3);
+      people = merged.slice(0, 3);
     }
 
     if (!results.length && !people.length) {
@@ -6844,10 +6852,16 @@ async function loadListsCache() {
   if (!currentUser) return;
   const uid = currentUser.id;
   try {
-    const { data: owned } = await sbClient.from('lists').select('id,name,owner_id,created_at,sort_order').eq('owner_id', uid);
-    const { data: memberships } = await sbClient.from('list_members')
+    const { data: owned, error: ownedErr } = await sbClient.from('lists').select('id,name,owner_id,created_at,sort_order').eq('owner_id', uid);
+    const { data: memberships, error: memErr } = await sbClient.from('list_members')
       .select('list_id,role,lists(id,name,owner_id,created_at,sort_order)')
       .eq('user_id', uid);
+    // Same non-throwing shape, worse consequence: both reads failing produced an empty
+    // allLists, which was then written over the offline cache. A dropped connection
+    // deleted the local copy of every list - and the films in shared lists went
+    // invisible with it. Keep what we have and say nothing; the cache is the fallback,
+    // not the casualty.
+    if (ownedErr || memErr) { console.warn('loadListsCache: read failed, keeping cache', ownedErr || memErr); return; }
 
     const memberLists = (memberships || [])
       .filter(m => m.lists && m.lists.owner_id !== uid)
@@ -7252,7 +7266,11 @@ async function _confirmNewListTab() {
   try {
     const { data, error } = await sbClient.from('lists').insert({ name, owner_id: currentUser.id }).select().single();
     if (error) throw new Error(error.message);
-    await sbClient.from('list_members').insert({ list_id: data.id, user_id: currentUser.id, role: 'owner' });
+    // Unchecked, this left a list nobody was a member of - created, invisible, and
+    // impossible to delete from the app. Two writes that must both land, so the second
+    // one's failure has to be heard.
+    const { error: memErr } = await sbClient.from('list_members').insert({ list_id: data.id, user_id: currentUser.id, role: 'owner' });
+    if (memErr) throw new Error(memErr.message);
     await loadListsCache();
     switchListTab(data.id);
     showToast(`"${name}" created`);
@@ -7430,7 +7448,11 @@ async function createList() {
   try {
     const { data, error } = await sbClient.from('lists').insert({ name, owner_id: currentUser.id }).select().single();
     if (error) throw new Error(error.message);
-    await sbClient.from('list_members').insert({ list_id: data.id, user_id: currentUser.id, role: 'owner' });
+    // Unchecked, this left a list nobody was a member of - created, invisible, and
+    // impossible to delete from the app. Two writes that must both land, so the second
+    // one's failure has to be heard.
+    const { error: memErr } = await sbClient.from('list_members').insert({ list_id: data.id, user_id: currentUser.id, role: 'owner' });
+    if (memErr) throw new Error(memErr.message);
     if (input) input.value = '';
     await loadListsCache();
     renderListsSection();
@@ -8125,7 +8147,11 @@ async function _createListFromPicker() {
   try {
     const { data, error } = await sbClient.from('lists').insert({ name, owner_id: currentUser.id }).select().single();
     if (error) throw new Error(error.message);
-    await sbClient.from('list_members').insert({ list_id: data.id, user_id: currentUser.id, role: 'owner' });
+    // Unchecked, this left a list nobody was a member of - created, invisible, and
+    // impossible to delete from the app. Two writes that must both land, so the second
+    // one's failure has to be heard.
+    const { error: memErr } = await sbClient.from('list_members').insert({ list_id: data.id, user_id: currentUser.id, role: 'owner' });
+    if (memErr) throw new Error(memErr.message);
     await loadListsCache();
     _listPickerNewMode = false;
     _onListPicked(data.id); // closes the picker itself + uses the captured callback (do NOT closeListPicker first — it wipes the callback)
@@ -9352,7 +9378,12 @@ async function saveDisplayName() {
   // Label stays the same — just disable + dim while saving (no width jump across 8 langs)
   btn.disabled=true;
   try {
-    await sbClient.from("profiles").upsert({id:currentUser.id,display_name:newName});
+    // supabase-js resolves with {data, error} rather than throwing, so the catch below
+    // only ever saw network faults. A refused write - RLS, a duplicate name, a bad
+    // session - returned normally and the next line said "Name updated" over a name
+    // the server never took.
+    const { error } = await sbClient.from("profiles").upsert({id:currentUser.id,display_name:newName});
+    if (error) throw new Error(error.message);
     currentUser.displayName=newName;
     _applyAvatar();
     document.getElementById("acc-name-display").textContent=newName;
@@ -9556,24 +9587,54 @@ const BackupLocal = {
 
   import() {
     return new Promise((resolve, reject) => {
-      const input = document.getElementById("backup-import-input");
-      const handler = (e) => {
-        input.removeEventListener("change", handler);
-        const file = e.target.files[0];
-        if (!file) return reject(new Error("No file selected"));
+      _pickBackupFile(".xlsx,.csv").then(file => {
         const reader = new FileReader();
-        reader.onload = (ev) => {
-          try { resolve(_parseCSV(ev.target.result)); }
-          catch(err) { reject(err); }
-        };
+        reader.onload = ev => { try { resolve(_parseCSV(ev.target.result)); } catch(err) { reject(err); } };
+        reader.onerror = () => reject(new Error("Could not read the file"));
         reader.readAsText(file, "utf-8");
-        input.value = "";
-      };
-      input.addEventListener("change", handler);
-      input.click();
+      }, reject);
     });
   }
 };
+
+// Pick a file, and survive the user changing their mind.
+//
+// Four places wired this by hand and all four hung: `change` does NOT fire when the
+// picker is dismissed, so removeEventListener never ran, the listener stacked up on
+// every attempt, and the promise never settled - leaving whichever button was awaiting
+// it disabled for the rest of the session. Cancelling a file dialog is not an edge case;
+// it is the second most common thing anyone does with one.
+//
+// `cancel` covers modern Safari and Chrome. The window-focus fallback covers everything
+// else: when the dialog closes the page regains focus, and if no file arrived shortly
+// after, the user backed out. Both paths run the same teardown exactly once.
+function _pickBackupFile(accept) {
+  return new Promise((resolve, reject) => {
+    const inp = document.getElementById("backup-import-input");
+    if (!inp) return reject(new Error("No file input"));
+    if (accept !== undefined) inp.accept = accept;
+    let done = false;
+    const finish = (fn, arg) => {
+      if (done) return;
+      done = true;
+      inp.removeEventListener("change", onChange);
+      inp.removeEventListener("cancel", onCancel);
+      window.removeEventListener("focus", onFocus);
+      inp.value = "";
+      fn(arg);
+    };
+    const onChange = e => {
+      const f = e.target.files && e.target.files[0];
+      f ? finish(resolve, f) : finish(reject, new Error("cancelled"));
+    };
+    const onCancel = () => finish(reject, new Error("cancelled"));
+    const onFocus = () => setTimeout(() => { if (!inp.files || !inp.files.length) onCancel(); }, 800);
+    inp.addEventListener("change", onChange);
+    inp.addEventListener("cancel", onCancel);
+    window.addEventListener("focus", onFocus, { once: true });
+    inp.click();
+  });
+}
 
 // ── Public backup actions ──────────────────────────────────────────────────────
 async function backupExportCSV() {
@@ -9687,7 +9748,7 @@ async function backupImportCSV() {
     if (skipped) parts.push(`${skipped} skipped`);
     showToast(parts.length ? parts.join(" · ") : "No valid rows found");
   } catch(e) {
-    if (e.message !== "No file selected") showToast(t("imp_failed") + ": " + e.message, true);
+    if (e.message !== "cancelled") showToast(t("imp_failed") + ": " + e.message, true);
   } finally {
     if (importBtn) { importBtn.textContent = "↑ Import CSV"; importBtn.disabled = false; }
   }
@@ -9787,13 +9848,9 @@ async function backupImportLetterboxd() {
       + `<div style="color:var(--muted);margin-top:3px">${t('backup_safe_hint')}</div>`;
   };
   try {
-    const file = await new Promise((res, rej) => {
-      const inp = document.getElementById("backup-import-input");
-      inp.accept = ""; // iOS greys out CSVs it typed as plain-text under a strict .csv filter; accept any file and let the parser validate the contents
-      const handler = (e) => { inp.removeEventListener("change", handler); const f = e.target.files[0]; inp.value = ""; if (!f) return rej(new Error("No file selected")); res(f); };
-      inp.addEventListener("change", handler);
-      inp.click();
-    });
+    // accept "" because iOS greys out CSVs it typed as plain-text under a strict .csv
+    // filter; take any file and let the parser judge the contents.
+    const file = await _pickBackupFile("");
     const text = await file.text();
     const rows = _parseLetterboxdRows(text, file.name);
     if (!rows) { showToast(t('lb_not_lb'), true); return; }
@@ -9818,7 +9875,7 @@ async function backupImportLetterboxd() {
     if (unmatched) parts.push(`${t("imp_notfound")}: ${unmatched}`);
     showToast(parts.length ? parts.join(" · ") : t("imp_nothing"));
   } catch (e) {
-    if (e.message !== "No file selected") showToast(t("imp_failed") + ": " + e.message, true);
+    if (e.message !== "cancelled") showToast(t("imp_failed") + ": " + e.message, true);
   } finally {
     setStatus(null);
     const inp = document.getElementById("backup-import-input");
@@ -9969,13 +10026,9 @@ async function backupImportIMDb() {
       + `<div style="color:var(--muted);margin-top:3px">${t('backup_safe_hint')}</div>`;
   };
   try {
-    const file = await new Promise((res, rej) => {
-      const inp = document.getElementById("backup-import-input");
-      inp.accept = ""; // iOS greys out CSVs it typed as plain-text under a strict .csv filter; accept any file and let the parser validate the contents
-      const handler = (e) => { inp.removeEventListener("change", handler); const f = e.target.files[0]; inp.value = ""; if (!f) return rej(new Error("No file selected")); res(f); };
-      inp.addEventListener("change", handler);
-      inp.click();
-    });
+    // accept "" because iOS greys out CSVs it typed as plain-text under a strict .csv
+    // filter; take any file and let the parser judge the contents.
+    const file = await _pickBackupFile("");
     ImportProgress.show('IMDb import');
     ImportProgress.update(t("imp_reading"));
     const text = await file.text();
@@ -10010,7 +10063,7 @@ async function backupImportIMDb() {
       ? parts.join('<br>') + `<br><br><span style="color:var(--muted)">${escapeHtml(t("imp_where"))}</span>`
       : escapeHtml(t("imp_nothing")));
   } catch (e) {
-    if (e.message === "No file selected") { ImportProgress.close(); return; }
+    if (e.message === "cancelled") { ImportProgress.close(); return; }
     ImportProgress.show('IMDb import');
     ImportProgress.finish(`<span style="color:#f87171">${escapeHtml(t("imp_failed"))}</span><br><br><span style="color:var(--muted)">${escapeHtml(e.message || String(e))}</span>`);
   } finally {
@@ -10099,10 +10152,13 @@ async function _ensureListsByName(names) {
   const map = {};
   let created = 0;
   if (!currentUser || !names.length) return { map, created };
-  try {
-    const { data: owned } = await sbClient.from('lists').select('id,name').eq('owner_id', currentUser.id);
-    (owned || []).forEach(l => { if (l.name) map[l.name.trim().toLowerCase()] = l.id; });
-  } catch(e) {}
+  // supabase-js RESOLVES with {data, error} - it does not throw - so the catch below
+  // never fired and `(owned || [])` turned a refused read into "you own no lists".
+  // The loop then created a fresh list for every name in the backup, duplicating the
+  // whole set. On a Restore, which is when this runs, that is the maximum blast radius.
+  const { data: owned, error: readErr } = await sbClient.from('lists').select('id,name').eq('owner_id', currentUser.id);
+  if (readErr) return { map, created, failed: true };
+  (owned || []).forEach(l => { if (l.name) map[l.name.trim().toLowerCase()] = l.id; });
   for (const raw of names) {
     const name = String(raw || "").trim();
     if (!name) continue;
@@ -10111,7 +10167,11 @@ async function _ensureListsByName(names) {
     try {
       const { data, error } = await sbClient.from('lists').insert({ name, owner_id: currentUser.id }).select().single();
       if (error || !data) continue;
-      await sbClient.from('list_members').insert({ list_id: data.id, user_id: currentUser.id, role: 'owner' });
+      // Unchecked, this left a list nobody was a member of - created, invisible, and
+    // impossible to delete from the app. Two writes that must both land, so the second
+    // one's failure has to be heard.
+    const { error: memErr } = await sbClient.from('list_members').insert({ list_id: data.id, user_id: currentUser.id, role: 'owner' });
+    if (memErr) throw new Error(memErr.message);
       map[key] = data.id; created++;
     } catch(e) { /* skip this list, keep going */ }
   }
@@ -10346,19 +10406,7 @@ async function backupImportXLSX() {
   try {
     setBusy(true);
     // Let the user pick either an .xlsx or a legacy .csv.
-    const file = await new Promise((res, rej) => {
-      const inp = document.getElementById("backup-import-input");
-      inp.accept = ".xlsx,.csv";
-      const handler = (e) => {
-        inp.removeEventListener("change", handler);
-        const f = e.target.files[0];
-        inp.value = "";
-        if (!f) return rej(new Error("No file selected"));
-        res(f);
-      };
-      inp.addEventListener("change", handler);
-      inp.click();
-    });
+    const file = await _pickBackupFile(".xlsx,.csv");
 
     let rows, listNamesFromBackup = [];
     if (/\.csv$/i.test(file.name)) {
@@ -10448,7 +10496,11 @@ async function backupImportXLSX() {
     let listsCreated = 0;
     if (wantedLists.size) {
       setLabel(t('backup_restoring'));
-      const { map, created } = await _ensureListsByName([...wantedLists]);
+      const { map, created, failed } = await _ensureListsByName([...wantedLists]);
+      // Could not read the existing lists, so we cannot tell which need creating.
+      // Restoring the films without their lists is recoverable; creating a second copy
+      // of every list is not.
+      if (failed) throw new Error(t('backup_err_lists') || 'Could not read your lists. Nothing was changed - try again.');
       listsCreated = created;
       rows.forEach(r => {
         const id = r.list_name && map[r.list_name.toLowerCase()];
@@ -10471,7 +10523,7 @@ async function backupImportXLSX() {
     if (listsCreated) parts.push(`+${listsCreated} lists`);
     showToast(parts.join(" · ") || "Nothing changed");
   } catch(e) {
-    if (e.message !== "No file selected") showToast(t("imp_failed") + ": " + e.message, true);
+    if (e.message !== "cancelled") showToast(t("imp_failed") + ": " + e.message, true);
   } finally {
     setBusy(false);
     setStatus("");
