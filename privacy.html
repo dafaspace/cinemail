@@ -154,7 +154,7 @@
     </nav>
 
     <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: 21 August 2026</p>
+    <p class="updated">Last updated: 3 September 2026</p>
 
     <div class="intro">
       Cinemail is built by one independent developer who cares deeply about user privacy. This policy explains, in plain language, what data the app collects, why, and what your rights are. No legalese, no dark patterns.
@@ -203,7 +203,11 @@
     <ul>
       <li>Anonymised request logs (IP address, user-agent string, timestamp) on our server infrastructure, kept only as long as needed to investigate abuse</li>
       <li>App version, device type and basic diagnostics when you submit feedback</li>
+      <li>A push notification token, but only if you switch notifications on</li>
     </ul>
+    <p>
+      The push token deserves a sentence of its own, because unlike everything else here it identifies a <em>device</em> rather than an account. It is only created after you tap the notifications switch in your account panel and then grant permission at your phone's own prompt - two deliberate steps, neither of which happens by default. It exists only in the App Store version; the website cannot create one. It is never stored for a guest account. It is kept next to your user id and used for exactly one thing: delivering a notification to the right phone. Switching notifications off, or deleting your account, removes it.
+    </p>
 
     <h3>2.4 What we do <em>not</em> collect</h3>
     <ul>
@@ -219,6 +223,7 @@
       <li>Provide the core app functionality (your watchlist, AI picks, sharing with friends)</li>
       <li>Sync your data across your devices when signed in</li>
       <li>Respond to your feedback or support requests</li>
+      <li>Notify you about activity that involves you - someone sending you a film, or a reply to something you sent - if you turned notifications on</li>
       <li>Protect the service against abuse (rate-limiting, fraud prevention)</li>
     </ul>
     <p>We do not sell your data. We do not share it with advertisers. We do not use it to train AI models.</p>
