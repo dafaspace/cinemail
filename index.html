@@ -10,7 +10,13 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Cinemail">
 <meta name="theme-color" content="#0d0d1a">
-<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+  <!-- Each favicon carries the #0d0d1a field rather than being a transparent mark, which
+       is why a light browser tab never reaches the artwork. Without any icon declared at
+       all - the state until 3 Sep 2026 - the tab showed a blank page glyph. -->
+  <link rel="apple-touch-icon" href="icon.png">
 <!-- Local, not a CDN. Loading this from jsdelivr meant the app could not START without a
      network: createClient is called during init, so an unreachable CDN threw before any
      screen was shown. Measured with the CDN blocked - blank body, no screens, no offline
@@ -2848,7 +2854,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.5</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.6</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
