@@ -2848,7 +2848,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.4</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.5</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -2926,6 +2926,9 @@ const TMDB_BASE   = "https://movie-night-proxy.dafa4me.workers.dev/tmdb";
 const TMDB_IMG    = "https://image.tmdb.org/t/p/w300";
 const ANTHROPIC_KEY = "enabled";
 const PROXY_URL   = "https://movie-night-proxy.dafa4me.workers.dev";
+// Every link the app hands to ANOTHER PERSON points here, never at location.origin -
+// inside the App Store build that is `capacitor://localhost` and the link opens nowhere.
+const PUBLIC_ORIGIN = "https://cinemail.app";
 const SB_URL      = "https://ubjafkxdybiwgcupassu.supabase.co";
 const SB_KEY      = "sb_publishable_Ep9kQs8XcfgUoK2ACiIo8w_CLDGkZJf";
 
@@ -7511,7 +7514,15 @@ function _qrHTML(url, size) {
 
 // ── Invite a friend to the whole app (referral that auto-connects) ────────────
 function _appInviteURL() {
-  return `${location.origin}${location.pathname}?friend=${currentUser.id}`;
+  // NOT location.origin. In the App Store build that is `capacitor://localhost`, so the
+  // invite people were being told to send read
+  //   capacitor://localhost/?friend=...
+  // which opens nowhere, for anyone, ever. Read from the simulator's own pasteboard on
+  // 3 Sep 2026, so that is what a real person would have pasted into a message.
+  //
+  // A link is for somebody else's device by definition, so it is always the public
+  // address, never wherever the sender happens to be running.
+  return `${PUBLIC_ORIGIN}/?friend=${currentUser.id}`;
 }
 // Re-read the display name straight from the profile so shared text always shows
 // the real, current name (never a stale/sticky cached value).
@@ -7813,14 +7824,25 @@ async function _sharedImport() {
 function _checkFilmLink() {
   const p = new URLSearchParams(location.search);
   const film = p.get('film');
+  const friend = p.get('friend');
+
   // Validate before storing: these come straight off a URL anyone can edit, and an
   // unchecked value is later sent to TMDB and Supabase, where a malformed id is a
   // rejected request rather than a graceful miss.
-  if (!film || !/^\d{1,12}$/.test(film)) return;
-  localStorage.setItem('pendingFilmLink', JSON.stringify({ id: film, tv: p.get('tv') === '1' }));
-  const friend = p.get('friend');
-  if (friend && /^[0-9a-f-]{36}$/i.test(friend)) localStorage.setItem('pendingFriendInvite', friend); // reuse the existing referral path
-  history.replaceState({}, '', location.pathname);
+
+  // The friend referral is handled FIRST and independently. It used to sit three lines
+  // below the film guard, so `if (!film) return` swallowed it: an invite link carries no
+  // ?film=, which meant the branch could only ever run on a link that was a film share as
+  // well. Every invite link ever sent did nothing at all - measured 3 Sep 2026 on a real
+  // account, three loads, and create_invite_request was never called once.
+  if (friend && /^[0-9a-f-]{36}$/i.test(friend)) localStorage.setItem('pendingFriendInvite', friend);
+
+  if (film && /^\d{1,12}$/.test(film)) {
+    localStorage.setItem('pendingFilmLink', JSON.stringify({ id: film, tv: p.get('tv') === '1' }));
+  }
+
+  // Only rewrite the address if something was actually taken off it.
+  if (friend || film) history.replaceState({}, '', location.pathname);
 }
 
 // After sign-in, open the shared film so the recipient decides what to do with it,
@@ -7884,7 +7906,7 @@ async function _loadInviteLink(listId) {
       if (error) throw new Error(error.message);
       token = data.token;
     }
-    const url = `${location.origin}${location.pathname}?join=${token}`;
+    const url = `${PUBLIC_ORIGIN}/?join=${token}`;   // same reason as the friend link above
     const listName = _getListName(listId);
     const myName = await _freshDisplayName();
     const msg = `${myName} shared the "${listName}" list with you on Cinemail. Open it to see what's inside.`;
