@@ -2859,7 +2859,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.11</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.12</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3694,14 +3694,14 @@ Object.keys(_I18N_IMDB_HINT).forEach(l => { if (I18N[l]) Object.assign(I18N[l], 
 // failed" - which was true of the run and false about the data, and left the user with no
 // idea that running it again was safe. A count and one sentence fix both.
 const _I18N_IMP_FAIL = {
-  en:{ imp_failed_n:"could not be saved", imp_retry:"Run the same file again - what is already in will be updated, not duplicated.", imp_by_title:"Searching the rest by title…", imp_limit_day:"Today's lookup limit is used up, so the rest were not matched. Run the same file again tomorrow - everything imported so far is kept." },
-  ru:{ imp_failed_n:"не удалось сохранить", imp_retry:"Запусти тот же файл ещё раз - то, что уже загружено, обновится, а не задвоится.", imp_by_title:"Ищу остальные по названию…", imp_limit_day:"Дневной лимит поиска исчерпан, остальные фильмы не сопоставлены. Запусти тот же файл завтра - всё загруженное сохранится." },
-  uk:{ imp_failed_n:"не вдалося зберегти", imp_retry:"Запусти той самий файл ще раз - те, що вже завантажено, оновиться, а не задвоїться.", imp_by_title:"Шукаю решту за назвою…", imp_limit_day:"Денний ліміт пошуку вичерпано, решту не зіставлено. Запусти той самий файл завтра - усе завантажене збережеться." },
-  ka:{ imp_failed_n:"ვერ შეინახა", imp_retry:"გაუშვი იგივე ფაილი ხელახლა - რაც უკვე ჩაიტვირთა, განახლდება და არ გაორმაგდება.", imp_by_title:"დანარჩენს სათაურით ვეძებ…", imp_limit_day:"დღიური ძიების ლიმიტი ამოიწურა, დანარჩენი ვერ დაემთხვა. გაუშვი იგივე ფაილი ხვალ - ყველაფერი ჩატვირთული შენარჩუნდება." },
-  es:{ imp_failed_n:"no se pudieron guardar", imp_retry:"Vuelve a importar el mismo archivo: lo que ya está se actualiza, no se duplica.", imp_by_title:"Buscando el resto por título…", imp_limit_day:"Se agotó el límite diario de búsquedas, así que el resto no se emparejó. Vuelve a importar el mismo archivo mañana: lo ya importado se conserva." },
-  fr:{ imp_failed_n:"n'ont pas pu être enregistrés", imp_retry:"Relance le même fichier - ce qui est déjà là sera mis à jour, pas dupliqué.", imp_by_title:"Recherche du reste par titre…", imp_limit_day:"La limite de recherches du jour est atteinte, le reste n'a pas été identifié. Relance le même fichier demain - tout ce qui est importé est conservé." },
-  de:{ imp_failed_n:"konnten nicht gespeichert werden", imp_retry:"Importiere dieselbe Datei noch einmal - was schon da ist, wird aktualisiert, nicht doppelt angelegt.", imp_by_title:"Suche den Rest nach Titel…", imp_limit_day:"Das Tageslimit für Suchanfragen ist aufgebraucht, der Rest wurde nicht zugeordnet. Importiere dieselbe Datei morgen erneut - alles bisher Importierte bleibt erhalten." },
-  it:{ imp_failed_n:"non sono stati salvati", imp_retry:"Importa di nuovo lo stesso file: ciò che c'è già viene aggiornato, non duplicato.", imp_by_title:"Cerco il resto per titolo…", imp_limit_day:"Il limite giornaliero di ricerche è esaurito, quindi il resto non è stato abbinato. Reimporta lo stesso file domani: tutto ciò che è già importato resta." },
+  en:{ imp_failed_n:"could not be saved", imp_retry:"Run the same file again - what is already in will be updated, not duplicated.", imp_by_title:"Searching the rest by title…", imp_server_err:"The server could not be reached, so nothing else was matched. This is on our side. Try the same file again in a few minutes - everything imported so far is kept.", imp_limit_day:"Today's lookup limit is used up, so the rest were not matched. Run the same file again tomorrow - everything imported so far is kept." },
+  ru:{ imp_failed_n:"не удалось сохранить", imp_retry:"Запусти тот же файл ещё раз - то, что уже загружено, обновится, а не задвоится.", imp_by_title:"Ищу остальные по названию…", imp_server_err:"Не удалось связаться с сервером, остальные фильмы не сопоставлены. Это на нашей стороне. Попробуй тот же файл через несколько минут - всё загруженное сохранится.", imp_limit_day:"Дневной лимит поиска исчерпан, остальные фильмы не сопоставлены. Запусти тот же файл завтра - всё загруженное сохранится." },
+  uk:{ imp_failed_n:"не вдалося зберегти", imp_retry:"Запусти той самий файл ще раз - те, що вже завантажено, оновиться, а не задвоїться.", imp_by_title:"Шукаю решту за назвою…", imp_server_err:"Не вдалося зв'язатися з сервером, решту не зіставлено. Це на нашому боці. Спробуй той самий файл за кілька хвилин - усе завантажене збережеться.", imp_limit_day:"Денний ліміт пошуку вичерпано, решту не зіставлено. Запусти той самий файл завтра - усе завантажене збережеться." },
+  ka:{ imp_failed_n:"ვერ შეინახა", imp_retry:"გაუშვი იგივე ფაილი ხელახლა - რაც უკვე ჩაიტვირთა, განახლდება და არ გაორმაგდება.", imp_by_title:"დანარჩენს სათაურით ვეძებ…", imp_server_err:"სერვერთან დაკავშირება ვერ მოხერხდა, დანარჩენი ვერ დაემთხვა. ეს ჩვენი მხრიდანაა. სცადე იგივე ფაილი რამდენიმე წუთში - ყველაფერი ჩატვირთული შენარჩუნდება.", imp_limit_day:"დღიური ძიების ლიმიტი ამოიწურა, დანარჩენი ვერ დაემთხვა. გაუშვი იგივე ფაილი ხვალ - ყველაფერი ჩატვირთული შენარჩუნდება." },
+  es:{ imp_failed_n:"no se pudieron guardar", imp_retry:"Vuelve a importar el mismo archivo: lo que ya está se actualiza, no se duplica.", imp_by_title:"Buscando el resto por título…", imp_server_err:"No se pudo conectar con el servidor, así que el resto no se emparejó. Es cosa nuestra. Prueba el mismo archivo en unos minutos: lo ya importado se conserva.", imp_limit_day:"Se agotó el límite diario de búsquedas, así que el resto no se emparejó. Vuelve a importar el mismo archivo mañana: lo ya importado se conserva." },
+  fr:{ imp_failed_n:"n'ont pas pu être enregistrés", imp_retry:"Relance le même fichier - ce qui est déjà là sera mis à jour, pas dupliqué.", imp_by_title:"Recherche du reste par titre…", imp_server_err:"Le serveur n'a pas répondu, le reste n'a pas été identifié. Cela vient de nous. Réessaie le même fichier dans quelques minutes - tout ce qui est importé est conservé.", imp_limit_day:"La limite de recherches du jour est atteinte, le reste n'a pas été identifié. Relance le même fichier demain - tout ce qui est importé est conservé." },
+  de:{ imp_failed_n:"konnten nicht gespeichert werden", imp_retry:"Importiere dieselbe Datei noch einmal - was schon da ist, wird aktualisiert, nicht doppelt angelegt.", imp_by_title:"Suche den Rest nach Titel…", imp_server_err:"Der Server war nicht erreichbar, der Rest wurde nicht zugeordnet. Das liegt an uns. Versuche dieselbe Datei in ein paar Minuten - alles bisher Importierte bleibt erhalten.", imp_limit_day:"Das Tageslimit für Suchanfragen ist aufgebraucht, der Rest wurde nicht zugeordnet. Importiere dieselbe Datei morgen erneut - alles bisher Importierte bleibt erhalten." },
+  it:{ imp_failed_n:"non sono stati salvati", imp_retry:"Importa di nuovo lo stesso file: ciò che c'è già viene aggiornato, non duplicato.", imp_by_title:"Cerco il resto per titolo…", imp_server_err:"Non è stato possibile raggiungere il server, quindi il resto non è stato abbinato. Dipende da noi. Riprova lo stesso file tra qualche minuto: tutto ciò che è importato resta.", imp_limit_day:"Il limite giornaliero di ricerche è esaurito, quindi il resto non è stato abbinato. Reimporta lo stesso file domani: tutto ciò che è già importato resta." },
 };
 Object.keys(_I18N_IMP_FAIL).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_IMP_FAIL[l]); });
 // Onboarding inbox slide (Ludwig → Sinners, recommendation with a note)
@@ -10052,7 +10052,10 @@ async function _resolveViaTMDBSearch(rows, onProgress) {
             ? (kind === 'tv' ? `&first_air_date_year=${encodeURIComponent(r.year)}` : `&year=${encodeURIComponent(r.year)}`)
             : "";
           const res = await tmdbFetch(`/search/${kind}?query=${encodeURIComponent(r.title)}${yr}&include_adult=false&language=${_tmdbLang()}`);
-          if (res && res.error === "limit_reached") { out.limitReached = res; return out; }
+          if (res && res.error) {
+            if (res.error === "limit_reached") out.limitReached = res; else out.serverError = res;
+            return out;
+          }
           hit = ((res && res.results) || [])[0] || null;
           break; // an answer, even an empty one, is a real answer - only errors get retried
         } catch (e) {
@@ -10218,7 +10221,14 @@ async function _resolveViaIMDbId(rows, onProgress) {
       // caller here reads as "no such film". An import past the cap would have reported
       // hundreds of titles as not found and given no hint why. Stop instead, keep what is
       // already resolved, and let the caller say what actually happened.
-      if (res && res.error === "limit_reached") { out.limitReached = res; break; }
+      // Any error object here means the proxy refused, not that the film does not exist.
+      // Reporting a refusal as "not found" is what happened on 7 Sep 2026: the rate limiter
+      // had exhausted its KV write budget, every call came back 500, and the import announced
+      // 806 missing films. Stop on the first one and say which kind it was.
+      if (res && res.error) {
+        if (res.error === "limit_reached") out.limitReached = res; else out.serverError = res;
+        break;
+      }
       const tv = (res && res.tv_results) || [], mv = (res && res.movie_results) || [];
       let hit = r.media_type === 'tv' ? tv[0] : mv[0];
       let isTV = r.media_type === 'tv' && !!hit;
@@ -10259,6 +10269,7 @@ async function _resolveViaIMDbId(rows, onProgress) {
     // .map() builds a fresh array, so the marker has to be carried over by hand or the caller
     // never learns why the run stopped short.
     merged.limitReached = out.limitReached || fixed.limitReached;
+    merged.serverError  = out.serverError  || fixed.serverError;
     return merged;
   }
   return out;
@@ -10383,6 +10394,7 @@ async function backupImportIMDb() {
     // A catalogue bigger than the daily allowance is a normal thing to own - IMDb lets a
     // single list hold 10,000 - so this is a "come back tomorrow", not a failure.
     if (resolved.limitReached) parts.push(`<span style="color:var(--accent)">${escapeHtml(t("imp_limit_day"))}</span>`);
+    else if (resolved.serverError) parts.push(`<span style="color:#f87171">${escapeHtml(t("imp_server_err"))}</span>`);
     else if (unmatched) parts.push(`<span style="color:var(--muted)">${escapeHtml(t("imp_notfound"))}: ${escapeHtml(unmatched)}</span>`);
     ImportProgress.finish(parts.length
       ? parts.join('<br>') + `<br><br><span style="color:var(--muted)">${escapeHtml(t("imp_where"))}</span>`
