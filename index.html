@@ -2859,7 +2859,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.13</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.14</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3694,14 +3694,14 @@ Object.keys(_I18N_IMDB_HINT).forEach(l => { if (I18N[l]) Object.assign(I18N[l], 
 // failed" - which was true of the run and false about the data, and left the user with no
 // idea that running it again was safe. A count and one sentence fix both.
 const _I18N_IMP_FAIL = {
-  en:{ imp_failed_n:"could not be saved", imp_retry:"Run the same file again - what is already in will be updated, not duplicated.", imp_by_title:"Searching the rest by title…", imp_server_err:"The server could not be reached, so nothing else was matched. This is on our side. Try the same file again in a few minutes - everything imported so far is kept.", imp_limit_day:"Today's lookup limit is used up, so the rest were not matched. Run the same file again tomorrow - everything imported so far is kept." },
-  ru:{ imp_failed_n:"не удалось сохранить", imp_retry:"Запусти тот же файл ещё раз - то, что уже загружено, обновится, а не задвоится.", imp_by_title:"Ищу остальные по названию…", imp_server_err:"Не удалось связаться с сервером, остальные фильмы не сопоставлены. Это на нашей стороне. Попробуй тот же файл через несколько минут - всё загруженное сохранится.", imp_limit_day:"Дневной лимит поиска исчерпан, остальные фильмы не сопоставлены. Запусти тот же файл завтра - всё загруженное сохранится." },
-  uk:{ imp_failed_n:"не вдалося зберегти", imp_retry:"Запусти той самий файл ще раз - те, що вже завантажено, оновиться, а не задвоїться.", imp_by_title:"Шукаю решту за назвою…", imp_server_err:"Не вдалося зв'язатися з сервером, решту не зіставлено. Це на нашому боці. Спробуй той самий файл за кілька хвилин - усе завантажене збережеться.", imp_limit_day:"Денний ліміт пошуку вичерпано, решту не зіставлено. Запусти той самий файл завтра - усе завантажене збережеться." },
-  ka:{ imp_failed_n:"ვერ შეინახა", imp_retry:"გაუშვი იგივე ფაილი ხელახლა - რაც უკვე ჩაიტვირთა, განახლდება და არ გაორმაგდება.", imp_by_title:"დანარჩენს სათაურით ვეძებ…", imp_server_err:"სერვერთან დაკავშირება ვერ მოხერხდა, დანარჩენი ვერ დაემთხვა. ეს ჩვენი მხრიდანაა. სცადე იგივე ფაილი რამდენიმე წუთში - ყველაფერი ჩატვირთული შენარჩუნდება.", imp_limit_day:"დღიური ძიების ლიმიტი ამოიწურა, დანარჩენი ვერ დაემთხვა. გაუშვი იგივე ფაილი ხვალ - ყველაფერი ჩატვირთული შენარჩუნდება." },
-  es:{ imp_failed_n:"no se pudieron guardar", imp_retry:"Vuelve a importar el mismo archivo: lo que ya está se actualiza, no se duplica.", imp_by_title:"Buscando el resto por título…", imp_server_err:"No se pudo conectar con el servidor, así que el resto no se emparejó. Es cosa nuestra. Prueba el mismo archivo en unos minutos: lo ya importado se conserva.", imp_limit_day:"Se agotó el límite diario de búsquedas, así que el resto no se emparejó. Vuelve a importar el mismo archivo mañana: lo ya importado se conserva." },
-  fr:{ imp_failed_n:"n'ont pas pu être enregistrés", imp_retry:"Relance le même fichier - ce qui est déjà là sera mis à jour, pas dupliqué.", imp_by_title:"Recherche du reste par titre…", imp_server_err:"Le serveur n'a pas répondu, le reste n'a pas été identifié. Cela vient de nous. Réessaie le même fichier dans quelques minutes - tout ce qui est importé est conservé.", imp_limit_day:"La limite de recherches du jour est atteinte, le reste n'a pas été identifié. Relance le même fichier demain - tout ce qui est importé est conservé." },
-  de:{ imp_failed_n:"konnten nicht gespeichert werden", imp_retry:"Importiere dieselbe Datei noch einmal - was schon da ist, wird aktualisiert, nicht doppelt angelegt.", imp_by_title:"Suche den Rest nach Titel…", imp_server_err:"Der Server war nicht erreichbar, der Rest wurde nicht zugeordnet. Das liegt an uns. Versuche dieselbe Datei in ein paar Minuten - alles bisher Importierte bleibt erhalten.", imp_limit_day:"Das Tageslimit für Suchanfragen ist aufgebraucht, der Rest wurde nicht zugeordnet. Importiere dieselbe Datei morgen erneut - alles bisher Importierte bleibt erhalten." },
-  it:{ imp_failed_n:"non sono stati salvati", imp_retry:"Importa di nuovo lo stesso file: ciò che c'è già viene aggiornato, non duplicato.", imp_by_title:"Cerco il resto per titolo…", imp_server_err:"Non è stato possibile raggiungere il server, quindi il resto non è stato abbinato. Dipende da noi. Riprova lo stesso file tra qualche minuto: tutto ciò che è importato resta.", imp_limit_day:"Il limite giornaliero di ricerche è esaurito, quindi il resto non è stato abbinato. Reimporta lo stesso file domani: tutto ciò che è già importato resta." },
+  en:{ imp_failed_n:"could not be saved", imp_retry:"Run the same file again - what is already in will be updated, not duplicated.", imp_by_title:"Searching the rest by title…", err_server_busy:"The server is not answering right now. This is on our side, not your search. Try again in a minute.", imp_server_err:"The server could not be reached, so nothing else was matched. This is on our side. Try the same file again in a few minutes - everything imported so far is kept.", imp_limit_day:"Today's lookup limit is used up, so the rest were not matched. Run the same file again tomorrow - everything imported so far is kept." },
+  ru:{ imp_failed_n:"не удалось сохранить", imp_retry:"Запусти тот же файл ещё раз - то, что уже загружено, обновится, а не задвоится.", imp_by_title:"Ищу остальные по названию…", err_server_busy:"Сервер сейчас не отвечает. Это на нашей стороне, а не в твоём запросе. Попробуй через минуту.", imp_server_err:"Не удалось связаться с сервером, остальные фильмы не сопоставлены. Это на нашей стороне. Попробуй тот же файл через несколько минут - всё загруженное сохранится.", imp_limit_day:"Дневной лимит поиска исчерпан, остальные фильмы не сопоставлены. Запусти тот же файл завтра - всё загруженное сохранится." },
+  uk:{ imp_failed_n:"не вдалося зберегти", imp_retry:"Запусти той самий файл ще раз - те, що вже завантажено, оновиться, а не задвоїться.", imp_by_title:"Шукаю решту за назвою…", err_server_busy:"Сервер зараз не відповідає. Це на нашому боці, а не у твоєму запиті. Спробуй за хвилину.", imp_server_err:"Не вдалося зв'язатися з сервером, решту не зіставлено. Це на нашому боці. Спробуй той самий файл за кілька хвилин - усе завантажене збережеться.", imp_limit_day:"Денний ліміт пошуку вичерпано, решту не зіставлено. Запусти той самий файл завтра - усе завантажене збережеться." },
+  ka:{ imp_failed_n:"ვერ შეინახა", imp_retry:"გაუშვი იგივე ფაილი ხელახლა - რაც უკვე ჩაიტვირთა, განახლდება და არ გაორმაგდება.", imp_by_title:"დანარჩენს სათაურით ვეძებ…", err_server_busy:"სერვერი ამჟამად არ პასუხობს. ეს ჩვენი მხრიდანაა, არა შენი ძიების. სცადე ერთ წუთში.", imp_server_err:"სერვერთან დაკავშირება ვერ მოხერხდა, დანარჩენი ვერ დაემთხვა. ეს ჩვენი მხრიდანაა. სცადე იგივე ფაილი რამდენიმე წუთში - ყველაფერი ჩატვირთული შენარჩუნდება.", imp_limit_day:"დღიური ძიების ლიმიტი ამოიწურა, დანარჩენი ვერ დაემთხვა. გაუშვი იგივე ფაილი ხვალ - ყველაფერი ჩატვირთული შენარჩუნდება." },
+  es:{ imp_failed_n:"no se pudieron guardar", imp_retry:"Vuelve a importar el mismo archivo: lo que ya está se actualiza, no se duplica.", imp_by_title:"Buscando el resto por título…", err_server_busy:"El servidor no responde ahora mismo. Es cosa nuestra, no de tu búsqueda. Inténtalo en un minuto.", imp_server_err:"No se pudo conectar con el servidor, así que el resto no se emparejó. Es cosa nuestra. Prueba el mismo archivo en unos minutos: lo ya importado se conserva.", imp_limit_day:"Se agotó el límite diario de búsquedas, así que el resto no se emparejó. Vuelve a importar el mismo archivo mañana: lo ya importado se conserva." },
+  fr:{ imp_failed_n:"n'ont pas pu être enregistrés", imp_retry:"Relance le même fichier - ce qui est déjà là sera mis à jour, pas dupliqué.", imp_by_title:"Recherche du reste par titre…", err_server_busy:"Le serveur ne répond pas pour le moment. Cela vient de nous, pas de ta recherche. Réessaie dans une minute.", imp_server_err:"Le serveur n'a pas répondu, le reste n'a pas été identifié. Cela vient de nous. Réessaie le même fichier dans quelques minutes - tout ce qui est importé est conservé.", imp_limit_day:"La limite de recherches du jour est atteinte, le reste n'a pas été identifié. Relance le même fichier demain - tout ce qui est importé est conservé." },
+  de:{ imp_failed_n:"konnten nicht gespeichert werden", imp_retry:"Importiere dieselbe Datei noch einmal - was schon da ist, wird aktualisiert, nicht doppelt angelegt.", imp_by_title:"Suche den Rest nach Titel…", err_server_busy:"Der Server antwortet gerade nicht. Das liegt an uns, nicht an deiner Suche. Versuch es in einer Minute.", imp_server_err:"Der Server war nicht erreichbar, der Rest wurde nicht zugeordnet. Das liegt an uns. Versuche dieselbe Datei in ein paar Minuten - alles bisher Importierte bleibt erhalten.", imp_limit_day:"Das Tageslimit für Suchanfragen ist aufgebraucht, der Rest wurde nicht zugeordnet. Importiere dieselbe Datei morgen erneut - alles bisher Importierte bleibt erhalten." },
+  it:{ imp_failed_n:"non sono stati salvati", imp_retry:"Importa di nuovo lo stesso file: ciò che c'è già viene aggiornato, non duplicato.", imp_by_title:"Cerco il resto per titolo…", err_server_busy:"Il server non risponde in questo momento. Dipende da noi, non dalla tua ricerca. Riprova tra un minuto.", imp_server_err:"Non è stato possibile raggiungere il server, quindi il resto non è stato abbinato. Dipende da noi. Riprova lo stesso file tra qualche minuto: tutto ciò che è importato resta.", imp_limit_day:"Il limite giornaliero di ricerche è esaurito, quindi il resto non è stato abbinato. Reimporta lo stesso file domani: tutto ciò che è già importato resta." },
 };
 Object.keys(_I18N_IMP_FAIL).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_IMP_FAIL[l]); });
 // Onboarding inbox slide (Ludwig → Sinners, recommendation with a note)
@@ -4956,12 +4956,33 @@ function _whereToWatchInner(wp) {
     <div style="font-size:9px;color:var(--muted);margin-top:6px">${t('watch_attrib')}</div>
   </div>`;
 }
+// This ended `return res.json()` and looked at nothing else, which is how the worst outage
+// this app has had stayed invisible for hours on 7 Sep 2026: the rate limiter exhausted its
+// KV write budget, every proxied call came back 500 with {"error":"internal", ...}, and every
+// caller here read a body with no `results` in it as "there is no such film". Search drew NO
+// RESULTS, the import announced 806 missing films, and Cloudflare's dashboard showed zero
+// errors, correctly, because the worker was returning 500 on purpose rather than crashing.
+//
+// A refusal is not an absence. The status is checked here, at the source, so no caller has to
+// remember to - and a body that is not JSON at all (a Cloudflare error page, an empty
+// response) becomes a named error instead of an exception nobody catches.
 async function tmdbFetch(path) {
   const { data: { session } } = await sbClient.auth.getSession();
   const headers = { "accept": "application/json" };
   if (session) headers["Authorization"] = "Bearer " + session.access_token;
-  const res = await fetch(TMDB_BASE + path, { headers });
-  return res.json();
+  let res;
+  try { res = await fetch(TMDB_BASE + path, { headers }); }
+  catch (e) { console.warn("[tmdb] network:", e.message); return { error: "network", message: e.message }; }
+  let body = null;
+  try { body = await res.json(); } catch (e) { body = null; }
+  if (!res.ok) {
+    // The worker already answers with {error, message}; keep it, and invent one when the
+    // response was not JSON so callers always get the same shape.
+    const err = (body && body.error) ? body : { error: "http_" + res.status };
+    console.warn("[tmdb]", res.status, path, err.message || err.error);
+    return err;
+  }
+  return body || { error: "bad_json" };
 }
 function hasCyrillic(str) { return /[а-яёА-ЯЁ]/.test(str); }
 async function translateQuery(q) {
@@ -5020,6 +5041,11 @@ async function tmdbSearch(q) {
     tmdbFetch(`/search/multi?query=${encodeURIComponent(q)}&include_adult=false&language=${_tmdbLang()}`),
     tmdbFetch(`/search/multi?query=${encodeURIComponent(q)}&include_adult=false`)
   ]);
+  // Both refused means the server is unreachable, not that the film does not exist. Say so,
+  // instead of drawing an empty-results screen that blames the user's spelling.
+  if (enRes && enRes.error && multiRes && multiRes.error) {
+    const e = new Error(enRes.error); e.tmdbRefused = enRes; throw e;
+  }
   const all = [...(enRes.results||[]), ...(multiRes.results||[])];
   const seen = new Set();
   return all.filter(r => {
@@ -5509,7 +5535,15 @@ async function doSearch() {
     el.innerHTML = peopleBlock + `<div class="card-list">${results.map(m => movieCardHTML(m)).join("")}</div>`;
     if (results.length) _maybeShowSearchCoach();
   } catch(e) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-state-title">${t('err_connection')}</div><p>${e.message}</p></div>`;
+    // A refused request gets a sentence a person can act on. The raw code ("internal",
+    // "http_500") goes to the console, where it is useful, and not onto the screen, where it
+    // is not - but the screen must still say the server is at fault rather than show an
+    // empty-results shrug that reads as "your film does not exist".
+    const why = e.tmdbRefused
+      ? (e.tmdbRefused.error === "limit_reached" ? t('imp_limit_day') : t('err_server_busy'))
+      : escapeHtml(e.message || "");
+    if (e.tmdbRefused) console.warn("[search] refused:", e.tmdbRefused);
+    el.innerHTML = `<div class="empty-state"><div class="empty-state-title">${t('err_connection')}</div><p>${why}</p></div>`;
   }
 }
 
@@ -9569,9 +9603,23 @@ async function saveDisplayName() {
 // ── Backup ────────────────────────────────────────────────────────────────────
 
 // Core: fetch all watchlist rows from Supabase (storage-agnostic)
+// Paged deliberately. This asked for the whole table in one request with no limit, and relied
+// on PostgREST not having a row cap configured - which is a thing to find out from a user
+// whose backup silently held part of their catalogue, not from a decision. A backup that looks
+// complete and is not is the worst member of a family of bugs this app has already had five of.
+//
+// 1,000 at a time, until a page comes back short. The extra requests cost nothing next to the
+// spreadsheet being written, and the loop has no way to stop early and still look finished.
 async function getBackupData() {
-  const rows = await sbFetch("watchlist?order=created_at.asc");
-  return Array.isArray(rows) ? rows : [];
+  const PAGE = 1000, out = [];
+  for (let from = 0; ; from += PAGE) {
+    const page = await sbFetch(`watchlist?order=created_at.asc&limit=${PAGE}&offset=${from}`);
+    if (!Array.isArray(page) || !page.length) break;
+    out.push(...page);
+    if (page.length < PAGE) break;
+    if (out.length > 100000) { console.warn("[backup] stopping at 100k rows"); break; }
+  }
+  return out;
 }
 
 // Core: merge-import enriched rows into Supabase (skip existing by tmdb_id+status)
@@ -10586,7 +10634,7 @@ async function _renderBannerPNG(subtitle) {
     if (subtitle) {
       try { ctx.letterSpacing = '0px'; } catch(e) {}
       ctx.font = '15px "DM Sans", -apple-system, sans-serif';
-      ctx.fillStyle = '#E9DEFB';
+      ctx.fillStyle = '#C9C9D2';   // the app's own muted grey; #E9DEFB was a lilac tint left over from the purple banner
       ctx.fillText(subtitle, textX, 68);
     }
     const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
@@ -10609,11 +10657,22 @@ async function backupExportXLSX() {
     const listNameById = {};
     (_listsCache || []).forEach(l => { listNameById[l.id] = l.name; });
 
-    const BRAND   = "FF7C3AED";   // Cinemail purple (ARGB)
-    const BRAND_D = "FF5B21B6";   // deeper purple
-    const LINK    = "FF6D28D9";
-    const ZEBRA   = "FFF5F3FB";   // very light purple for alternating rows
-    const RULE    = "FFE5E1F2";   // light border
+    // Cinemail's accent is gold #F5C518. These were #7C3AED and its neighbours - which is
+    // TUNEMAIL's purple, sitting in Cinemail's export under a comment calling it "Cinemail
+    // purple". The accent colour is precisely the thing that distinguishes the two apps, so
+    // one of them handing out files in the other's colour is the one mistake the family rule
+    // exists to prevent.
+    // Cinemail is a DARK surface with a gold accent, not a gold surface - which is what the
+    // banner already assumed: it draws "CINE" in #F5C518 and "MAIL" in white, and both need a
+    // dark ground. So the band is the app's own ink and the text on it is gold, which is
+    // literally the app header. Measured rather than eyeballed: gold on ink 12.0:1, white on
+    // gold would have been 1.63:1, and the LINK gold on white is 4.92:1, over the 4.5 floor.
+    const BRAND   = "FF0E081C";   // Cinemail ink - the app's own background (ARGB)
+    const BRAND_ON= "FFF5C518";   // gold, for text sitting on that band
+    const BRAND_D = "FFC79A00";   // deeper gold, for the rule under the band
+    const LINK    = "FF8A6D00";   // gold dark enough to read as a link on white
+    const ZEBRA   = "FFFFFBEF";   // very light gold for alternating rows
+    const RULE    = "FFF0E4C0";   // light border
     const wb = new ExcelJS.Workbook();
     wb.creator = "Cinemail";
     wb.created = new Date();
@@ -10625,7 +10684,7 @@ async function backupExportXLSX() {
       for (let c = 1; c <= colCount; c++) {
         const cell = hr.getCell(c);
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BRAND } };
-        cell.font = { bold: true, color: { argb: "FFFFFFFF" }, size: 11 };
+        cell.font = { bold: true, color: { argb: BRAND_ON }, size: 11 };
         cell.alignment = { vertical: 'middle' };
         cell.border = { bottom: { style: 'thin', color: { argb: BRAND_D } } };
       }
