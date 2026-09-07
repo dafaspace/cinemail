@@ -1,5 +1,13 @@
 // ── Cache version — bump this string on every deploy to force refresh ──────────
-const CACHE_VERSION = "v226";
+// It is not optional and forgetting it is invisible. On 7 Sep 2026 v0.57.10 went to the
+// domain with this left at v226: cinemail.app served the new file, every browser that had
+// ever opened the app kept serving the old one from cache, and an import was debugged for
+// an hour against code that was not running. Verifying the version on the domain is NOT
+// enough - the domain was right. Check what a browser actually loads.
+//
+// Keep this in step with the app version in index.html, so the two can be compared at a
+// glance and a missed bump is visible rather than silent.
+const CACHE_VERSION = "v227-0.57.11";
 const CACHE_NAME = "cinemail-" + CACHE_VERSION;
 
 // Files to cache for offline use

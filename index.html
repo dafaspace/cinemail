@@ -2859,7 +2859,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.10</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.11</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -10244,7 +10244,9 @@ async function _resolveViaIMDbId(rows, onProgress) {
   // it as its own stage instead: it is a different question being asked, so say so.
   const missing = out.filter(r => !r.imdb_id);
   if (missing.length) {
-    const fixed = await _resolveViaTMDBSearch(missing, (d, tot) => onProgress?.(rows.length, rows.length, `${d}/${tot}`));
+    // Report this pass's OWN d/tot, not the first pass's finished total. The third argument
+    // says which pass it is, so the caller can colour it and name it.
+    const fixed = await _resolveViaTMDBSearch(missing, (d, tot) => onProgress?.(d, tot, true));
     const byConst = new Map(fixed.map(r => [r.imdbConst, r]));
     const merged = out.map(r => r.imdb_id ? r : (byConst.get(r.imdbConst) || r));
     // The title search is the expensive half - two endpoints and a retry each - so its
@@ -10299,13 +10301,18 @@ const ImportProgress = {
     document.body.appendChild(ov);
     this._el = ov;
   },
-  update(msg, done, total) {
+  // `tone` gives a stage its own colour. The import has two matching passes that ask different
+  // questions - by IMDb id, then by title for whatever missed - and the second one used to be
+  // drawn as the first one standing still at 100%, which is indistinguishable from a hang.
+  // A bar that restarts at zero in another colour says "different question" without a word.
+  update(msg, done, total, tone) {
     if (!this._el) return;
     const m = this._el.querySelector('#ip-msg'); if (m) m.textContent = msg;
     const wrap = this._el.querySelector('#ip-barwrap'), bar = this._el.querySelector('#ip-bar'), env = this._el.querySelector('#ip-env');
     if (wrap && bar && total) {
       const pct = Math.round((done / total) * 100);
       wrap.style.display = 'block';
+      bar.style.background = tone === 'accent' ? 'var(--accent)' : 'var(--primary)';
       bar.style.width = pct + '%';
       if (env) env.style.left = pct + '%'; // the envelope rides the leading edge — films being delivered
     }
@@ -10353,7 +10360,8 @@ async function backupImportIMDb() {
     }
     ImportProgress.update(t("imp_found").replace("{n}", rows.length), 0, rows.length);
     const resolved = await _resolveViaIMDbId(rows, (d, tot, byTitle) => ImportProgress.update(
-      byTitle ? `${t("imp_by_title")} ${byTitle}` : `${t("lb_matching")} ${d}/${tot}`, d, tot));
+      byTitle ? `${t("imp_by_title")} ${d}/${tot}` : `${t("lb_matching")} ${d}/${tot}`,
+      d, tot, byTitle ? 'accent' : null));
     const ok = resolved.filter(r => r.imdb_id && r.title);
     // Name them. "1 not found" tells the user something is missing but not WHAT, so there
     // is no way to add it back by hand - the one thing they could actually do about it.
