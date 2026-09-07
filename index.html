@@ -2859,7 +2859,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.12</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.13</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -10099,7 +10099,12 @@ async function backupImportLetterboxd() {
     const ok = resolved.filter(r => r.imdb_id && r.title);
     // Name them. "1 not found" tells the user something is missing but not WHAT, so there
     // is no way to add it back by hand - the one thing they could actually do about it.
-    const missing = resolved.filter(r => !(r.imdb_id && r.title)).map(r => r.title).filter(Boolean);
+    // With the year, because a title alone can be ambiguous inside the user's own file. The
+    // 806-film test export held TWO films called "Behind Her Eyes" - a 2021 series that
+    // matched and a 2018 short that did not - and the report named one of them with no way to
+    // tell which. Naming what is missing only helps if the name identifies it.
+    const missing = resolved.filter(r => !(r.imdb_id && r.title))
+      .map(r => r.title ? (r.year ? `${r.title} (${r.year})` : r.title) : "").filter(Boolean);
     const unmatched = missing.length
       ? (missing.slice(0, 3).join(", ") + (missing.length > 3 ? ` +${missing.length - 3}` : ""))
       : "";
@@ -10376,7 +10381,12 @@ async function backupImportIMDb() {
     const ok = resolved.filter(r => r.imdb_id && r.title);
     // Name them. "1 not found" tells the user something is missing but not WHAT, so there
     // is no way to add it back by hand - the one thing they could actually do about it.
-    const missing = resolved.filter(r => !(r.imdb_id && r.title)).map(r => r.title).filter(Boolean);
+    // With the year, because a title alone can be ambiguous inside the user's own file. The
+    // 806-film test export held TWO films called "Behind Her Eyes" - a 2021 series that
+    // matched and a 2018 short that did not - and the report named one of them with no way to
+    // tell which. Naming what is missing only helps if the name identifies it.
+    const missing = resolved.filter(r => !(r.imdb_id && r.title))
+      .map(r => r.title ? (r.year ? `${r.title} (${r.year})` : r.title) : "").filter(Boolean);
     const unmatched = missing.length
       ? (missing.slice(0, 3).join(", ") + (missing.length > 3 ? ` +${missing.length - 3}` : ""))
       : "";
