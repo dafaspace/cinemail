@@ -2777,7 +2777,12 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       </div>
       <div class="backup-hint" data-i18n="backup_hint" style="font-size:11px;color:var(--muted);line-height:1.4;margin-top:6px">Save an Excel backup of your lists, or restore them from a backup file.</div>
       <button class="btn-backup" onclick="backupImportLetterboxd()" data-i18n="lb_import_btn" title="Coming from Letterboxd? On Letterboxd: Settings → Data → Export Your Data, unzip, then pick a .csv (e.g. watched.csv or ratings.csv)." style="width:100%;margin-top:8px">↑ Import from Letterboxd</button>
-      <button class="btn-backup" onclick="backupImportIMDb()" data-i18n="imdb_import_btn" title="Coming from IMDb? On your phone: open imdb.com in Safari → aA menu → Request Desktop Website → sign in → your profile → Your Ratings (or Watchlist) → Export → save the .csv, then pick it here. (Also works on a desktop browser.)" style="width:100%;margin-top:8px">↑ Import from IMDb</button>
+      <button class="btn-backup" onclick="backupImportIMDb()" data-i18n="imdb_import_btn" title="Coming from IMDb? Export lives on the IMDb website, not in the app. Tap &quot;How to export from IMDb&quot; below for the steps." style="width:100%;margin-top:8px">↑ Import from IMDb</button>
+      <!-- This used to live in the title attribute above, where a phone never shows it - there
+           is no hover on a touch screen, so the one instruction mobile users need was visible
+           only on desktop. Found when an Android user could not get past IMDb's app intercept. -->
+      <button onclick="var e=document.getElementById('imdb-hint');e.hidden=!e.hidden" data-i18n="imdb_how" style="display:block;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:4px 0 0;text-align:left;text-decoration:underline;font-family:'DM Sans','Noto Sans Georgian',sans-serif">How to export from IMDb</button>
+      <div id="imdb-hint" hidden data-i18n="imdb_hint" data-i18n-html="1" style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:6px;padding:8px 10px;border:1px solid rgba(255,255,255,0.08);border-radius:8px"></div>
       <button onclick="backupExportJSON()" data-i18n="backup_json_nerd" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:4px 0 0;margin-top:2px;text-decoration:underline;font-family:'DM Sans','Noto Sans Georgian',sans-serif">JSON backup (advanced)</button>
       <div id="backup-status" style="display:none;font-size:11px;line-height:1.45;margin-top:8px"></div>
       <div id="btn-backfill-crew-row" style="display:none;margin-top:8px">
@@ -2854,7 +2859,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.6</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.10</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -3368,6 +3373,13 @@ const _I18N_EXTRA = {
     reset_title:"Set New Password", reset_newpass:"New Password", reset_confirm:"Confirm Password", reset_update:"Update Password",
     reset_email_sent:"We sent a password reset link to", reset_done:"Password updated",
     err_enter_email:"Please enter your email.", err_pass_short:"Password must be at least 6 characters.", err_pass_match:"Passwords don't match.",
+    err_enter_name:"Please enter your name.", err_signin_fields:"Please enter your email and password.",
+    err_name_taken:"\"{name}\" is taken, so your name will be \"{suggested}\". Press Create Account again to confirm.",
+    email_sent_to:"We sent a confirmation link to", email_sent_activate:"Click it to activate your account.",
+    err_email_taken:"That email already has an account. Try signing in instead.", err_email_bad:"That email address does not look right.",
+    err_too_many:"Too many attempts. Please wait a few minutes and try again.",
+    err_mail_failed:"We could not send the confirmation email. This is on our side, not yours.",
+    err_try_again:"Something went wrong. Please try again.", write_support:"Write to support@dafaspace.com",
     cancel:"Cancel", accept:"Accept", copy:"Copy", share_invite:"Share invite",
     friend_wants:"wants to be friends", no_members:"No members yet",
     no_lists:"No lists yet. Create one to share with friends.",
@@ -3393,6 +3405,13 @@ const _I18N_EXTRA = {
     reset_title:"Новый пароль", reset_newpass:"Новый пароль", reset_confirm:"Повтори пароль", reset_update:"Обновить пароль",
     reset_email_sent:"Мы отправили ссылку для сброса пароля на", reset_done:"Пароль обновлён",
     err_enter_email:"Введи email.", err_pass_short:"Пароль минимум 6 символов.", err_pass_match:"Пароли не совпадают.",
+    err_enter_name:"Введи имя.", err_signin_fields:"Введи email и пароль.",
+    err_name_taken:"«{name}» уже занято, твоё имя будет «{suggested}». Нажми «Создать аккаунт» ещё раз, чтобы подтвердить.",
+    email_sent_to:"Мы отправили ссылку для подтверждения на", email_sent_activate:"Нажми на неё, чтобы активировать аккаунт.",
+    err_email_taken:"На этот email уже есть аккаунт. Попробуй войти.", err_email_bad:"Похоже, этот адрес неверный.",
+    err_too_many:"Слишком много попыток. Подожди пару минут и попробуй снова.",
+    err_mail_failed:"Не удалось отправить письмо с подтверждением. Это на нашей стороне, не на твоей.",
+    err_try_again:"Что-то пошло не так. Попробуй ещё раз.", write_support:"Напиши на support@dafaspace.com",
     cancel:"Отмена", accept:"Принять", copy:"Копировать", share_invite:"Поделиться",
     friend_wants:"хочет добавить в друзья", no_members:"Пока нет участников",
     no_lists:"Пока нет списков. Создай, чтобы делиться с друзьями.",
@@ -3418,6 +3437,13 @@ const _I18N_EXTRA = {
     reset_title:"Новий пароль", reset_newpass:"Новий пароль", reset_confirm:"Повтори пароль", reset_update:"Оновити пароль",
     reset_email_sent:"Ми надіслали посилання для скидання пароля на", reset_done:"Пароль оновлено",
     err_enter_email:"Введи email.", err_pass_short:"Пароль щонайменше 6 символів.", err_pass_match:"Паролі не збігаються.",
+    err_enter_name:"Введи ім'я.", err_signin_fields:"Введи email і пароль.",
+    err_name_taken:"«{name}» вже зайняте, твоє ім'я буде «{suggested}». Натисни «Створити акаунт» ще раз, щоб підтвердити.",
+    email_sent_to:"Ми надіслали посилання для підтвердження на", email_sent_activate:"Натисни його, щоб активувати акаунт.",
+    err_email_taken:"На цей email уже є акаунт. Спробуй увійти.", err_email_bad:"Схоже, ця адреса неправильна.",
+    err_too_many:"Забагато спроб. Зачекай кілька хвилин і спробуй ще раз.",
+    err_mail_failed:"Не вдалося надіслати лист із підтвердженням. Це на нашому боці, не на твоєму.",
+    err_try_again:"Щось пішло не так. Спробуй ще раз.", write_support:"Напиши на support@dafaspace.com",
     cancel:"Скасувати", accept:"Прийняти", copy:"Копіювати", share_invite:"Поділитися",
     friend_wants:"хоче додати в друзі", no_members:"Поки немає учасників",
     no_lists:"Поки немає списків. Створи, щоб ділитися з друзями.",
@@ -3443,6 +3469,13 @@ const _I18N_EXTRA = {
     reset_title:"ახალი პაროლი", reset_newpass:"ახალი პაროლი", reset_confirm:"გაიმეორე პაროლი", reset_update:"პაროლის განახლება",
     reset_email_sent:"პაროლის აღდგენის ბმული გავაგზავნეთ მისამართზე", reset_done:"პაროლი განახლდა",
     err_enter_email:"შეიყვანე email.", err_pass_short:"პაროლი მინიმუმ 6 სიმბოლო.", err_pass_match:"პაროლები არ ემთხვევა.",
+    err_enter_name:"შეიყვანე სახელი.", err_signin_fields:"შეიყვანე email და პაროლი.",
+    err_name_taken:"„{name}“ დაკავებულია, შენი სახელი იქნება „{suggested}“. დასადასტურებლად კვლავ დააჭირე ღილაკს „ანგარიშის შექმნა“.",
+    email_sent_to:"დადასტურების ბმული გამოგზავნეთ მისამართზე", email_sent_activate:"დააჭირე ანგარიშის გასააქტიურებლად.",
+    err_email_taken:"ამ მისამართზე უკვე არსებობს ანგარიში. სცადე შესვლა.", err_email_bad:"როგორც ჩანს, ეს მისამართი არასწორია.",
+    err_too_many:"ძალიან ბევრი მცდელობა. დაელოდე რამდენიმე წუთს და სცადე ხელახლა.",
+    err_mail_failed:"დადასტურების წერილის გაგზავნა ვერ მოხერხდა. ეს ჩვენი მხრიდანაა, არა შენი.",
+    err_try_again:"რაღაც ვერ გამოვიდა. სცადე ხელახლა.", write_support:"მოგვწერე: support@dafaspace.com",
     cancel:"გაუქმება", accept:"მიღება", copy:"კოპირება", share_invite:"გაზიარება",
     friend_wants:"უნდა დაგიმეგობრდეს", no_members:"ჯერ წევრები არ არის",
     no_lists:"ჯერ სიები არ არის. შექმენი მეგობრებთან გასაზიარებლად.",
@@ -3468,6 +3501,13 @@ const _I18N_EXTRA = {
     reset_title:"Nueva contraseña", reset_newpass:"Nueva contraseña", reset_confirm:"Confirmar contraseña", reset_update:"Actualizar contraseña",
     reset_email_sent:"Enviamos un enlace para restablecer tu contraseña a", reset_done:"Contraseña actualizada",
     err_enter_email:"Introduce tu email.", err_pass_short:"La contraseña debe tener al menos 6 caracteres.", err_pass_match:"Las contraseñas no coinciden.",
+    err_enter_name:"Introduce tu nombre.", err_signin_fields:"Introduce tu email y tu contraseña.",
+    err_name_taken:"«{name}» ya está en uso, tu nombre será «{suggested}». Pulsa Crear cuenta otra vez para confirmar.",
+    email_sent_to:"Enviamos un enlace de confirmación a", email_sent_activate:"Haz clic para activar tu cuenta.",
+    err_email_taken:"Ese email ya tiene una cuenta. Prueba a iniciar sesión.", err_email_bad:"Esa dirección de correo no parece correcta.",
+    err_too_many:"Demasiados intentos. Espera unos minutos y vuelve a probar.",
+    err_mail_failed:"No pudimos enviar el correo de confirmación. Es cosa nuestra, no tuya.",
+    err_try_again:"Algo salió mal. Inténtalo de nuevo.", write_support:"Escribe a support@dafaspace.com",
     cancel:"Cancelar", accept:"Aceptar", copy:"Copiar", share_invite:"Compartir",
     friend_wants:"quiere ser tu amigo", no_members:"Aún no hay miembros",
     no_lists:"Aún no hay listas. Crea una para compartir con amigos.",
@@ -3493,6 +3533,13 @@ const _I18N_EXTRA = {
     reset_title:"Nouveau mot de passe", reset_newpass:"Nouveau mot de passe", reset_confirm:"Confirmer le mot de passe", reset_update:"Mettre à jour le mot de passe",
     reset_email_sent:"Nous avons envoyé un lien de réinitialisation à", reset_done:"Mot de passe mis à jour",
     err_enter_email:"Saisis ton email.", err_pass_short:"Le mot de passe doit comporter au moins 6 caractères.", err_pass_match:"Les mots de passe ne correspondent pas.",
+    err_enter_name:"Saisis ton nom.", err_signin_fields:"Saisis ton email et ton mot de passe.",
+    err_name_taken:"« {name} » est déjà pris, ton nom sera « {suggested} ». Appuie de nouveau sur Créer un compte pour confirmer.",
+    email_sent_to:"Nous avons envoyé un lien de confirmation à", email_sent_activate:"Clique dessus pour activer ton compte.",
+    err_email_taken:"Cet email a déjà un compte. Essaie de te connecter.", err_email_bad:"Cette adresse e-mail ne semble pas correcte.",
+    err_too_many:"Trop de tentatives. Patiente quelques minutes et réessaie.",
+    err_mail_failed:"Nous n'avons pas pu envoyer l'e-mail de confirmation. Cela vient de nous, pas de toi.",
+    err_try_again:"Une erreur est survenue. Réessaie.", write_support:"Écris à support@dafaspace.com",
     cancel:"Annuler", accept:"Accepter", copy:"Copier", share_invite:"Partager",
     friend_wants:"veut devenir ami", no_members:"Aucun membre pour l'instant",
     no_lists:"Aucune liste. Créez-en une à partager avec des amis.",
@@ -3518,6 +3565,13 @@ const _I18N_EXTRA = {
     reset_title:"Neues Passwort festlegen", reset_newpass:"Neues Passwort", reset_confirm:"Passwort bestätigen", reset_update:"Passwort aktualisieren",
     reset_email_sent:"Wir haben einen Link zum Zurücksetzen gesendet an", reset_done:"Passwort aktualisiert",
     err_enter_email:"Bitte gib deine E-Mail ein.", err_pass_short:"Das Passwort muss mindestens 6 Zeichen haben.", err_pass_match:"Die Passwörter stimmen nicht überein.",
+    err_enter_name:"Bitte gib deinen Namen ein.", err_signin_fields:"Bitte gib E-Mail und Passwort ein.",
+    err_name_taken:"„{name}“ ist vergeben, dein Name wird „{suggested}“. Tippe erneut auf Konto erstellen, um zu bestätigen.",
+    email_sent_to:"Wir haben einen Bestätigungslink gesendet an", email_sent_activate:"Klicke darauf, um dein Konto zu aktivieren.",
+    err_email_taken:"Für diese E-Mail gibt es bereits ein Konto. Versuche dich anzumelden.", err_email_bad:"Diese E-Mail-Adresse sieht nicht richtig aus.",
+    err_too_many:"Zu viele Versuche. Warte ein paar Minuten und versuche es erneut.",
+    err_mail_failed:"Wir konnten die Bestätigungsmail nicht senden. Das liegt an uns, nicht an dir.",
+    err_try_again:"Etwas ist schiefgelaufen. Bitte versuche es erneut.", write_support:"Schreib an support@dafaspace.com",
     cancel:"Abbrechen", accept:"Annehmen", copy:"Kopieren", share_invite:"Einladung teilen",
     friend_wants:"möchte mit dir befreundet sein", no_members:"Noch keine Mitglieder",
     no_lists:"Noch keine Listen. Erstelle eine, um sie mit Freunden zu teilen.",
@@ -3543,6 +3597,13 @@ const _I18N_EXTRA = {
     reset_title:"Imposta nuova password", reset_newpass:"Nuova password", reset_confirm:"Conferma password", reset_update:"Aggiorna password",
     reset_email_sent:"Abbiamo inviato un link per reimpostare la password a", reset_done:"Password aggiornata",
     err_enter_email:"Inserisci la tua email.", err_pass_short:"La password deve avere almeno 6 caratteri.", err_pass_match:"Le password non coincidono.",
+    err_enter_name:"Inserisci il tuo nome.", err_signin_fields:"Inserisci email e password.",
+    err_name_taken:"«{name}» è già in uso, il tuo nome sarà «{suggested}». Tocca di nuovo Crea un account per confermare.",
+    email_sent_to:"Abbiamo inviato un link di conferma a", email_sent_activate:"Cliccaci sopra per attivare il tuo account.",
+    err_email_taken:"Questa email ha già un account. Prova ad accedere.", err_email_bad:"Questo indirizzo email non sembra corretto.",
+    err_too_many:"Troppi tentativi. Aspetta qualche minuto e riprova.",
+    err_mail_failed:"Non siamo riusciti a inviare l'email di conferma. Dipende da noi, non da te.",
+    err_try_again:"Qualcosa è andato storto. Riprova.", write_support:"Scrivi a support@dafaspace.com",
     cancel:"Annulla", accept:"Accetta", copy:"Copia", share_invite:"Condividi invito",
     friend_wants:"vuole essere tuo amico", no_members:"Ancora nessun membro",
     no_lists:"Ancora nessuna lista. Creane una da condividere con gli amici.",
@@ -3615,6 +3676,34 @@ const _I18N_LB = {
   it:{ lb_import_btn:"↑ Importa da Letterboxd", lb_matching:"Abbinamento film…", lb_not_lb:"Non sembra un CSV di Letterboxd.", imdb_import_btn:"↑ Importa da IMDb", imdb_not_imdb:"Non sembra un CSV di IMDb.", imp_pick_imdb:"Scegli il .csv esportato da IMDb (Your Ratings o Watchlist).", imp_none_found:"Nessun film trovato in questo file.", imp_found:"Trovati {n} film. Abbinamento…", imp_saving:"Salvataggio di {n} film…", imp_added:"aggiunti", imp_updated:"aggiornati", imp_notfound:"non trovati", imp_nothing:"Niente importato", imp_failed:"Importazione non riuscita", share_link_btn:"Condividi il link del film", share_outside_lbl:"Non è su Cinemail?", share_outside_hint:"Invia un link che chiunque può aprire: il tuo messaggio viaggia con lui.", share_outside_btn:"Copia un link da inviare ovunque", surprise_need_title:"I consigli diventano personali a 5 film", picks_hint_early:"Ora Cinemail legge i tuoi generi, epoche e paesi. Verso i 15 film inizia a notare i tuoi registi e compositori preferiti: lì i consigli diventano personali. Ne hai {n}.", picks_hint_mid:"Quasi: verso i 15 film emergono registi e compositori ricorrenti e i consigli si affinano parecchio. Ne hai {n}.", surprise_need_sub:"{n} di {need} ✨ Segna qualche film come visto: più ne aggiungi, migliori sono i consigli.", sending:"Invio…", share_pick_friend:"Scegli almeno un amico", share_sent_to:"Inviato a", share_failed:"Invio non riuscito", share_link_copied:"Link copiato", imp_reading:"Lettura del file…", imp_where:"I film sono nelle tue liste Visti e Da vedere." },
 };
 Object.keys(_I18N_LB).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_LB[l]); });
+// The Android half is not a nicety. Tapping any imdb.com link hands off to the IMDb app, which
+// has no export, so the instruction "open imdb.com" fails silently for every Android user who
+// follows it the obvious way. Typing the address is what keeps them in the browser.
+const _I18N_IMDB_HINT = {
+  en:{ imdb_how:"How to export from IMDb", imdb_hint:"Export lives on the IMDb website - the app has no export.<br><b>iPhone:</b> open imdb.com in Safari, then aA → Request Desktop Website.<br><b>Android:</b> type imdb.com into Chrome's address bar. Do not tap a link - a link opens the IMDb app. If it still jumps to the app: Settings → Apps → IMDb → Open by default → turn off supported links.<br>Then sign in → Your Ratings → Export, and again for Your Watchlist. Both files appear at imdb.com/exports.<br><b>Two files, so import twice</b> - ratings first, then the watchlist." },
+  ru:{ imdb_how:"Как выгрузить из IMDb", imdb_hint:"Выгрузка есть только на сайте IMDb - в приложении её нет.<br><b>iPhone:</b> открой imdb.com в Safari, потом aA → «Полная версия сайта».<br><b>Android:</b> набери imdb.com в адресной строке Chrome. Не переходи по ссылке - ссылка откроет приложение IMDb. Если всё равно перекидывает: Настройки → Приложения → IMDb → «Открывать по умолчанию» → выключи открытие поддерживаемых ссылок.<br>Дальше войди → Your Ratings → Export, потом то же для Your Watchlist. Оба файла появятся на imdb.com/exports.<br><b>Файла два, поэтому импорт делается дважды</b> - сначала оценки, потом список к просмотру." },
+  uk:{ imdb_how:"Як вивантажити з IMDb", imdb_hint:"Вивантаження є лише на сайті IMDb - у застосунку його немає.<br><b>iPhone:</b> відкрий imdb.com у Safari, потім aA → «Повна версія сайту».<br><b>Android:</b> набери imdb.com в адресному рядку Chrome. Не переходь за посиланням - воно відкриє застосунок IMDb. Якщо все одно перекидає: Налаштування → Застосунки → IMDb → «Відкривати за умовчанням» → вимкни відкриття підтримуваних посилань.<br>Далі увійди → Your Ratings → Export, потім те саме для Your Watchlist. Обидва файли з'являться на imdb.com/exports.<br><b>Файли два, тому імпорт робиться двічі</b> - спершу оцінки, потім список до перегляду." },
+  ka:{ imdb_how:"როგორ გადმოვწეროთ IMDb-იდან", imdb_hint:"ექსპორტი მხოლოდ IMDb-ის საიტზეა - აპლიკაციაში ის არ არის.<br><b>iPhone:</b> გახსენი imdb.com Safari-ში, შემდეგ aA → Request Desktop Website.<br><b>Android:</b> აკრიფე imdb.com Chrome-ის მისამართის ველში. ბმულს არ დააჭირო - ბმული IMDb-ის აპლიკაციას გახსნის. თუ მაინც გადაგისვრის: პარამეტრები → აპები → IMDb → გახსნა ნაგულისხმევად → გამორთე მხარდაჭერილი ბმულები.<br>შემდეგ შედი → Your Ratings → Export, და იგივე Your Watchlist-ისთვის. ორივე ფაილი გამოჩნდება imdb.com/exports-ზე.<br><b>ფაილი ორია, ამიტომ იმპორტი ორჯერ კეთდება</b> - ჯერ შეფასებები, მერე სანახავი სია." },
+  es:{ imdb_how:"Cómo exportar desde IMDb", imdb_hint:"La exportación solo está en la web de IMDb - la app no la tiene.<br><b>iPhone:</b> abre imdb.com en Safari, luego aA → Solicitar sitio web para ordenador.<br><b>Android:</b> escribe imdb.com en la barra de direcciones de Chrome. No toques un enlace: un enlace abre la app de IMDb. Si aun así salta a la app: Ajustes → Aplicaciones → IMDb → Abrir de forma predeterminada → desactiva los enlaces admitidos.<br>Luego inicia sesión → Your Ratings → Export, y otra vez para Your Watchlist. Ambos archivos aparecen en imdb.com/exports.<br><b>Son dos archivos, así que importa dos veces</b>: primero las valoraciones, después la lista." },
+  fr:{ imdb_how:"Comment exporter depuis IMDb", imdb_hint:"L'export n'existe que sur le site IMDb - l'appli ne l'a pas.<br><b>iPhone :</b> ouvre imdb.com dans Safari, puis aA → Demander le site pour ordinateur.<br><b>Android :</b> tape imdb.com dans la barre d'adresse de Chrome. Ne clique pas sur un lien : un lien ouvre l'appli IMDb. Si ça bascule quand même : Paramètres → Applications → IMDb → Ouvrir par défaut → désactive les liens pris en charge.<br>Ensuite connecte-toi → Your Ratings → Export, puis pareil pour Your Watchlist. Les deux fichiers arrivent sur imdb.com/exports.<br><b>Deux fichiers, donc deux imports</b> : les notes d'abord, la liste ensuite." },
+  de:{ imdb_how:"So exportierst du aus IMDb", imdb_hint:"Den Export gibt es nur auf der IMDb-Website - die App hat ihn nicht.<br><b>iPhone:</b> öffne imdb.com in Safari, dann aA → Desktop-Website anfordern.<br><b>Android:</b> tippe imdb.com in die Adressleiste von Chrome. Klicke keinen Link an - ein Link öffnet die IMDb-App. Falls es trotzdem umspringt: Einstellungen → Apps → IMDb → Standardmäßig öffnen → unterstützte Links ausschalten.<br>Dann anmelden → Your Ratings → Export, und dasselbe für Your Watchlist. Beide Dateien liegen dann unter imdb.com/exports.<br><b>Zwei Dateien, also zweimal importieren</b> - erst die Bewertungen, dann die Watchlist." },
+  it:{ imdb_how:"Come esportare da IMDb", imdb_hint:"L'esportazione esiste solo sul sito IMDb - l'app non ce l'ha.<br><b>iPhone:</b> apri imdb.com in Safari, poi aA → Richiedi sito desktop.<br><b>Android:</b> digita imdb.com nella barra degli indirizzi di Chrome. Non toccare un link: un link apre l'app IMDb. Se salta comunque all'app: Impostazioni → App → IMDb → Apri per impostazione predefinita → disattiva i link supportati.<br>Poi accedi → Your Ratings → Export, e lo stesso per Your Watchlist. Entrambi i file compaiono su imdb.com/exports.<br><b>I file sono due, quindi importa due volte</b>: prima i voti, poi la watchlist." },
+};
+Object.keys(_I18N_IMDB_HINT).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_IMDB_HINT[l]); });
+// Added 7 Sep 2026 after a real 806-film import saved 36 rows and then reported "Import
+// failed" - which was true of the run and false about the data, and left the user with no
+// idea that running it again was safe. A count and one sentence fix both.
+const _I18N_IMP_FAIL = {
+  en:{ imp_failed_n:"could not be saved", imp_retry:"Run the same file again - what is already in will be updated, not duplicated.", imp_by_title:"Searching the rest by title…", imp_limit_day:"Today's lookup limit is used up, so the rest were not matched. Run the same file again tomorrow - everything imported so far is kept." },
+  ru:{ imp_failed_n:"не удалось сохранить", imp_retry:"Запусти тот же файл ещё раз - то, что уже загружено, обновится, а не задвоится.", imp_by_title:"Ищу остальные по названию…", imp_limit_day:"Дневной лимит поиска исчерпан, остальные фильмы не сопоставлены. Запусти тот же файл завтра - всё загруженное сохранится." },
+  uk:{ imp_failed_n:"не вдалося зберегти", imp_retry:"Запусти той самий файл ще раз - те, що вже завантажено, оновиться, а не задвоїться.", imp_by_title:"Шукаю решту за назвою…", imp_limit_day:"Денний ліміт пошуку вичерпано, решту не зіставлено. Запусти той самий файл завтра - усе завантажене збережеться." },
+  ka:{ imp_failed_n:"ვერ შეინახა", imp_retry:"გაუშვი იგივე ფაილი ხელახლა - რაც უკვე ჩაიტვირთა, განახლდება და არ გაორმაგდება.", imp_by_title:"დანარჩენს სათაურით ვეძებ…", imp_limit_day:"დღიური ძიების ლიმიტი ამოიწურა, დანარჩენი ვერ დაემთხვა. გაუშვი იგივე ფაილი ხვალ - ყველაფერი ჩატვირთული შენარჩუნდება." },
+  es:{ imp_failed_n:"no se pudieron guardar", imp_retry:"Vuelve a importar el mismo archivo: lo que ya está se actualiza, no se duplica.", imp_by_title:"Buscando el resto por título…", imp_limit_day:"Se agotó el límite diario de búsquedas, así que el resto no se emparejó. Vuelve a importar el mismo archivo mañana: lo ya importado se conserva." },
+  fr:{ imp_failed_n:"n'ont pas pu être enregistrés", imp_retry:"Relance le même fichier - ce qui est déjà là sera mis à jour, pas dupliqué.", imp_by_title:"Recherche du reste par titre…", imp_limit_day:"La limite de recherches du jour est atteinte, le reste n'a pas été identifié. Relance le même fichier demain - tout ce qui est importé est conservé." },
+  de:{ imp_failed_n:"konnten nicht gespeichert werden", imp_retry:"Importiere dieselbe Datei noch einmal - was schon da ist, wird aktualisiert, nicht doppelt angelegt.", imp_by_title:"Suche den Rest nach Titel…", imp_limit_day:"Das Tageslimit für Suchanfragen ist aufgebraucht, der Rest wurde nicht zugeordnet. Importiere dieselbe Datei morgen erneut - alles bisher Importierte bleibt erhalten." },
+  it:{ imp_failed_n:"non sono stati salvati", imp_retry:"Importa di nuovo lo stesso file: ciò che c'è già viene aggiornato, non duplicato.", imp_by_title:"Cerco il resto per titolo…", imp_limit_day:"Il limite giornaliero di ricerche è esaurito, quindi il resto non è stato abbinato. Reimporta lo stesso file domani: tutto ciò che è già importato resta." },
+};
+Object.keys(_I18N_IMP_FAIL).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_IMP_FAIL[l]); });
 // Onboarding inbox slide (Ludwig → Sinners, recommendation with a note)
 const _I18N_OB = {
   en:{ ob_inbox_sent:"sent you a film →", ob_inbox_note:"Great film overall - but the soundtrack is the real star. Highly recommend." },
@@ -4177,7 +4266,7 @@ async function doSignIn() {
   const btn = document.getElementById("signin-btn");
   const errEl = document.getElementById("signin-error");
   errEl.classList.remove("show");
-  if (!email || !password) { showSignInError("Please enter your email and password."); return; }
+  if (!email || !password) { showSignInError(t('err_signin_fields')); return; }
   btn.textContent = "…"; btn.disabled = true;
   try {
     const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
@@ -4192,7 +4281,7 @@ async function doSignIn() {
       el.innerHTML = `${t('err_bad_login')} <a onclick="_signinToSignup()" style="color:var(--primary);font-weight:700;cursor:pointer;text-decoration:underline">${t('signin_create_cta')}</a>`;
       el.classList.add("show");
     } else {
-      showSignInError(m);
+      showSignInError(_authErr(e));
     }
     btn.textContent = t('sign_in'); btn.disabled = false;
   }
@@ -4229,7 +4318,12 @@ async function doForgotPassword() {
     document.getElementById("check-email-msg").innerHTML =
       `${t('reset_email_sent')}<br><strong style="color:var(--text)">${email}</strong>`;
     showScreen("check-email");
-  } catch(e) { showForgotError(e.message); }
+  } catch(e) {
+    // Same mail path as signup, so it fails the same way and needs the same way out.
+    showForgotError(_authErr(e));
+    if (_authIsOurs(e)) document.getElementById("forgot-error").insertAdjacentHTML("beforeend",
+      `<br><a href="mailto:support@dafaspace.com?subject=Cinemail%20password%20reset" style="color:var(--accent-text);font-weight:700">${t('write_support')}</a>`);
+  }
   finally { btn.textContent = label; btn.disabled = false; }
 }
 
@@ -4251,7 +4345,7 @@ async function doResetPassword() {
     if (error) throw error;
     showToast(t('reset_done'));
     await onSignedIn(data.user); // recovery session is active → log them straight in
-  } catch(e) { showResetError(e.message); btn.textContent = label; btn.disabled = false; }
+  } catch(e) { showResetError(_authErr(e)); btn.textContent = label; btn.disabled = false; }
 }
 
 // Ask the server for a free name instead of pulling every profile down to compare them
@@ -4275,16 +4369,16 @@ async function doSignUp() {
   const btn = document.getElementById("signup-btn");
   const errEl = document.getElementById("signup-error");
   errEl.classList.remove("show");
-  if (!name) { showSignUpError("Please enter your name."); return; }
-  if (!email) { showSignUpError("Please enter your email."); return; }
-  if (password.length < 6) { showSignUpError("Password must be at least 6 characters."); return; }
+  if (!name) { showSignUpError(t('err_enter_name')); return; }
+  if (!email) { showSignUpError(t('err_enter_email')); return; }
+  if (password.length < 6) { showSignUpError(t('err_pass_short')); return; }
   btn.textContent = "…"; btn.disabled = true;
   try {
     const uniqueName = await findUniqueName(name);
     if (uniqueName !== name) {
       document.getElementById("signup-name").value = uniqueName;
-      showSignUpError(`"${name}" is taken — your name will be "${uniqueName}". Press Create Account again to confirm.`);
-      btn.textContent = "Create Account"; btn.disabled = false; return;
+      showSignUpError(t('err_name_taken').replace('{name}', name).replace('{suggested}', uniqueName));
+      btn.textContent = t('sign_up'); btn.disabled = false; return;
     }
     // Carry the inviter id into the account's server-side metadata so the friend
     // connection survives the email-confirmation hop (different browser/device).
@@ -4295,16 +4389,44 @@ async function doSignUp() {
     if (error) throw error;
     if (data.user) { try { await sbClient.from("profiles").upsert({ id: data.user.id, display_name: uniqueName }); } catch(e2) {} }
     document.getElementById("check-email-msg").innerHTML =
-      `We sent a confirmation link to<br><strong style="color:var(--text)">${email}</strong><br><br>Click it to activate your account.`;
+      `${t('email_sent_to')}<br><strong style="color:var(--text)">${email}</strong><br><br>${t('email_sent_activate')}`;
     showScreen("check-email");
   } catch(e) {
-    showSignUpError(e.message);
-    btn.textContent = "Create Account"; btn.disabled = false;
+    showSignUpError(_authErr(e), _authIsOurs(e));
+    btn.textContent = t('sign_up'); btn.disabled = false;
   }
 }
-function showSignUpError(msg) {
+
+// Supabase returns auth errors in English whatever the app's language is, so showing
+// e.message put an English sentence under Russian labels - which is exactly what a user
+// reported on 5 Sep 2026, alongside a button this same handler had overwritten with the
+// literal "Create Account". Map the ones a person can actually meet; log the rest.
+function _authErr(e) {
+  const m = String((e && e.message) || e || "");
+  if (/already registered|already been registered|user already exists/i.test(m)) return t('err_email_taken');
+  if (/invalid.*email|email.*invalid|unable to validate email/i.test(m))         return t('err_email_bad');
+  if (/rate limit|too many requests|for security purposes/i.test(m))             return t('err_too_many');
+  if (/error sending|confirmation email|smtp|mailer/i.test(m))                   return t('err_mail_failed');
+  if (/password.*at least|password should be/i.test(m))                          return t('err_pass_short');
+  console.warn("[auth]", m);
+  return t('err_try_again');
+}
+
+// True when the failure is ours rather than the user's. "Email taken" or a short password
+// they can fix themselves; a mail server that would not send leaves them on a dead end,
+// and until now that dead end carried no address to write to at all.
+function _authIsOurs(e) {
+  const m = String((e && e.message) || e || "");
+  if (/already registered|already been registered|user already exists|invalid.*email|email.*invalid|password.*at least|password should be/i.test(m)) return false;
+  return true;
+}
+
+function showSignUpError(msg, offerHelp) {
   const el = document.getElementById("signup-error");
-  el.textContent = msg; el.classList.add("show");
+  el.textContent = msg;
+  if (offerHelp) el.insertAdjacentHTML("beforeend",
+    `<br><a href="mailto:support@dafaspace.com?subject=Cinemail%20sign-up" style="color:var(--accent-text);font-weight:700">${t('write_support')}</a>`);
+  el.classList.add("show");
 }
 function showAuthError(msg) { showSignInError(msg); }
 
@@ -4766,7 +4888,9 @@ async function loadHistoryFromDB() {
   _cacheSaveHistory(mapped);
   return mapped;
 }
-async function saveEntryToDB(entry) {
+// Split out so the bulk importer can build the same row without going through a request
+// per film. It used to be inline here, which is why applyBackupData had no way to batch.
+function _watchlistPayload(entry) {
   const payload = {
     imdb_id: entry.tmdbID, title: entry.title, year: entry.year, poster: entry.poster,
     stars: entry.stars, comment: entry.comment, status: entry.status,
@@ -4780,7 +4904,10 @@ async function saveEntryToDB(entry) {
   };
   // Optional: preserve original add date on backup restore (otherwise Supabase defaults to NOW())
   if (entry.addedAt) payload.created_at = entry.addedAt;
-  await sbFetch("watchlist", { method: "POST", prefer: "return=representation", body: JSON.stringify(payload) });
+  return payload;
+}
+async function saveEntryToDB(entry) {
+  await sbFetch("watchlist", { method: "POST", prefer: "return=representation", body: JSON.stringify(_watchlistPayload(entry)) });
 }
 async function deleteEntryFromDB(id) { await sbFetch(`watchlist?id=eq.${id}`, { method: "DELETE" }); }
 async function updateEntryInDB(id, fields) {
@@ -9448,8 +9575,23 @@ async function getBackupData() {
 }
 
 // Core: merge-import enriched rows into Supabase (skip existing by tmdb_id+status)
-async function applyBackupData(rows) {
-  if (!currentUser || !rows.length) return { added: 0, updated: 0, skipped: 0 };
+// Import 806 films from IMDb and this used to send 806 separate POSTs, one after another,
+// and treat any single one of them failing as fatal. Measured on a real user's catalogue on
+// 7 Sep 2026: 36 rows landed out of 733 before one request came back "Failed to fetch" and
+// threw out of the whole import - and the app then reported failure, so he had no way to know
+// those 36 were saved or that re-running was safe.
+//
+// Three things changed and they are separate fixes, not one:
+//   1. INSERTS GO IN BATCHES of 100. 733 rows is 8 requests instead of 733, which is both
+//      faster and two orders of magnitude fewer chances to be interrupted.
+//   2. A FAILURE IS NEVER FATAL. A batch that fails is retried row by row, and a row that
+//      fails is counted and stepped over. The worst case of the new path equals the old
+//      path's normal case, which is what makes this safe to ship without being able to test
+//      the write end to end.
+//   3. IT REPORTS PROGRESS AND THE TRUTH. onProgress fires per batch, and `failed` comes
+//      back so the caller can say "512 added, 221 failed, press again" instead of "failed".
+async function applyBackupData(rows, onProgress) {
+  if (!currentUser || !rows.length) return { added: 0, updated: 0, skipped: 0, failed: 0 };
   const existing = await sbFetch("watchlist?select=id,imdb_id,status");
   // Map tmdb_id → existing row (prefer same-status match if multiple statuses exist for same film)
   const byKey = new Map();          // "imdb_id|status" → row
@@ -9458,32 +9600,18 @@ async function applyBackupData(rows) {
     byKey.set(`${r.imdb_id}|${r.status}`, r);
     if (!byImdb.has(r.imdb_id)) byImdb.set(r.imdb_id, r);
   });
-  let added = 0, updated = 0, skipped = 0;
+  let added = 0, updated = 0, skipped = 0, failed = 0;
+  // Sort first, write second. The old version decided and wrote in the same pass, which is
+  // what forced one request per film - you cannot batch a decision you have not made yet.
+  const toInsert = [], toUpdate = [];
   for (const r of rows) {
     if (!r.imdb_id || !r.title) { skipped++; continue; }
     // Match: same imdb_id+status first, else any row with that imdb_id (lets user change status via CSV)
     const match = byKey.get(`${r.imdb_id}|${r.status}`) || byImdb.get(r.imdb_id);
     if (match) {
-      // UPDATE the mutable fields with whatever's in the CSV. This is what makes the round-trip
-      // actually round-trip: edit in Excel, re-import, changes land.
-      const patch = {
-        stars:    parseFloat(r.stars) || 0,
-        comment:  r.comment || "",
-        status:   r.status || "watched",
-        runtime:  _parseRuntimeMin(r.runtime),
-      };
-      if (r.director)        patch.director        = r.director;
-      if (r.composer)        patch.composer        = r.composer;
-      if (r.cinematographer) patch.cinematographer = r.cinematographer;
-      if (r.actors)          patch.actors          = r.actors;
-      if (r.added_at)        patch.created_at      = r.added_at;
-      try { await updateEntryInDB(match.id, patch); updated++; }
-      catch(e) { skipped++; }
-      continue;
-    }
-    // INSERT new
-    try {
-      await saveEntryToDB({
+      toUpdate.push([match.id, r]);
+    } else {
+      toInsert.push({
         tmdbID: r.imdb_id, title: r.title, year: r.year,
         poster: r.poster || "",
         stars: parseFloat(r.stars) || 0,
@@ -9498,23 +9626,67 @@ async function applyBackupData(rows) {
         listId: r.list_id || null,    // preserve list membership (works for same-account restore)
         addedAt: r.added_at || null   // preserve original add date — true round-trip
       });
-    } catch(e) {
+    }
+  }
+  const total = toInsert.length + toUpdate.length;
+  let done = 0;
+  const tick = () => { done++; if (done % 10 === 0 || done === total) onProgress?.(done, total); };
+
+  // One row, with the list_id retry the old code had. Used as the fallback when a batch
+  // fails, so a single bad row costs one row rather than the hundred it travelled with.
+  const _insertOne = async (entry) => {
+    try { await saveEntryToDB(entry); return true; }
+    catch (e) {
       // FK violation: list no longer exists — retry without list_id
       if (e.message?.includes('foreign key') || e.message?.includes('violates')) {
-        await saveEntryToDB({
-          tmdbID: r.imdb_id, title: r.title, year: r.year,
-          poster: r.poster || "", stars: parseFloat(r.stars) || 0,
-          comment: r.comment || "", status: r.status || "watched",
-          mediaType: r.media_type || "movie",
-          director: r.director || "", composer: r.composer || "",
-          cinematographer: r.cinematographer || "", actors: r.actors || "", runtime: r.runtime || null,
-          addedAt: r.added_at || null
-        });
-      } else { throw e; }
+        try { await saveEntryToDB({ ...entry, listId: null }); return true; } catch (e2) { return false; }
+      }
+      return false;
     }
-    added++;
+  };
+
+  const CHUNK = 100;
+  for (let i = 0; i < toInsert.length && !ImportProgress.isCancelled(); i += CHUNK) {
+    const chunk = toInsert.slice(i, i + CHUNK);
+    try {
+      // return=minimal, not representation: the response for 100 rows is otherwise ~100x
+      // bigger than it needs to be, and every byte of it is another chance to be cut off.
+      await sbFetch("watchlist", { method: "POST", prefer: "return=minimal", body: JSON.stringify(chunk.map(_watchlistPayload)) });
+      added += chunk.length;
+      done += chunk.length; onProgress?.(done, total);
+    } catch (e) {
+      console.warn("[import] batch of", chunk.length, "failed, retrying one at a time:", e.message);
+      for (const entry of chunk) {
+        if (ImportProgress.isCancelled()) break;
+        if (await _insertOne(entry)) added++; else failed++;
+        tick();
+      }
+    }
   }
-  return { added, updated, skipped };
+
+  // Updates stay one at a time: each is a different row with different fields, so there is
+  // nothing to batch. They were already non-fatal before this change and stay that way.
+  for (const [id, r] of toUpdate) {
+    if (ImportProgress.isCancelled()) break;
+    // UPDATE the mutable fields with whatever's in the CSV. This is what makes the round-trip
+    // actually round-trip: edit in Excel, re-import, changes land.
+    const patch = {
+      stars:    parseFloat(r.stars) || 0,
+      comment:  r.comment || "",
+      status:   r.status || "watched",
+      runtime:  _parseRuntimeMin(r.runtime),
+    };
+    if (r.director)        patch.director        = r.director;
+    if (r.composer)        patch.composer        = r.composer;
+    if (r.cinematographer) patch.cinematographer = r.cinematographer;
+    if (r.actors)          patch.actors          = r.actors;
+    if (r.added_at)        patch.created_at      = r.added_at;
+    try { await updateEntryInDB(id, patch); updated++; }
+    catch(e) { failed++; }
+    tick();
+  }
+  onProgress?.(total, total);
+  return { added, updated, skipped, failed };
 }
 
 // Enrich rows with fresh data from TMDB (poster, canonical title/year)
@@ -9783,7 +9955,7 @@ async function backupImportCSV() {
 
     // Step 2: save to Supabase
     setLabel("Saving…");
-    const { added, updated, skipped } = await applyBackupData(enriched);
+    const { added, updated, skipped, failed } = await applyBackupData(enriched, (d, tot) => setLabel(`Saving ${d}/${tot}…`));
 
     watchHistory = await loadHistoryFromDB();
     renderHistory();
@@ -9792,6 +9964,7 @@ async function backupImportCSV() {
     const parts = [];
     if (added)   parts.push(`✓ ${added} new`);
     if (updated) parts.push(`↻ ${updated} updated`);
+    if (failed)  parts.push(`✕ ${failed} ${t("imp_failed_n")} - ${t("imp_retry")}`);
     if (skipped) parts.push(`${skipped} skipped`);
     showToast(parts.length ? parts.join(" · ") : "No valid rows found");
   } catch(e) {
@@ -9863,21 +10036,37 @@ async function _resolveViaTMDBSearch(rows, onProgress) {
     // showcase import Oppenheimer came back unresolved and was the first hit when searched
     // again a minute later - nothing was wrong with the title or the query, the proxy just
     // had a bad moment. One retry turns "the import lost a film" into a shrug.
-    for (let attempt = 0; attempt < 2; attempt++) {
-      try {
-        const yr = r.year ? `&year=${encodeURIComponent(r.year)}` : "";
-        const res = await tmdbFetch(`/search/movie?query=${encodeURIComponent(r.title)}${yr}&include_adult=false&language=${_tmdbLang()}`);
-        const hit = ((res && res.results) || [])[0];
-        if (hit) {
-          r.imdb_id = String(hit.id);
-          r.poster  = hit.poster_path ? TMDB_IMG + hit.poster_path : "";
-          r.title   = hit.title || r.title;
-          r.year    = (hit.release_date || "").slice(0, 4) || r.year;
+    // This asked /search/movie and nothing else, so a series that missed on its tt-id was
+    // lost outright - silently, since the row just came back unresolved. IMDb's export says
+    // what each row is ("Title Type"), the parser already carries it as media_type, and this
+    // was the one place that ignored it. Ask the right endpoint first; ask the other only if
+    // the first finds nothing, so a correctly-typed catalogue costs exactly what it did.
+    const order = r.media_type === 'tv' ? ['tv', 'movie'] : ['movie', 'tv'];
+    for (const kind of order) {
+      let hit = null;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          // TMDB spells the year filter differently per endpoint, and returns the title under
+          // a different key too - name/first_air_date for tv, title/release_date for movie.
+          const yr = r.year
+            ? (kind === 'tv' ? `&first_air_date_year=${encodeURIComponent(r.year)}` : `&year=${encodeURIComponent(r.year)}`)
+            : "";
+          const res = await tmdbFetch(`/search/${kind}?query=${encodeURIComponent(r.title)}${yr}&include_adult=false&language=${_tmdbLang()}`);
+          if (res && res.error === "limit_reached") { out.limitReached = res; return out; }
+          hit = ((res && res.results) || [])[0] || null;
+          break; // an answer, even an empty one, is a real answer - only errors get retried
+        } catch (e) {
+          if (attempt === 0) { await _delay(600); continue; }
+          /* leave unresolved; reported by title, not just counted */
         }
-        break; // an answer, even an empty one, is a real answer - only errors get retried
-      } catch (e) {
-        if (attempt === 0) { await _delay(600); continue; }
-        /* leave unresolved; reported by title, not just counted */
+      }
+      if (hit) {
+        r.imdb_id    = String(hit.id);
+        r.media_type = kind;
+        r.poster     = hit.poster_path ? TMDB_IMG + hit.poster_path : "";
+        r.title      = (kind === 'tv' ? hit.name : hit.title) || r.title;
+        r.year       = ((kind === 'tv' ? hit.first_air_date : hit.release_date) || "").slice(0, 4) || r.year;
+        break;
       }
     }
     out.push(r);
@@ -9912,13 +10101,14 @@ async function backupImportLetterboxd() {
       ? (missing.slice(0, 3).join(", ") + (missing.length > 3 ? ` +${missing.length - 3}` : ""))
       : "";
     setStatus(t('backup_restoring'));
-    const { added, updated } = await applyBackupData(ok);
+    const { added, updated, failed } = await applyBackupData(ok, (d, tot) => setStatus(`${t('backup_restoring')} ${d}/${tot}`));
     watchHistory = await loadHistoryFromDB();
     renderHistory();
     closeAccount();
     const parts = [];
     if (added)     parts.push(`✓ ${added} new`);
     if (updated)   parts.push(`↻ ${updated} updated`);
+    if (failed)    parts.push(`✕ ${failed} ${t("imp_failed_n")} - ${t("imp_retry")}`);
     if (unmatched) parts.push(`${t("imp_notfound")}: ${unmatched}`);
     showToast(parts.length ? parts.join(" · ") : t("imp_nothing"));
   } catch (e) {
@@ -9943,7 +10133,16 @@ function _parseIMDbRows(text, fileName) {
   if (!recs.length) return null;
   const keys = Object.keys(recs[0]);
   if (!keys.includes('Const') || !keys.includes('Title')) return null; // not an IMDb export
-  const isWatchlist = /watchlist/i.test(fileName || "");
+  // Read the file, do not guess from its name. This used to be /watchlist/i on the filename,
+  // and measured against a real 806-row export saved as "imdb.csv" it marked every single film
+  // as watched - 783 of which the person had not seen. A downloaded file gets renamed all the
+  // time; its columns do not change.
+  //
+  // IMDb ships two shapes. A LIST or watchlist export carries Position/Created/Modified/URL
+  // per row; a ratings export carries none of them and is watched by definition. So a rating
+  // means watched either way, and an unrated row means "to watch" only in a list.
+  const isListExport = keys.includes('Position') && keys.includes('Created');
+  const isWatchlist = isListExport || /watchlist/i.test(fileName || "");
   const TYPE_MAP = { movie:'movie', short:'movie', tvmovie:'movie', video:'movie',
                      tvseries:'tv', tvminiseries:'tv', tvspecial:'tv' };
   return recs.map(r => {
@@ -9965,17 +10164,61 @@ function _parseIMDbRows(text, fileName) {
   }).filter(r => r && r.title && r.imdbConst);
 }
 
+// An IMDb tt-id maps to the same TMDB entry for everyone, forever, so asking twice is pure
+// waste - and until this existed the waste was fatal rather than merely slow. A catalogue
+// larger than the daily lookup allowance could never finish: the next run started at row one
+// again, spent the whole new allowance re-resolving films already imported, and stopped at
+// exactly the same place. "Try again tomorrow" was advice that could not work.
+//
+// With the cache a re-run costs nothing for anything already seen, so the second attempt
+// starts spending its allowance where the first one stopped. It also makes an ordinary retry
+// after a dropped connection close to instant.
+const _IMP_CACHE_KEY = 'cm_ttmap_v1';
+const _IMP_CACHE_MAX = 12000;   // IMDb caps a single list at 10,000; leave room for two files
+function _impCacheLoad() {
+  try { const v = JSON.parse(localStorage.getItem(_IMP_CACHE_KEY) || '{}'); return (v && typeof v === 'object') ? v : {}; }
+  catch (e) { return {}; }
+}
+function _impCacheSave(map) {
+  try {
+    const keys = Object.keys(map);
+    // Oldest-first is not knowable here and not worth a timestamp per row; if it ever grows
+    // past the cap, keep the newest half rather than letting a quota error kill the import.
+    if (keys.length > _IMP_CACHE_MAX) {
+      const keep = keys.slice(-Math.floor(_IMP_CACHE_MAX / 2));
+      map = Object.fromEntries(keep.map(k => [k, map[k]]));
+    }
+    localStorage.setItem(_IMP_CACHE_KEY, JSON.stringify(map));
+  } catch (e) { /* a full quota must never be the reason an import fails */ }
+}
+
 // Resolve rows carrying an IMDb tt-id to TMDB — exact via /find, then title+year fallback.
 async function _resolveViaIMDbId(rows, onProgress) {
   const out = [];
+  const cache = _impCacheLoad();
+  let cacheDirty = false;
   const _delay = ms => new Promise(r => setTimeout(r, ms));
   for (let i = 0; i < rows.length; i++) {
     if (ImportProgress.isCancelled()) break; // user bailed out — stop hitting TMDB
     onProgress?.(i + 1, rows.length);
     if (i > 0 && i % 20 === 0) await _delay(500); // be gentle with TMDB
     const r = { ...rows[i] };
+    // Seen before: no request, no pause, no allowance spent.
+    const c = cache[r.imdbConst];
+    if (c) {
+      r.imdb_id = c.i; r.media_type = c.k; r.poster = c.p || "";
+      r.title = c.t || r.title; r.year = c.y || r.year;
+      out.push(r);
+      continue;
+    }
     try {
       const res = await tmdbFetch(`/find/${encodeURIComponent(r.imdbConst)}?external_source=imdb_id&language=${_tmdbLang()}`);
+      // tmdbFetch returns res.json() without looking at the status, so the worker's daily
+      // rate-limit refusal arrives as an ordinary object with no results in it - which every
+      // caller here reads as "no such film". An import past the cap would have reported
+      // hundreds of titles as not found and given no hint why. Stop instead, keep what is
+      // already resolved, and let the caller say what actually happened.
+      if (res && res.error === "limit_reached") { out.limitReached = res; break; }
       const tv = (res && res.tv_results) || [], mv = (res && res.movie_results) || [];
       let hit = r.media_type === 'tv' ? tv[0] : mv[0];
       let isTV = r.media_type === 'tv' && !!hit;
@@ -9986,16 +10229,35 @@ async function _resolveViaIMDbId(rows, onProgress) {
         r.poster = hit.poster_path ? TMDB_IMG + hit.poster_path : "";
         r.title  = (isTV ? hit.name : hit.title) || r.title;
         r.year   = ((isTV ? hit.first_air_date : hit.release_date) || "").slice(0, 4) || r.year;
+        cache[r.imdbConst] = { i: r.imdb_id, k: r.media_type, p: r.poster, t: r.title, y: r.year };
+        cacheDirty = true;
       }
     } catch (e) { /* leave unresolved; fallback below */ }
     out.push(r);
   }
+  // Written once at the end, not per film: 800 localStorage writes during an import is 800
+  // synchronous JSON serialisations of the whole map on the main thread.
+  if (cacheDirty) _impCacheSave(cache);
   // Rare misses (tt-id not in TMDB): try the title+year search resolver as a fallback.
+  // This pass used to be handed `null` for progress, so the bar sat frozen at "806/806" for
+  // however long it took - minutes, on a big catalogue, looking exactly like a hang. Report
+  // it as its own stage instead: it is a different question being asked, so say so.
   const missing = out.filter(r => !r.imdb_id);
   if (missing.length) {
-    const fixed = await _resolveViaTMDBSearch(missing, null);
+    const fixed = await _resolveViaTMDBSearch(missing, (d, tot) => onProgress?.(rows.length, rows.length, `${d}/${tot}`));
     const byConst = new Map(fixed.map(r => [r.imdbConst, r]));
-    return out.map(r => r.imdb_id ? r : (byConst.get(r.imdbConst) || r));
+    const merged = out.map(r => r.imdb_id ? r : (byConst.get(r.imdbConst) || r));
+    // The title search is the expensive half - two endpoints and a retry each - so its
+    // answers are exactly the ones worth never asking for twice.
+    let d2 = false;
+    merged.forEach(r => { if (r.imdb_id && r.imdbConst && !cache[r.imdbConst]) {
+      cache[r.imdbConst] = { i: r.imdb_id, k: r.media_type, p: r.poster, t: r.title, y: r.year }; d2 = true;
+    }});
+    if (d2) _impCacheSave(cache);
+    // .map() builds a fresh array, so the marker has to be carried over by hand or the caller
+    // never learns why the run stopped short.
+    merged.limitReached = out.limitReached || fixed.limitReached;
+    return merged;
   }
   return out;
 }
@@ -10090,7 +10352,8 @@ async function backupImportIMDb() {
       return;
     }
     ImportProgress.update(t("imp_found").replace("{n}", rows.length), 0, rows.length);
-    const resolved = await _resolveViaIMDbId(rows, (d, tot) => ImportProgress.update(`${t("lb_matching")} ${d}/${tot}`, d, tot));
+    const resolved = await _resolveViaIMDbId(rows, (d, tot, byTitle) => ImportProgress.update(
+      byTitle ? `${t("imp_by_title")} ${byTitle}` : `${t("lb_matching")} ${d}/${tot}`, d, tot));
     const ok = resolved.filter(r => r.imdb_id && r.title);
     // Name them. "1 not found" tells the user something is missing but not WHAT, so there
     // is no way to add it back by hand - the one thing they could actually do about it.
@@ -10098,14 +10361,21 @@ async function backupImportIMDb() {
     const unmatched = missing.length
       ? (missing.slice(0, 3).join(", ") + (missing.length > 3 ? ` +${missing.length - 3}` : ""))
       : "";
-    ImportProgress.update(t("imp_saving").replace("{n}", ok.length));
-    const { added, updated } = await applyBackupData(ok);
+    ImportProgress.update(t("imp_saving").replace("{n}", ok.length), 0, ok.length);
+    const { added, updated, failed } = await applyBackupData(ok,
+      (d, tot) => ImportProgress.update(`${t("imp_saving").replace("{n}", tot)} ${d}/${tot}`, d, tot));
     watchHistory = await loadHistoryFromDB();
     renderHistory();
     const parts = [];
     if (added)     parts.push(`✓ <b>${added}</b> ${escapeHtml(t("imp_added"))}`);
     if (updated)   parts.push(`↻ <b>${updated}</b> ${escapeHtml(t("imp_updated"))}`);
-    if (unmatched) parts.push(`<span style="color:var(--muted)">${escapeHtml(t("imp_notfound"))}: ${escapeHtml(unmatched)}</span>`);
+    // Say it, and say what to do about it. A row that did not save is not lost work - running
+    // the same file again matches on imdb_id, so it updates what is there and adds the rest.
+    if (failed)    parts.push(`<span style="color:#f87171">✕ <b>${failed}</b> ${escapeHtml(t("imp_failed_n"))}</span><br><span style="color:var(--muted)">${escapeHtml(t("imp_retry"))}</span>`);
+    // A catalogue bigger than the daily allowance is a normal thing to own - IMDb lets a
+    // single list hold 10,000 - so this is a "come back tomorrow", not a failure.
+    if (resolved.limitReached) parts.push(`<span style="color:var(--accent)">${escapeHtml(t("imp_limit_day"))}</span>`);
+    else if (unmatched) parts.push(`<span style="color:var(--muted)">${escapeHtml(t("imp_notfound"))}: ${escapeHtml(unmatched)}</span>`);
     ImportProgress.finish(parts.length
       ? parts.join('<br>') + `<br><br><span style="color:var(--muted)">${escapeHtml(t("imp_where"))}</span>`
       : escapeHtml(t("imp_nothing")));
@@ -10558,7 +10828,7 @@ async function backupImportXLSX() {
     setLabel(`${t('backup_restoring')} 1/${rows.length}`);
     const enriched = await _enrichFromTMDB(rows, (done, total) => setLabel(`${t('backup_restoring')} ${done}/${total}`));
     setLabel(t('backup_saving'));
-    const { added, updated, skipped } = await applyBackupData(enriched);
+    const { added, updated, skipped, failed } = await applyBackupData(enriched, (d, tot) => setLabel(`${t('backup_saving')} ${d}/${tot}`));
     await loadListsCache();
     watchHistory = await loadHistoryFromDB();
     renderHistory();
@@ -10566,6 +10836,7 @@ async function backupImportXLSX() {
     const parts = [];
     if (added)        parts.push(`✓ ${added} new`);
     if (updated)      parts.push(`↻ ${updated} updated`);
+    if (failed)       parts.push(`✕ ${failed} ${t("imp_failed_n")} - ${t("imp_retry")}`);
     if (skipped)      parts.push(`${skipped} unchanged`);
     if (listsCreated) parts.push(`+${listsCreated} lists`);
     showToast(parts.join(" · ") || "Nothing changed");
