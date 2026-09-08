@@ -2859,7 +2859,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.15</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.16</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -9638,7 +9638,22 @@ async function getBackupData() {
 //      the write end to end.
 //   3. IT REPORTS PROGRESS AND THE TRUTH. onProgress fires per batch, and `failed` comes
 //      back so the caller can say "512 added, 221 failed, press again" instead of "failed".
-async function applyBackupData(rows, onProgress) {
+// `opts.preserveLocal` decides what an UPDATE means, and the two answers are both right for
+// different callers.
+//
+// Restoring your own XLSX backup should overwrite: you edited the spreadsheet in order to
+// change something, and clearing a note there has to clear it here or the round trip is a lie.
+//
+// Importing from IMDb or Letterboxd must NOT. Those files carry no review text at all - the
+// parser sets comment:'' on every row because IMDb does not export one - and the patch wrote it
+// unconditionally, so re-importing to pick up new films silently wiped every note written in
+// Cinemail and zeroed the rating of anything the person had not also rated on IMDb. Found
+// 8 Sep 2026 when a user asked the obvious question: how do I keep this up to date?
+//
+// With preserveLocal, an incoming blank leaves the local value alone. Status still moves,
+// because "I have now watched it" is exactly what a re-import is for.
+async function applyBackupData(rows, onProgress, opts = {}) {
+  const preserveLocal = opts.preserveLocal === true;
   if (!currentUser || !rows.length) return { added: 0, updated: 0, skipped: 0, failed: 0 };
   const existing = await sbFetch("watchlist?select=id,imdb_id,status");
   // Map tmdb_id → existing row (prefer same-status match if multiple statuses exist for same film)
@@ -9718,12 +9733,12 @@ async function applyBackupData(rows, onProgress) {
     if (ImportProgress.isCancelled()) break;
     // UPDATE the mutable fields with whatever's in the CSV. This is what makes the round-trip
     // actually round-trip: edit in Excel, re-import, changes land.
-    const patch = {
-      stars:    parseFloat(r.stars) || 0,
-      comment:  r.comment || "",
-      status:   r.status || "watched",
-      runtime:  _parseRuntimeMin(r.runtime),
-    };
+    const inStars = parseFloat(r.stars) || 0;
+    const patch = { status: r.status || "watched" };
+    if (!preserveLocal || inStars > 0)  patch.stars   = inStars;
+    if (!preserveLocal || r.comment)    patch.comment = r.comment || "";
+    const inRuntime = _parseRuntimeMin(r.runtime);
+    if (!preserveLocal || inRuntime)    patch.runtime = inRuntime;
     if (r.director)        patch.director        = r.director;
     if (r.composer)        patch.composer        = r.composer;
     if (r.cinematographer) patch.cinematographer = r.cinematographer;
@@ -10157,7 +10172,7 @@ async function backupImportLetterboxd() {
       ? (missing.slice(0, 3).join(", ") + (missing.length > 3 ? ` +${missing.length - 3}` : ""))
       : "";
     setStatus(t('backup_restoring'));
-    const { added, updated, failed } = await applyBackupData(ok, (d, tot) => setStatus(`${t('backup_restoring')} ${d}/${tot}`));
+    const { added, updated, failed } = await applyBackupData(ok, (d, tot) => setStatus(`${t('backup_restoring')} ${d}/${tot}`), { preserveLocal: true });
     watchHistory = await loadHistoryFromDB();
     renderHistory();
     closeAccount();
@@ -10440,7 +10455,9 @@ async function backupImportIMDb() {
       : "";
     ImportProgress.update(t("imp_saving").replace("{n}", ok.length), 0, ok.length);
     const { added, updated, failed } = await applyBackupData(ok,
-      (d, tot) => ImportProgress.update(`${t("imp_saving").replace("{n}", tot)} ${d}/${tot}`, d, tot));
+      (d, tot) => ImportProgress.update(`${t("imp_saving").replace("{n}", tot)} ${d}/${tot}`, d, tot),
+      // A foreign catalogue must never blank what the person wrote here.
+      { preserveLocal: true });
     watchHistory = await loadHistoryFromDB();
     renderHistory();
     const parts = [];
