@@ -2859,7 +2859,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.16</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.17</span></div>
       </div>
 
       <div style="display:flex;gap:9px">
@@ -10611,6 +10611,15 @@ async function _renderBannerPNG(subtitle) {
     canvas.width = W * scale; canvas.height = H * scale;
     const ctx = canvas.getContext('2d');
     ctx.scale(scale, scale);
+    // Paint the ground into the image instead of leaving it transparent over a cell fill.
+    // A viewer in dark mode remaps FILLS so a document stays readable - Google Sheets on
+    // Android renders our #0E081C band as near-white - but it does not touch the pixels of an
+    // embedded picture. The envelope in logo.png is near-white paper whose only outline is the
+    // background showing through, so on that inverted band it dissolved into its own shading
+    // and left the reel floating. Baking the ground makes the banner look the same everywhere,
+    // because there is nothing left for a viewer to reinterpret.
+    ctx.fillStyle = '#0E081C';
+    ctx.fillRect(0, 0, W, H);
     try { await document.fonts.load('700 46px "Bebas Neue"'); await document.fonts.ready; } catch(e) {}
     let logoImg = null, lbox = null;
     try {
