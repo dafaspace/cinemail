@@ -2059,13 +2059,13 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <div class="ob-body" data-i18n="ob0_body" style="margin-bottom:28px">Films. Music. Friends.</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:240px">
         <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
-        <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
-        <button class="lang-btn" data-lang="uk" onclick="setLang('uk')">UA</button>
-        <button class="lang-btn" data-lang="ka" onclick="setLang('ka')">KA</button>
         <button class="lang-btn" data-lang="es" onclick="setLang('es')">ES</button>
         <button class="lang-btn" data-lang="fr" onclick="setLang('fr')">FR</button>
+        <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
         <button class="lang-btn" data-lang="de" onclick="setLang('de')">DE</button>
         <button class="lang-btn" data-lang="it" onclick="setLang('it')">IT</button>
+        <button class="lang-btn" data-lang="uk" onclick="setLang('uk')">UA</button>
+        <button class="lang-btn" data-lang="ka" onclick="setLang('ka')">KA</button>
       </div>
     </div>
 
@@ -2716,7 +2716,14 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 
 <!-- Account Modal -->
 <div id="account-overlay" class="overlay" style="display:none;align-items:flex-start;overflow-y:auto;padding-top:env(safe-area-inset-top)" onclick="closeAccount()">
-  <div style="padding:20px;width:100%;display:flex;justify-content:center;min-height:100%" onclick="event.stopPropagation()">
+  <!-- This carried event.stopPropagation() and covers the whole overlay (width:100%,
+       min-height:100%), so every tap on the "outside" landed on it and was swallowed. The
+       overlay's own onclick="closeAccount()" could never fire, and tapping away from the
+       sheet did nothing at all - which is worse than not offering the gesture, because a
+       person tries it, gets no response, and then hunts for a button.
+       The stop belongs on the sheet, which already has its own, so removing it here lets a
+       tap on the surrounding space bubble up and close, while a tap inside still does not. -->
+  <div style="padding:20px;width:100%;display:flex;justify-content:center;min-height:100%">
     <div class="modal-sheet" style="max-width:360px;width:100%;max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 40px);overflow-y:auto;-webkit-overflow-scrolling:touch;align-self:flex-start;position:relative" id="account-modal-sheet" onclick="event.stopPropagation()">
       <button onclick="closeAccount()" aria-label="Close" style="position:absolute;top:12px;right:12px;z-index:5;width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--muted);font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--accent-border)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">×</button>
       <div style="text-align:center;padding:8px 0 20px">
@@ -2797,13 +2804,13 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <div class="add-label" data-i18n="lang_label" style="margin-top:4px">Language</div>
       <div class="lang-toggle" style="margin-bottom:20px;flex-wrap:wrap">
         <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
-        <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
-        <button class="lang-btn" data-lang="uk" onclick="setLang('uk')">UA</button>
-        <button class="lang-btn" data-lang="ka" onclick="setLang('ka')">KA</button>
         <button class="lang-btn" data-lang="es" onclick="setLang('es')">ES</button>
         <button class="lang-btn" data-lang="fr" onclick="setLang('fr')">FR</button>
+        <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
         <button class="lang-btn" data-lang="de" onclick="setLang('de')">DE</button>
         <button class="lang-btn" data-lang="it" onclick="setLang('it')">IT</button>
+        <button class="lang-btn" data-lang="uk" onclick="setLang('uk')">UA</button>
+        <button class="lang-btn" data-lang="ka" onclick="setLang('ka')">KA</button>
       </div>
 
       <button onclick="replayOnboarding()" style="width:100%;padding:9px;border-radius:9px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;margin-bottom:14px;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:7px" onmouseover="this.style.borderColor='var(--accent-border)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"><span data-ic="film" data-ic-size="14"></span><span data-i18n="replay_onboarding">Replay Welcome Tour</span></button>
@@ -2836,6 +2843,17 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       </div>
       <!-- SUPPORT-BLOCK-END -->
 
+      <!-- No box around it. A bordered "danger zone" containing a bordered button is two
+           frames doing one job, and it shouted: the loudest thing in the sheet was the
+           action a person should almost never take. The separation that matters is
+           POSITIONAL and already there - this sits at the end of the settings, with the
+           About plate between it and the two working buttons at the bottom.
+           So: the same shape and size as Close and Sign Out, differing only in colour,
+           which is the one signal worth spending here. -->
+      <div id="acc-delete-row" style="margin:22px 0 18px">
+        <button class="btn-modal-close" onclick="confirmDeleteAccount()" style="width:100%;color:#f87171;border-color:rgba(248,113,113,0.3);background:none" data-i18n="delete_account">Delete account</button>
+      </div>
+
       <!-- About / Attribution -->
       <div style="margin-top:8px;margin-bottom:18px;padding:12px 14px;background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:10px;font-size:11px;line-height:1.6;color:var(--muted)">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
@@ -2859,16 +2877,35 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.17</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.19</span></div>
       </div>
 
-      <div style="display:flex;gap:9px">
-        <button class="btn-modal-close" data-i18n="close" onclick="closeAccount()">Close</button>
-        <button class="btn-modal-close" id="acc-signout-btn" data-i18n="sign_out" onclick="closeAccount();signOut();" style="color:#f87171;border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.05)">Sign Out</button>
-      </div>
-      <div style="margin-top:24px;text-align:center" id="acc-delete-row">
-        <button onclick="confirmDeleteAccount()" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;font-family:'DM Sans','Noto Sans Georgian',sans-serif" data-i18n="delete_account">Delete account</button>
-      </div>
+      <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
+           Three actions of completely different cost within one thumb's reach, and the
+           order was upside down.
+
+           Close is pressed hundreds of times for every Sign Out, and it sat on the LEFT,
+           narrower, while the red one took the right-hand slot - the easiest reach for a
+           right thumb and the position the eye reads as primary. Someone scrolling down to
+           get back to Search met "sign me out" exactly where "close this" should have been.
+           Delete account then sat directly beneath, a centimetre from the most-pressed
+           control in the sheet.
+
+           Rebuilt on the three conventions that already exist for this:
+           - frequency decides position, not importance, so Close is full width at the
+             bottom where the thumb rests;
+           - a destructive action is moved away rather than merely coloured (Apple's HIG,
+             and the reason an iOS action sheet detaches Cancel into its own group);
+           - deletion lives in its own bounded region with space around it - the danger
+             zone pattern - which keeps it findable for 5.1.1(v) while making it
+             impossible to hit by accident. -->
+      <!-- Sign Out is no longer red. Red is the app's word for irreversible, and signing
+           out is not: you sign back in. Spending the alarm colour on it left the genuinely
+           irreversible control competing with a routine one, and pulled the eye to the
+           wrong button of the two at the bottom. It is muted now, and 18px clear of Close
+           rather than 9, because the button under it is the one people are reaching for. -->
+      <button class="btn-modal-close" id="acc-signout-btn" data-i18n="sign_out" onclick="closeAccount();signOut();" style="width:100%;margin-bottom:18px;color:var(--muted);border-color:var(--border);background:none">Sign Out</button>
+      <button class="btn-modal-close" data-i18n="close" onclick="closeAccount()" style="width:100%">Close</button>
     </div>
   </div>
 </div>
@@ -3934,32 +3971,18 @@ async function doGuestConvert() {
   }
 }
 
-// ── Pro tier gate (single source of truth) ───────────────────────────────────
-// Everything is unlocked right now (free launch). When Pro launches after the
-// work permit, flip PRO_GATING_ON to true and make isPro() check the real
-// subscription. Existing users are grandfathered (early-supporter promise).
+// ── The Pro tier scaffolding lived here and has been removed ─────────────────
+// PRO_GATING_ON, PRO_FEATURES, isPro() and _requirePro() sat here with the master
+// switch off and, measured 10 Sep 2026, ZERO callers anywhere in the file. Dead code
+// in any app; in one being submitted to the App Store it is worse than dead, because
+// the string "A Cinemail Pro feature" shipped inside a bundle whose listing says the
+// app is free. Guideline 3.1.1 is about paid mechanics being declared, and a reviewer
+// who greps the bundle finds a paid tier the listing never mentions.
 //
-// Changing WHICH features are Pro later is cheap: edit PRO_FEATURES and add/remove
-// a one-line `if (!_requirePro('key')) return;` guard at the feature's entry point.
-// No rearchitecting required.
-const PRO_GATING_ON = false; // master switch — keep false until the paid launch
-const PRO_FEATURES = {
-  extraLists:     true, // creating custom lists beyond personal + Watched
-  cinemaStats:    true, // top directors / composers / cinematographers / actors
-  unlimitedPicks: true, // remove the daily personal-picks cap
-};
-function isPro() {
-  if (!PRO_GATING_ON) return true;                                   // free-for-all until launch
-  if (localStorage.getItem('__cm_force_free') === '1') return false; // dev: simulate a free user
-  // TODO at launch: return (active Pro subscription) || (grandfathered early user)
-  return false;
-}
-// Gate helper: returns true if allowed; otherwise shows an upsell and returns false.
-function _requirePro(feature) {
-  if (isPro()) return true;
-  showToast(t('pro_locked') || 'A Cinemail Pro feature');
-  return false;
-}
+// Nothing is lost by deleting it. It gated nothing, so removing it changes no
+// behaviour, and the design it encoded - one boolean, one feature map, one guard
+// helper - is twenty lines to write again on the day Pro is real. Writing it early
+// bought nothing and cost a question at review.
 
 // Instruction appended to recommendation prompts: localise the "why" text to the
 // current UI language, informal & warm, no em dashes / emoji, keep titles original.
@@ -4387,6 +4410,32 @@ async function doSignUp() {
     if (_pendingInvite) _signUpData.invited_by = _pendingInvite;
     const { data, error } = await sbClient.auth.signUp({ email, password, options: { data: _signUpData } });
     if (error) throw error;
+    // Signing up with an address that ALREADY has an account is not an error here, and
+    // that is the whole problem. Supabase has email-enumeration protection on, so it
+    // answers HTTP 200 with a fabricated user - a random id, and created_at and
+    // confirmation_sent_at both stamped with the current time - and sends no mail at
+    // all. Measured against the live project on 10 Sep 2026, not inferred: the only
+    // thing that gives it away is `identities`, which comes back empty.
+    //
+    // Until this check existed the app said "we sent you a confirmation link", nothing
+    // ever arrived, and the person concluded Cinemail was broken. Reported on
+    // 10 Sep 2026 by someone who had simply forgotten they were already registered.
+    //
+    // The fabricated id is also why the upsert below is now guarded: writing a profile
+    // row keyed to an id that belongs to nobody is not a good outcome even when RLS
+    // rejects it.
+    if (data && data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      const si = document.getElementById("signin-email");   // so Sign In is one tap, not retyping
+      if (si) si.value = email;
+      const fe = document.getElementById("forgot-email");
+      if (fe) fe.value = email;
+      showSignUpError(t('err_email_taken'));
+      document.getElementById("signup-error").insertAdjacentHTML("beforeend",
+        `<br><a onclick="showScreen('signin')" style="color:var(--accent-text);font-weight:700;cursor:pointer">${t('sign_in')}</a>`
+        + `<span style="opacity:.5"> · </span>`
+        + `<a onclick="showScreen('forgot')" style="color:var(--accent-text);font-weight:700;cursor:pointer">${t('forgot_link')}</a>`);
+      btn.textContent = t('sign_up'); btn.disabled = false; return;
+    }
     if (data.user) { try { await sbClient.from("profiles").upsert({ id: data.user.id, display_name: uniqueName }); } catch(e2) {} }
     document.getElementById("check-email-msg").innerHTML =
       `${t('email_sent_to')}<br><strong style="color:var(--text)">${email}</strong><br><br>${t('email_sent_activate')}`;
@@ -5554,7 +5603,7 @@ function clickableNames(str, closeModal) {
     const safe = escapeJsAttr(name.trim());
     // Use back-nav-friendly transition when called from inside detail modal
     const handler = closeModal ? `_transitionToPerson('${safe}')` : `openPerson('${safe}')`;
-    return `<span onclick="${handler}" style="cursor:pointer;color:#ddd;border-bottom:1px dotted rgba(255,255,255,0.2);transition:color .15s;white-space:nowrap" onmouseover="this.style.color='var(--primary)';this.style.borderBottomColor='var(--primary)'" onmouseout="this.style.color='#ddd';this.style.borderBottomColor='rgba(255,255,255,0.2)'">${name.trim()}</span>`;
+    return `<span onclick="${handler}" style="cursor:pointer;color:#ddd;border-bottom:1px dotted rgba(255,255,255,0.2);transition:color .15s;white-space:nowrap" onmouseover="this.style.color='var(--primary)';this.style.borderBottomColor='var(--primary)'" onmouseout="this.style.color='#ddd';this.style.borderBottomColor='rgba(255,255,255,0.2)'">${escapeHtml(name.trim())}</span>`;
   }).join('<span style="color:var(--muted)">, </span>');
 }
 
@@ -5647,7 +5696,7 @@ async function openDetail(id, type) {
   try {
     const d = await tmdbDetail(id, type || "movie");
     const status = getEntryStatus(id);
-    const chips = d.Genre.split(", ").filter(Boolean).map(g => `<span class="chip">${g}</span>`).join("");
+    const chips = d.Genre.split(", ").filter(Boolean).map(g => `<span class="chip">${escapeHtml(g)}</span>`).join("");
     const crew = [
       d.Director        ? `<div class="crew-label">${icon('film',13)} Director</div><div class="crew-val">${clickableNames(d.Director, true)}</div>` : "",
       d.Cinematographer ? `<div class="crew-label">${icon('camera',13)} Cinematography</div><div class="crew-val">${clickableNames(d.Cinematographer, true)}</div>` : "",
@@ -6220,9 +6269,9 @@ async function openPerson(name, personId) {
             <div onclick="_transitionToDetail('${escapeJsAttr(m.tmdbID)}','${escapeJsAttr(m.type)}')" style="display:flex;gap:11px;flex:1;min-width:0;cursor:pointer">
               ${posterHTML(m.Poster, m.Title, 56, 80, true)}
               <div class="card-body">
-                <div class="card-title">${m.Title}</div>
+                <div class="card-title">${escapeHtml(m.Title || "")}</div>
                 <div class="card-meta">${m.Year}${m.Rating ? ` · ★ ${m.Rating}` : ""}${m.type === "tv" ? " · TV" : ""}</div>
-                ${role ? `<div style="color:var(--muted);font-size:11px;margin-top:2px;font-style:italic">${role}</div>` : ""}
+                ${role ? `<div style="color:var(--muted);font-size:11px;margin-top:2px;font-style:italic">${escapeHtml(role)}</div>` : ""}
               </div>
             </div>
             <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;margin-left:6px;align-items:stretch">${actionBtns}${shareBtn}</div>
