@@ -2543,7 +2543,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   <!-- ── TAB: Search ──────────────────────────────────────────────────── -->
   <div id="tab-search" class="tab-panel active">
     <div class="search-row">
-      <input id="search-input" type="text" data-i18n-ph="search_ph" placeholder="Movie or series title…" data-i18n-ph="ph_search_title"
+      <input id="search-input" type="text" data-i18n-ph="search_ph" placeholder="Movie or series title…"
         onkeydown="if(event.key==='Enter')doSearch()">
       <button class="btn btn-primary btn-sm" style="width:auto;min-width:104px" onclick="doSearch()" data-i18n="search_btn">Search</button>
     </div>
@@ -2559,7 +2559,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   <!-- ── TAB: Picks ───────────────────────────────────────────────────── -->
   <div id="tab-recs" class="tab-panel" style="display:none">
     <div class="search-row">
-      <input id="rec-input" type="text" data-i18n-ph="recs_ph" placeholder="Mood, genre, or anything…" data-i18n-ph="ph_mood">
+      <input id="rec-input" type="text" data-i18n-ph="recs_ph" placeholder="Mood, genre, or anything…">
       <button class="btn btn-primary btn-sm" style="width:auto;min-width:104px" id="rec-btn" onclick="loadRecs()" data-i18n="find_btn">Find</button>
     </div>
     <button onclick="surpriseMe()" data-i18n="surprise" style="width:100%;margin-top:0;margin-bottom:12px;padding:11px;border-radius:11px;background:color-mix(in srgb, var(--accent) 12%, transparent);border:1px solid color-mix(in srgb, var(--accent) 50%, transparent);color:var(--accent-text);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:1.5px;cursor:pointer;transition:all .18s;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)" onmouseover="this.style.background='color-mix(in srgb, var(--accent) 22%, transparent)';this.style.borderColor='color-mix(in srgb, var(--accent) 85%, transparent)';this.style.boxShadow='0 4px 18px color-mix(in srgb, var(--accent) 28%, transparent)';this.style.color='var(--text)'" onmouseout="this.style.background='color-mix(in srgb, var(--accent) 12%, transparent)';this.style.borderColor='color-mix(in srgb, var(--accent) 50%, transparent)';this.style.boxShadow='none';this.style.color='var(--accent-text)'">✨ Surprise Me</button>
@@ -2657,7 +2657,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
           <span class="star">★</span>
         </div>
         <div class="add-label" data-i18n="notes">Notes</div>
-        <textarea id="add-note" data-i18n-ph="note_ph" placeholder="What did you think?" data-i18n-ph="ph_review" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+        <textarea id="add-note" data-i18n-ph="note_ph" placeholder="What did you think?" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       </div>
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" onclick="closeAdd()" data-i18n="cancel">Cancel</button>
@@ -2682,7 +2682,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <span class="star">★</span>
       </div>
       <div class="add-label" data-i18n="notes">Notes</div>
-      <textarea id="edit-note" data-i18n-ph="note_ph" placeholder="What did you think?" data-i18n-ph="ph_review" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      <textarea id="edit-note" data-i18n-ph="note_ph" placeholder="What did you think?" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" onclick="closeEdit()" data-i18n="cancel">Cancel</button>
         <button class="btn-modal-save" id="edit-confirm-btn" onclick="confirmEdit()" data-i18n="save">Save</button>
@@ -2700,7 +2700,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <div class="add-label" data-i18n="send_to">Send to</div>
       <div id="share-friends-list" style="margin-bottom:12px;max-height:170px;overflow-y:auto"></div>
       <div class="add-label" data-i18n="msg_opt">Message (optional)</div>
-      <textarea id="share-message" data-i18n-ph="share_msg_ph" placeholder="Why you'd love this…" data-i18n-ph="ph_why_love" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:55px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--accent-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      <textarea id="share-message" data-i18n-ph="share_msg_ph" placeholder="Why you'd love this…" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:55px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--accent-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" onclick="closeShare()" data-i18n="cancel">Cancel</button>
         <button id="share-confirm-btn" onclick="confirmShare()" style="flex:2;padding:10px;border-radius:9px;background:var(--accent);border:none;color:var(--on-accent);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer" data-i18n="send_btn">Send</button>
@@ -2763,7 +2763,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
            belong between the watch-time counter and the Display Name input. -->
       <div class="add-label" id="acc-name-lbl" data-i18n="display_name_lbl">Display Name</div>
       <div id="acc-name-row" style="display:flex;gap:8px;margin-bottom:24px">
-        <input type="text" id="acc-name-input" data-i18n-ph="display_name" placeholder="Your name" data-i18n-ph="ph_your_name"
+        <input type="text" id="acc-name-input" data-i18n-ph="display_name" placeholder="Your name"
           style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:14px;padding:10px 12px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;transition:border-color .2s"
           onfocus="this.style.borderColor='var(--primary-border)'"
           onblur="this.style.borderColor='var(--border)'">
@@ -2877,7 +2877,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.24</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.25</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -3448,13 +3448,9 @@ const _I18N_EXTRA = {
     join_expired_token:"That invite link has expired",
     join_token_exhausted:"That invite link has been used up",
     ph_your_name:"Your name",
-    ph_review:"What did you think?",
-    ph_why_love:"Why you'd love this…",
     ph_feedback:"Tell me what's on your mind…",
     ph_reply:"Reply…",
     ph_new_list:"New list name…",
-    ph_search_title:"Movie or series title…",
-    ph_mood:"Mood, genre, or anything…",
     ph_list_name:"List name…",
     confirm_delete:"Delete?",
     toast_enter_list_name:"Enter a list name",
@@ -3529,13 +3525,9 @@ const _I18N_EXTRA = {
     join_expired_token:"Срок действия ссылки истёк",
     join_token_exhausted:"Лимит переходов по ссылке исчерпан",
     ph_your_name:"Твоё имя",
-    ph_review:"Что скажешь?",
-    ph_why_love:"Почему тебе это понравится…",
     ph_feedback:"Расскажи, что думаешь…",
     ph_reply:"Ответить…",
     ph_new_list:"Название нового списка…",
-    ph_search_title:"Название фильма или сериала…",
-    ph_mood:"Настроение, жанр, что угодно…",
     ph_list_name:"Название списка…",
     confirm_delete:"Удалить?",
     toast_enter_list_name:"Введи название списка",
@@ -3610,13 +3602,9 @@ const _I18N_EXTRA = {
     join_expired_token:"Термін дії посилання минув",
     join_token_exhausted:"Ліміт переходів за посиланням вичерпано",
     ph_your_name:"Твоє ім'я",
-    ph_review:"Що скажеш?",
-    ph_why_love:"Чому тобі це сподобається…",
     ph_feedback:"Розкажи, що думаєш…",
     ph_reply:"Відповісти…",
     ph_new_list:"Назва нового списку…",
-    ph_search_title:"Назва фільму або серіалу…",
-    ph_mood:"Настрій, жанр, будь-що…",
     ph_list_name:"Назва списку…",
     confirm_delete:"Видалити?",
     toast_enter_list_name:"Введи назву списку",
@@ -3691,13 +3679,9 @@ const _I18N_EXTRA = {
     join_expired_token:"მოსაწვევ ბმულს ვადა გაუვიდა",
     join_token_exhausted:"მოსაწვევი ბმულის ლიმიტი ამოიწურა",
     ph_your_name:"შენი სახელი",
-    ph_review:"რას იტყვი?",
-    ph_why_love:"რატომ მოგეწონება…",
     ph_feedback:"მომიყევი, რას ფიქრობ…",
     ph_reply:"პასუხი…",
     ph_new_list:"ახალი სიის სახელი…",
-    ph_search_title:"ფილმის ან სერიალის სახელი…",
-    ph_mood:"განწყობა, ჟანრი, ნებისმიერი რამ…",
     ph_list_name:"სიის სახელი…",
     confirm_delete:"წავშალო?",
     toast_enter_list_name:"შეიყვანე სიის სახელი",
@@ -3772,13 +3756,9 @@ const _I18N_EXTRA = {
     join_expired_token:"Ese enlace de invitación ha caducado",
     join_token_exhausted:"Ese enlace de invitación se ha agotado",
     ph_your_name:"Tu nombre",
-    ph_review:"¿Qué te ha parecido?",
-    ph_why_love:"Por qué te va a encantar…",
     ph_feedback:"Cuéntame qué piensas…",
     ph_reply:"Responder…",
     ph_new_list:"Nombre de la nueva lista…",
-    ph_search_title:"Título de película o serie…",
-    ph_mood:"Ánimo, género o lo que quieras…",
     ph_list_name:"Nombre de la lista…",
     confirm_delete:"¿Borrar?",
     toast_enter_list_name:"Escribe un nombre para la lista",
@@ -3853,13 +3833,9 @@ const _I18N_EXTRA = {
     join_expired_token:"Ce lien d'invitation a expiré",
     join_token_exhausted:"Ce lien d'invitation a atteint sa limite",
     ph_your_name:"Ton nom",
-    ph_review:"Qu'en as-tu pensé ?",
-    ph_why_love:"Pourquoi tu vas adorer…",
     ph_feedback:"Dis-moi ce que tu en penses…",
     ph_reply:"Répondre…",
     ph_new_list:"Nom de la nouvelle liste…",
-    ph_search_title:"Titre de film ou de série…",
-    ph_mood:"Humeur, genre, ce que tu veux…",
     ph_list_name:"Nom de la liste…",
     confirm_delete:"Supprimer ?",
     toast_enter_list_name:"Saisis un nom de liste",
@@ -3934,13 +3910,9 @@ const _I18N_EXTRA = {
     join_expired_token:"Dieser Einladungslink ist abgelaufen",
     join_token_exhausted:"Dieser Einladungslink ist aufgebraucht",
     ph_your_name:"Dein Name",
-    ph_review:"Was hältst du davon?",
-    ph_why_love:"Warum dir das gefallen wird…",
     ph_feedback:"Erzähl mir, was dich beschäftigt…",
     ph_reply:"Antworten…",
     ph_new_list:"Name der neuen Liste…",
-    ph_search_title:"Film- oder Serientitel…",
-    ph_mood:"Stimmung, Genre, irgendetwas…",
     ph_list_name:"Listenname…",
     confirm_delete:"Löschen?",
     toast_enter_list_name:"Gib einen Listennamen ein",
@@ -4015,13 +3987,9 @@ const _I18N_EXTRA = {
     join_expired_token:"Questo link di invito è scaduto",
     join_token_exhausted:"Questo link di invito ha raggiunto il limite",
     ph_your_name:"Il tuo nome",
-    ph_review:"Che ne pensi?",
-    ph_why_love:"Perché ti piacerà…",
     ph_feedback:"Dimmi cosa ne pensi…",
     ph_reply:"Rispondi…",
     ph_new_list:"Nome della nuova lista…",
-    ph_search_title:"Titolo di film o serie…",
-    ph_mood:"Umore, genere, qualsiasi cosa…",
     ph_list_name:"Nome della lista…",
     confirm_delete:"Eliminare?",
     toast_enter_list_name:"Inserisci un nome per la lista",
