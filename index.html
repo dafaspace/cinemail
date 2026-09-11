@@ -2877,7 +2877,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.26</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.27</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -3489,6 +3489,8 @@ const _I18N_EXTRA = {
     sign_in_first:"Sign in first.",
     import_needs_session:"Your films are saved to your Cinemail account, so you need a session to import.",
     fb_history_failed:"Couldn't load history",
+    del_acct_type_email:"Type your email to confirm",
+    del_acct_type_name:"Type your name to confirm",
     err_link_expired:"That link has expired or was already used. Ask for a new one below.",
     err_email_taken:"That email already has an account. Try signing in instead.", err_email_bad:"That email address does not look right.",
     err_too_many:"Too many attempts. Please wait a few minutes and try again.",
@@ -3598,6 +3600,8 @@ const _I18N_EXTRA = {
     sign_in_first:"Сначала войди.",
     import_needs_session:"Твои фильмы хранятся в аккаунте Cinemail, поэтому для импорта нужен вход.",
     fb_history_failed:"Не удалось загрузить историю",
+    del_acct_type_email:"Введи свою почту, чтобы подтвердить",
+    del_acct_type_name:"Введи своё имя, чтобы подтвердить",
     err_link_expired:"Ссылка устарела или уже была использована. Запроси новую ниже.",
     err_email_taken:"На этот email уже есть аккаунт. Попробуй войти.", err_email_bad:"Похоже, этот адрес неверный.",
     err_too_many:"Слишком много попыток. Подожди пару минут и попробуй снова.",
@@ -3707,6 +3711,8 @@ const _I18N_EXTRA = {
     sign_in_first:"Спочатку увійди.",
     import_needs_session:"Твої фільми зберігаються в акаунті Cinemail, тому для імпорту потрібен вхід.",
     fb_history_failed:"Не вдалося завантажити історію",
+    del_acct_type_email:"Введи свою пошту, щоб підтвердити",
+    del_acct_type_name:"Введи своє ім'я, щоб підтвердити",
     err_link_expired:"Посилання застаріло або вже було використане. Запроси нове нижче.",
     err_email_taken:"На цей email уже є акаунт. Спробуй увійти.", err_email_bad:"Схоже, ця адреса неправильна.",
     err_too_many:"Забагато спроб. Зачекай кілька хвилин і спробуй ще раз.",
@@ -3816,6 +3822,8 @@ const _I18N_EXTRA = {
     sign_in_first:"ჯერ შედი.",
     import_needs_session:"შენი ფილმები ინახება Cinemail-ის ანგარიშში, ამიტომ იმპორტისთვის შესვლაა საჭირო.",
     fb_history_failed:"ისტორია ვერ ჩაიტვირთა",
+    del_acct_type_email:"დასადასტურებლად აკრიფე შენი ელფოსტა",
+    del_acct_type_name:"დასადასტურებლად აკრიფე შენი სახელი",
     err_link_expired:"ბმულს ვადა გაუვიდა ან უკვე გამოყენებულია. მოითხოვე ახალი ქვემოთ.",
     err_email_taken:"ამ მისამართზე უკვე არსებობს ანგარიში. სცადე შესვლა.", err_email_bad:"როგორც ჩანს, ეს მისამართი არასწორია.",
     err_too_many:"ძალიან ბევრი მცდელობა. დაელოდე რამდენიმე წუთს და სცადე ხელახლა.",
@@ -3925,6 +3933,8 @@ const _I18N_EXTRA = {
     sign_in_first:"Inicia sesión primero.",
     import_needs_session:"Tus películas se guardan en tu cuenta de Cinemail, así que necesitas iniciar sesión para importar.",
     fb_history_failed:"No se ha podido cargar el historial",
+    del_acct_type_email:"Escribe tu correo para confirmar",
+    del_acct_type_name:"Escribe tu nombre para confirmar",
     err_link_expired:"Ese enlace ha caducado o ya se ha usado. Pide uno nuevo abajo.",
     err_email_taken:"Ese email ya tiene una cuenta. Prueba a iniciar sesión.", err_email_bad:"Esa dirección de correo no parece correcta.",
     err_too_many:"Demasiados intentos. Espera unos minutos y vuelve a probar.",
@@ -4034,6 +4044,8 @@ const _I18N_EXTRA = {
     sign_in_first:"Connecte-toi d'abord.",
     import_needs_session:"Tes films sont enregistrés dans ton compte Cinemail : il faut être connecté pour importer.",
     fb_history_failed:"Impossible de charger l'historique",
+    del_acct_type_email:"Saisis ton e-mail pour confirmer",
+    del_acct_type_name:"Saisis ton nom pour confirmer",
     err_link_expired:"Ce lien a expiré ou a déjà été utilisé. Demandes-en un nouveau ci-dessous.",
     err_email_taken:"Cet email a déjà un compte. Essaie de te connecter.", err_email_bad:"Cette adresse e-mail ne semble pas correcte.",
     err_too_many:"Trop de tentatives. Patiente quelques minutes et réessaie.",
@@ -4143,6 +4155,8 @@ const _I18N_EXTRA = {
     sign_in_first:"Melde dich zuerst an.",
     import_needs_session:"Deine Filme liegen in deinem Cinemail-Konto, für den Import ist also eine Anmeldung nötig.",
     fb_history_failed:"Verlauf konnte nicht geladen werden",
+    del_acct_type_email:"Gib zur Bestätigung deine E-Mail ein",
+    del_acct_type_name:"Gib zur Bestätigung deinen Namen ein",
     err_link_expired:"Dieser Link ist abgelaufen oder wurde schon benutzt. Fordere unten einen neuen an.",
     err_email_taken:"Für diese E-Mail gibt es bereits ein Konto. Versuche dich anzumelden.", err_email_bad:"Diese E-Mail-Adresse sieht nicht richtig aus.",
     err_too_many:"Zu viele Versuche. Warte ein paar Minuten und versuche es erneut.",
@@ -4252,6 +4266,8 @@ const _I18N_EXTRA = {
     sign_in_first:"Accedi prima.",
     import_needs_session:"I tuoi film sono salvati nel tuo account Cinemail, quindi per importare devi accedere.",
     fb_history_failed:"Impossibile caricare la cronologia",
+    del_acct_type_email:"Scrivi la tua email per confermare",
+    del_acct_type_name:"Scrivi il tuo nome per confermare",
     err_link_expired:"Questo link è scaduto o è già stato usato. Chiedine uno nuovo qui sotto.",
     err_email_taken:"Questa email ha già un account. Prova ad accedere.", err_email_bad:"Questo indirizzo email non sembra corretto.",
     err_too_many:"Troppi tentativi. Aspetta qualche minuto e riprova.",
@@ -5222,6 +5238,26 @@ async function signOut() {
 }
 
 // ── Delete account ────────────────────────────────────────────────────────────
+// What the person has to type back before the red button will work. A guest account has
+// no address, so it falls back to the display name; both are visible on the sheet they
+// just came from, so this is a deliberate act rather than a memory test.
+function _delConfirmWord() {
+  return (isGuestUser() ? (currentUser?.displayName || "") : (currentUser?.email || "")).trim();
+}
+function _delConfirmLabel() {
+  return isGuestUser() ? t('del_acct_type_name') : t('del_acct_type_email');
+}
+function _delConfirmCheck() {
+  const inp = document.getElementById('del-confirm-input');
+  const btn = document.getElementById('del-confirm-btn');
+  if (!inp || !btn) return;
+  // Case-insensitive: addresses are not case-sensitive in practice and a phone that
+  // capitalised the first letter must not lock someone out of deleting their account.
+  const ok = inp.value.trim().toLowerCase() === _delConfirmWord().toLowerCase() && _delConfirmWord() !== "";
+  btn.disabled = !ok;
+  btn.style.opacity = ok ? "1" : ".4";
+  btn.style.pointerEvents = ok ? "auto" : "none";
+}
 function confirmDeleteAccount() {
   closeAccount();
   const overlay = document.createElement('div');
@@ -5235,8 +5271,20 @@ function confirmDeleteAccount() {
       <div style="margin-bottom:12px;color:var(--amber,#FBBF24);display:flex;justify-content:center">${icon('triangle-alert', 26)}</div>
       <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:10px">${t('del_acct_q')}</div>
       <div style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:22px">${t('del_acct_warn')}${isGuestUser() ? `<div style="margin-top:9px;color:#f87171">${t('del_acct_guest')}</div>` : ''}</div>
+      <!-- Typing the address back is the same guard Tunemail puts on this screen, where it
+           asks for the literal word DELETE. That does not survive eight languages: a person
+           on a Georgian keyboard would have to switch layouts to type a Latin word, and
+           translating the word means the placeholder and the comparison have to agree in
+           every locale - a mismatch there is not a typo, it is an account that cannot be
+           deleted, which is the 5.1.1(v) failure this screen exists to avoid. The address is
+           already on screen above, needs no particular keyboard, and is what GitHub and
+           Google ask for in the same place. Guests have no address, so they type their name. -->
+      <label style="display:block;text-align:left;font-size:11px;color:var(--muted);margin-bottom:6px">${_delConfirmLabel()}</label>
+      <input id="del-confirm-input" type="text" autocomplete="off" autocapitalize="none" spellcheck="false"
+             placeholder="${escapeHtml(_delConfirmWord())}" oninput="_delConfirmCheck()"
+             style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:11px;color:var(--text);font-size:14px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;margin-bottom:16px">
       <div style="display:flex;flex-direction:column;gap:12px">
-        <button onclick="deleteAccount()" style="background:#c93b3b;border:none;color:#fff;font-size:14px;font-weight:700;font-family:'DM Sans','Noto Sans Georgian',sans-serif;padding:12px;border-radius:10px;cursor:pointer">${t('del_acct_confirm')}</button>
+        <button id="del-confirm-btn" disabled onclick="deleteAccount()" style="background:#c93b3b;border:none;color:#fff;font-size:14px;font-weight:700;font-family:'DM Sans','Noto Sans Georgian',sans-serif;padding:12px;border-radius:10px;cursor:pointer;opacity:.4;pointer-events:none;transition:opacity .15s">${t('del_acct_confirm')}</button>
         <button onclick="document.getElementById('delete-account-overlay').remove();openAccount();" style="background:none;border:1px solid rgba(255,255,255,0.12);color:var(--muted);font-size:14px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;padding:11px;border-radius:10px;cursor:pointer">${t('cancel')}</button>
       </div>
     </div>
@@ -5246,7 +5294,7 @@ function confirmDeleteAccount() {
 
 async function deleteAccount() {
   const overlay = document.getElementById('delete-account-overlay');
-  const btn = overlay.querySelector('button');
+  const btn = document.getElementById('del-confirm-btn') || overlay.querySelector('button');
   btn.textContent = t('del_acct_working');
   btn.disabled = true;
   try {
