@@ -2384,7 +2384,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <div id="signup-error" class="error-msg"></div>
       <div class="form-group">
         <label data-i18n="display_name">Display Name</label>
-        <input type="text" id="signup-name" placeholder="Your name" autocomplete="name">
+        <input type="text" id="signup-name" placeholder="Your name" data-i18n-ph="ph_your_name" autocomplete="name">
       </div>
       <div class="form-group">
         <label data-i18n="email">Email</label>
@@ -2481,7 +2481,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     <div id="guest-convert-error" class="error-msg"></div>
     <div class="form-group">
       <label data-i18n="display_name">Display Name</label>
-      <input type="text" id="gc-name" placeholder="Your name" autocomplete="name" onkeydown="if(event.key==='Enter')document.getElementById('gc-email').focus()">
+      <input type="text" id="gc-name" placeholder="Your name" data-i18n-ph="ph_your_name" autocomplete="name" onkeydown="if(event.key==='Enter')document.getElementById('gc-email').focus()">
     </div>
     <div class="form-group">
       <label data-i18n="email">Email</label>
@@ -2543,7 +2543,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   <!-- ── TAB: Search ──────────────────────────────────────────────────── -->
   <div id="tab-search" class="tab-panel active">
     <div class="search-row">
-      <input id="search-input" type="text" data-i18n-ph="search_ph" placeholder="Movie or series title…"
+      <input id="search-input" type="text" data-i18n-ph="search_ph" placeholder="Movie or series title…" data-i18n-ph="ph_search_title"
         onkeydown="if(event.key==='Enter')doSearch()">
       <button class="btn btn-primary btn-sm" style="width:auto;min-width:104px" onclick="doSearch()" data-i18n="search_btn">Search</button>
     </div>
@@ -2559,7 +2559,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   <!-- ── TAB: Picks ───────────────────────────────────────────────────── -->
   <div id="tab-recs" class="tab-panel" style="display:none">
     <div class="search-row">
-      <input id="rec-input" type="text" data-i18n-ph="recs_ph" placeholder="Mood, genre, or anything…">
+      <input id="rec-input" type="text" data-i18n-ph="recs_ph" placeholder="Mood, genre, or anything…" data-i18n-ph="ph_mood">
       <button class="btn btn-primary btn-sm" style="width:auto;min-width:104px" id="rec-btn" onclick="loadRecs()" data-i18n="find_btn">Find</button>
     </div>
     <button onclick="surpriseMe()" data-i18n="surprise" style="width:100%;margin-top:0;margin-bottom:12px;padding:11px;border-radius:11px;background:color-mix(in srgb, var(--accent) 12%, transparent);border:1px solid color-mix(in srgb, var(--accent) 50%, transparent);color:var(--accent-text);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:1.5px;cursor:pointer;transition:all .18s;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)" onmouseover="this.style.background='color-mix(in srgb, var(--accent) 22%, transparent)';this.style.borderColor='color-mix(in srgb, var(--accent) 85%, transparent)';this.style.boxShadow='0 4px 18px color-mix(in srgb, var(--accent) 28%, transparent)';this.style.color='var(--text)'" onmouseout="this.style.background='color-mix(in srgb, var(--accent) 12%, transparent)';this.style.borderColor='color-mix(in srgb, var(--accent) 50%, transparent)';this.style.boxShadow='none';this.style.color='var(--accent-text)'">✨ Surprise Me</button>
@@ -2657,7 +2657,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
           <span class="star">★</span>
         </div>
         <div class="add-label" data-i18n="notes">Notes</div>
-        <textarea id="add-note" data-i18n-ph="note_ph" placeholder="What did you think?" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+        <textarea id="add-note" data-i18n-ph="note_ph" placeholder="What did you think?" data-i18n-ph="ph_review" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       </div>
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" onclick="closeAdd()" data-i18n="cancel">Cancel</button>
@@ -2682,7 +2682,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <span class="star">★</span>
       </div>
       <div class="add-label" data-i18n="notes">Notes</div>
-      <textarea id="edit-note" data-i18n-ph="note_ph" placeholder="What did you think?" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      <textarea id="edit-note" data-i18n-ph="note_ph" placeholder="What did you think?" data-i18n-ph="ph_review" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" onclick="closeEdit()" data-i18n="cancel">Cancel</button>
         <button class="btn-modal-save" id="edit-confirm-btn" onclick="confirmEdit()" data-i18n="save">Save</button>
@@ -2700,7 +2700,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <div class="add-label" data-i18n="send_to">Send to</div>
       <div id="share-friends-list" style="margin-bottom:12px;max-height:170px;overflow-y:auto"></div>
       <div class="add-label" data-i18n="msg_opt">Message (optional)</div>
-      <textarea id="share-message" data-i18n-ph="share_msg_ph" placeholder="Why you'd love this…" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:55px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--accent-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      <textarea id="share-message" data-i18n-ph="share_msg_ph" placeholder="Why you'd love this…" data-i18n-ph="ph_why_love" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:55px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--accent-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" onclick="closeShare()" data-i18n="cancel">Cancel</button>
         <button id="share-confirm-btn" onclick="confirmShare()" style="flex:2;padding:10px;border-radius:9px;background:var(--accent);border:none;color:var(--on-accent);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer" data-i18n="send_btn">Send</button>
@@ -2763,7 +2763,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
            belong between the watch-time counter and the Display Name input. -->
       <div class="add-label" id="acc-name-lbl" data-i18n="display_name_lbl">Display Name</div>
       <div id="acc-name-row" style="display:flex;gap:8px;margin-bottom:24px">
-        <input type="text" id="acc-name-input" data-i18n-ph="display_name" placeholder="Your name"
+        <input type="text" id="acc-name-input" data-i18n-ph="display_name" placeholder="Your name" data-i18n-ph="ph_your_name"
           style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:14px;padding:10px 12px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;transition:border-color .2s"
           onfocus="this.style.borderColor='var(--primary-border)'"
           onblur="this.style.borderColor='var(--border)'">
@@ -2877,7 +2877,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.20</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.21</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -2938,7 +2938,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
           <button id="fb-type-other" onclick="setFbType('other')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px"><span data-ic="message-circle" data-ic-size="13"></span>Other</button>
         </div>
         <div class="add-label">Message</div>
-        <textarea id="fb-message" placeholder="Tell me what's on your mind..." style="min-height:70px;margin-bottom:10px;width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:13px;padding:10px 12px;outline:none;resize:vertical;transition:border-color .2s"></textarea>
+        <textarea id="fb-message" placeholder="Tell me what's on your mind..." data-i18n-ph="ph_feedback" style="min-height:70px;margin-bottom:10px;width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:13px;padding:10px 12px;outline:none;resize:vertical;transition:border-color .2s"></textarea>
 
         <!-- Screenshot attach -->
         <input type="file" id="fb-screenshot" accept="image/*" style="display:none" onchange="onFbScreenshotPicked(event)">
@@ -3414,6 +3414,53 @@ const _I18N_EXTRA = {
     err_name_taken:"\"{name}\" is taken, so your name will be \"{suggested}\". Press Create Account again to confirm.",
     email_sent_to:"We sent a confirmation link to", email_sent_activate:"Click it to activate your account.",
     ph_min6:"Min. 6 characters",
+    toast_session_expired:"Session expired - please sign in again",
+    alert_not_connected:"Not connected. Please sign out and sign in again.",
+    alert_session_expired:"Session expired. Please sign in again.",
+    err_could_not_save:"Could not save: ",
+    err_could_not_delete:"Could not delete: ",
+    toast_select_someone:"Search and select someone first",
+    toast_already_friends:"Already friends or request pending",
+    err_prefix:"Error: ",
+    toast_friend_added:"Friend added",
+    toast_request_declined:"Request declined",
+    toast_friend_removed:"Friend removed",
+    toast_link_copied:"Link copied",
+    toast_invite_not_found:"Invite not found",
+    err_failed_to_send:"Failed to send: ",
+    toast_err_invite_not_found:"Error: invite not found",
+    toast_feedback_reply:"You got a reply to your feedback",
+    toast_usdt_copied:"USDT address copied",
+    toast_name_empty:"Name cannot be empty",
+    toast_name_updated:"Name updated",
+    err_name_update:"Could not update the name: ",
+    toast_nothing_export:"Nothing to export yet",
+    err_export_failed:"Export failed: ",
+    err_json_export_failed:"JSON export failed: ",
+    toast_crew_complete:"Every film already has its crew",
+    toast_no_valid_entries:"No usable entries in that file",
+    toast_no_films_in_file:"No films found in that file",
+    toast_image_too_large:"Image too large (max 5 MB)",
+    toast_write_something:"Write something first",
+    toast_feedback_thanks:"Got it. I read everything personally",
+    err_could_not_send:"Could not send: ",
+    join_invalid_token:"That invite link is not valid",
+    join_expired_token:"That invite link has expired",
+    join_token_exhausted:"That invite link has been used up",
+    ph_your_name:"Your name",
+    ph_review:"What did you think?",
+    ph_why_love:"Why you'd love this…",
+    ph_feedback:"Tell me what's on your mind…",
+    ph_reply:"Reply…",
+    ph_new_list:"New list name…",
+    ph_search_title:"Movie or series title…",
+    ph_mood:"Mood, genre, or anything…",
+    ph_list_name:"List name…",
+    confirm_delete:"Delete?",
+    toast_enter_list_name:"Enter a list name",
+    toast_enter_a_name:"Enter a name",
+    toast_member_removed:"Member removed",
+    toast_new_friend_request:"New friend request - check your account",
     err_link_expired:"That link has expired or was already used. Ask for a new one below.",
     err_email_taken:"That email already has an account. Try signing in instead.", err_email_bad:"That email address does not look right.",
     err_too_many:"Too many attempts. Please wait a few minutes and try again.",
@@ -3448,6 +3495,53 @@ const _I18N_EXTRA = {
     err_name_taken:"«{name}» уже занято, твоё имя будет «{suggested}». Нажми «Создать аккаунт» ещё раз, чтобы подтвердить.",
     email_sent_to:"Мы отправили ссылку для подтверждения на", email_sent_activate:"Нажми на неё, чтобы активировать аккаунт.",
     ph_min6:"Минимум 6 символов",
+    toast_session_expired:"Сессия истекла - войди снова",
+    alert_not_connected:"Нет соединения. Выйди и войди снова.",
+    alert_session_expired:"Сессия истекла. Войди снова.",
+    err_could_not_save:"Не удалось сохранить: ",
+    err_could_not_delete:"Не удалось удалить: ",
+    toast_select_someone:"Сначала найди и выбери человека",
+    toast_already_friends:"Вы уже друзья или запрос отправлен",
+    err_prefix:"Ошибка: ",
+    toast_friend_added:"Друг добавлен",
+    toast_request_declined:"Запрос отклонён",
+    toast_friend_removed:"Друг удалён",
+    toast_link_copied:"Ссылка скопирована",
+    toast_invite_not_found:"Приглашение не найдено",
+    err_failed_to_send:"Не удалось отправить: ",
+    toast_err_invite_not_found:"Ошибка: приглашение не найдено",
+    toast_feedback_reply:"Тебе ответили на обращение",
+    toast_usdt_copied:"Адрес USDT скопирован",
+    toast_name_empty:"Имя не может быть пустым",
+    toast_name_updated:"Имя обновлено",
+    err_name_update:"Не удалось обновить имя: ",
+    toast_nothing_export:"Пока нечего экспортировать",
+    err_export_failed:"Экспорт не удался: ",
+    err_json_export_failed:"Экспорт JSON не удался: ",
+    toast_crew_complete:"У всех фильмов уже есть съёмочная группа",
+    toast_no_valid_entries:"В файле нет подходящих записей",
+    toast_no_films_in_file:"В файле не найдено фильмов",
+    toast_image_too_large:"Изображение слишком большое (максимум 5 МБ)",
+    toast_write_something:"Сначала напиши что-нибудь",
+    toast_feedback_thanks:"Получил. Я читаю всё лично",
+    err_could_not_send:"Не удалось отправить: ",
+    join_invalid_token:"Эта ссылка-приглашение недействительна",
+    join_expired_token:"Срок действия ссылки истёк",
+    join_token_exhausted:"Лимит переходов по ссылке исчерпан",
+    ph_your_name:"Твоё имя",
+    ph_review:"Что скажешь?",
+    ph_why_love:"Почему тебе это понравится…",
+    ph_feedback:"Расскажи, что думаешь…",
+    ph_reply:"Ответить…",
+    ph_new_list:"Название нового списка…",
+    ph_search_title:"Название фильма или сериала…",
+    ph_mood:"Настроение, жанр, что угодно…",
+    ph_list_name:"Название списка…",
+    confirm_delete:"Удалить?",
+    toast_enter_list_name:"Введи название списка",
+    toast_enter_a_name:"Введи имя",
+    toast_member_removed:"Участник удалён",
+    toast_new_friend_request:"Новая заявка в друзья - загляни в аккаунт",
     err_link_expired:"Ссылка устарела или уже была использована. Запроси новую ниже.",
     err_email_taken:"На этот email уже есть аккаунт. Попробуй войти.", err_email_bad:"Похоже, этот адрес неверный.",
     err_too_many:"Слишком много попыток. Подожди пару минут и попробуй снова.",
@@ -3482,6 +3576,53 @@ const _I18N_EXTRA = {
     err_name_taken:"«{name}» вже зайняте, твоє ім'я буде «{suggested}». Натисни «Створити акаунт» ще раз, щоб підтвердити.",
     email_sent_to:"Ми надіслали посилання для підтвердження на", email_sent_activate:"Натисни його, щоб активувати акаунт.",
     ph_min6:"Мінімум 6 символів",
+    toast_session_expired:"Сесія завершилася - увійди знову",
+    alert_not_connected:"Немає з'єднання. Вийди та увійди знову.",
+    alert_session_expired:"Сесія завершилася. Увійди знову.",
+    err_could_not_save:"Не вдалося зберегти: ",
+    err_could_not_delete:"Не вдалося видалити: ",
+    toast_select_someone:"Спочатку знайди й обери людину",
+    toast_already_friends:"Ви вже друзі або запит надіслано",
+    err_prefix:"Помилка: ",
+    toast_friend_added:"Друга додано",
+    toast_request_declined:"Запит відхилено",
+    toast_friend_removed:"Друга видалено",
+    toast_link_copied:"Посилання скопійовано",
+    toast_invite_not_found:"Запрошення не знайдено",
+    err_failed_to_send:"Не вдалося надіслати: ",
+    toast_err_invite_not_found:"Помилка: запрошення не знайдено",
+    toast_feedback_reply:"Тобі відповіли на звернення",
+    toast_usdt_copied:"Адресу USDT скопійовано",
+    toast_name_empty:"Ім'я не може бути порожнім",
+    toast_name_updated:"Ім'я оновлено",
+    err_name_update:"Не вдалося оновити ім'я: ",
+    toast_nothing_export:"Поки нема чого експортувати",
+    err_export_failed:"Експорт не вдався: ",
+    err_json_export_failed:"Експорт JSON не вдався: ",
+    toast_crew_complete:"У всіх фільмів уже є знімальна група",
+    toast_no_valid_entries:"У файлі немає придатних записів",
+    toast_no_films_in_file:"У файлі не знайдено фільмів",
+    toast_image_too_large:"Зображення завелике (максимум 5 МБ)",
+    toast_write_something:"Спочатку напиши щось",
+    toast_feedback_thanks:"Отримав. Я читаю все особисто",
+    err_could_not_send:"Не вдалося надіслати: ",
+    join_invalid_token:"Це посилання-запрошення недійсне",
+    join_expired_token:"Термін дії посилання минув",
+    join_token_exhausted:"Ліміт переходів за посиланням вичерпано",
+    ph_your_name:"Твоє ім'я",
+    ph_review:"Що скажеш?",
+    ph_why_love:"Чому тобі це сподобається…",
+    ph_feedback:"Розкажи, що думаєш…",
+    ph_reply:"Відповісти…",
+    ph_new_list:"Назва нового списку…",
+    ph_search_title:"Назва фільму або серіалу…",
+    ph_mood:"Настрій, жанр, будь-що…",
+    ph_list_name:"Назва списку…",
+    confirm_delete:"Видалити?",
+    toast_enter_list_name:"Введи назву списку",
+    toast_enter_a_name:"Введи ім'я",
+    toast_member_removed:"Учасника видалено",
+    toast_new_friend_request:"Новий запит у друзі - зазирни в акаунт",
     err_link_expired:"Посилання застаріло або вже було використане. Запроси нове нижче.",
     err_email_taken:"На цей email уже є акаунт. Спробуй увійти.", err_email_bad:"Схоже, ця адреса неправильна.",
     err_too_many:"Забагато спроб. Зачекай кілька хвилин і спробуй ще раз.",
@@ -3516,6 +3657,53 @@ const _I18N_EXTRA = {
     err_name_taken:"„{name}“ დაკავებულია, შენი სახელი იქნება „{suggested}“. დასადასტურებლად კვლავ დააჭირე ღილაკს „ანგარიშის შექმნა“.",
     email_sent_to:"დადასტურების ბმული გამოგზავნეთ მისამართზე", email_sent_activate:"დააჭირე ანგარიშის გასააქტიურებლად.",
     ph_min6:"მინიმუმ 6 სიმბოლო",
+    toast_session_expired:"სესიას ვადა გაუვიდა - შედი ხელახლა",
+    alert_not_connected:"კავშირი არ არის. გახვედი და ხელახლა შედი.",
+    alert_session_expired:"სესიას ვადა გაუვიდა. შედი ხელახლა.",
+    err_could_not_save:"ვერ შევინახე: ",
+    err_could_not_delete:"ვერ წავშალე: ",
+    toast_select_someone:"ჯერ მოძებნე და აირჩიე ადამიანი",
+    toast_already_friends:"უკვე მეგობრები ხართ ან მოთხოვნა გაგზავნილია",
+    err_prefix:"შეცდომა: ",
+    toast_friend_added:"მეგობარი დაემატა",
+    toast_request_declined:"მოთხოვნა უარყოფილია",
+    toast_friend_removed:"მეგობარი წაიშალა",
+    toast_link_copied:"ბმული დაკოპირდა",
+    toast_invite_not_found:"მოწვევა ვერ მოიძებნა",
+    err_failed_to_send:"გაგზავნა ვერ მოხერხდა: ",
+    toast_err_invite_not_found:"შეცდომა: მოწვევა ვერ მოიძებნა",
+    toast_feedback_reply:"შენს მიმართვას გიპასუხეს",
+    toast_usdt_copied:"USDT მისამართი დაკოპირდა",
+    toast_name_empty:"სახელი ცარიელი ვერ იქნება",
+    toast_name_updated:"სახელი განახლდა",
+    err_name_update:"სახელი ვერ განახლდა: ",
+    toast_nothing_export:"ჯერ არაფერია გასატანი",
+    err_export_failed:"ექსპორტი ვერ შესრულდა: ",
+    err_json_export_failed:"JSON-ის ექსპორტი ვერ შესრულდა: ",
+    toast_crew_complete:"ყველა ფილმს უკვე აქვს გადამღები ჯგუფი",
+    toast_no_valid_entries:"ფაილში გამოსადეგი ჩანაწერები არ არის",
+    toast_no_films_in_file:"ფაილში ფილმები ვერ მოიძებნა",
+    toast_image_too_large:"სურათი ძალიან დიდია (მაქსიმუმ 5 MB)",
+    toast_write_something:"ჯერ დაწერე რამე",
+    toast_feedback_thanks:"მივიღე. ყველაფერს პირადად ვკითხულობ",
+    err_could_not_send:"ვერ გავგზავნე: ",
+    join_invalid_token:"ეს მოსაწვევი ბმული არასწორია",
+    join_expired_token:"მოსაწვევ ბმულს ვადა გაუვიდა",
+    join_token_exhausted:"მოსაწვევი ბმულის ლიმიტი ამოიწურა",
+    ph_your_name:"შენი სახელი",
+    ph_review:"რას იტყვი?",
+    ph_why_love:"რატომ მოგეწონება…",
+    ph_feedback:"მომიყევი, რას ფიქრობ…",
+    ph_reply:"პასუხი…",
+    ph_new_list:"ახალი სიის სახელი…",
+    ph_search_title:"ფილმის ან სერიალის სახელი…",
+    ph_mood:"განწყობა, ჟანრი, ნებისმიერი რამ…",
+    ph_list_name:"სიის სახელი…",
+    confirm_delete:"წავშალო?",
+    toast_enter_list_name:"შეიყვანე სიის სახელი",
+    toast_enter_a_name:"შეიყვანე სახელი",
+    toast_member_removed:"წევრი წაიშალა",
+    toast_new_friend_request:"ახალი მეგობრობის მოთხოვნა - შეამოწმე ანგარიში",
     err_link_expired:"ბმულს ვადა გაუვიდა ან უკვე გამოყენებულია. მოითხოვე ახალი ქვემოთ.",
     err_email_taken:"ამ მისამართზე უკვე არსებობს ანგარიში. სცადე შესვლა.", err_email_bad:"როგორც ჩანს, ეს მისამართი არასწორია.",
     err_too_many:"ძალიან ბევრი მცდელობა. დაელოდე რამდენიმე წუთს და სცადე ხელახლა.",
@@ -3550,6 +3738,53 @@ const _I18N_EXTRA = {
     err_name_taken:"«{name}» ya está en uso, tu nombre será «{suggested}». Pulsa Crear cuenta otra vez para confirmar.",
     email_sent_to:"Enviamos un enlace de confirmación a", email_sent_activate:"Haz clic para activar tu cuenta.",
     ph_min6:"Mínimo 6 caracteres",
+    toast_session_expired:"La sesión ha caducado: inicia sesión de nuevo",
+    alert_not_connected:"Sin conexión. Cierra sesión y vuelve a entrar.",
+    alert_session_expired:"La sesión ha caducado. Inicia sesión de nuevo.",
+    err_could_not_save:"No se pudo guardar: ",
+    err_could_not_delete:"No se pudo eliminar: ",
+    toast_select_someone:"Primero busca y selecciona a alguien",
+    toast_already_friends:"Ya sois amigos o hay una solicitud pendiente",
+    err_prefix:"Error: ",
+    toast_friend_added:"Amigo añadido",
+    toast_request_declined:"Solicitud rechazada",
+    toast_friend_removed:"Amigo eliminado",
+    toast_link_copied:"Enlace copiado",
+    toast_invite_not_found:"Invitación no encontrada",
+    err_failed_to_send:"No se pudo enviar: ",
+    toast_err_invite_not_found:"Error: invitación no encontrada",
+    toast_feedback_reply:"Has recibido una respuesta a tu mensaje",
+    toast_usdt_copied:"Dirección USDT copiada",
+    toast_name_empty:"El nombre no puede estar vacío",
+    toast_name_updated:"Nombre actualizado",
+    err_name_update:"No se pudo actualizar el nombre: ",
+    toast_nothing_export:"Todavía no hay nada que exportar",
+    err_export_failed:"La exportación ha fallado: ",
+    err_json_export_failed:"La exportación JSON ha fallado: ",
+    toast_crew_complete:"Todas las películas ya tienen su equipo",
+    toast_no_valid_entries:"No hay entradas utilizables en ese archivo",
+    toast_no_films_in_file:"No se han encontrado películas en ese archivo",
+    toast_image_too_large:"Imagen demasiado grande (máx. 5 MB)",
+    toast_write_something:"Escribe algo primero",
+    toast_feedback_thanks:"Recibido. Lo leo todo personalmente",
+    err_could_not_send:"No se pudo enviar: ",
+    join_invalid_token:"Ese enlace de invitación no es válido",
+    join_expired_token:"Ese enlace de invitación ha caducado",
+    join_token_exhausted:"Ese enlace de invitación se ha agotado",
+    ph_your_name:"Tu nombre",
+    ph_review:"¿Qué te ha parecido?",
+    ph_why_love:"Por qué te va a encantar…",
+    ph_feedback:"Cuéntame qué piensas…",
+    ph_reply:"Responder…",
+    ph_new_list:"Nombre de la nueva lista…",
+    ph_search_title:"Título de película o serie…",
+    ph_mood:"Ánimo, género o lo que quieras…",
+    ph_list_name:"Nombre de la lista…",
+    confirm_delete:"¿Borrar?",
+    toast_enter_list_name:"Escribe un nombre para la lista",
+    toast_enter_a_name:"Escribe un nombre",
+    toast_member_removed:"Miembro eliminado",
+    toast_new_friend_request:"Nueva solicitud de amistad: mira tu cuenta",
     err_link_expired:"Ese enlace ha caducado o ya se ha usado. Pide uno nuevo abajo.",
     err_email_taken:"Ese email ya tiene una cuenta. Prueba a iniciar sesión.", err_email_bad:"Esa dirección de correo no parece correcta.",
     err_too_many:"Demasiados intentos. Espera unos minutos y vuelve a probar.",
@@ -3584,6 +3819,53 @@ const _I18N_EXTRA = {
     err_name_taken:"« {name} » est déjà pris, ton nom sera « {suggested} ». Appuie de nouveau sur Créer un compte pour confirmer.",
     email_sent_to:"Nous avons envoyé un lien de confirmation à", email_sent_activate:"Clique dessus pour activer ton compte.",
     ph_min6:"6 caractères minimum",
+    toast_session_expired:"Session expirée - reconnecte-toi",
+    alert_not_connected:"Non connecté. Déconnecte-toi puis reconnecte-toi.",
+    alert_session_expired:"Session expirée. Reconnecte-toi.",
+    err_could_not_save:"Enregistrement impossible : ",
+    err_could_not_delete:"Suppression impossible : ",
+    toast_select_someone:"Cherche et sélectionne d'abord quelqu'un",
+    toast_already_friends:"Déjà amis ou demande en attente",
+    err_prefix:"Erreur : ",
+    toast_friend_added:"Ami ajouté",
+    toast_request_declined:"Demande refusée",
+    toast_friend_removed:"Ami supprimé",
+    toast_link_copied:"Lien copié",
+    toast_invite_not_found:"Invitation introuvable",
+    err_failed_to_send:"Échec de l'envoi : ",
+    toast_err_invite_not_found:"Erreur : invitation introuvable",
+    toast_feedback_reply:"Tu as reçu une réponse à ton message",
+    toast_usdt_copied:"Adresse USDT copiée",
+    toast_name_empty:"Le nom ne peut pas être vide",
+    toast_name_updated:"Nom mis à jour",
+    err_name_update:"Impossible de mettre à jour le nom : ",
+    toast_nothing_export:"Rien à exporter pour l'instant",
+    err_export_failed:"Échec de l'export : ",
+    err_json_export_failed:"Échec de l'export JSON : ",
+    toast_crew_complete:"Tous les films ont déjà leur équipe",
+    toast_no_valid_entries:"Aucune entrée utilisable dans ce fichier",
+    toast_no_films_in_file:"Aucun film trouvé dans ce fichier",
+    toast_image_too_large:"Image trop lourde (5 Mo maximum)",
+    toast_write_something:"Écris d'abord quelque chose",
+    toast_feedback_thanks:"Bien reçu. Je lis tout personnellement",
+    err_could_not_send:"Envoi impossible : ",
+    join_invalid_token:"Ce lien d'invitation n'est pas valide",
+    join_expired_token:"Ce lien d'invitation a expiré",
+    join_token_exhausted:"Ce lien d'invitation a atteint sa limite",
+    ph_your_name:"Ton nom",
+    ph_review:"Qu'en as-tu pensé ?",
+    ph_why_love:"Pourquoi tu vas adorer…",
+    ph_feedback:"Dis-moi ce que tu en penses…",
+    ph_reply:"Répondre…",
+    ph_new_list:"Nom de la nouvelle liste…",
+    ph_search_title:"Titre de film ou de série…",
+    ph_mood:"Humeur, genre, ce que tu veux…",
+    ph_list_name:"Nom de la liste…",
+    confirm_delete:"Supprimer ?",
+    toast_enter_list_name:"Saisis un nom de liste",
+    toast_enter_a_name:"Saisis un nom",
+    toast_member_removed:"Membre retiré",
+    toast_new_friend_request:"Nouvelle demande d'ami - regarde ton compte",
     err_link_expired:"Ce lien a expiré ou a déjà été utilisé. Demandes-en un nouveau ci-dessous.",
     err_email_taken:"Cet email a déjà un compte. Essaie de te connecter.", err_email_bad:"Cette adresse e-mail ne semble pas correcte.",
     err_too_many:"Trop de tentatives. Patiente quelques minutes et réessaie.",
@@ -3618,6 +3900,53 @@ const _I18N_EXTRA = {
     err_name_taken:"„{name}“ ist vergeben, dein Name wird „{suggested}“. Tippe erneut auf Konto erstellen, um zu bestätigen.",
     email_sent_to:"Wir haben einen Bestätigungslink gesendet an", email_sent_activate:"Klicke darauf, um dein Konto zu aktivieren.",
     ph_min6:"Mindestens 6 Zeichen",
+    toast_session_expired:"Sitzung abgelaufen - melde dich erneut an",
+    alert_not_connected:"Keine Verbindung. Melde dich ab und wieder an.",
+    alert_session_expired:"Sitzung abgelaufen. Melde dich erneut an.",
+    err_could_not_save:"Speichern fehlgeschlagen: ",
+    err_could_not_delete:"Löschen fehlgeschlagen: ",
+    toast_select_someone:"Suche und wähle zuerst jemanden aus",
+    toast_already_friends:"Ihr seid schon Freunde oder die Anfrage läuft",
+    err_prefix:"Fehler: ",
+    toast_friend_added:"Freund hinzugefügt",
+    toast_request_declined:"Anfrage abgelehnt",
+    toast_friend_removed:"Freund entfernt",
+    toast_link_copied:"Link kopiert",
+    toast_invite_not_found:"Einladung nicht gefunden",
+    err_failed_to_send:"Senden fehlgeschlagen: ",
+    toast_err_invite_not_found:"Fehler: Einladung nicht gefunden",
+    toast_feedback_reply:"Du hast eine Antwort auf dein Feedback",
+    toast_usdt_copied:"USDT-Adresse kopiert",
+    toast_name_empty:"Der Name darf nicht leer sein",
+    toast_name_updated:"Name aktualisiert",
+    err_name_update:"Name konnte nicht aktualisiert werden: ",
+    toast_nothing_export:"Noch nichts zu exportieren",
+    err_export_failed:"Export fehlgeschlagen: ",
+    err_json_export_failed:"JSON-Export fehlgeschlagen: ",
+    toast_crew_complete:"Alle Filme haben bereits ihr Team",
+    toast_no_valid_entries:"Keine brauchbaren Einträge in dieser Datei",
+    toast_no_films_in_file:"In dieser Datei wurden keine Filme gefunden",
+    toast_image_too_large:"Bild zu groß (max. 5 MB)",
+    toast_write_something:"Schreib zuerst etwas",
+    toast_feedback_thanks:"Angekommen. Ich lese alles persönlich",
+    err_could_not_send:"Senden fehlgeschlagen: ",
+    join_invalid_token:"Dieser Einladungslink ist ungültig",
+    join_expired_token:"Dieser Einladungslink ist abgelaufen",
+    join_token_exhausted:"Dieser Einladungslink ist aufgebraucht",
+    ph_your_name:"Dein Name",
+    ph_review:"Was hältst du davon?",
+    ph_why_love:"Warum dir das gefallen wird…",
+    ph_feedback:"Erzähl mir, was dich beschäftigt…",
+    ph_reply:"Antworten…",
+    ph_new_list:"Name der neuen Liste…",
+    ph_search_title:"Film- oder Serientitel…",
+    ph_mood:"Stimmung, Genre, irgendetwas…",
+    ph_list_name:"Listenname…",
+    confirm_delete:"Löschen?",
+    toast_enter_list_name:"Gib einen Listennamen ein",
+    toast_enter_a_name:"Gib einen Namen ein",
+    toast_member_removed:"Mitglied entfernt",
+    toast_new_friend_request:"Neue Freundschaftsanfrage - schau in dein Konto",
     err_link_expired:"Dieser Link ist abgelaufen oder wurde schon benutzt. Fordere unten einen neuen an.",
     err_email_taken:"Für diese E-Mail gibt es bereits ein Konto. Versuche dich anzumelden.", err_email_bad:"Diese E-Mail-Adresse sieht nicht richtig aus.",
     err_too_many:"Zu viele Versuche. Warte ein paar Minuten und versuche es erneut.",
@@ -3652,6 +3981,53 @@ const _I18N_EXTRA = {
     err_name_taken:"«{name}» è già in uso, il tuo nome sarà «{suggested}». Tocca di nuovo Crea un account per confermare.",
     email_sent_to:"Abbiamo inviato un link di conferma a", email_sent_activate:"Cliccaci sopra per attivare il tuo account.",
     ph_min6:"Almeno 6 caratteri",
+    toast_session_expired:"Sessione scaduta: accedi di nuovo",
+    alert_not_connected:"Non connesso. Esci e accedi di nuovo.",
+    alert_session_expired:"Sessione scaduta. Accedi di nuovo.",
+    err_could_not_save:"Impossibile salvare: ",
+    err_could_not_delete:"Impossibile eliminare: ",
+    toast_select_someone:"Prima cerca e seleziona qualcuno",
+    toast_already_friends:"Siete già amici o la richiesta è in attesa",
+    err_prefix:"Errore: ",
+    toast_friend_added:"Amico aggiunto",
+    toast_request_declined:"Richiesta rifiutata",
+    toast_friend_removed:"Amico rimosso",
+    toast_link_copied:"Link copiato",
+    toast_invite_not_found:"Invito non trovato",
+    err_failed_to_send:"Invio non riuscito: ",
+    toast_err_invite_not_found:"Errore: invito non trovato",
+    toast_feedback_reply:"Hai ricevuto una risposta al tuo messaggio",
+    toast_usdt_copied:"Indirizzo USDT copiato",
+    toast_name_empty:"Il nome non può essere vuoto",
+    toast_name_updated:"Nome aggiornato",
+    err_name_update:"Impossibile aggiornare il nome: ",
+    toast_nothing_export:"Non c'è ancora nulla da esportare",
+    err_export_failed:"Esportazione non riuscita: ",
+    err_json_export_failed:"Esportazione JSON non riuscita: ",
+    toast_crew_complete:"Tutti i film hanno già la troupe",
+    toast_no_valid_entries:"Nessuna voce utilizzabile in quel file",
+    toast_no_films_in_file:"Nessun film trovato in quel file",
+    toast_image_too_large:"Immagine troppo grande (max 5 MB)",
+    toast_write_something:"Scrivi prima qualcosa",
+    toast_feedback_thanks:"Ricevuto. Leggo tutto personalmente",
+    err_could_not_send:"Impossibile inviare: ",
+    join_invalid_token:"Questo link di invito non è valido",
+    join_expired_token:"Questo link di invito è scaduto",
+    join_token_exhausted:"Questo link di invito ha raggiunto il limite",
+    ph_your_name:"Il tuo nome",
+    ph_review:"Che ne pensi?",
+    ph_why_love:"Perché ti piacerà…",
+    ph_feedback:"Dimmi cosa ne pensi…",
+    ph_reply:"Rispondi…",
+    ph_new_list:"Nome della nuova lista…",
+    ph_search_title:"Titolo di film o serie…",
+    ph_mood:"Umore, genere, qualsiasi cosa…",
+    ph_list_name:"Nome della lista…",
+    confirm_delete:"Eliminare?",
+    toast_enter_list_name:"Inserisci un nome per la lista",
+    toast_enter_a_name:"Inserisci un nome",
+    toast_member_removed:"Membro rimosso",
+    toast_new_friend_request:"Nuova richiesta di amicizia: controlla il tuo account",
     err_link_expired:"Questo link è scaduto o è già stato usato. Chiedine uno nuovo qui sotto.",
     err_email_taken:"Questa email ha già un account. Prova ad accedere.", err_email_bad:"Questo indirizzo email non sembra corretto.",
     err_too_many:"Troppi tentativi. Aspetta qualche minuto e riprova.",
@@ -4838,7 +5214,7 @@ async function proxyFetch(body) {
   const period = res.headers.get("X-RateLimit-Period");
   if (remaining !== null && limit !== null) updateAICounter(+remaining, +limit, period);
   if (res.status === 429) { const data = await res.json().catch(() => ({})); handleRateLimitHit(data); throw new Error("rate_limited"); }
-  if (res.status === 401) { showToast("Session expired — please sign in again"); throw new Error("unauthorized"); }
+  if (res.status === 401) { showToast(t('toast_session_expired')); throw new Error("unauthorized"); }
   if (!res.ok) throw new Error("Proxy error " + res.status);
   return res.json();
 }
@@ -5444,7 +5820,7 @@ async function toggleFilmInList(listId, tmdbID) {
     // Revert optimistic change to the DB truth
     try { watchHistory = await loadHistoryFromDB(); } catch(_) {}
     _refreshDetailChecklist(tmdbID); renderHistory();
-    showToast('Error: ' + _safeErr(e), true);
+    showToast(t('err_prefix') + _safeErr(e), true);
   } finally {
     _togglingLists.delete(key);
   }
@@ -6385,8 +6761,8 @@ async function confirmAdd() {
   const m = currentAddMovie;
   const btn = document.getElementById("add-confirm-btn");
   btn.textContent = "Saving…"; btn.disabled = true;
-  if (!sbClient) { alert("Not connected. Please sign out and sign in again."); btn.textContent = "Save"; btn.disabled = false; return; }
-  if (!currentUser) { alert("Session expired. Please sign in again."); btn.textContent = "Save"; btn.disabled = false; return; }
+  if (!sbClient) { alert(t('alert_not_connected')); btn.textContent = "Save"; btn.disabled = false; return; }
+  if (!currentUser) { alert(t('alert_session_expired')); btn.textContent = "Save"; btn.disabled = false; return; }
   const tmdbID = String(m.tmdbID || m.id || "");
   const existing = watchHistory.find(h => h.tmdbID === tmdbID);
   let composer = m.Composer || "";
@@ -6429,7 +6805,7 @@ async function confirmAdd() {
     }
     const newHistory = await loadHistoryFromDB();
     if (newHistory.length > 0 || watchHistory.length === 0) watchHistory = newHistory;
-  } catch(e) { alert("Could not save: " + e.message); btn.textContent = "Save"; btn.disabled = false; return; }
+  } catch(e) { alert(t('err_could_not_save') + e.message); btn.textContent = "Save"; btn.disabled = false; return; }
   closeAdd(); closeDetail(); renderHistory();
   _repaintCardsFor(tmdbID);
   // Name the film and where it went. "Saved" on its own leaves the person checking.
@@ -6463,14 +6839,14 @@ async function confirmEdit() {
     await updateEntryInDB(currentEditId, { stars: currentEditStars, comment: document.getElementById("edit-note").value });
     watchHistory = await loadHistoryFromDB();
     closeEdit(); renderHistory();
-  } catch(e) { alert("Could not save: " + e.message); }
+  } catch(e) { alert(t('err_could_not_save') + e.message); }
   btn.textContent = "Save"; btn.disabled = false;
 }
 
 // ── Delete ────────────────────────────────────────────────────────────────────
 async function deleteItem(id) {
   try { await deleteEntryFromDB(id); watchHistory = watchHistory.filter(h => h.id !== id); renderHistory(); }
-  catch(e) { alert("Could not delete: " + e.message); }
+  catch(e) { alert(t('err_could_not_delete') + e.message); }
 }
 // Inline "tap to confirm" delete: first tap arms (× → "Delete?"), second tap within 3s deletes.
 let _delArmId = null, _delArmEl = null, _delArmTimer = null;
@@ -6949,12 +7325,12 @@ function selectFriendToAdd(id, name) {
 }
 
 async function sendFriendRequest() {
-  if (!_friendAddTarget) { showToast("Search and select someone first"); return; }
+  if (!_friendAddTarget) { showToast(t('toast_select_someone')); return; }
   const { id, name } = _friendAddTarget;
   // Check if already friends or pending
   const all = [..._friendsCache, ..._friendRequestsCache];
   const exists = all.some(f => f.user_id === id || f.friend_id === id);
-  if (exists) { showToast("Already friends or request pending"); return; }
+  if (exists) { showToast(t('toast_already_friends')); return; }
   try {
     const { error } = await sbClient.from("friendships").insert({
       user_id:     currentUser.id,
@@ -6978,9 +7354,9 @@ async function respondFriendRequest(fid, status) {
     if (status === "accepted") {
       const f = _friendRequestsCache.find(r => r.id === fid);
       if (f) { _friendsCache.unshift({ ...f, status: "accepted" }); }
-      showToast("Friend added!");
+      showToast(t('toast_friend_added'));
     } else {
-      showToast("Request declined");
+      showToast(t('toast_request_declined'));
     }
     _friendRequestsCache = _friendRequestsCache.filter(r => r.id !== fid);
     _updateFriendsBadge();
@@ -7082,7 +7458,7 @@ async function deleteFriendConfirmed(fid) {
     _friendsCache = _friendsCache.filter(f => f.id !== fid);
     _friendDeleteConfirmFid = null;
     renderFriendsSection();
-    showToast("Friend removed");
+    showToast(t('toast_friend_removed'));
   } catch(e) { showToast("Error: " + _safeErr(e)); }
 }
 
@@ -7213,7 +7589,7 @@ function renderListTabs() {
   });
 
   if (_listTabCreating) {
-    html += `<input id="list-tab-input" type="text" placeholder="List name…"
+    html += `<input id="list-tab-input" type="text" placeholder="List name…" data-i18n-ph="ph_list_name"
       style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--text);font-size:12px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;width:110px;flex-shrink:0"
       enterkeyhint="done"
       onkeydown="if(event.key==='Enter'){event.preventDefault();_confirmNewListTab()}if(event.key==='Escape')_cancelNewListTab()"
@@ -7514,7 +7890,7 @@ async function _confirmNewListTab() {
     await loadListsCache();
     switchListTab(data.id);
     showToast(`"${name}" created`);
-  } catch(e) { showToast('Error: ' + _safeErr(e), true); renderListTabs(); }
+  } catch(e) { showToast(t('err_prefix') + _safeErr(e), true); renderListTabs(); }
   finally { _listTabSaving = false; }
 }
 
@@ -7684,7 +8060,7 @@ function renderListsSection() {
 async function createList() {
   const input = document.getElementById('list-name-input');
   const name = (input?.value || '').trim();
-  if (!name) { showToast('Enter a list name', true); return; }
+  if (!name) { showToast(t('toast_enter_list_name'), true); return; }
   try {
     const { data, error } = await sbClient.from('lists').insert({ name, owner_id: currentUser.id }).select().single();
     if (error) throw new Error(error.message);
@@ -7697,13 +8073,13 @@ async function createList() {
     await loadListsCache();
     renderListsSection();
     showToast(`"${name}" created`);
-  } catch(e) { showToast('Error: ' + _safeErr(e), true); }
+  } catch(e) { showToast(t('err_prefix') + _safeErr(e), true); }
 }
 
 async function renameList(listId) {
   const input = document.getElementById('list-rename-input');
   const name = (input?.value || '').trim();
-  if (!name) { showToast('Enter a name', true); return; }
+  if (!name) { showToast(t('toast_enter_a_name'), true); return; }
   try {
     const { error } = await sbClient.from('lists').update({ name }).eq('id', listId);
     if (error) throw new Error(error.message);
@@ -7711,7 +8087,7 @@ async function renameList(listId) {
     await loadListsCache();
     renderListTabs();
     showToast(`Renamed to "${name}"`);
-  } catch(e) { showToast('Error: ' + _safeErr(e), true); }
+  } catch(e) { showToast(t('err_prefix') + _safeErr(e), true); }
 }
 
 // Native share sheet (WhatsApp/Telegram/Messages…) with clipboard fallback
@@ -7720,7 +8096,7 @@ async function _shareOrCopy(url, title, text) {
     try { await navigator.share({ title, text, url }); return; }
     catch(e) { if (e && e.name === 'AbortError') return; /* fall through to copy */ }
   }
-  try { await navigator.clipboard.writeText(url); showToast('Link copied!'); }
+  try { await navigator.clipboard.writeText(url); showToast(t('toast_link_copied')); }
   catch(e) { showToast(url); }
 }
 // Drawn here, by qr.js, rather than fetched. This used to point at api.qrserver.com,
@@ -7783,7 +8159,7 @@ async function toggleAppInvite() {
     <div style="display:flex;gap:8px">
       <button onclick='_shareOrCopy(${JSON.stringify(url)}, "Cinemail", ${JSON.stringify(msg)})'
         style="flex:2;padding:9px;border-radius:8px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;font-weight:600">${t('share_invite')}</button>
-      <button onclick='navigator.clipboard.writeText(${JSON.stringify(url)}).then(()=>showToast("Link copied!"))'
+      <button onclick='navigator.clipboard.writeText(${JSON.stringify(url)}).then(()=>showToast(t('toast_link_copied')))'
         style="flex:1;padding:9px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${t('copy')}</button>
     </div>`;
   panel.style.display = 'block';
@@ -8114,7 +8490,7 @@ async function checkPendingFriendInvite() {
     await _clearInviteMeta();
     if (data === 'created') {
       await loadFriendsCache();   // refresh avatar badge + requests list
-      showToast('New friend request - check your account');
+      showToast(t('toast_new_friend_request'));
     }
   } catch(e) { console.warn('[invite]', e.message); }
 }
@@ -8153,7 +8529,7 @@ async function _loadInviteLink(listId) {
       <div style="display:flex;gap:8px">
         <button onclick='_shareOrCopy(${JSON.stringify(url)}, "Cinemail", ${JSON.stringify(msg)})'
           style="flex:2;padding:9px;border-radius:8px;background:var(--accent);border:none;color:var(--on-accent);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer">${t('share_invite')}</button>
-        <button onclick='navigator.clipboard.writeText(${JSON.stringify(url)}).then(()=>showToast("Link copied!"))'
+        <button onclick='navigator.clipboard.writeText(${JSON.stringify(url)}).then(()=>showToast(t('toast_link_copied')))'
           style="flex:1;padding:9px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${t('copy')}</button>
       </div>`;
   } catch(e) { if (el) el.innerHTML = `<div style="font-size:12px;color:#f87171">${e.message}</div>`; }
@@ -8184,9 +8560,9 @@ async function checkPendingJoinToken() {
     // authorisation - it is the secret.
     const { data: rows, error } = await sbClient.rpc('preview_invite_token', { p_token: token });
     const data = Array.isArray(rows) ? rows[0] : rows;
-    if (error || !data) { showToast('Invite link is invalid', true); return; }
-    if (data.expired)   { showToast('Invite link has expired', true); return; }
-    if (data.exhausted) { showToast('Invite link limit reached', true); return; }
+    if (error || !data) { showToast(t('join_invalid_token'), true); return; }
+    if (data.expired)   { showToast(t('join_expired_token'), true); return; }
+    if (data.exhausted) { showToast(t('join_token_exhausted'), true); return; }
     const { data: already } = await sbClient.from('list_members')
       .select('id').eq('list_id', data.list_id).eq('user_id', currentUser.id).maybeSingle();
     if (already) { showToast(`You're already in "${data.list_name}"`); return; }
@@ -8229,9 +8605,9 @@ async function _confirmJoin(token, listId, listName) {
     // itself when a translation is missing, so `t('join_invalid') || fallback` would put
     // the string "join_invalid" on screen and the fallback would never run.
     if (error) throw new Error(({
-      invalid_token:   'Invite link is invalid',
-      expired_token:   'Invite link has expired',
-      token_exhausted: 'Invite link limit reached',
+      invalid_token:   t('join_invalid_token'),
+      expired_token:   t('join_expired_token'),
+      token_exhausted: t('join_token_exhausted'),
     })[error.message] || error.message);
     await loadListsCache();
     watchHistory = await loadHistoryFromDB();
@@ -8239,7 +8615,7 @@ async function _confirmJoin(token, listId, listName) {
     switchTab('history');
     switchListTab(listId);
     showToast(`Joined "${listName}" 🎬`);
-  } catch(e) { showToast('Error: ' + _safeErr(e), true); }
+  } catch(e) { showToast(t('err_prefix') + _safeErr(e), true); }
 }
 
 async function _listInviteSearch(query, listId) {
@@ -8295,7 +8671,7 @@ async function inviteToList(listId, userId, userName, listName) {
     renderListManageStrip();
     renderListTabs();
     showToast(`Invite sent to ${userName}`);
-  } catch(e) { showToast('Error: ' + _safeErr(e), true); }
+  } catch(e) { showToast(t('err_prefix') + _safeErr(e), true); }
 }
 
 async function _kickMember(listId, userId) {
@@ -8305,8 +8681,8 @@ async function _kickMember(listId, userId) {
     if (error) throw new Error(error.message);
     await loadListsCache();
     renderListManageStrip();
-    showToast('Member removed');
-  } catch(e) { showToast('Error: ' + _safeErr(e), true); }
+    showToast(t('toast_member_removed'));
+  } catch(e) { showToast(t('err_prefix') + _safeErr(e), true); }
 }
 
 async function confirmListDelete(listId) {
@@ -8329,7 +8705,7 @@ async function confirmListDelete(listId) {
     renderListsSection();
     renderListTabs();
     renderHistory();
-  } catch(e) { showToast('Error: ' + _safeErr(e), true); }
+  } catch(e) { showToast(t('err_prefix') + _safeErr(e), true); }
 }
 
 let _listPickerCallback = null;
@@ -8385,7 +8761,7 @@ function _renderListPickerNewRow() {
   if (_listPickerNewMode) {
     row.innerHTML = `
       <div style="display:flex;gap:6px">
-        <input id="list-picker-new-input" type="text" placeholder="New list name…" maxlength="40"
+        <input id="list-picker-new-input" type="text" placeholder="New list name…" data-i18n-ph="ph_new_list" maxlength="40"
           style="flex:1;padding:9px 11px;border-radius:8px;border:1px solid var(--accent-border);background:color-mix(in srgb, var(--accent) 8%, transparent);color:var(--text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none"
           onkeydown="if(event.key==='Enter')_createListFromPicker();if(event.key==='Escape'){_listPickerNewMode=false;_renderListPickerNewRow()}">
         <button onclick="_createListFromPicker()" style="padding:9px 14px;border-radius:8px;border:none;background:var(--accent);color:var(--on-accent);font-size:12px;cursor:pointer;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">Create</button>
@@ -8402,7 +8778,7 @@ function _renderListPickerNewRow() {
 async function _createListFromPicker() {
   const inp = document.getElementById('list-picker-new-input');
   const name = (inp?.value || '').trim();
-  if (!name) { showToast('Enter a name', true); return; }
+  if (!name) { showToast(t('toast_enter_a_name'), true); return; }
   try {
     const { data, error } = await sbClient.from('lists').insert({ name, owner_id: currentUser.id }).select().single();
     if (error) throw new Error(error.message);
@@ -8415,7 +8791,7 @@ async function _createListFromPicker() {
     _listPickerNewMode = false;
     _onListPicked(data.id); // closes the picker itself + uses the captured callback (do NOT closeListPicker first — it wipes the callback)
     showToast(`"${name}" created`);
-  } catch(e) { showToast('Error: ' + _safeErr(e), true); }
+  } catch(e) { showToast(t('err_prefix') + _safeErr(e), true); }
 }
 
 function closeListPicker() {
@@ -8435,7 +8811,7 @@ function _maybePickList(movie, status) {
 // ── Accept film invite with list picker ───────────────────────────────────────
 function acceptFilmInvite(invId) {
   const inv = _inboxCache.received.find(i => i.id === invId);
-  if (!inv) { showToast("Invite not found", true); return; }
+  if (!inv) { showToast(t('toast_invite_not_found'), true); return; }
   if (!_listsCache.length) {
     // No shared lists — accept directly to personal
     respondInviteById(invId, 'accepted');
@@ -8462,7 +8838,7 @@ async function _doAcceptFilmInvite(invId, inv, listId) {
     const listName = listId ? _getListName(listId) : (currentUser?.displayName || 'My') + "'s List";
     showToast(`"${inv.title}" → ${listName}`);
     _updateInboxBadge();
-  } catch(e) { showToast('Error: ' + _safeErr(e), true); }
+  } catch(e) { showToast(t('err_prefix') + _safeErr(e), true); }
   renderInboxFromCache();
 }
 
@@ -8905,7 +9281,7 @@ function _renderInvThread(inv) {
     </div>
     <div class="inv-reply-row" style="display:flex;margin-top:8px">
       <input type="text" class="inv-reply-input" id="inv-reply-input-${inv.id}"
-        placeholder="Reply…" maxlength="200"
+        placeholder="Reply…" data-i18n-ph="ph_reply" maxlength="200"
         onkeydown="if(event.key==='Enter')sendInviteTextReply('${inv.id}')">
       <button class="inv-reply-send" onclick="sendInviteTextReply('${inv.id}')">↑</button>
     </div>
@@ -9048,7 +9424,7 @@ async function sendInviteMsg(inviteId, text, type = "text") {
     });
     if (error) throw new Error(error.message);
   } catch(e) {
-    showToast("Failed to send: " + _safeErr(e), true);
+    showToast(t('err_failed_to_send') + _safeErr(e), true);
     // Revert optimistic push
     const i = inv.messages.indexOf(newMsg);
     if (i >= 0) inv.messages.splice(i, 1);
@@ -9058,7 +9434,7 @@ async function sendInviteMsg(inviteId, text, type = "text") {
 
 async function respondInviteById(id, status) {
   const inv = _inboxCache.received.find(i => i.id === id);
-  if (!inv) { showToast("Error: invite not found"); return; }
+  if (!inv) { showToast(t('toast_err_invite_not_found')); return; }
   await respondInvite(id, status, status === "accepted" ? inv : null);
 }
 
@@ -9069,7 +9445,7 @@ async function deleteInvite(id) {
     _inboxCache.sent = _inboxCache.sent.filter(i => i.id !== id);
     _updateInboxBadge();
     renderInboxFromCache();
-  } catch(e) { showToast("Could not delete: " + _safeErr(e)); }
+  } catch(e) { showToast(t('err_could_not_delete') + _safeErr(e)); }
 }
 
 async function respondInvite(id, status, inv) {
@@ -9257,7 +9633,7 @@ function notifyFeedbackReply() {
   setFeedbackUnread(true);
   playNotificationSound();
   triggerVibration();
-  showToast("💬 You got a reply to your feedback!");
+  showToast(t('toast_feedback_reply'));
   if(document.getElementById("feedback-overlay")?.style.display!=="none") loadFeedbackReplies();
 }
 async function pollFeedbackReplies() {
@@ -9642,7 +10018,7 @@ function copyUSDT(e) {
   if (e) e.preventDefault();
   const lbl = document.getElementById("usdt-acc-label");
   navigator.clipboard.writeText(USDT_ADDRESS).then(() => {
-    if (!lbl) { showToast("USDT address copied ✓"); return; }
+    if (!lbl) { showToast(t('toast_usdt_copied')); return; }
     const orig = lbl.textContent;
     lbl.textContent = "Copied ✓ " + USDT_ADDRESS.slice(0,6) + "…" + USDT_ADDRESS.slice(-4);
     setTimeout(() => { lbl.textContent = orig; }, 2500);
@@ -9651,22 +10027,22 @@ function copyUSDT(e) {
 // SUPPORT-JS-END
 async function saveDisplayName() {
   const newName=document.getElementById("acc-name-input").value.trim();
-  if(!newName){showToast("Name cannot be empty",true);return;}
+  if(!newName){showToast(t('toast_name_empty'),true);return;}
   const btn=document.getElementById("btn-save-name");
   // Label stays the same — just disable + dim while saving (no width jump across 8 langs)
   btn.disabled=true;
   try {
     // supabase-js resolves with {data, error} rather than throwing, so the catch below
     // only ever saw network faults. A refused write - RLS, a duplicate name, a bad
-    // session - returned normally and the next line said "Name updated" over a name
+    // session - returned normally and the next line said t('toast_name_updated') over a name
     // the server never took.
     const { error } = await sbClient.from("profiles").upsert({id:currentUser.id,display_name:newName});
     if (error) throw new Error(error.message);
     currentUser.displayName=newName;
     _applyAvatar();
     document.getElementById("acc-name-display").textContent=newName;
-    showToast("Name updated");
-  } catch(e){showToast("Error updating name: "+_safeErr(e),true);}
+    showToast(t('toast_name_updated'));
+  } catch(e){showToast(t('err_name_update')+_safeErr(e),true);}
   btn.disabled=false;
 }
 
@@ -9994,10 +10370,10 @@ async function backupExportCSV() {
   if (btn) { btn.textContent = "Exporting…"; btn.disabled = true; }
   try {
     const rows = await getBackupData();
-    if (!rows.length) { showToast("Nothing to export yet"); return; }
+    if (!rows.length) { showToast(t('toast_nothing_export')); return; }
     BackupLocal.export(rows);
     showToast(`✓ Exported ${rows.length} items`);
-  } catch(e) { showToast("Export failed: " + _safeErr(e), true); }
+  } catch(e) { showToast(t('err_export_failed') + _safeErr(e), true); }
   finally { if (btn) { btn.textContent = "↓ Export CSV"; btn.disabled = false; } }
 }
 
@@ -10007,7 +10383,7 @@ async function backupExportJSON() {
   if (btn) { btn.textContent = "Exporting…"; btn.disabled = true; }
   try {
     const watchlist = await getBackupData();
-    if (!watchlist.length) { showToast("Nothing to export yet"); return; }
+    if (!watchlist.length) { showToast(t('toast_nothing_export')); return; }
     // Bundle lists + memberships if any (best-effort)
     let lists = [], members = [];
     try { lists   = await sbFetch("lists?select=*"); } catch(e) {}
@@ -10028,7 +10404,7 @@ async function backupExportJSON() {
     const shared = await _saveOrShareBlob(blob, `cinemail-backup-${_todayStr()}.json`, "application/json");
     showToast(shared ? `✓ ${watchlist.length} items + ${lists?.length || 0} lists - choose where to save`
                      : `✓ Exported ${watchlist.length} items + ${lists?.length || 0} lists as JSON`);
-  } catch(e) { showToast("JSON export failed: " + _safeErr(e), true); }
+  } catch(e) { showToast(t('err_json_export_failed') + _safeErr(e), true); }
   finally { if (btn) { btn.textContent = "↓ Export JSON"; btn.disabled = false; } }
 }
 
@@ -10050,7 +10426,7 @@ async function backfillCrewData() {
     h.tmdbID && (!h.cinematographer || !h.composer || !h.director || !h.actors || !h.runtime
                  || _nameCount(h.actors) < _CAST_CAP)
   );
-  if (!targets.length) { showToast("All films already have crew data ✓"); return; }
+  if (!targets.length) { showToast(t('toast_crew_complete')); return; }
   if (btn) { btn.disabled = true; }
   let updated = 0, processed = 0;
   for (const h of targets) {
@@ -10079,7 +10455,7 @@ async function backupImportCSV() {
   const importBtn = document.querySelector('.btn-backup[onclick="backupImportCSV()"]');
   try {
     const rows = await BackupLocal.import();
-    if (!rows.length) { showToast("No valid entries found in file", true); return; }
+    if (!rows.length) { showToast(t('toast_no_valid_entries'), true); return; }
 
     // Step 1: enrich with TMDB (poster + canonical data), show progress
     const setLabel = (txt) => { if (importBtn) { importBtn.textContent = txt; importBtn.disabled = true; } };
@@ -10226,7 +10602,7 @@ async function backupImportLetterboxd() {
     const text = await file.text();
     const rows = _parseLetterboxdRows(text, file.name);
     if (!rows) { showToast(t('lb_not_lb'), true); return; }
-    if (!rows.length) { showToast("No films found in file", true); return; }
+    if (!rows.length) { showToast(t('toast_no_films_in_file'), true); return; }
     setStatus(`${t('lb_matching')} 1/${rows.length}`);
     const resolved = await _resolveViaTMDBSearch(rows, (d, tot) => setStatus(`${t('lb_matching')} ${d}/${tot}`));
     const ok = resolved.filter(r => r.imdb_id && r.title);
@@ -10757,7 +11133,7 @@ async function backupExportXLSX() {
   try {
     await _loadExcelJS();
     const rows = await getBackupData();
-    if (!rows.length) { showToast("Nothing to export yet"); return; }
+    if (!rows.length) { showToast(t('toast_nothing_export')); return; }
     if (!(_listsCache && _listsCache.length)) { try { await loadListsCache(); } catch(e) {} }
     const listNameById = {};
     (_listsCache || []).forEach(l => { listNameById[l.id] = l.name; });
@@ -10894,7 +11270,7 @@ async function backupExportXLSX() {
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     showToast(shared ? `✓ ${rows.length} items - choose where to save`
                      : `✓ Exported ${rows.length} items`);
-  } catch(e) { showToast("Export failed: " + _safeErr(e), true); }
+  } catch(e) { showToast(t('err_export_failed') + _safeErr(e), true); }
   finally { if (btn) { btn.disabled = false; } }
 }
 
@@ -10999,7 +11375,7 @@ async function backupImportXLSX() {
       }
     }
 
-    if (!rows.length) { showToast("No valid entries in file", true); return; }
+    if (!rows.length) { showToast(t('toast_no_valid_entries'), true); return; }
 
     // Recreate lists and map their names → ids, then reattach films by name.
     const wantedLists = new Set(listNamesFromBackup);
@@ -11099,7 +11475,7 @@ function openFeedback() {
 function onFbScreenshotPicked(event) {
   const file = event.target.files?.[0];
   if (!file) return;
-  if (file.size > 5 * 1024 * 1024) { showToast("Image too large (max 5MB)", true); event.target.value = ""; return; }
+  if (file.size > 5 * 1024 * 1024) { showToast(t('toast_image_too_large'), true); event.target.value = ""; return; }
   _fbScreenshotFile = file;
   const url = URL.createObjectURL(file);
   document.getElementById("fb-attach-thumb").src = url;
@@ -11186,7 +11562,7 @@ function setFbType(type) {
 }
 async function submitFeedback() {
   const message = document.getElementById("fb-message").value.trim();
-  if (!message) { showToast("Please write something first", true); return; }
+  if (!message) { showToast(t('toast_write_something'), true); return; }
 
   const btn = document.getElementById("fb-submit-btn");
   btn.textContent = "SENDING..."; btn.disabled = true;
@@ -11232,9 +11608,9 @@ async function submitFeedback() {
     clearFbScreenshot();
     document.getElementById("fb-message").value = "";
     closeFeedback();
-    showToast("Got it! I read everything personally 🙏");
+    showToast(t('toast_feedback_thanks'));
   } catch(e) {
-    showToast("Could not send: " + _safeErr(e), true);
+    showToast(t('err_could_not_send') + _safeErr(e), true);
   } finally {
     btn.textContent = "SEND"; btn.disabled = false;
   }
@@ -11249,7 +11625,7 @@ async function deleteFeedback(id) {
     await loadFeedbackReplies();
   } catch(e) {
     if (btn) { btn.disabled = false; btn.textContent = "×"; }
-    showToast("Could not delete: " + _safeErr(e), true);
+    showToast(t('err_could_not_delete') + _safeErr(e), true);
   }
 }
 function _fmtDT(iso){ if(!iso) return ""; try { return new Date(iso).toLocaleString(undefined,{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}); } catch(e){ return ""; } }
