@@ -2877,7 +2877,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.27</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.28</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -5238,9 +5238,22 @@ async function signOut() {
 }
 
 // ── Delete account ────────────────────────────────────────────────────────────
-// What the person has to type back before the red button will work. A guest account has
-// no address, so it falls back to the display name; both are visible on the sheet they
-// just came from, so this is a deliberate act rather than a memory test.
+// What the person has to type back before the red button will work - or an EMPTY STRING,
+// meaning there is nothing to type and the button is live immediately.
+//
+// That empty case is not an edge case, it is the guest account, and getting it wrong here
+// was shipped for about twenty minutes in v0.57.27. A guest has no email, and onSignedIn
+// derives displayName from the email prefix, so a real guest's displayName is "". The first
+// version required the typed value to equal a non-empty word, so for guests the button could
+// never be enabled and a guest could not delete their account at all - which is exactly the
+// App Store 5.1.1(v) failure this screen exists to prevent, introduced by the guard meant to
+// protect it. It passed testing because the test stubbed a guest with a display name, which
+// no real guest has: an assumption was tested instead of the actual state.
+//
+// The rule that follows: a confirmation may never be the reason a deletion is impossible.
+// Where there is nothing to type back, the two-step sheet and the guest warning are the
+// whole guard, and they are proportionate - a guest has no address to recover with, which
+// the warning already says in red.
 function _delConfirmWord() {
   return (isGuestUser() ? (currentUser?.displayName || "") : (currentUser?.email || "")).trim();
 }
@@ -5253,7 +5266,8 @@ function _delConfirmCheck() {
   if (!inp || !btn) return;
   // Case-insensitive: addresses are not case-sensitive in practice and a phone that
   // capitalised the first letter must not lock someone out of deleting their account.
-  const ok = inp.value.trim().toLowerCase() === _delConfirmWord().toLowerCase() && _delConfirmWord() !== "";
+  const want = _delConfirmWord().toLowerCase();
+  const ok = want === "" || inp.value.trim().toLowerCase() === want;
   btn.disabled = !ok;
   btn.style.opacity = ok ? "1" : ".4";
   btn.style.pointerEvents = ok ? "auto" : "none";
@@ -5279,12 +5293,13 @@ function confirmDeleteAccount() {
            deleted, which is the 5.1.1(v) failure this screen exists to avoid. The address is
            already on screen above, needs no particular keyboard, and is what GitHub and
            Google ask for in the same place. Guests have no address, so they type their name. -->
+      ${_delConfirmWord() ? `
       <label style="display:block;text-align:left;font-size:11px;color:var(--muted);margin-bottom:6px">${_delConfirmLabel()}</label>
       <input id="del-confirm-input" type="text" autocomplete="off" autocapitalize="none" spellcheck="false"
              placeholder="${escapeHtml(_delConfirmWord())}" oninput="_delConfirmCheck()"
-             style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:11px;color:var(--text);font-size:14px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;margin-bottom:16px">
+             style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:11px;color:var(--text);font-size:14px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;margin-bottom:16px">` : ''}
       <div style="display:flex;flex-direction:column;gap:12px">
-        <button id="del-confirm-btn" disabled onclick="deleteAccount()" style="background:#c93b3b;border:none;color:#fff;font-size:14px;font-weight:700;font-family:'DM Sans','Noto Sans Georgian',sans-serif;padding:12px;border-radius:10px;cursor:pointer;opacity:.4;pointer-events:none;transition:opacity .15s">${t('del_acct_confirm')}</button>
+        <button id="del-confirm-btn" ${_delConfirmWord() ? 'disabled' : ''} onclick="deleteAccount()" style="background:#c93b3b;border:none;color:#fff;font-size:14px;font-weight:700;font-family:'DM Sans','Noto Sans Georgian',sans-serif;padding:12px;border-radius:10px;cursor:pointer;opacity:${_delConfirmWord() ? '.4' : '1'};pointer-events:${_delConfirmWord() ? 'none' : 'auto'};transition:opacity .15s">${t('del_acct_confirm')}</button>
         <button onclick="document.getElementById('delete-account-overlay').remove();openAccount();" style="background:none;border:1px solid rgba(255,255,255,0.12);color:var(--muted);font-size:14px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;padding:11px;border-radius:10px;cursor:pointer">${t('cancel')}</button>
       </div>
     </div>
