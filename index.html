@@ -2392,7 +2392,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       </div>
       <div class="form-group">
         <label data-i18n="password">Password</label>
-        <input type="password" id="signup-password" placeholder="Min. 6 characters" autocomplete="new-password"
+        <input type="password" id="signup-password" placeholder="Min. 6 characters" data-i18n-ph="ph_min6" autocomplete="new-password"
           onkeydown="if(event.key==='Enter')doSignUp()">
       </div>
       <div style="margin-top:4px">
@@ -2457,7 +2457,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <div id="reset-error" class="error-msg"></div>
       <div class="form-group">
         <label data-i18n="reset_newpass">New Password</label>
-        <input type="password" id="reset-password" placeholder="Min. 6 characters" autocomplete="new-password">
+        <input type="password" id="reset-password" placeholder="Min. 6 characters" data-i18n-ph="ph_min6" autocomplete="new-password">
       </div>
       <div class="form-group">
         <label data-i18n="reset_confirm">Confirm Password</label>
@@ -2489,7 +2489,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     </div>
     <div class="form-group">
       <label data-i18n="password">Password</label>
-      <input type="password" id="gc-password" placeholder="Min. 6 characters" autocomplete="new-password" onkeydown="if(event.key==='Enter')doGuestConvert()">
+      <input type="password" id="gc-password" placeholder="Min. 6 characters" data-i18n-ph="ph_min6" autocomplete="new-password" onkeydown="if(event.key==='Enter')doGuestConvert()">
     </div>
     <button class="btn btn-primary" id="gc-btn" onclick="doGuestConvert()" data-i18n="guest_join_free" style="margin-top:4px">Join free</button>
     <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--muted)">
@@ -2877,7 +2877,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.19</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.20</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -3413,6 +3413,8 @@ const _I18N_EXTRA = {
     err_enter_name:"Please enter your name.", err_signin_fields:"Please enter your email and password.",
     err_name_taken:"\"{name}\" is taken, so your name will be \"{suggested}\". Press Create Account again to confirm.",
     email_sent_to:"We sent a confirmation link to", email_sent_activate:"Click it to activate your account.",
+    ph_min6:"Min. 6 characters",
+    err_link_expired:"That link has expired or was already used. Ask for a new one below.",
     err_email_taken:"That email already has an account. Try signing in instead.", err_email_bad:"That email address does not look right.",
     err_too_many:"Too many attempts. Please wait a few minutes and try again.",
     err_mail_failed:"We could not send the confirmation email. This is on our side, not yours.",
@@ -3445,6 +3447,8 @@ const _I18N_EXTRA = {
     err_enter_name:"Введи имя.", err_signin_fields:"Введи email и пароль.",
     err_name_taken:"«{name}» уже занято, твоё имя будет «{suggested}». Нажми «Создать аккаунт» ещё раз, чтобы подтвердить.",
     email_sent_to:"Мы отправили ссылку для подтверждения на", email_sent_activate:"Нажми на неё, чтобы активировать аккаунт.",
+    ph_min6:"Минимум 6 символов",
+    err_link_expired:"Ссылка устарела или уже была использована. Запроси новую ниже.",
     err_email_taken:"На этот email уже есть аккаунт. Попробуй войти.", err_email_bad:"Похоже, этот адрес неверный.",
     err_too_many:"Слишком много попыток. Подожди пару минут и попробуй снова.",
     err_mail_failed:"Не удалось отправить письмо с подтверждением. Это на нашей стороне, не на твоей.",
@@ -3477,6 +3481,8 @@ const _I18N_EXTRA = {
     err_enter_name:"Введи ім'я.", err_signin_fields:"Введи email і пароль.",
     err_name_taken:"«{name}» вже зайняте, твоє ім'я буде «{suggested}». Натисни «Створити акаунт» ще раз, щоб підтвердити.",
     email_sent_to:"Ми надіслали посилання для підтвердження на", email_sent_activate:"Натисни його, щоб активувати акаунт.",
+    ph_min6:"Мінімум 6 символів",
+    err_link_expired:"Посилання застаріло або вже було використане. Запроси нове нижче.",
     err_email_taken:"На цей email уже є акаунт. Спробуй увійти.", err_email_bad:"Схоже, ця адреса неправильна.",
     err_too_many:"Забагато спроб. Зачекай кілька хвилин і спробуй ще раз.",
     err_mail_failed:"Не вдалося надіслати лист із підтвердженням. Це на нашому боці, не на твоєму.",
@@ -3509,6 +3515,8 @@ const _I18N_EXTRA = {
     err_enter_name:"შეიყვანე სახელი.", err_signin_fields:"შეიყვანე email და პაროლი.",
     err_name_taken:"„{name}“ დაკავებულია, შენი სახელი იქნება „{suggested}“. დასადასტურებლად კვლავ დააჭირე ღილაკს „ანგარიშის შექმნა“.",
     email_sent_to:"დადასტურების ბმული გამოგზავნეთ მისამართზე", email_sent_activate:"დააჭირე ანგარიშის გასააქტიურებლად.",
+    ph_min6:"მინიმუმ 6 სიმბოლო",
+    err_link_expired:"ბმულს ვადა გაუვიდა ან უკვე გამოყენებულია. მოითხოვე ახალი ქვემოთ.",
     err_email_taken:"ამ მისამართზე უკვე არსებობს ანგარიში. სცადე შესვლა.", err_email_bad:"როგორც ჩანს, ეს მისამართი არასწორია.",
     err_too_many:"ძალიან ბევრი მცდელობა. დაელოდე რამდენიმე წუთს და სცადე ხელახლა.",
     err_mail_failed:"დადასტურების წერილის გაგზავნა ვერ მოხერხდა. ეს ჩვენი მხრიდანაა, არა შენი.",
@@ -3541,6 +3549,8 @@ const _I18N_EXTRA = {
     err_enter_name:"Introduce tu nombre.", err_signin_fields:"Introduce tu email y tu contraseña.",
     err_name_taken:"«{name}» ya está en uso, tu nombre será «{suggested}». Pulsa Crear cuenta otra vez para confirmar.",
     email_sent_to:"Enviamos un enlace de confirmación a", email_sent_activate:"Haz clic para activar tu cuenta.",
+    ph_min6:"Mínimo 6 caracteres",
+    err_link_expired:"Ese enlace ha caducado o ya se ha usado. Pide uno nuevo abajo.",
     err_email_taken:"Ese email ya tiene una cuenta. Prueba a iniciar sesión.", err_email_bad:"Esa dirección de correo no parece correcta.",
     err_too_many:"Demasiados intentos. Espera unos minutos y vuelve a probar.",
     err_mail_failed:"No pudimos enviar el correo de confirmación. Es cosa nuestra, no tuya.",
@@ -3573,6 +3583,8 @@ const _I18N_EXTRA = {
     err_enter_name:"Saisis ton nom.", err_signin_fields:"Saisis ton email et ton mot de passe.",
     err_name_taken:"« {name} » est déjà pris, ton nom sera « {suggested} ». Appuie de nouveau sur Créer un compte pour confirmer.",
     email_sent_to:"Nous avons envoyé un lien de confirmation à", email_sent_activate:"Clique dessus pour activer ton compte.",
+    ph_min6:"6 caractères minimum",
+    err_link_expired:"Ce lien a expiré ou a déjà été utilisé. Demandes-en un nouveau ci-dessous.",
     err_email_taken:"Cet email a déjà un compte. Essaie de te connecter.", err_email_bad:"Cette adresse e-mail ne semble pas correcte.",
     err_too_many:"Trop de tentatives. Patiente quelques minutes et réessaie.",
     err_mail_failed:"Nous n'avons pas pu envoyer l'e-mail de confirmation. Cela vient de nous, pas de toi.",
@@ -3605,6 +3617,8 @@ const _I18N_EXTRA = {
     err_enter_name:"Bitte gib deinen Namen ein.", err_signin_fields:"Bitte gib E-Mail und Passwort ein.",
     err_name_taken:"„{name}“ ist vergeben, dein Name wird „{suggested}“. Tippe erneut auf Konto erstellen, um zu bestätigen.",
     email_sent_to:"Wir haben einen Bestätigungslink gesendet an", email_sent_activate:"Klicke darauf, um dein Konto zu aktivieren.",
+    ph_min6:"Mindestens 6 Zeichen",
+    err_link_expired:"Dieser Link ist abgelaufen oder wurde schon benutzt. Fordere unten einen neuen an.",
     err_email_taken:"Für diese E-Mail gibt es bereits ein Konto. Versuche dich anzumelden.", err_email_bad:"Diese E-Mail-Adresse sieht nicht richtig aus.",
     err_too_many:"Zu viele Versuche. Warte ein paar Minuten und versuche es erneut.",
     err_mail_failed:"Wir konnten die Bestätigungsmail nicht senden. Das liegt an uns, nicht an dir.",
@@ -3637,6 +3651,8 @@ const _I18N_EXTRA = {
     err_enter_name:"Inserisci il tuo nome.", err_signin_fields:"Inserisci email e password.",
     err_name_taken:"«{name}» è già in uso, il tuo nome sarà «{suggested}». Tocca di nuovo Crea un account per confermare.",
     email_sent_to:"Abbiamo inviato un link di conferma a", email_sent_activate:"Cliccaci sopra per attivare il tuo account.",
+    ph_min6:"Almeno 6 caratteri",
+    err_link_expired:"Questo link è scaduto o è già stato usato. Chiedine uno nuovo qui sotto.",
     err_email_taken:"Questa email ha già un account. Prova ad accedere.", err_email_bad:"Questo indirizzo email non sembra corretto.",
     err_too_many:"Troppi tentativi. Aspetta qualche minuto e riprova.",
     err_mail_failed:"Non siamo riusciti a inviare l'email di conferma. Dipende da noi, non da te.",
@@ -4406,7 +4422,12 @@ async function doSignUp() {
     // Carry the inviter id into the account's server-side metadata so the friend
     // connection survives the email-confirmation hop (different browser/device).
     const _pendingInvite = localStorage.getItem('pendingFriendInvite');
-    const _signUpData = { display_name: uniqueName };
+    // The language they signed up in, recorded now even though nothing reads it yet. Our
+    // auth emails are English-only for everyone, in an app whose interface speaks eight
+    // languages; fixing that means a Send Email Hook that picks a template per person, and
+    // the hook can only pick if the locale is on the account. Writing it from today costs
+    // one line, and retrofitting it later would mean guessing for every existing user.
+    const _signUpData = { display_name: uniqueName, locale: _lang };
     if (_pendingInvite) _signUpData.invited_by = _pendingInvite;
     const { data, error } = await sbClient.auth.signUp({ email, password, options: { data: _signUpData } });
     if (error) throw error;
@@ -11354,8 +11375,35 @@ function initUI() {
 
   const params=new URLSearchParams(window.location.search);
   const tokenHash=params.get("token_hash"),type=params.get("type");
+
+  // A password-reset link IS a session, and that is the whole trap. supabase-js reads the
+  // tokens out of the URL by itself (detectSessionInUrl is on by default), saves the
+  // session, and only afterwards announces what happened. So getSession() further down
+  // answers with a live session and we used to hand it to onSignedIn - dropping the person
+  // into the app, signed in, having never been shown a password field, with the password
+  // they came to change still unknown to them. Sign out once and they are locked out again.
+  // Reported 11 Sep 2026 by the same user who could not register.
+  //
+  // Two shapes arrive, and BOTH have to be read before createClient runs, because the
+  // client strips the URL of whatever it consumes:
+  //
+  //   ?token_hash=…&type=recovery    a template that calls {{ .TokenHash }} - handled
+  //                                  below, and the only one we ever handled
+  //   #access_token=…&type=recovery  the default {{ .ConfirmationURL }} after its hop
+  //                                  through /auth/v1/verify. A HASH - and `location.hash`
+  //                                  appeared nowhere in this file, so it fell straight
+  //                                  through to the ordinary sign-in path.
+  //
+  // Measured in the bundle we actually ship rather than assumed: `flowType` defaults to
+  // `implicit`, which is what puts the tokens in the fragment, and three call sites emit
+  // PASSWORD_RECOVERY instead of SIGNED_IN - an event our listener did not handle either.
+  // Both holes are closed here; the flag is the one that matters, because _saveSession
+  // runs before the event is dispatched and getSession() therefore wins the race.
+  const _hashParams = new URLSearchParams((window.location.hash || "").replace(/^#/, ""));
+  const isRecoveryLink = type === "recovery" || _hashParams.get("type") === "recovery";
+
   if (tokenHash&&type) {
-    window.history.replaceState({},",",window.location.pathname);
+    window.history.replaceState({},"",window.location.pathname);
     sbClient=window.supabase.createClient(SB_URL,SB_KEY);
     const {data,error}=await sbClient.auth.verifyOtp({token_hash:tokenHash,type});
     if(error){showScreen("signin");showSignInError("Confirmation failed: "+error.message);return;}
@@ -11369,7 +11417,21 @@ function initUI() {
   _checkListLink();
   _checkFilmLink();
   const {data:{session}}=await sbClient.auth.getSession();
-  if(session){await onSignedIn(session.user);}
+  if(session && isRecoveryLink){
+    // Signed in, deliberately not shown the app. The recovery session is what authorises
+    // updateUser() on the next screen, so it has to stay - but the only thing this person
+    // is here to do is choose a password.
+    window.history.replaceState({},"",window.location.pathname);
+    showScreen("reset");
+  }
+  else if(session){await onSignedIn(session.user);}
+  else if(isRecoveryLink){
+    // Came from a reset link and there is no session: the link is spent or expired. It used
+    // to land on a bare sign-in screen with no explanation, which reads as "it is broken".
+    window.history.replaceState({},"",window.location.pathname);
+    showScreen("signin");
+    showSignInError(t('err_link_expired'));
+  }
   else{ if(!_maybeShowOnboarding()) showScreen("signin"); }
   _applyI18n(); // apply stored language preference to static elements
   _paintIcons(); // swap data-ic placeholders for real vector glyphs
@@ -11392,6 +11454,13 @@ function initUI() {
         return;
       }
       await onSignedIn(session.user);
+    }
+    else if(event==="PASSWORD_RECOVERY"){
+      // Belt and braces. The flag above normally gets there first, because the session is
+      // saved before this event is dispatched. This catches the case where it does not -
+      // a link opened into an already-running tab, say.
+      document.getElementById("main-app").style.display="none";
+      showScreen("reset");
     }
     else if(event==="SIGNED_OUT"){showScreen("signin");document.getElementById("main-app").style.display="none";}
   });
