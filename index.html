@@ -2089,7 +2089,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div class="list-check-section" style="margin-top:11px;margin-bottom:0">
           <div class="list-check-header" data-i18n="lists_header">Add to a list</div>
           <div class="list-check-row"><span class="list-check-icon">○</span><span style="font-size:13px">Date night</span></div>
-          <div class="list-check-row checked"><span class="list-check-icon">✓</span><span style="font-size:13px">Watch with friends</span><span style="font-size:10px;color:var(--muted);margin-left:auto">added</span></div>
+          <div class="list-check-row checked"><span class="list-check-icon">✓</span><span style="font-size:13px">Watch with friends</span><span style="font-size:10px;color:var(--muted);margin-left:auto" data-i18n="tag_added">added</span></div>
         </div>
         <div style="display:flex;gap:8px;margin-top:10px">
           <button class="btn-modal-primary" data-i18n="mark_watched" style="flex:1;padding:9px 8px;font-size:13px">Mark as Watched</button>
@@ -2520,7 +2520,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
             <polyline points="2,4 12,13 22,4"/>
           </svg>
         </span>
-        <span style="color:var(--muted);line-height:1">Feedback</span>
+        <span style="color:var(--muted);line-height:1" data-i18n="feedback">Feedback</span>
       </button>
       <button class="avatar-btn" id="btn-avatar" onclick="openAccount()" title="Account">U</button>
     </div>
@@ -2645,7 +2645,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 <div id="add-overlay" class="overlay" style="display:none" onclick="closeAdd()">
   <div style="padding:20px;width:100%;display:flex;justify-content:center" onclick="event.stopPropagation()">
     <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="sheet-label" id="add-modal-label">ADD TO HISTORY</div>
+      <div class="sheet-label" id="add-modal-label" data-i18n="add_to_history">ADD TO HISTORY</div>
       <div class="sheet-title" id="add-movie-title"></div>
       <div id="add-stars-section">
         <div class="add-label" data-i18n="your_rating">Your Rating</div>
@@ -2732,7 +2732,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
           <div class="avatar-edit-badge"><span data-ic="pencil" data-ic-size="11"></span></div>
         </div>
         <div id="avatar-picker-wrap" class="avatar-picker-wrap"></div>
-        <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:24px;letter-spacing:0.5px;color:var(--text)" id="acc-name-display">User</div>
+        <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:24px;letter-spacing:0.5px;color:var(--text)" id="acc-name-display" data-i18n="default_user">User</div>
         <div style="font-size:13px;color:#aaa;margin-top:2px" id="acc-email-display"></div>
       </div>
 
@@ -2858,7 +2858,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <div style="margin-top:8px;margin-bottom:18px;padding:12px 14px;background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:10px;font-size:11px;line-height:1.6;color:var(--muted)">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
           <svg viewBox="0 0 273.5 199.6" width="34" height="14" style="flex-shrink:0" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="tmdb-grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#90cea1"/><stop offset="56%" stop-color="#3cbec9"/><stop offset="100%" stop-color="#00b3e5"/></linearGradient></defs><path fill="url(#tmdb-grad)" d="M105.7 76.9h60.9c4.2 0 7.6 3.4 7.6 7.6v30.5c0 4.2-3.4 7.6-7.6 7.6h-60.9c-4.2 0-7.6-3.4-7.6-7.6V84.6c0-4.2 3.4-7.6 7.6-7.6zM7.6 76.9h60.9c4.2 0 7.6 3.4 7.6 7.6v30.5c0 4.2-3.4 7.6-7.6 7.6H7.6C3.4 122.7 0 119.3 0 115.1V84.6c0-4.2 3.4-7.6 7.6-7.6zm196.3 0h60.9c4.2 0 7.6 3.4 7.6 7.6v30.5c0 4.2-3.4 7.6-7.6 7.6h-60.9c-4.2 0-7.6-3.4-7.6-7.6V84.6c.1-4.2 3.5-7.6 7.6-7.6z"/></svg>
-          <span style="color:var(--text);font-weight:600;font-size:11px;letter-spacing:0.3px">About Cinemail</span>
+          <span style="color:var(--text);font-weight:600;font-size:11px;letter-spacing:0.3px" data-i18n="about_cinemail">About Cinemail</span>
         </div>
         <!-- The logo is part of TMDB's attribution requirement, not decoration. Their terms
              ask for the logo AND the notice; we carried only the notice. Their own asset,
@@ -2877,7 +2877,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.25</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.26</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -2929,15 +2929,15 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <button onclick="closeFeedback()" aria-label="Close" style="position:absolute;top:12px;right:12px;z-index:5;width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--muted);font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--primary-border)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">×</button>
 
       <div style="flex-shrink:0;">
-        <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;color:#F5C518;font-size:12px;letter-spacing:2px;margin-bottom:3px">FEEDBACK</div>
-        <div id="fb-title" style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:19px;margin-bottom:14px;line-height:1.2">Share a thought or report a bug</div>
-        <div class="add-label" id="fb-type-label">Type</div>
+        <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;color:#F5C518;font-size:12px;letter-spacing:2px;margin-bottom:3px" data-i18n="fb_heading">FEEDBACK</div>
+        <div id="fb-title" style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:19px;margin-bottom:14px;line-height:1.2" data-i18n="fb_sub">Share a thought or report a bug</div>
+        <div class="add-label" id="fb-type-label" data-i18n="fb_type">Type</div>
         <div id="fb-type-row" style="display:flex;gap:8px;margin-bottom:14px">
           <button id="fb-type-bug" onclick="setFbType('bug')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px"><span data-ic="bug" data-ic-size="13"></span>Bug</button>
           <button id="fb-type-idea" onclick="setFbType('idea')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px"><span data-ic="lightbulb" data-ic-size="13"></span>Idea</button>
           <button id="fb-type-other" onclick="setFbType('other')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px"><span data-ic="message-circle" data-ic-size="13"></span>Other</button>
         </div>
-        <div class="add-label">Message</div>
+        <div class="add-label" data-i18n="fb_message_lbl">Message</div>
         <textarea id="fb-message" placeholder="Tell me what's on your mind..." data-i18n-ph="ph_feedback" style="min-height:70px;margin-bottom:10px;width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:13px;padding:10px 12px;outline:none;resize:vertical;transition:border-color .2s"></textarea>
 
         <!-- Screenshot attach -->
@@ -2945,7 +2945,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div id="fb-attach-row" style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
           <button id="fb-attach-btn" onclick="document.getElementById('fb-screenshot').click()" style="display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s">
             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <span id="fb-attach-lbl">Attach screenshot</span>
+            <span id="fb-attach-lbl" data-i18n="fb_attach">Attach screenshot</span>
           </button>
           <div id="fb-attach-preview" style="display:none;align-items:center;gap:6px">
             <img id="fb-attach-thumb" src="" style="height:32px;width:32px;border-radius:5px;object-fit:cover;border:1px solid var(--border)">
@@ -2955,7 +2955,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 
         <div style="display:flex;gap:9px;margin-bottom:14px">
           <button class="btn-modal-close" onclick="closeFeedback()" data-i18n="cancel">Cancel</button>
-          <button class="btn-modal-save" id="fb-submit-btn" onclick="submitFeedback()">SEND</button>
+          <button class="btn-modal-save" id="fb-submit-btn" onclick="submitFeedback()" data-i18n="fb_send">SEND</button>
         </div>
       </div>
 
@@ -3457,6 +3457,38 @@ const _I18N_EXTRA = {
     toast_enter_a_name:"Enter a name",
     toast_member_removed:"Member removed",
     toast_new_friend_request:"New friend request - check your account",
+    feedback:"Feedback",
+    add_to_history:"Add to history",
+    default_user:"User",
+    about_cinemail:"About Cinemail",
+    fb_heading:"Feedback",
+    fb_sub:"Share a thought or report a bug",
+    fb_type:"Type",
+    fb_message_lbl:"Message",
+    fb_attach:"Attach screenshot",
+    fb_send:"Send",
+    fb_previous:"Your previous messages",
+    retry:"Retry",
+    picks_limit:"Picks limit reached",
+    picks_limit_why:"The weekly budget is what keeps Cinemail free for everyone.",
+    got_it:"Got it",
+    my_list:"My List",
+    tag_personal:"personal",
+    tag_added:"added",
+    tag_active:"active",
+    lbl_personal:"Personal",
+    tap_details:"tap for details",
+    seasons_eps:"Seasons / Episodes",
+    country_lang:"Country / Language",
+    av_emoji:"Emoji",
+    av_color:"Color",
+    av_remove_emoji:"Remove emoji",
+    create:"Create",
+    no_users_found:"No users found",
+    add_friends_hint:"Add friends in Account to share films with them",
+    sign_in_first:"Sign in first.",
+    import_needs_session:"Your films are saved to your Cinemail account, so you need a session to import.",
+    fb_history_failed:"Couldn't load history",
     err_link_expired:"That link has expired or was already used. Ask for a new one below.",
     err_email_taken:"That email already has an account. Try signing in instead.", err_email_bad:"That email address does not look right.",
     err_too_many:"Too many attempts. Please wait a few minutes and try again.",
@@ -3534,6 +3566,38 @@ const _I18N_EXTRA = {
     toast_enter_a_name:"Введи имя",
     toast_member_removed:"Участник удалён",
     toast_new_friend_request:"Новая заявка в друзья - загляни в аккаунт",
+    feedback:"Обратная связь",
+    add_to_history:"Добавить в историю",
+    default_user:"Пользователь",
+    about_cinemail:"О Cinemail",
+    fb_heading:"Обратная связь",
+    fb_sub:"Поделись мыслью или сообщи об ошибке",
+    fb_type:"Тип",
+    fb_message_lbl:"Сообщение",
+    fb_attach:"Прикрепить скриншот",
+    fb_send:"Отправить",
+    fb_previous:"Твои прошлые сообщения",
+    retry:"Повторить",
+    picks_limit:"Лимит подборок исчерпан",
+    picks_limit_why:"Недельный лимит - это то, что позволяет Cinemail оставаться бесплатным для всех.",
+    got_it:"Понятно",
+    my_list:"Мой список",
+    tag_personal:"личный",
+    tag_added:"добавлено",
+    tag_active:"активный",
+    lbl_personal:"Личный",
+    tap_details:"нажми, чтобы открыть",
+    seasons_eps:"Сезоны / Серии",
+    country_lang:"Страна / Язык",
+    av_emoji:"Эмодзи",
+    av_color:"Цвет",
+    av_remove_emoji:"Убрать эмодзи",
+    create:"Создать",
+    no_users_found:"Никого не нашлось",
+    add_friends_hint:"Добавь друзей в аккаунте, чтобы делиться с ними фильмами",
+    sign_in_first:"Сначала войди.",
+    import_needs_session:"Твои фильмы хранятся в аккаунте Cinemail, поэтому для импорта нужен вход.",
+    fb_history_failed:"Не удалось загрузить историю",
     err_link_expired:"Ссылка устарела или уже была использована. Запроси новую ниже.",
     err_email_taken:"На этот email уже есть аккаунт. Попробуй войти.", err_email_bad:"Похоже, этот адрес неверный.",
     err_too_many:"Слишком много попыток. Подожди пару минут и попробуй снова.",
@@ -3611,6 +3675,38 @@ const _I18N_EXTRA = {
     toast_enter_a_name:"Введи ім'я",
     toast_member_removed:"Учасника видалено",
     toast_new_friend_request:"Новий запит у друзі - зазирни в акаунт",
+    feedback:"Зворотний зв'язок",
+    add_to_history:"Додати до історії",
+    default_user:"Користувач",
+    about_cinemail:"Про Cinemail",
+    fb_heading:"Зворотний зв'язок",
+    fb_sub:"Поділись думкою або повідом про помилку",
+    fb_type:"Тип",
+    fb_message_lbl:"Повідомлення",
+    fb_attach:"Прикріпити скриншот",
+    fb_send:"Надіслати",
+    fb_previous:"Твої попередні повідомлення",
+    retry:"Повторити",
+    picks_limit:"Ліміт добірок вичерпано",
+    picks_limit_why:"Тижневий ліміт - це те, що дозволяє Cinemail лишатися безкоштовним для всіх.",
+    got_it:"Зрозуміло",
+    my_list:"Мій список",
+    tag_personal:"особистий",
+    tag_added:"додано",
+    tag_active:"активний",
+    lbl_personal:"Особистий",
+    tap_details:"натисни, щоб відкрити",
+    seasons_eps:"Сезони / Серії",
+    country_lang:"Країна / Мова",
+    av_emoji:"Емодзі",
+    av_color:"Колір",
+    av_remove_emoji:"Прибрати емодзі",
+    create:"Створити",
+    no_users_found:"Нікого не знайдено",
+    add_friends_hint:"Додай друзів в акаунті, щоб ділитися з ними фільмами",
+    sign_in_first:"Спочатку увійди.",
+    import_needs_session:"Твої фільми зберігаються в акаунті Cinemail, тому для імпорту потрібен вхід.",
+    fb_history_failed:"Не вдалося завантажити історію",
     err_link_expired:"Посилання застаріло або вже було використане. Запроси нове нижче.",
     err_email_taken:"На цей email уже є акаунт. Спробуй увійти.", err_email_bad:"Схоже, ця адреса неправильна.",
     err_too_many:"Забагато спроб. Зачекай кілька хвилин і спробуй ще раз.",
@@ -3688,6 +3784,38 @@ const _I18N_EXTRA = {
     toast_enter_a_name:"შეიყვანე სახელი",
     toast_member_removed:"წევრი წაიშალა",
     toast_new_friend_request:"ახალი მეგობრობის მოთხოვნა - შეამოწმე ანგარიში",
+    feedback:"უკუკავშირი",
+    add_to_history:"ისტორიაში დამატება",
+    default_user:"მომხმარებელი",
+    about_cinemail:"Cinemail-ის შესახებ",
+    fb_heading:"უკუკავშირი",
+    fb_sub:"გაგვიზიარე აზრი ან შეგვატყობინე შეცდომა",
+    fb_type:"ტიპი",
+    fb_message_lbl:"შეტყობინება",
+    fb_attach:"სკრინშოტის მიმაგრება",
+    fb_send:"გაგზავნა",
+    fb_previous:"შენი წინა შეტყობინებები",
+    retry:"ხელახლა",
+    picks_limit:"რჩევების ლიმიტი ამოიწურა",
+    picks_limit_why:"კვირეული ლიმიტი სწორედ ის არის, რაც Cinemail-ს ყველასთვის უფასოდ ინარჩუნებს.",
+    got_it:"გასაგებია",
+    my_list:"ჩემი სია",
+    tag_personal:"პირადი",
+    tag_added:"დამატებულია",
+    tag_active:"აქტიური",
+    lbl_personal:"პირადი",
+    tap_details:"შეეხე დეტალებისთვის",
+    seasons_eps:"სეზონები / ეპიზოდები",
+    country_lang:"ქვეყანა / ენა",
+    av_emoji:"ემოჯი",
+    av_color:"ფერი",
+    av_remove_emoji:"ემოჯის მოცილება",
+    create:"შექმნა",
+    no_users_found:"მომხმარებლები ვერ მოიძებნა",
+    add_friends_hint:"დაამატე მეგობრები ანგარიშში, რომ ფილმები გაუზიარო",
+    sign_in_first:"ჯერ შედი.",
+    import_needs_session:"შენი ფილმები ინახება Cinemail-ის ანგარიშში, ამიტომ იმპორტისთვის შესვლაა საჭირო.",
+    fb_history_failed:"ისტორია ვერ ჩაიტვირთა",
     err_link_expired:"ბმულს ვადა გაუვიდა ან უკვე გამოყენებულია. მოითხოვე ახალი ქვემოთ.",
     err_email_taken:"ამ მისამართზე უკვე არსებობს ანგარიში. სცადე შესვლა.", err_email_bad:"როგორც ჩანს, ეს მისამართი არასწორია.",
     err_too_many:"ძალიან ბევრი მცდელობა. დაელოდე რამდენიმე წუთს და სცადე ხელახლა.",
@@ -3765,6 +3893,38 @@ const _I18N_EXTRA = {
     toast_enter_a_name:"Escribe un nombre",
     toast_member_removed:"Miembro eliminado",
     toast_new_friend_request:"Nueva solicitud de amistad: mira tu cuenta",
+    feedback:"Sugerencias",
+    add_to_history:"Añadir al historial",
+    default_user:"Usuario",
+    about_cinemail:"Acerca de Cinemail",
+    fb_heading:"Sugerencias",
+    fb_sub:"Comparte una idea o informa de un fallo",
+    fb_type:"Tipo",
+    fb_message_lbl:"Mensaje",
+    fb_attach:"Adjuntar captura",
+    fb_send:"Enviar",
+    fb_previous:"Tus mensajes anteriores",
+    retry:"Reintentar",
+    picks_limit:"Has alcanzado el límite de sugerencias",
+    picks_limit_why:"El límite semanal es lo que mantiene Cinemail gratis para todos.",
+    got_it:"Entendido",
+    my_list:"Mi lista",
+    tag_personal:"personal",
+    tag_added:"añadida",
+    tag_active:"activa",
+    lbl_personal:"Personal",
+    tap_details:"toca para ver más",
+    seasons_eps:"Temporadas / Episodios",
+    country_lang:"País / Idioma",
+    av_emoji:"Emoji",
+    av_color:"Color",
+    av_remove_emoji:"Quitar emoji",
+    create:"Crear",
+    no_users_found:"No se ha encontrado a nadie",
+    add_friends_hint:"Añade amigos en Cuenta para compartir películas con ellos",
+    sign_in_first:"Inicia sesión primero.",
+    import_needs_session:"Tus películas se guardan en tu cuenta de Cinemail, así que necesitas iniciar sesión para importar.",
+    fb_history_failed:"No se ha podido cargar el historial",
     err_link_expired:"Ese enlace ha caducado o ya se ha usado. Pide uno nuevo abajo.",
     err_email_taken:"Ese email ya tiene una cuenta. Prueba a iniciar sesión.", err_email_bad:"Esa dirección de correo no parece correcta.",
     err_too_many:"Demasiados intentos. Espera unos minutos y vuelve a probar.",
@@ -3842,6 +4002,38 @@ const _I18N_EXTRA = {
     toast_enter_a_name:"Saisis un nom",
     toast_member_removed:"Membre retiré",
     toast_new_friend_request:"Nouvelle demande d'ami - regarde ton compte",
+    feedback:"Votre avis",
+    add_to_history:"Ajouter à l'historique",
+    default_user:"Utilisateur",
+    about_cinemail:"À propos de Cinemail",
+    fb_heading:"Votre avis",
+    fb_sub:"Partage une idée ou signale un bug",
+    fb_type:"Type",
+    fb_message_lbl:"Message",
+    fb_attach:"Joindre une capture",
+    fb_send:"Envoyer",
+    fb_previous:"Tes messages précédents",
+    retry:"Réessayer",
+    picks_limit:"Limite de suggestions atteinte",
+    picks_limit_why:"C'est le budget hebdomadaire qui garde Cinemail gratuit pour tout le monde.",
+    got_it:"Compris",
+    my_list:"Ma liste",
+    tag_personal:"perso",
+    tag_added:"ajouté",
+    tag_active:"actif",
+    lbl_personal:"Perso",
+    tap_details:"touche pour en savoir plus",
+    seasons_eps:"Saisons / Épisodes",
+    country_lang:"Pays / Langue",
+    av_emoji:"Émoji",
+    av_color:"Couleur",
+    av_remove_emoji:"Retirer l'émoji",
+    create:"Créer",
+    no_users_found:"Personne trouvé",
+    add_friends_hint:"Ajoute des amis dans ton compte pour partager des films",
+    sign_in_first:"Connecte-toi d'abord.",
+    import_needs_session:"Tes films sont enregistrés dans ton compte Cinemail : il faut être connecté pour importer.",
+    fb_history_failed:"Impossible de charger l'historique",
     err_link_expired:"Ce lien a expiré ou a déjà été utilisé. Demandes-en un nouveau ci-dessous.",
     err_email_taken:"Cet email a déjà un compte. Essaie de te connecter.", err_email_bad:"Cette adresse e-mail ne semble pas correcte.",
     err_too_many:"Trop de tentatives. Patiente quelques minutes et réessaie.",
@@ -3919,6 +4111,38 @@ const _I18N_EXTRA = {
     toast_enter_a_name:"Gib einen Namen ein",
     toast_member_removed:"Mitglied entfernt",
     toast_new_friend_request:"Neue Freundschaftsanfrage - schau in dein Konto",
+    feedback:"Feedback",
+    add_to_history:"Zum Verlauf hinzufügen",
+    default_user:"Nutzer",
+    about_cinemail:"Über Cinemail",
+    fb_heading:"Feedback",
+    fb_sub:"Teile einen Gedanken oder melde einen Fehler",
+    fb_type:"Art",
+    fb_message_lbl:"Nachricht",
+    fb_attach:"Screenshot anhängen",
+    fb_send:"Senden",
+    fb_previous:"Deine früheren Nachrichten",
+    retry:"Erneut versuchen",
+    picks_limit:"Vorschlagslimit erreicht",
+    picks_limit_why:"Das Wochenbudget ist es, was Cinemail für alle kostenlos hält.",
+    got_it:"Verstanden",
+    my_list:"Meine Liste",
+    tag_personal:"privat",
+    tag_added:"hinzugefügt",
+    tag_active:"aktiv",
+    lbl_personal:"Privat",
+    tap_details:"antippen für Details",
+    seasons_eps:"Staffeln / Folgen",
+    country_lang:"Land / Sprache",
+    av_emoji:"Emoji",
+    av_color:"Farbe",
+    av_remove_emoji:"Emoji entfernen",
+    create:"Erstellen",
+    no_users_found:"Niemand gefunden",
+    add_friends_hint:"Füge im Konto Freunde hinzu, um Filme zu teilen",
+    sign_in_first:"Melde dich zuerst an.",
+    import_needs_session:"Deine Filme liegen in deinem Cinemail-Konto, für den Import ist also eine Anmeldung nötig.",
+    fb_history_failed:"Verlauf konnte nicht geladen werden",
     err_link_expired:"Dieser Link ist abgelaufen oder wurde schon benutzt. Fordere unten einen neuen an.",
     err_email_taken:"Für diese E-Mail gibt es bereits ein Konto. Versuche dich anzumelden.", err_email_bad:"Diese E-Mail-Adresse sieht nicht richtig aus.",
     err_too_many:"Zu viele Versuche. Warte ein paar Minuten und versuche es erneut.",
@@ -3996,6 +4220,38 @@ const _I18N_EXTRA = {
     toast_enter_a_name:"Inserisci un nome",
     toast_member_removed:"Membro rimosso",
     toast_new_friend_request:"Nuova richiesta di amicizia: controlla il tuo account",
+    feedback:"Feedback",
+    add_to_history:"Aggiungi alla cronologia",
+    default_user:"Utente",
+    about_cinemail:"Informazioni su Cinemail",
+    fb_heading:"Feedback",
+    fb_sub:"Condividi un'idea o segnala un problema",
+    fb_type:"Tipo",
+    fb_message_lbl:"Messaggio",
+    fb_attach:"Allega screenshot",
+    fb_send:"Invia",
+    fb_previous:"I tuoi messaggi precedenti",
+    retry:"Riprova",
+    picks_limit:"Limite di suggerimenti raggiunto",
+    picks_limit_why:"Il limite settimanale è ciò che mantiene Cinemail gratuito per tutti.",
+    got_it:"Ho capito",
+    my_list:"La mia lista",
+    tag_personal:"personale",
+    tag_added:"aggiunto",
+    tag_active:"attiva",
+    lbl_personal:"Personale",
+    tap_details:"tocca per i dettagli",
+    seasons_eps:"Stagioni / Episodi",
+    country_lang:"Paese / Lingua",
+    av_emoji:"Emoji",
+    av_color:"Colore",
+    av_remove_emoji:"Rimuovi emoji",
+    create:"Crea",
+    no_users_found:"Nessun utente trovato",
+    add_friends_hint:"Aggiungi amici nell'account per condividere film",
+    sign_in_first:"Accedi prima.",
+    import_needs_session:"I tuoi film sono salvati nel tuo account Cinemail, quindi per importare devi accedere.",
+    fb_history_failed:"Impossibile caricare la cronologia",
     err_link_expired:"Questo link è scaduto o è già stato usato. Chiedine uno nuovo qui sotto.",
     err_email_taken:"Questa email ha già un account. Prova ad accedere.", err_email_bad:"Questo indirizzo email non sembra corretto.",
     err_too_many:"Troppi tentativi. Aspetta qualche minuto e riprova.",
@@ -5223,11 +5479,11 @@ function showLimitExplainer(data, resetStr) {
   ov.innerHTML = `
     <div style="padding:20px;width:100%;display:flex;justify-content:center" onclick="event.stopPropagation()">
       <div class="modal-sheet" style="max-width:340px">
-        <div class="sheet-label" style="color:var(--primary)">PICKS LIMIT REACHED</div>
+        <div class="sheet-label" style="color:var(--primary)" data-i18n="picks_limit">PICKS LIMIT REACHED</div>
         <div class="sheet-title">You've used all ${data.limit||10} personal picks this week</div>
         <div style="color:#bbb;font-size:13px;line-height:1.6;margin-bottom:14px">Resets ${resetStr}. Search and watchlist still work, only personal picks are paused.</div>
-        <div style="color:var(--muted);font-size:12px;line-height:1.6;margin-bottom:18px;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--border)">The weekly budget is what keeps Cinemail free for everyone.</div>
-        <button class="btn-modal-save" style="width:100%" onclick="this.closest('.overlay').remove()">Got It</button>
+        <div style="color:var(--muted);font-size:12px;line-height:1.6;margin-bottom:18px;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--border)" data-i18n="picks_limit_why">The weekly budget is what keeps Cinemail free for everyone.</div>
+        <button class="btn-modal-save" style="width:100%" onclick="this.closest('.overlay').remove()" data-i18n="got_it">Got It</button>
       </div>
     </div>`;
   document.body.appendChild(ov);
@@ -5682,7 +5938,7 @@ function loadingHTML(quote, withSkeletons, cancellable) {
       </div>
     </div>`).join("") : "";
   const cancelBtn = cancellable ? `
-    <button id="ai-cancel-btn" onclick="cancelAIRequest()" style="margin-top:14px;padding:7px 18px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#888;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#f87171';this.style.color='#f87171'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='#888'">Cancel</button>` : "";
+    <button id="ai-cancel-btn" onclick="cancelAIRequest()" style="margin-top:14px;padding:7px 18px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#888;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#f87171';this.style.color='#f87171'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='#888'" data-i18n="cancel">Cancel</button>` : "";
   return `
     <div class="loading-box">
       <div class="loading-dots">${[0,1,2,3,4].map(()=>`<div class="loading-dot"></div>`).join("")}</div>
@@ -5722,8 +5978,8 @@ function _buildListChecklistHTML(tmdbID) {
   const inPersonal = !!fls.personalPlanEntry;
   html += `<div class="list-check-row ${inPersonal ? 'checked-personal' : ''}" onclick="toggleFilmInList(null,'${escapeJsAttr(tmdbID)}')">
     <span class="list-check-icon">${inPersonal ? '✓' : '○'}</span>
-    <span style="font-size:13px">≡ My List</span>
-    ${inPersonal ? '<span style="font-size:10px;color:var(--muted);margin-left:auto">personal</span>' : ''}
+    <span style="font-size:13px">≡ ${t("my_list")}</span>
+    ${inPersonal ? '<span style="font-size:10px;color:var(--muted);margin-left:auto">'+t('tag_personal')+'</span>' : ''}
   </div>`;
   // Shared lists
   _listsCache.forEach(l => {
@@ -5731,7 +5987,7 @@ function _buildListChecklistHTML(tmdbID) {
     html += `<div class="list-check-row ${inList ? 'checked' : ''}" onclick="toggleFilmInList('${l.id}','${escapeJsAttr(tmdbID)}')">
       <span class="list-check-icon">${inList ? '✓' : '○'}</span>
       <span style="font-size:13px">${escapeHtml(l.name)}</span>
-      ${inList ? '<span style="font-size:10px;color:var(--muted);margin-left:auto">added</span>' : ''}
+      ${inList ? '<span style="font-size:10px;color:var(--muted);margin-left:auto">'+t('tag_added')+'</span>' : ''}
     </div>`;
   });
   return html;
@@ -5859,7 +6115,7 @@ function movieCardHTML(m, why) {
           <div class="card-body">
             <div class="card-title">${escapeHtml(m.Title||"")}</div>
             <div class="card-meta">${m.Year||""}${rating}${genre}${mediaTag}</div>
-            ${idVal ? `<div class="card-hint">tap for details →</div>` : ""}
+            ${idVal ? `<div class="card-hint">${t("tap_details")} →</div>` : ""}
           </div>
         </div>
         <div class="card-actions">
@@ -6095,7 +6351,7 @@ async function openDetail(id, type) {
       ? `<div class="crew-label">${t('tv_status')}</div><div class="crew-val">${escapeHtml(d.TvStatus)}${d.LastAirDate ? ` · ${t('tv_last_aired')} ${escapeHtml(String(d.LastAirDate).slice(0,4))}` : ""}</div>`
       : "";
 
-    const tvInfo = d.Seasons ? `<div class="crew-label">Seasons / Episodes</div><div class="crew-val">${escapeHtml(d.Seasons)} ${d.Seasons === 1 ? t('tv_season') : t('tv_seasons')} · ${escapeHtml(d.Episodes)} ${d.Episodes === 1 ? t('tv_episode') : t('tv_episodes')}${d.Networks ? ` · ${escapeHtml(d.Networks)}` : ""}</div>${_tvNext}${_tvState}` : "";
+    const tvInfo = d.Seasons ? `<div class="crew-label" data-i18n="seasons_eps">Seasons / Episodes</div><div class="crew-val">${escapeHtml(d.Seasons)} ${d.Seasons === 1 ? t('tv_season') : t('tv_seasons')} · ${escapeHtml(d.Episodes)} ${d.Episodes === 1 ? t('tv_episode') : t('tv_episodes')}${d.Networks ? ` · ${escapeHtml(d.Networks)}` : ""}</div>${_tvNext}${_tvState}` : "";
 
     const existing = watchHistory.find(h => h.tmdbID === String(id));
     if (existing) {
@@ -6147,7 +6403,7 @@ async function openDetail(id, type) {
       </div>
       ${d.Plot ? `<div class="detail-plot">${escapeHtml(d.Plot)}</div>` : ""}
       ${crew}${tvInfo}
-      ${d.Country ? `<div style="margin-bottom:14px"><div class="crew-label">Country / Language</div><div class="crew-val">${escapeHtml(d.Country)} · ${escapeHtml(d.Language)}</div></div>` : ""}
+      ${d.Country ? `<div style="margin-bottom:14px"><div class="crew-label" data-i18n="country_lang">Country / Language</div><div class="crew-val">${escapeHtml(d.Country)} · ${escapeHtml(d.Language)}</div></div>` : ""}
       <div id="where-to-watch">${_whereToWatchInner(d.WatchAll || {})}</div>
       ${watchedStatusLine}
       ${checklistSection}
@@ -6366,11 +6622,11 @@ function _renderAvatarPicker() {
     `<div class="avatar-color-dot" data-col="${c}" style="background:${c}" onclick="pickAvatarColor('${c}')"></div>`
   ).join('');
   wrap.innerHTML = `
-    <div class="avatar-picker-label">Emoji</div>
+    <div class="avatar-picker-label" data-i18n="av_emoji">Emoji</div>
     <div class="avatar-emoji-grid">${emojiHTML}</div>
-    <div class="avatar-picker-label">Color</div>
+    <div class="avatar-picker-label" data-i18n="av_color">Color</div>
     <div class="avatar-color-row">${colorHTML}</div>
-    <button id="avatar-clear-btn" onclick="clearAvatarEmoji()" style="margin-top:10px;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:2px 0;font-family:'DM Sans','Noto Sans Georgian',sans-serif">✕ Remove emoji</button>
+    <button id="avatar-clear-btn" onclick="clearAvatarEmoji()" style="margin-top:10px;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:2px 0;font-family:'DM Sans','Noto Sans Georgian',sans-serif">✕ ${t("av_remove_emoji")}</button>
   `;
   _markAvatarPicker();
 }
@@ -7272,7 +7528,7 @@ async function searchFriendUsers(q) {
     const { data, error } = await sbClient.rpc("search_profiles", { search_query: q, exclude_id: currentUser.id });
     if (error) throw new Error(error.message);
     if (!data || !data.length) {
-      el.innerHTML = `<div style="padding:8px 12px;color:var(--muted);font-size:12px">Not found</div>`; return;
+      el.innerHTML = `<div style="padding:8px 12px;color:var(--muted);font-size:12px">${t("not_found")}</div>`; return;
     }
     el.innerHTML = data.map(u => {
       const safe = escapeJsAttr(u.display_name);
@@ -7562,7 +7818,7 @@ function renderListTabs() {
       enterkeyhint="done"
       onkeydown="if(event.key==='Enter'){event.preventDefault();_confirmNewListTab()}if(event.key==='Escape')_cancelNewListTab()"
       onblur="_blurNewListTab()">
-    <button onclick="_confirmNewListTab()" style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px;flex-shrink:0">Create</button>`;
+    <button onclick="_confirmNewListTab()" style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px;flex-shrink:0">${t("create")}</button>`;
   } else {
     html += `<button class="list-tab-add" onclick="_startNewListTab()">${t('new_list_tab')}</button>`;
   }
@@ -8601,7 +8857,7 @@ async function _listInviteSearch(query, listId) {
     });
     if (error) throw new Error(error.message);
     const hits = (data || []).slice(0, 6);
-    if (!hits.length) { res.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:4px 0">No users found</div>'; return; }
+    if (!hits.length) { res.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:4px 0">'+t('no_users_found')+'</div>'; return; }
     res.innerHTML = hits.map(u =>
       `<button data-uid="${u.id}" data-name="${(u.display_name||u.email||'?').replace(/"/g,'&quot;')}" onclick="_doInviteToList('${listId}',this)"
         style="display:block;width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;padding:8px 12px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif;margin-bottom:4px">${escapeHtml(u.display_name||u.email||'?')}</button>`
@@ -8702,16 +8958,16 @@ function openListPicker(movie, status, callback = null) {
     <button class="list-picker-opt" style="${isPersonalActive && !callback ? activeStyle : ''}" onclick="_onListPicked(null)">
       <div style="display:flex;align-items:center;gap:6px">
         <div style="font-size:14px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">${(currentUser?.displayName||currentUser?.email?.split('@')[0]||'My')+"'s List"}</div>
-        ${isPersonalActive && !callback ? '<span style="font-size:10px;color:var(--accent-text);background:color-mix(in srgb, var(--accent) 8%, transparent);padding:1px 7px;border-radius:10px">active</span>' : ''}
+        ${isPersonalActive && !callback ? '<span style="font-size:10px;color:var(--accent-text);background:color-mix(in srgb, var(--accent) 8%, transparent);padding:1px 7px;border-radius:10px">'+t('tag_active')+'</span>' : ''}
       </div>
-      <div style="font-size:11px;color:var(--muted);margin-top:2px">Personal</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px">${t("lbl_personal")}</div>
     </button>
     ${_listsCache.map(l => {
       const isActive = !callback && _activeListId === l.id;
       return `<button class="list-picker-opt" style="${isActive ? activeStyle : ''}" onclick="_onListPicked('${l.id}')">
         <div style="display:flex;align-items:center;gap:6px">
           <div style="font-size:14px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">${escapeHtml(l.name)}</div>
-          ${isActive ? '<span style="font-size:10px;color:var(--accent-text);background:color-mix(in srgb, var(--accent) 8%, transparent);padding:1px 7px;border-radius:10px">active</span>' : ''}
+          ${isActive ? '<span style="font-size:10px;color:var(--accent-text);background:color-mix(in srgb, var(--accent) 8%, transparent);padding:1px 7px;border-radius:10px">'+t('tag_active')+'</span>' : ''}
         </div>
         <div style="font-size:11px;color:var(--muted);margin-top:2px">${l.memberCount ? l.memberCount + ' member' + (l.memberCount !== 1 ? 's' : '') : l.role}</div>
       </button>`;
@@ -8732,7 +8988,7 @@ function _renderListPickerNewRow() {
         <input id="list-picker-new-input" type="text" placeholder="New list name…" data-i18n-ph="ph_new_list" maxlength="40"
           style="flex:1;padding:9px 11px;border-radius:8px;border:1px solid var(--accent-border);background:color-mix(in srgb, var(--accent) 8%, transparent);color:var(--text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none"
           onkeydown="if(event.key==='Enter')_createListFromPicker();if(event.key==='Escape'){_listPickerNewMode=false;_renderListPickerNewRow()}">
-        <button onclick="_createListFromPicker()" style="padding:9px 14px;border-radius:8px;border:none;background:var(--accent);color:var(--on-accent);font-size:12px;cursor:pointer;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">Create</button>
+        <button onclick="_createListFromPicker()" style="padding:9px 14px;border-radius:8px;border:none;background:var(--accent);color:var(--on-accent);font-size:12px;cursor:pointer;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">${t("create")}</button>
       </div>`;
     setTimeout(() => document.getElementById('list-picker-new-input')?.focus(), 30);
   } else {
@@ -8830,7 +9086,7 @@ function _renderShareFriendsList() {
   const el = document.getElementById("share-friends-list");
   if (!el) return;
   if (!_friendsCache.length) {
-    el.innerHTML = `<div style="color:var(--muted);font-size:12px;padding:4px 0">Add friends in Account to share films with them</div>`;
+    el.innerHTML = `<div style="color:var(--muted);font-size:12px;padding:4px 0">${t("add_friends_hint")}</div>`;
     return;
   }
   _fetchProfileAvatars(_friendsCache.map(f => _friendInfo(f).id), _renderShareFriendsList);
@@ -10848,7 +11104,7 @@ async function backupImportIMDb() {
     // they can import as well — moving a whole IMDb library in is the strongest
     // possible first experience. Only a missing session is a real blocker.
     if (!currentUser) {
-      ImportProgress.finish(`<span style="color:#f87171">Sign in first.</span><br><br>Your films are saved to your Cinemail account, so you need a session to import.`);
+      ImportProgress.finish(`<span style="color:#f87171">${t("sign_in_first")}</span><br><br>${t("import_needs_session")}`);
       return;
     }
     ImportProgress.update(t("imp_found").replace("{n}", rows.length), 0, rows.length);
@@ -11610,7 +11866,7 @@ async function loadFeedbackReplies() {
     setFeedbackUnread(false);
     const typeIcon={bug:icon("bug",12),idea:icon("lightbulb",12),other:icon("message-circle",12)};
     el.style.display="block";
-    el.innerHTML=`<div style="color:var(--muted);font-size:11px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Your previous messages</div>
+    el.innerHTML=`<div style="color:var(--muted);font-size:11px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">${t("fb_previous")}</div>
       ${data.map(f=>`<div style="margin-bottom:10px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--border)">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
           <div style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px">${typeIcon[f.type]||typeIcon.other} ${_fmtDT(f.created_at)}</div>
@@ -11624,8 +11880,8 @@ async function loadFeedbackReplies() {
   } catch(e){
     el.style.display="block";
     el.innerHTML=`<div style="color:var(--muted);font-size:12px;padding:8px 0;text-align:center">
-      Couldn't load history &nbsp;
-      <button onclick="loadFeedbackReplies()" style="background:none;border:1px solid var(--border);color:var(--muted);font-size:11px;padding:3px 8px;border-radius:6px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">↺ Retry</button>
+      ${t("fb_history_failed")} &nbsp;
+      <button onclick="loadFeedbackReplies()" style="background:none;border:1px solid var(--border);color:var(--muted);font-size:11px;padding:3px 8px;border-radius:6px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">↺ ${t("retry")}</button>
     </div>`;
   }
 }
