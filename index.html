@@ -2877,7 +2877,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.28</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.29</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -3491,6 +3491,26 @@ const _I18N_EXTRA = {
     fb_history_failed:"Couldn't load history",
     del_acct_type_email:"Type your email to confirm",
     del_acct_type_name:"Type your name to confirm",
+    limit_ip_shared:"Your network has reached its shared limit for now. Resets {reset}.",
+    limit_picks_reached:"Picks limit reached ({n} per week). Resets {reset}.",
+    toast_friend_req_sent:"Friend request sent to {name}",
+    toast_list_created:"“{name}” created",
+    toast_list_renamed:"Renamed to “{name}”",
+    toast_already_in_list:"You are already in “{name}”",
+    toast_joined_list:"Joined “{name}”",
+    toast_invite_sent:"Invite sent to {name}",
+    toast_list_deleted:"“{name}” deleted",
+    toast_list_left:"Left “{name}”",
+    toast_film_added_yours:"“{title}” added to your list",
+    toast_new_recs:"You have {n} new film suggestions",
+    toast_they_added:"{name} added “{title}” to their list",
+    toast_film_declined:"“{title}” was declined",
+    toast_replied_to:"{name} replied about “{title}”",
+    toast_sent_friend_req:"{name} sent you a friend request",
+    toast_accepted_friend:"{name} accepted your friend request",
+    toast_exported_n:"Exported {n} items",
+    toast_crew_updated_n:"Crew data updated for {n} films",
+    someone:"Someone",
     err_link_expired:"That link has expired or was already used. Ask for a new one below.",
     err_email_taken:"That email already has an account. Try signing in instead.", err_email_bad:"That email address does not look right.",
     err_too_many:"Too many attempts. Please wait a few minutes and try again.",
@@ -3602,6 +3622,26 @@ const _I18N_EXTRA = {
     fb_history_failed:"Не удалось загрузить историю",
     del_acct_type_email:"Введи свою почту, чтобы подтвердить",
     del_acct_type_name:"Введи своё имя, чтобы подтвердить",
+    limit_ip_shared:"Твоя сеть пока исчерпала общий лимит. Обновится {reset}.",
+    limit_picks_reached:"Лимит подборок исчерпан ({n} в неделю). Обновится {reset}.",
+    toast_friend_req_sent:"Заявка в друзья отправлена: {name}",
+    toast_list_created:"Список «{name}» создан",
+    toast_list_renamed:"Переименован в «{name}»",
+    toast_already_in_list:"Ты уже в списке «{name}»",
+    toast_joined_list:"Ты в списке «{name}»",
+    toast_invite_sent:"Приглашение отправлено: {name}",
+    toast_list_deleted:"Список «{name}» удалён",
+    toast_list_left:"Ты вышел из списка «{name}»",
+    toast_film_added_yours:"«{title}» добавлен в твой список",
+    toast_new_recs:"У тебя {n} новых рекомендаций",
+    toast_they_added:"{name} добавил «{title}» к себе",
+    toast_film_declined:"«{title}» отклонён",
+    toast_replied_to:"{name} ответил про «{title}»",
+    toast_sent_friend_req:"{name} отправил тебе заявку в друзья",
+    toast_accepted_friend:"{name} принял твою заявку в друзья",
+    toast_exported_n:"Экспортировано записей: {n}",
+    toast_crew_updated_n:"Съёмочная группа обновлена у {n} фильмов",
+    someone:"Кто-то",
     err_link_expired:"Ссылка устарела или уже была использована. Запроси новую ниже.",
     err_email_taken:"На этот email уже есть аккаунт. Попробуй войти.", err_email_bad:"Похоже, этот адрес неверный.",
     err_too_many:"Слишком много попыток. Подожди пару минут и попробуй снова.",
@@ -3713,6 +3753,26 @@ const _I18N_EXTRA = {
     fb_history_failed:"Не вдалося завантажити історію",
     del_acct_type_email:"Введи свою пошту, щоб підтвердити",
     del_acct_type_name:"Введи своє ім'я, щоб підтвердити",
+    limit_ip_shared:"Твоя мережа наразі вичерпала спільний ліміт. Оновиться {reset}.",
+    limit_picks_reached:"Ліміт добірок вичерпано ({n} на тиждень). Оновиться {reset}.",
+    toast_friend_req_sent:"Запит у друзі надіслано: {name}",
+    toast_list_created:"Список «{name}» створено",
+    toast_list_renamed:"Перейменовано на «{name}»",
+    toast_already_in_list:"Ти вже в списку «{name}»",
+    toast_joined_list:"Ти в списку «{name}»",
+    toast_invite_sent:"Запрошення надіслано: {name}",
+    toast_list_deleted:"Список «{name}» видалено",
+    toast_list_left:"Ти вийшов зі списку «{name}»",
+    toast_film_added_yours:"«{title}» додано до твого списку",
+    toast_new_recs:"У тебе {n} нових рекомендацій",
+    toast_they_added:"{name} додав «{title}» до себе",
+    toast_film_declined:"«{title}» відхилено",
+    toast_replied_to:"{name} відповів про «{title}»",
+    toast_sent_friend_req:"{name} надіслав тобі запит у друзі",
+    toast_accepted_friend:"{name} прийняв твій запит у друзі",
+    toast_exported_n:"Експортовано записів: {n}",
+    toast_crew_updated_n:"Знімальна група оновлена у {n} фільмів",
+    someone:"Хтось",
     err_link_expired:"Посилання застаріло або вже було використане. Запроси нове нижче.",
     err_email_taken:"На цей email уже є акаунт. Спробуй увійти.", err_email_bad:"Схоже, ця адреса неправильна.",
     err_too_many:"Забагато спроб. Зачекай кілька хвилин і спробуй ще раз.",
@@ -3824,6 +3884,26 @@ const _I18N_EXTRA = {
     fb_history_failed:"ისტორია ვერ ჩაიტვირთა",
     del_acct_type_email:"დასადასტურებლად აკრიფე შენი ელფოსტა",
     del_acct_type_name:"დასადასტურებლად აკრიფე შენი სახელი",
+    limit_ip_shared:"შენმა ქსელმა ჯერჯერობით ამოწურა საერთო ლიმიტი. განახლდება {reset}.",
+    limit_picks_reached:"რჩევების ლიმიტი ამოიწურა (კვირაში {n}). განახლდება {reset}.",
+    toast_friend_req_sent:"მეგობრობის მოთხოვნა გაეგზავნა: {name}",
+    toast_list_created:"„{name}“ შეიქმნა",
+    toast_list_renamed:"გადაერქვა „{name}“",
+    toast_already_in_list:"უკვე ხარ სიაში „{name}“",
+    toast_joined_list:"შეუერთდი სიას „{name}“",
+    toast_invite_sent:"მოწვევა გაეგზავნა: {name}",
+    toast_list_deleted:"„{name}“ წაიშალა",
+    toast_list_left:"დატოვე სია „{name}“",
+    toast_film_added_yours:"„{title}“ დაემატა შენს სიას",
+    toast_new_recs:"გაქვს {n} ახალი რეკომენდაცია",
+    toast_they_added:"{name}-მა დაიმატა „{title}“",
+    toast_film_declined:"„{title}“ უარყოფილია",
+    toast_replied_to:"{name}-მა უპასუხა „{title}“-ზე",
+    toast_sent_friend_req:"{name}-მა გამოგიგზავნა მეგობრობის მოთხოვნა",
+    toast_accepted_friend:"{name}-მა მიიღო შენი მოთხოვნა",
+    toast_exported_n:"გატანილია ჩანაწერი: {n}",
+    toast_crew_updated_n:"გადამღები ჯგუფი განახლდა {n} ფილმისთვის",
+    someone:"ვიღაც",
     err_link_expired:"ბმულს ვადა გაუვიდა ან უკვე გამოყენებულია. მოითხოვე ახალი ქვემოთ.",
     err_email_taken:"ამ მისამართზე უკვე არსებობს ანგარიში. სცადე შესვლა.", err_email_bad:"როგორც ჩანს, ეს მისამართი არასწორია.",
     err_too_many:"ძალიან ბევრი მცდელობა. დაელოდე რამდენიმე წუთს და სცადე ხელახლა.",
@@ -3935,6 +4015,26 @@ const _I18N_EXTRA = {
     fb_history_failed:"No se ha podido cargar el historial",
     del_acct_type_email:"Escribe tu correo para confirmar",
     del_acct_type_name:"Escribe tu nombre para confirmar",
+    limit_ip_shared:"Tu red ha alcanzado su límite compartido por ahora. Se renueva {reset}.",
+    limit_picks_reached:"Has alcanzado el límite de sugerencias ({n} por semana). Se renueva {reset}.",
+    toast_friend_req_sent:"Solicitud de amistad enviada a {name}",
+    toast_list_created:"Lista «{name}» creada",
+    toast_list_renamed:"Renombrada a «{name}»",
+    toast_already_in_list:"Ya estás en «{name}»",
+    toast_joined_list:"Te has unido a «{name}»",
+    toast_invite_sent:"Invitación enviada a {name}",
+    toast_list_deleted:"Lista «{name}» eliminada",
+    toast_list_left:"Has salido de «{name}»",
+    toast_film_added_yours:"«{title}» añadida a tu lista",
+    toast_new_recs:"Tienes {n} sugerencias nuevas",
+    toast_they_added:"{name} ha añadido «{title}» a su lista",
+    toast_film_declined:"«{title}» ha sido rechazada",
+    toast_replied_to:"{name} ha respondido sobre «{title}»",
+    toast_sent_friend_req:"{name} te ha enviado una solicitud de amistad",
+    toast_accepted_friend:"{name} ha aceptado tu solicitud",
+    toast_exported_n:"Exportados {n} elementos",
+    toast_crew_updated_n:"Equipo actualizado en {n} películas",
+    someone:"Alguien",
     err_link_expired:"Ese enlace ha caducado o ya se ha usado. Pide uno nuevo abajo.",
     err_email_taken:"Ese email ya tiene una cuenta. Prueba a iniciar sesión.", err_email_bad:"Esa dirección de correo no parece correcta.",
     err_too_many:"Demasiados intentos. Espera unos minutos y vuelve a probar.",
@@ -4046,6 +4146,26 @@ const _I18N_EXTRA = {
     fb_history_failed:"Impossible de charger l'historique",
     del_acct_type_email:"Saisis ton e-mail pour confirmer",
     del_acct_type_name:"Saisis ton nom pour confirmer",
+    limit_ip_shared:"Ton réseau a atteint sa limite partagée pour le moment. Réinitialisation {reset}.",
+    limit_picks_reached:"Limite de suggestions atteinte ({n} par semaine). Réinitialisation {reset}.",
+    toast_friend_req_sent:"Demande d'ami envoyée à {name}",
+    toast_list_created:"Liste « {name} » créée",
+    toast_list_renamed:"Renommée en « {name} »",
+    toast_already_in_list:"Tu es déjà dans « {name} »",
+    toast_joined_list:"Tu as rejoint « {name} »",
+    toast_invite_sent:"Invitation envoyée à {name}",
+    toast_list_deleted:"Liste « {name} » supprimée",
+    toast_list_left:"Tu as quitté « {name} »",
+    toast_film_added_yours:"« {title} » ajouté à ta liste",
+    toast_new_recs:"Tu as {n} nouvelles suggestions",
+    toast_they_added:"{name} a ajouté « {title} » à sa liste",
+    toast_film_declined:"« {title} » a été refusé",
+    toast_replied_to:"{name} a répondu à propos de « {title} »",
+    toast_sent_friend_req:"{name} t'a envoyé une demande d'ami",
+    toast_accepted_friend:"{name} a accepté ta demande d'ami",
+    toast_exported_n:"{n} éléments exportés",
+    toast_crew_updated_n:"Équipe mise à jour pour {n} films",
+    someone:"Quelqu'un",
     err_link_expired:"Ce lien a expiré ou a déjà été utilisé. Demandes-en un nouveau ci-dessous.",
     err_email_taken:"Cet email a déjà un compte. Essaie de te connecter.", err_email_bad:"Cette adresse e-mail ne semble pas correcte.",
     err_too_many:"Trop de tentatives. Patiente quelques minutes et réessaie.",
@@ -4157,6 +4277,26 @@ const _I18N_EXTRA = {
     fb_history_failed:"Verlauf konnte nicht geladen werden",
     del_acct_type_email:"Gib zur Bestätigung deine E-Mail ein",
     del_acct_type_name:"Gib zur Bestätigung deinen Namen ein",
+    limit_ip_shared:"Dein Netzwerk hat sein gemeinsames Limit vorerst erreicht. Zurückgesetzt {reset}.",
+    limit_picks_reached:"Vorschlagslimit erreicht ({n} pro Woche). Zurückgesetzt {reset}.",
+    toast_friend_req_sent:"Freundschaftsanfrage an {name} gesendet",
+    toast_list_created:"Liste „{name}“ erstellt",
+    toast_list_renamed:"Umbenannt in „{name}“",
+    toast_already_in_list:"Du bist schon in „{name}“",
+    toast_joined_list:"„{name}“ beigetreten",
+    toast_invite_sent:"Einladung an {name} gesendet",
+    toast_list_deleted:"Liste „{name}“ gelöscht",
+    toast_list_left:"„{name}“ verlassen",
+    toast_film_added_yours:"„{title}“ zu deiner Liste hinzugefügt",
+    toast_new_recs:"Du hast {n} neue Vorschläge",
+    toast_they_added:"{name} hat „{title}“ zur eigenen Liste hinzugefügt",
+    toast_film_declined:"„{title}“ wurde abgelehnt",
+    toast_replied_to:"{name} hat zu „{title}“ geantwortet",
+    toast_sent_friend_req:"{name} hat dir eine Freundschaftsanfrage geschickt",
+    toast_accepted_friend:"{name} hat deine Freundschaftsanfrage angenommen",
+    toast_exported_n:"{n} Einträge exportiert",
+    toast_crew_updated_n:"Team für {n} Filme aktualisiert",
+    someone:"Jemand",
     err_link_expired:"Dieser Link ist abgelaufen oder wurde schon benutzt. Fordere unten einen neuen an.",
     err_email_taken:"Für diese E-Mail gibt es bereits ein Konto. Versuche dich anzumelden.", err_email_bad:"Diese E-Mail-Adresse sieht nicht richtig aus.",
     err_too_many:"Zu viele Versuche. Warte ein paar Minuten und versuche es erneut.",
@@ -4268,6 +4408,26 @@ const _I18N_EXTRA = {
     fb_history_failed:"Impossibile caricare la cronologia",
     del_acct_type_email:"Scrivi la tua email per confermare",
     del_acct_type_name:"Scrivi il tuo nome per confermare",
+    limit_ip_shared:"La tua rete ha raggiunto il limite condiviso per ora. Si azzera {reset}.",
+    limit_picks_reached:"Limite di suggerimenti raggiunto ({n} a settimana). Si azzera {reset}.",
+    toast_friend_req_sent:"Richiesta di amicizia inviata a {name}",
+    toast_list_created:"Lista «{name}» creata",
+    toast_list_renamed:"Rinominata in «{name}»",
+    toast_already_in_list:"Sei già in «{name}»",
+    toast_joined_list:"Ti sei unito a «{name}»",
+    toast_invite_sent:"Invito inviato a {name}",
+    toast_list_deleted:"Lista «{name}» eliminata",
+    toast_list_left:"Hai lasciato «{name}»",
+    toast_film_added_yours:"«{title}» aggiunto alla tua lista",
+    toast_new_recs:"Hai {n} nuovi suggerimenti",
+    toast_they_added:"{name} ha aggiunto «{title}» alla sua lista",
+    toast_film_declined:"«{title}» è stato rifiutato",
+    toast_replied_to:"{name} ha risposto su «{title}»",
+    toast_sent_friend_req:"{name} ti ha inviato una richiesta di amicizia",
+    toast_accepted_friend:"{name} ha accettato la tua richiesta",
+    toast_exported_n:"Esportati {n} elementi",
+    toast_crew_updated_n:"Troupe aggiornata per {n} film",
+    someone:"Qualcuno",
     err_link_expired:"Questo link è scaduto o è già stato usato. Chiedine uno nuovo qui sotto.",
     err_email_taken:"Questa email ha già un account. Prova ad accedere.", err_email_bad:"Questo indirizzo email non sembra corretto.",
     err_too_many:"Troppi tentativi. Aspetta qualche minuto e riprova.",
@@ -5527,12 +5687,12 @@ function handleRateLimitHit(data) {
   // 50 a week was told they had "used all 200" while the counter beside it still read
   // 47 left: two parts of one screen disagreeing, and the louder one untrue.
   if (data.scope === "ip") {
-    showToast(`Your network has reached its shared limit for now. Resets ${resetStr}.`);
+    showToast(t('limit_ip_shared').replace('{reset}', resetStr));
     return;
   }
   const seen = localStorage.getItem("seenLimitExplainer") === "1";
   if (!seen) { showLimitExplainer(data, resetStr); localStorage.setItem("seenLimitExplainer", "1"); }
-  else showToast(`Picks limit reached (${data.limit||10} per week). Resets ${resetStr}.`);
+  else showToast(t('limit_picks_reached').replace('{n}', data.limit || 5).replace('{reset}', resetStr));
 }
 
 function showLimitExplainer(data, resetStr) {
@@ -7627,7 +7787,7 @@ async function sendFriendRequest() {
       status:      "pending"
     });
     if (error) throw new Error(error.message);
-    showToast(`Friend request sent to ${name}`);
+    showToast(t('toast_friend_req_sent').replace('{name}', name));
     _friendAddTarget = null;
     const inp = document.getElementById("friend-add-input");
     if (inp) inp.value = "";
@@ -8176,7 +8336,7 @@ async function _confirmNewListTab() {
     if (memErr) throw new Error(memErr.message);
     await loadListsCache();
     switchListTab(data.id);
-    showToast(`"${name}" created`);
+    showToast(t('toast_list_created').replace('{name}', name));
   } catch(e) { showToast(t('err_prefix') + _safeErr(e), true); renderListTabs(); }
   finally { _listTabSaving = false; }
 }
@@ -8359,7 +8519,7 @@ async function createList() {
     if (input) input.value = '';
     await loadListsCache();
     renderListsSection();
-    showToast(`"${name}" created`);
+    showToast(t('toast_list_created').replace('{name}', name));
   } catch(e) { showToast(t('err_prefix') + _safeErr(e), true); }
 }
 
@@ -8373,7 +8533,7 @@ async function renameList(listId) {
     _listManageMode = null;
     await loadListsCache();
     renderListTabs();
-    showToast(`Renamed to "${name}"`);
+    showToast(t('toast_list_renamed').replace('{name}', name));
   } catch(e) { showToast(t('err_prefix') + _safeErr(e), true); }
 }
 
@@ -8852,7 +9012,7 @@ async function checkPendingJoinToken() {
     if (data.exhausted) { showToast(t('join_token_exhausted'), true); return; }
     const { data: already } = await sbClient.from('list_members')
       .select('id').eq('list_id', data.list_id).eq('user_id', currentUser.id).maybeSingle();
-    if (already) { showToast(`You're already in "${data.list_name}"`); return; }
+    if (already) { showToast(t('toast_already_in_list').replace('{name}', data.list_name)); return; }
     // Carry the token itself, not its row id: joining is done by the server, which
     // re-checks expiry and the use count for real. The checks above are only there to
     // give a useful message before the confirm dialog.
@@ -8901,7 +9061,7 @@ async function _confirmJoin(token, listId, listName) {
     renderHistory();
     switchTab('history');
     switchListTab(listId);
-    showToast(`Joined "${listName}" 🎬`);
+    showToast(t('toast_joined_list').replace('{name}', listName));
   } catch(e) { showToast(t('err_prefix') + _safeErr(e), true); }
 }
 
@@ -8957,7 +9117,7 @@ async function inviteToList(listId, userId, userName, listName) {
     _listManageMode = null;
     renderListManageStrip();
     renderListTabs();
-    showToast(`Invite sent to ${userName}`);
+    showToast(t('toast_invite_sent').replace('{name}', userName));
   } catch(e) { showToast(t('err_prefix') + _safeErr(e), true); }
 }
 
@@ -8979,11 +9139,11 @@ async function confirmListDelete(listId) {
     if (list.role === 'owner') {
       const { error } = await sbClient.from('lists').delete().eq('id', listId);
       if (error) throw new Error(error.message);
-      showToast(`"${list.name}" deleted`);
+      showToast(t('toast_list_deleted').replace('{name}', list.name));
     } else {
       const { error } = await sbClient.from('list_members').delete().eq('list_id', listId).eq('user_id', currentUser.id);
       if (error) throw new Error(error.message);
-      showToast(`Left "${list.name}"`);
+      showToast(t('toast_list_left').replace('{name}', list.name));
     }
     if (_activeListId === listId) { _activeListId = 'personal'; }
     _listDeleteConfirmId = null;
@@ -9077,7 +9237,7 @@ async function _createListFromPicker() {
     await loadListsCache();
     _listPickerNewMode = false;
     _onListPicked(data.id); // closes the picker itself + uses the captured callback (do NOT closeListPicker first — it wipes the callback)
-    showToast(`"${name}" created`);
+    showToast(t('toast_list_created').replace('{name}', name));
   } catch(e) { showToast(t('err_prefix') + _safeErr(e), true); }
 }
 
@@ -9749,12 +9909,12 @@ async function respondInvite(id, status, inv) {
         await loadListsCache();
         watchHistory = await loadHistoryFromDB();
         renderHistory();
-        showToast(`Joined "${inv.title}"`);
+        showToast(t('toast_joined_list').replace('{name}', inv.title));
       } else {
         await saveEntryToDB({tmdbID:inv.tmdb_id,title:inv.title,year:inv.year,poster:inv.poster,stars:0,comment:"",status:"plan",mediaType:inv.media_type||"movie"});
         const newHistory = await loadHistoryFromDB();
         if (newHistory.length > 0 || watchHistory.length === 0) watchHistory = newHistory;
-        showToast(`"${inv.title}" added to your list`);
+        showToast(t('toast_film_added_yours').replace('{title}', inv.title));
       }
     } else { showToast(inv?.type === 'list_invite' ? "Invite declined" : "Recommendation declined"); }
   } catch(e) { showToast("Error: " + _safeErr(e)); }
@@ -9817,7 +9977,7 @@ function playNotificationSound() {
   } catch(e){}
 }
 function triggerVibration(){try{if(navigator.vibrate)navigator.vibrate([80,60,120]);}catch(e){}}
-function notifyNewInvite(count){playNotificationSound();triggerVibration();showToast(`🎬 You have ${count} new film recommendation${count>1?"s":""}!`);}
+function notifyNewInvite(count){playNotificationSound();triggerVibration();showToast(t('toast_new_recs').replace('{n}', count));}
 function checkPendingInvites(notify=false) {
   if (_inboxCacheLoaded) { _updateInboxBadge(); return; }
   // Fallback before cache loads. Must use the SAME definition of "new" as
@@ -9866,13 +10026,13 @@ function startInboxPolling() {
       if(idx>=0){
         const old=_inboxCache.sent[idx], upd=payload.new;
         if(old.status!==upd.status){
-          if(upd.status==="accepted"){playNotificationSound();showToast(`${upd.to_name||"Someone"} added "${upd.title}" to their list!`);}
-          else if(upd.status==="declined") showToast(`"${upd.title}" was declined`);
+          if(upd.status==="accepted"){playNotificationSound();showToast(t('toast_they_added').replace('{name}', upd.to_name || t('someone')).replace('{title}', upd.title));}
+          else if(upd.status==="declined") showToast(t('toast_film_declined').replace('{title}', upd.title));
         }
         const oldLen=(old.messages||[]).length, newLen=(upd.messages||[]).length;
         if(newLen>oldLen){
           const last=(upd.messages||[])[newLen-1];
-          if(last&&last.from!==uid){playNotificationSound();showToast(`💬 ${upd.to_name||"Someone"} replied to "${upd.title}"`);}
+          if(last&&last.from!==uid){playNotificationSound();showToast(t('toast_replied_to').replace('{name}', upd.to_name || t('someone')).replace('{title}', upd.title));}
         }
         // Merge messages array (preserves optimistic local msgs awaiting their own echo)
         const merged = _mergeMessages(old.messages, upd.messages);
@@ -9894,14 +10054,14 @@ function startInboxPolling() {
       _friendRequestsCache.unshift(payload.new);
       _updateFriendsBadge();
       playNotificationSound();
-      showToast(`👋 ${payload.new.user_name||"Someone"} sent you a friend request`);
+      showToast(t('toast_sent_friend_req').replace('{name}', payload.new.user_name || t('someone')));
     })
     .on("postgres_changes",{event:"UPDATE",schema:"public",table:"friendships",filter:`user_id=eq.${uid}`},(payload)=>{
       if(payload.new?.status==="accepted"){
         const f=payload.new;
         if(!_friendsCache.find(x=>x.id===f.id)) _friendsCache.unshift(f);
         _updateFriendsBadge();
-        showToast(`🎉 ${f.friend_name||"Someone"} accepted your friend request`);
+        showToast(t('toast_accepted_friend').replace('{name}', f.friend_name || t('someone')));
       }
     })
     .subscribe();
@@ -10659,7 +10819,7 @@ async function backupExportCSV() {
     const rows = await getBackupData();
     if (!rows.length) { showToast(t('toast_nothing_export')); return; }
     BackupLocal.export(rows);
-    showToast(`✓ Exported ${rows.length} items`);
+    showToast(t('toast_exported_n').replace('{n}', rows.length));
   } catch(e) { showToast(t('err_export_failed') + _safeErr(e), true); }
   finally { if (btn) { btn.textContent = "↓ Export CSV"; btn.disabled = false; } }
 }
@@ -10735,7 +10895,7 @@ async function backfillCrewData() {
   try { watchHistory = await loadHistoryFromDB(); renderHistory(); _updateAccountStats(); } catch(e) {}
   if (btn) { btn.textContent = "Refresh crew data"; btn.disabled = false; }
   _updateBackfillCrewVisibility(); // auto-hide the row if nothing else needs fixing
-  showToast(`✓ Updated crew data for ${updated} film${updated===1?"":"s"}`);
+  showToast(t('toast_crew_updated_n').replace('{n}', updated));
 }
 
 async function backupImportCSV() {
