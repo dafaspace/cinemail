@@ -1094,7 +1094,17 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
   padding: 9px 16px;
   white-space: nowrap;
-  z-index: 500;
+  /* 10000, not 500. It WAS 500 - the same as every auth screen - and at equal z-index the
+     later element in the document paints on top. #toast is at line ~2043 and all five auth
+     screens are at 2343-2451, so every toast shown on sign-in, sign-up, check-email, forgot
+     or reset password has been rendering BEHIND the screen it belongs to. Confirmed by
+     hit-testing rather than by reading the cascade: elementFromPoint at the toast's own
+     centre returned `auth-wrap`.
+     The visible symptom was reported on 13 Sep 2026 as "it hangs on this screen with no
+     indication that anything worked" - the password WAS being updated and the confirmation
+     was being drawn underneath the form. 10000 sits above the auth screens and below the
+     9999x modals that must cover everything, so a toast is visible wherever it fires. */
+  z-index: 10000;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s, transform 0.2s;
@@ -2877,7 +2887,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.29</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.30</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -3511,6 +3521,8 @@ const _I18N_EXTRA = {
     toast_exported_n:"Exported {n} items",
     toast_crew_updated_n:"Crew data updated for {n} films",
     someone:"Someone",
+    err_timeout:"That took too long. Check your connection and try again.",
+    reset_done_signin:"Password changed. Sign in with the new one.",
     err_link_expired:"That link has expired or was already used. Ask for a new one below.",
     err_email_taken:"That email already has an account. Try signing in instead.", err_email_bad:"That email address does not look right.",
     err_too_many:"Too many attempts. Please wait a few minutes and try again.",
@@ -3642,6 +3654,8 @@ const _I18N_EXTRA = {
     toast_exported_n:"Экспортировано записей: {n}",
     toast_crew_updated_n:"Съёмочная группа обновлена у {n} фильмов",
     someone:"Кто-то",
+    err_timeout:"Слишком долго. Проверь связь и попробуй ещё раз.",
+    reset_done_signin:"Пароль изменён. Войди с новым.",
     err_link_expired:"Ссылка устарела или уже была использована. Запроси новую ниже.",
     err_email_taken:"На этот email уже есть аккаунт. Попробуй войти.", err_email_bad:"Похоже, этот адрес неверный.",
     err_too_many:"Слишком много попыток. Подожди пару минут и попробуй снова.",
@@ -3773,6 +3787,8 @@ const _I18N_EXTRA = {
     toast_exported_n:"Експортовано записів: {n}",
     toast_crew_updated_n:"Знімальна група оновлена у {n} фільмів",
     someone:"Хтось",
+    err_timeout:"Задовго. Перевір з'єднання і спробуй ще раз.",
+    reset_done_signin:"Пароль змінено. Увійди з новим.",
     err_link_expired:"Посилання застаріло або вже було використане. Запроси нове нижче.",
     err_email_taken:"На цей email уже є акаунт. Спробуй увійти.", err_email_bad:"Схоже, ця адреса неправильна.",
     err_too_many:"Забагато спроб. Зачекай кілька хвилин і спробуй ще раз.",
@@ -3904,6 +3920,8 @@ const _I18N_EXTRA = {
     toast_exported_n:"გატანილია ჩანაწერი: {n}",
     toast_crew_updated_n:"გადამღები ჯგუფი განახლდა {n} ფილმისთვის",
     someone:"ვიღაც",
+    err_timeout:"ძალიან დიდხანს გაგრძელდა. შეამოწმე კავშირი და სცადე ხელახლა.",
+    reset_done_signin:"პაროლი შეიცვალა. შედი ახლით.",
     err_link_expired:"ბმულს ვადა გაუვიდა ან უკვე გამოყენებულია. მოითხოვე ახალი ქვემოთ.",
     err_email_taken:"ამ მისამართზე უკვე არსებობს ანგარიში. სცადე შესვლა.", err_email_bad:"როგორც ჩანს, ეს მისამართი არასწორია.",
     err_too_many:"ძალიან ბევრი მცდელობა. დაელოდე რამდენიმე წუთს და სცადე ხელახლა.",
@@ -4035,6 +4053,8 @@ const _I18N_EXTRA = {
     toast_exported_n:"Exportados {n} elementos",
     toast_crew_updated_n:"Equipo actualizado en {n} películas",
     someone:"Alguien",
+    err_timeout:"Ha tardado demasiado. Comprueba tu conexión e inténtalo de nuevo.",
+    reset_done_signin:"Contraseña cambiada. Inicia sesión con la nueva.",
     err_link_expired:"Ese enlace ha caducado o ya se ha usado. Pide uno nuevo abajo.",
     err_email_taken:"Ese email ya tiene una cuenta. Prueba a iniciar sesión.", err_email_bad:"Esa dirección de correo no parece correcta.",
     err_too_many:"Demasiados intentos. Espera unos minutos y vuelve a probar.",
@@ -4166,6 +4186,8 @@ const _I18N_EXTRA = {
     toast_exported_n:"{n} éléments exportés",
     toast_crew_updated_n:"Équipe mise à jour pour {n} films",
     someone:"Quelqu'un",
+    err_timeout:"Trop long. Vérifie ta connexion et réessaie.",
+    reset_done_signin:"Mot de passe changé. Connecte-toi avec le nouveau.",
     err_link_expired:"Ce lien a expiré ou a déjà été utilisé. Demandes-en un nouveau ci-dessous.",
     err_email_taken:"Cet email a déjà un compte. Essaie de te connecter.", err_email_bad:"Cette adresse e-mail ne semble pas correcte.",
     err_too_many:"Trop de tentatives. Patiente quelques minutes et réessaie.",
@@ -4297,6 +4319,8 @@ const _I18N_EXTRA = {
     toast_exported_n:"{n} Einträge exportiert",
     toast_crew_updated_n:"Team für {n} Filme aktualisiert",
     someone:"Jemand",
+    err_timeout:"Das hat zu lange gedauert. Prüfe deine Verbindung und versuch es erneut.",
+    reset_done_signin:"Passwort geändert. Melde dich mit dem neuen an.",
     err_link_expired:"Dieser Link ist abgelaufen oder wurde schon benutzt. Fordere unten einen neuen an.",
     err_email_taken:"Für diese E-Mail gibt es bereits ein Konto. Versuche dich anzumelden.", err_email_bad:"Diese E-Mail-Adresse sieht nicht richtig aus.",
     err_too_many:"Zu viele Versuche. Warte ein paar Minuten und versuche es erneut.",
@@ -4428,6 +4452,8 @@ const _I18N_EXTRA = {
     toast_exported_n:"Esportati {n} elementi",
     toast_crew_updated_n:"Troupe aggiornata per {n} film",
     someone:"Qualcuno",
+    err_timeout:"Ci ha messo troppo. Controlla la connessione e riprova.",
+    reset_done_signin:"Password cambiata. Accedi con quella nuova.",
     err_link_expired:"Questo link è scaduto o è già stato usato. Chiedine uno nuovo qui sotto.",
     err_email_taken:"Questa email ha già un account. Prova ad accedere.", err_email_bad:"Questo indirizzo email non sembra corretto.",
     err_too_many:"Troppi tentativi. Aspetta qualche minuto e riprova.",
@@ -5153,14 +5179,41 @@ async function doResetPassword() {
   if (p1.length < 6) { showResetError(t('err_pass_short') || "Password must be at least 6 characters."); return; }
   if (p1 !== p2) { showResetError(t('err_pass_match') || "Passwords don't match."); return; }
   const btn = document.getElementById("reset-btn");
-  const label = btn.textContent;
+  const label = t('reset_update');
   btn.textContent = "…"; btn.disabled = true;
+  // Three things this used to get wrong, all reported as one symptom on 13 Sep 2026:
+  // "it hangs on this screen and there is no indication that anything worked or failed."
+  //
+  //   1. No timeout. If the request never settled, the catch never ran, the button stayed
+  //      "…" for ever and nothing at all was shown. A spinner with no end state is the worst
+  //      thing a form can do, because the person cannot tell it from a slow success.
+  //   2. onSignedIn was INSIDE the try. A stall or failure loading the library afterwards
+  //      was reported as a password-reset error - telling someone their password did not
+  //      change when it did, which sends them round the loop again.
+  //   3. The button was only restored in the catch, so every path that was not an error left
+  //      the form dead.
+  //
+  // The toast that says it worked was ALSO invisible here until the z-index fix above, which
+  // is why this looked like a hang rather than a slow success.
+  let data;
   try {
-    const { data, error } = await sbClient.auth.updateUser({ password: p1 });
-    if (error) throw error;
-    showToast(t('reset_done'));
-    await onSignedIn(data.user); // recovery session is active → log them straight in
-  } catch(e) { showResetError(_authErr(e)); btn.textContent = label; btn.disabled = false; }
+    data = await Promise.race([
+      sbClient.auth.updateUser({ password: p1 }).then(r => { if (r.error) throw r.error; return r.data; }),
+      new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 20000)),
+    ]);
+  } catch (e) {
+    showResetError(String(e && e.message) === "timeout" ? t('err_timeout') : _authErr(e));
+    btn.textContent = label; btn.disabled = false;
+    return;
+  }
+  // Past this line the password IS changed, and nothing below may say otherwise.
+  showToast(t('reset_done'));
+  btn.textContent = label; btn.disabled = false;
+  try { await onSignedIn(data.user); }          // recovery session is active -> log them in
+  catch (e) {
+    console.warn("[reset] signed in but could not load:", e);
+    showResetError(t('reset_done_signin'));     // password changed, just sign in normally
+  }
 }
 
 // Ask the server for a free name instead of pulling every profile down to compare them
