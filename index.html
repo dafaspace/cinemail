@@ -2887,7 +2887,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.30</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.31</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -12276,7 +12276,31 @@ function initUI() {
   // Both holes are closed here; the flag is the one that matters, because _saveSession
   // runs before the event is dispatched and getSession() therefore wins the race.
   const _hashParams = new URLSearchParams((window.location.hash || "").replace(/^#/, ""));
-  const isRecoveryLink = type === "recovery" || _hashParams.get("type") === "recovery";
+
+  // A link can also come back FAILED, and until 13 Sep 2026 we read nothing about that.
+  //
+  // When Supabase refuses a link - spent, expired, tampered with - it does not send tokens.
+  // It sends an error in the same place the tokens would have been:
+  //
+  //     #error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid...
+  //
+  // No `type=recovery` in it, so isRecoveryLink was false, and with no session the init fell
+  // through to the last branch - which shows the ONBOARDING TOUR to a person who just pressed
+  // "reset my password". Reported exactly that way on 13 Sep: "opens either with the tour or
+  // the sign-in panel, no reset offered". supabase-js parses these three fields itself; we
+  // simply never looked at them (grep for error_code in this file returned 0).
+  //
+  // Why a link is often already spent by the time a person taps it: these tokens are
+  // single-use, and mail providers and security scanners FETCH links to check them. The scan
+  // consumes the token. The human then gets the error, which is why "it worked the first time
+  // and never again" is the normal shape of this rather than a strange one.
+  const _authErrCode = _hashParams.get("error_code") || params.get("error_code") ||
+                       _hashParams.get("error")      || params.get("error")      || "";
+  const _authErrDesc = _hashParams.get("error_description") || params.get("error_description") || "";
+
+  // An error came back from a link, so this person arrived from a link whatever it said.
+  // Never show them onboarding.
+  const isRecoveryLink = type === "recovery" || _hashParams.get("type") === "recovery" || !!_authErrCode;
 
   if (tokenHash&&type) {
     window.history.replaceState({},"",window.location.pathname);
@@ -12302,11 +12326,18 @@ function initUI() {
   }
   else if(session){await onSignedIn(session.user);}
   else if(isRecoveryLink){
-    // Came from a reset link and there is no session: the link is spent or expired. It used
-    // to land on a bare sign-in screen with no explanation, which reads as "it is broken".
+    // Came from a link and there is no session: refused, spent or expired. It used to land on
+    // a bare sign-in screen with no explanation - or, when the URL carried an error rather
+    // than a type, on the onboarding tour, which is worse.
     window.history.replaceState({},"",window.location.pathname);
     showScreen("signin");
+    if (_authErrDesc) console.warn("[auth link]", _authErrCode, _authErrDesc);
     showSignInError(t('err_link_expired'));
+    // The action is always the same and the sign-in screen already has the control for it,
+    // so point at it rather than describing it.
+    const _el = document.getElementById("signin-error");
+    if (_el) _el.insertAdjacentHTML("beforeend",
+      `<br><a onclick="showScreen('forgot')" style="color:var(--accent-text);font-weight:700;cursor:pointer">${t('forgot_link')}</a>`);
   }
   else{ if(!_maybeShowOnboarding()) showScreen("signin"); }
   _applyI18n(); // apply stored language preference to static elements
