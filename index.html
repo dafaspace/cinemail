@@ -2827,31 +2827,6 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 
       <div id="acc-blocked-list" style="display:none;margin-bottom:14px"></div>
 
-      <!-- SUPPORT-BLOCK-START
-           Everything between these markers is CUT OUT of the native bundles by
-           sync-web.sh - not hidden, removed. display:none would still ship the USDT
-           address and the sentence about unlocking Pro features to anyone who opens the
-           bundle, and a reviewer can open the bundle. The markers exist so the cut is a
-           delimited region rather than a regex guessing at markup. -->
-      <div id="support-block" style="margin-bottom:14px;padding:12px 14px;background:rgba(255,140,40,0.06);border:1px solid rgba(255,140,40,0.22);border-radius:10px;font-size:12px;line-height:1.55">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-          <span style="display:flex;color:var(--primary)" data-ic="heart" data-ic-size="14"></span>
-          <span style="color:var(--text);font-weight:600;font-size:12px;letter-spacing:0.3px" data-i18n="support_title">Support Cinemail</span>
-        </div>
-        <div data-i18n="support_text" data-i18n-html="1" style="color:var(--muted);margin-bottom:9px">
-          Cinemail is free and has no ads. If it is useful to you, this helps cover the running costs.
-        </div>
-        <a id="support-kofi" href="https://ko-fi.com/dafaspace" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:7px;background:rgba(255,140,40,0.18);border:1px solid rgba(255,140,40,0.35);color:var(--text);text-decoration:none;font-size:12px;font-weight:600;transition:all 0.15s"><span data-ic="coffee" data-ic-size="13"></span><span data-i18n="support_button">Support on Ko-fi →</span></a>
-        <div style="margin-top:9px;display:flex;align-items:center;gap:7px">
-          <!-- Dark chip, not a light one: this button sits on the warm support panel, and
-               lifting its ground with 4% white took --muted down to 4.48:1. 20% black on the
-               same panel measures 5.28:1 and the chip still reads as its own control. -->
-          <button onclick="copyUSDT(event)" style="display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:7px;background:rgba(0,0,0,0.2);border:1px solid var(--border);color:var(--muted);font-size:11px;font-weight:500;cursor:pointer;transition:all 0.15s" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--accent-border)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">
-            <span style="font-size:12px">◈</span><span id="usdt-acc-label">USDT (TRC20)</span>
-          </button>
-        </div>
-      </div>
-      <!-- SUPPORT-BLOCK-END -->
 
       <!-- No box around it. A bordered "danger zone" containing a bordered button is two
            frames doing one job, and it shouted: the loudest thing in the sheet was the
@@ -2887,7 +2862,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.32</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.33</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -3039,9 +3014,6 @@ const I18N = {
     invite_to_app:"Invite friends to Cinemail",
     delete_account:"Delete account",
     replay_onboarding:"Replay Welcome Tour",
-    support_title:"Support Cinemail",
-    support_text:"Cinemail is free and has no ads. If it is useful to you, this helps cover the running costs.",
-    support_button:"Support on Ko-fi →",
     about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Privacy Policy</a>",
     about_tmdb:"Film data, posters and crew info from <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail uses the TMDB API but is not endorsed or certified by TMDB.",
     about_author:"Made by <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
@@ -3090,9 +3062,6 @@ const I18N = {
     invite_to_app:"Пригласить друзей в Cinemail",
     delete_account:"Удалить аккаунт",
     replay_onboarding:"Пройти тур заново",
-    support_title:"Поддержать Cinemail",
-    support_text:"Cinemail бесплатен и без рекламы. Если он тебе полезен - это помогает покрывать расходы на его работу.",
-    support_button:"Поддержать на Ko-fi →",
     about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Политика конфиденциальности</a>",
     about_tmdb:"Данные о фильмах, постеры и creative crew - из <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail использует TMDB API, но не сертифицирован TMDB.",
     about_author:"Сделано <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
@@ -3141,9 +3110,6 @@ const I18N = {
     invite_to_app:"Запросити друзів у Cinemail",
     delete_account:"Видалити акаунт",
     replay_onboarding:"Повторити знайомство",
-    support_title:"Підтримати Cinemail",
-    support_text:"Cinemail безкоштовний і без реклами. Якщо він тобі корисний - це допомагає покривати витрати на його роботу.",
-    support_button:"Підтримати на Ko-fi →",
     about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Політика конфіденційності</a>",
     about_tmdb:"Дані про фільми, постери та crew - з <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail використовує TMDB API, але не сертифікований TMDB.",
     about_author:"Зроблено <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
@@ -3192,9 +3158,6 @@ const I18N = {
     invite_to_app:"მოიწვიე მეგობრები Cinemail-ში",
     delete_account:"ანგარიშის წაშლა",
     replay_onboarding:"გაცნობის გამეორება",
-    support_title:"დაუჭირე მხარი Cinemail-ს",
-    support_text:"Cinemail უფასოა და რეკლამის გარეშე. თუ ის შენთვის სასარგებლოა, ეს ეხმარება მისი მუშაობის ხარჯების დაფარვას.",
-    support_button:"მხარდაჭერა Ko-fi-ზე →",
     about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>კონფიდენციალურობის პოლიტიკა</a>",
     about_tmdb:"ფილმების მონაცემები, პოსტერები და crew - <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>-დან. Cinemail იყენებს TMDB API-ს, მაგრამ არ არის TMDB-ის მიერ სერტიფიცირებული.",
     about_author:"შექმნა <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>-მა.",
@@ -3243,9 +3206,6 @@ const I18N = {
     invite_to_app:"Invita a amigos a Cinemail",
     delete_account:"Eliminar cuenta",
     replay_onboarding:"Repetir introducción",
-    support_title:"Apoya a Cinemail",
-    support_text:"Cinemail es gratuito y sin anuncios. Si te resulta útil, esto ayuda a cubrir sus costes de funcionamiento.",
-    support_button:"Apoyar en Ko-fi →",
     about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Política de privacidad</a>",
     about_tmdb:"Datos de películas, pósters e información del equipo de <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail usa la API de TMDB pero no está avalada ni certificada por TMDB.",
     about_author:"Hecho por <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
@@ -3294,9 +3254,6 @@ const I18N = {
     invite_to_app:"Inviter des amis sur Cinemail",
     delete_account:"Supprimer le compte",
     replay_onboarding:"Revoir l'introduction",
-    support_title:"Soutenir Cinemail",
-    support_text:"Cinemail est gratuit et sans publicité. S'il t'est utile, cela aide à couvrir ses frais de fonctionnement.",
-    support_button:"Soutenir sur Ko-fi →",
     about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Politique de confidentialité</a>",
     about_tmdb:"Données de films, affiches et équipe via <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail utilise l'API TMDB mais n'est ni approuvé ni certifié par TMDB.",
     about_author:"Créé par <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
@@ -3345,9 +3302,6 @@ const I18N = {
     invite_to_app:"Lade Freunde zu Cinemail ein",
     delete_account:"Konto löschen",
     replay_onboarding:"Tour erneut ansehen",
-    support_title:"Cinemail unterstützen",
-    support_text:"Cinemail ist kostenlos und werbefrei. Wenn es dir nützt, hilft das, die laufenden Kosten zu decken.",
-    support_button:"Auf Ko-fi unterstützen →",
     about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Datenschutzerklärung</a>",
     about_tmdb:"Filmdaten, Poster und Crew-Infos von <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail nutzt die TMDB-API, ist aber nicht von TMDB unterstützt oder zertifiziert.",
     about_author:"Erstellt von <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
@@ -3396,9 +3350,6 @@ const I18N = {
     invite_to_app:"Invita amici su Cinemail",
     delete_account:"Elimina account",
     replay_onboarding:"Rivedi l'introduzione",
-    support_title:"Sostieni Cinemail",
-    support_text:"Cinemail è gratuito e senza pubblicità. Se ti è utile, questo aiuta a coprire i costi di gestione.",
-    support_button:"Sostieni su Ko-fi →",
     about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>Informativa sulla privacy</a>",
     about_tmdb:"Dati dei film, locandine e info sulla troupe da <a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>. Cinemail usa l'API di TMDB ma non è approvato né certificato da TMDB.",
     about_author:"Creato da <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>.",
@@ -3440,7 +3391,6 @@ const _I18N_EXTRA = {
     err_failed_to_send:"Failed to send: ",
     toast_err_invite_not_found:"Error: invite not found",
     toast_feedback_reply:"You got a reply to your feedback",
-    toast_usdt_copied:"USDT address copied",
     toast_name_empty:"Name cannot be empty",
     toast_name_updated:"Name updated",
     err_name_update:"Could not update the name: ",
@@ -3573,7 +3523,6 @@ const _I18N_EXTRA = {
     err_failed_to_send:"Не удалось отправить: ",
     toast_err_invite_not_found:"Ошибка: приглашение не найдено",
     toast_feedback_reply:"Тебе ответили на обращение",
-    toast_usdt_copied:"Адрес USDT скопирован",
     toast_name_empty:"Имя не может быть пустым",
     toast_name_updated:"Имя обновлено",
     err_name_update:"Не удалось обновить имя: ",
@@ -3706,7 +3655,6 @@ const _I18N_EXTRA = {
     err_failed_to_send:"Не вдалося надіслати: ",
     toast_err_invite_not_found:"Помилка: запрошення не знайдено",
     toast_feedback_reply:"Тобі відповіли на звернення",
-    toast_usdt_copied:"Адресу USDT скопійовано",
     toast_name_empty:"Ім'я не може бути порожнім",
     toast_name_updated:"Ім'я оновлено",
     err_name_update:"Не вдалося оновити ім'я: ",
@@ -3839,7 +3787,6 @@ const _I18N_EXTRA = {
     err_failed_to_send:"გაგზავნა ვერ მოხერხდა: ",
     toast_err_invite_not_found:"შეცდომა: მოწვევა ვერ მოიძებნა",
     toast_feedback_reply:"შენს მიმართვას გიპასუხეს",
-    toast_usdt_copied:"USDT მისამართი დაკოპირდა",
     toast_name_empty:"სახელი ცარიელი ვერ იქნება",
     toast_name_updated:"სახელი განახლდა",
     err_name_update:"სახელი ვერ განახლდა: ",
@@ -3972,7 +3919,6 @@ const _I18N_EXTRA = {
     err_failed_to_send:"No se pudo enviar: ",
     toast_err_invite_not_found:"Error: invitación no encontrada",
     toast_feedback_reply:"Has recibido una respuesta a tu mensaje",
-    toast_usdt_copied:"Dirección USDT copiada",
     toast_name_empty:"El nombre no puede estar vacío",
     toast_name_updated:"Nombre actualizado",
     err_name_update:"No se pudo actualizar el nombre: ",
@@ -4105,7 +4051,6 @@ const _I18N_EXTRA = {
     err_failed_to_send:"Échec de l'envoi : ",
     toast_err_invite_not_found:"Erreur : invitation introuvable",
     toast_feedback_reply:"Tu as reçu une réponse à ton message",
-    toast_usdt_copied:"Adresse USDT copiée",
     toast_name_empty:"Le nom ne peut pas être vide",
     toast_name_updated:"Nom mis à jour",
     err_name_update:"Impossible de mettre à jour le nom : ",
@@ -4238,7 +4183,6 @@ const _I18N_EXTRA = {
     err_failed_to_send:"Senden fehlgeschlagen: ",
     toast_err_invite_not_found:"Fehler: Einladung nicht gefunden",
     toast_feedback_reply:"Du hast eine Antwort auf dein Feedback",
-    toast_usdt_copied:"USDT-Adresse kopiert",
     toast_name_empty:"Der Name darf nicht leer sein",
     toast_name_updated:"Name aktualisiert",
     err_name_update:"Name konnte nicht aktualisiert werden: ",
@@ -4371,7 +4315,6 @@ const _I18N_EXTRA = {
     err_failed_to_send:"Invio non riuscito: ",
     toast_err_invite_not_found:"Errore: invito non trovato",
     toast_feedback_reply:"Hai ricevuto una risposta al tuo messaggio",
-    toast_usdt_copied:"Indirizzo USDT copiato",
     toast_name_empty:"Il nome non può essere vuoto",
     toast_name_updated:"Nome aggiornato",
     err_name_update:"Impossibile aggiornare il nome: ",
@@ -10526,21 +10469,6 @@ function closeAccount(){
   ov.style.display="none";
   ov.scrollTop = 0;
 }
-// SUPPORT-JS-START - cut out of native bundles by sync-web.sh, along with the markup.
-// The markup region alone was not enough: the address lives here too, and a strip that
-// removed only the block still shipped it in the file.
-const USDT_ADDRESS = "TJ5kerJVe92YZDpqoyEKPqix2MWMmsr5bk";
-function copyUSDT(e) {
-  if (e) e.preventDefault();
-  const lbl = document.getElementById("usdt-acc-label");
-  navigator.clipboard.writeText(USDT_ADDRESS).then(() => {
-    if (!lbl) { showToast(t('toast_usdt_copied')); return; }
-    const orig = lbl.textContent;
-    lbl.textContent = "Copied ✓ " + USDT_ADDRESS.slice(0,6) + "…" + USDT_ADDRESS.slice(-4);
-    setTimeout(() => { lbl.textContent = orig; }, 2500);
-  }).catch(() => { prompt("Copy USDT (TRC20) address:", USDT_ADDRESS); });
-}
-// SUPPORT-JS-END
 async function saveDisplayName() {
   const newName=document.getElementById("acc-name-input").value.trim();
   if(!newName){showToast(t('toast_name_empty'),true);return;}
