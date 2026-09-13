@@ -2887,7 +2887,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.31</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.32</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -5094,10 +5094,18 @@ function _maybeShowOnboarding() {
 }
 
 function showScreen(name) {
-  ["signin","signup","check-email","forgot","reset"].forEach(s => {
-    const el = document.getElementById("screen-"+s);
-    if (el) el.style.display = s === name ? "block" : "none";
+  // By selector, for the same reason as onSignedIn: this list named five screens and there
+  // are six. The missing one was the ONBOARDING TOUR, which is position:fixed and would sit
+  // on top of whatever screen was just asked for - so "open the reset form" could leave the
+  // tour covering it, which is one of the two things reported on 13 Sep ("opens either with
+  // the tour or the sign-in panel").
+  const target = document.getElementById("screen-" + name);
+  document.querySelectorAll('[id^="screen-"]').forEach(el => {
+    if (el !== target) el.style.display = "none";
   });
+  // Only the named screen is shown, and only if it exists. The tour is never shown from here
+  // - that is _maybeShowOnboarding's job, and it uses flex rather than block.
+  if (target) target.style.display = "block";
   document.getElementById("main-app").style.display = "none";
 }
 
@@ -5338,10 +5346,18 @@ async function onSignedIn(user) {
     ? currentUser.displayName : null;
   currentUser = user;
   currentUser.displayName = preservedName || user.user_metadata?.display_name || emailPrefix;
-  ["signin","signup","check-email"].forEach(s => {
-    const el = document.getElementById("screen-"+s);
-    if (el) el.style.display = "none";
-  });
+  // EVERY auth screen, found by selector, not a list of three written down when there were
+  // three. Reported 13 Sep 2026: reset your password, see the toast say it worked, and stay
+  // sitting on the reset form with both fields still editable. The app had started correctly
+  // underneath - `main-app` was visible - but #screen-reset is position:fixed inset:0 and was
+  // still on top of it, because this list said "signin", "signup", "check-email" and the
+  // screens are "signin", "signup", "check-email", "forgot", "reset", "onboarding".
+  //
+  // Two screens were added after the list was written and nobody came back to it. That is the
+  // defect this file has already paid for twice - a rule applied instance by instance instead
+  // of once at the source - so it is a selector now and a seventh screen will be covered by it
+  // on the day it is added.
+  document.querySelectorAll('[id^="screen-"]').forEach(el => { el.style.display = "none"; });
   document.getElementById("main-app").style.display = "block";
   initUI(); // Show correct initial right away
 
