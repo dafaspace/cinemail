@@ -260,6 +260,149 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 @media (prefers-contrast: more) {
   :root { --muted: #c9c9d2; --border: rgba(255,255,255,0.38); }
 }
+/* ── The draw ─────────────────────────────────────────────────────────────── */
+.draw-btn {
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  width:100%; margin:0 0 10px; padding:.72em 1.1em; line-height:1;
+  font:inherit; font-size:13px; font-weight:600; letter-spacing:.02em;
+  border-radius:11px; cursor:pointer; box-sizing:border-box;
+  -webkit-appearance:none; appearance:none;
+  text-box:trim-both cap alphabetic;
+  background:color-mix(in srgb, var(--primary) 13%, transparent);
+  border:1px solid color-mix(in srgb, var(--primary) 45%, transparent);
+  color:var(--primary);
+  transition:background .16s, border-color .16s;
+}
+.draw-btn:hover { background:color-mix(in srgb, var(--primary) 22%, transparent);
+                  border-color:color-mix(in srgb, var(--primary) 80%, transparent); }
+.draw-btn svg { flex-shrink:0 }
+
+.draw-overlay {
+  display:none; position:fixed; inset:0; z-index:9000;
+  align-items:center; justify-content:center; padding:20px;
+  background:rgba(5,5,12,.82); -webkit-backdrop-filter:blur(7px); backdrop-filter:blur(7px);
+  opacity:0; transition:opacity .22s;
+}
+.draw-overlay.visible { opacity:1 }
+.draw-sheet {
+  position:relative; width:100%; max-width:340px; padding:30px 22px 24px;
+  border-radius:var(--radius-lg); background:var(--surface); overflow:hidden;
+  border:1px solid var(--border); text-align:center;
+  transform:translateY(10px) scale(.98); transition:transform .22s;
+}
+.draw-overlay.visible .draw-sheet { transform:none }
+.draw-close {
+  position:absolute; top:8px; right:8px; width:34px; height:34px;
+  display:flex; align-items:center; justify-content:center;
+  background:transparent; border:none; color:var(--muted);
+  font-size:22px; line-height:1; cursor:pointer; border-radius:50%;
+}
+.draw-stage { position:relative; min-height:250px; display:flex; flex-direction:column;
+              align-items:center; justify-content:center; gap:10px; overflow:hidden }
+
+/* Spotlights, thrown UPWARD from two sources at the bottom - the premiere searchlight, not
+   a stage lamp. They start almost vertical, then lean in and cross in the middle. Drawn with
+   gradients rather than images so they cost nothing and stay sharp at any size.
+   The cone is narrow at the source and wide at the far end, which is how a beam actually
+   spreads; brightest at the bottom, gone by the top. */
+.draw-beams { position:absolute; inset:0; z-index:0; pointer-events:none; opacity:0 }
+.draw-stage.reveal .draw-beams { opacity:1 }
+.draw-beam {
+  position:absolute; bottom:-8%; width:62%; height:140%;
+  background:linear-gradient(to top,
+    color-mix(in srgb, var(--primary) 46%, transparent) 0%,
+    color-mix(in srgb, var(--primary) 16%, transparent) 40%,
+    transparent 76%);
+  filter:blur(8px); opacity:0;
+  /* wide at the top, pinched to a source at the bottom */
+  clip-path:polygon(0% 0%, 100% 0%, 57% 100%, 43% 100%);
+  transform-origin:50% 100%;
+}
+.draw-beam.l { left:-16%; transform:rotate(-3deg) }
+.draw-beam.r { right:-16%; transform:rotate(3deg) }
+/* Nearly vertical first, then leaning in. The hold at 45% is what makes it read as two lamps
+   being aimed rather than one shape opening. */
+.draw-stage.reveal .draw-beam.l { animation:beamL 1.15s cubic-bezier(.3,.8,.25,1) forwards }
+.draw-stage.reveal .draw-beam.r { animation:beamR 1.15s cubic-bezier(.3,.8,.25,1) forwards }
+@keyframes beamL {
+  0%   { transform:rotate(-3deg); opacity:0 }
+  22%  { transform:rotate(-3deg); opacity:.95 }
+  45%  { transform:rotate(-1deg); opacity:.95 }
+  100% { transform:rotate(19deg); opacity:.72 }
+}
+@keyframes beamR {
+  0%   { transform:rotate(3deg); opacity:0 }
+  22%  { transform:rotate(3deg); opacity:.95 }
+  45%  { transform:rotate(1deg); opacity:.95 }
+  100% { transform:rotate(-19deg); opacity:.72 }
+}
+
+/* The brand circle, where the two beams meet. It blooms only once they have leaned in. */
+.draw-pool {
+  position:absolute; left:50%; top:46%; width:210px; height:210px; margin:-105px 0 0 -105px;
+  border-radius:50%; z-index:0; pointer-events:none; transform:scale(.2); opacity:0;
+  background:radial-gradient(circle,
+    color-mix(in srgb, var(--primary) 38%, transparent) 0%,
+    color-mix(in srgb, var(--primary) 16%, transparent) 46%,
+    transparent 70%);
+}
+.draw-stage.reveal .draw-pool { animation:poolBloom .6s .72s cubic-bezier(.2,.8,.3,1) forwards }
+@keyframes poolBloom { to { transform:scale(1); opacity:1 } }
+
+.draw-envelope { position:relative; z-index:2; transition:transform .45s cubic-bezier(.2,.8,.3,1) }
+.draw-stage.spinning .draw-envelope { animation:drawShake .5s ease-in-out infinite }
+.draw-stage.reveal .draw-envelope { animation:envLift .6s .6s cubic-bezier(.2,.8,.3,1) forwards }
+@keyframes envLift { to { transform:translateY(-6px) rotate(-4deg) scale(1.05) } }
+@keyframes drawShake { 0%,100% { transform:rotate(-3deg) } 50% { transform:rotate(3deg) } }
+
+/* The letter. It slides up from behind the envelope - the mark is an OPEN envelope already,
+   so a sheet emerging from it is the motion the logo is drawn for. */
+.draw-letter {
+  position:relative; z-index:1; margin-top:-16px; width:230px; max-width:100%;
+  padding:20px 14px 16px; border-radius:3px;
+  background:linear-gradient(180deg,#faf8f2 0%,#efede4 100%);
+  box-shadow:0 12px 30px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.8) inset;
+  transform:translateY(-46px) scale(.96); opacity:0;
+}
+.draw-stage.reveal .draw-letter { animation:letterOut .62s .85s cubic-bezier(.2,.85,.3,1) forwards }
+@keyframes letterOut { to { transform:translateY(0) scale(1); opacity:1 } }
+.draw-winner {
+  font-family:'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif;
+  font-size:24px; line-height:1.1; letter-spacing:.03em; color:#16161f;
+  word-wrap:break-word; opacity:0;
+}
+.draw-stage.reveal .draw-winner { animation:winnerIn .45s 1.3s ease-out forwards }
+@keyframes winnerIn { from { opacity:0; transform:translateY(5px) } to { opacity:1; transform:none } }
+
+.draw-phrase {
+  position:relative; z-index:2;
+  font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+}
+.draw-phrase .dots::after { content:''; animation:dots 1.1s steps(4,end) infinite }
+@keyframes dots { 0% { content:'' } 25% { content:'.' } 50% { content:'..' } 75%,100% { content:'...' } }
+
+.draw-reel { font-size:13px; color:var(--muted); min-height:18px; position:relative; z-index:2;
+             max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.draw-actions { position:relative; z-index:2; display:flex; flex-direction:column; gap:8px;
+                width:100%; margin-top:10px; opacity:0 }
+.draw-stage.reveal .draw-actions { animation:winnerIn .4s 1.65s ease-out forwards }
+
+@media (prefers-reduced-motion: reduce) {
+  .draw-stage.spinning .draw-envelope,
+  .draw-stage.reveal .draw-envelope,
+  .draw-stage.reveal .draw-beam.l, .draw-stage.reveal .draw-beam.r,
+  .draw-stage.reveal .draw-pool, .draw-stage.reveal .draw-letter,
+  .draw-stage.reveal .draw-winner, .draw-stage.reveal .draw-actions,
+  .draw-phrase .dots::after { animation:none }
+  .draw-stage.reveal .draw-letter, .draw-stage.reveal .draw-winner,
+  .draw-stage.reveal .draw-actions { opacity:1; transform:none }
+  .draw-stage.reveal .draw-pool { opacity:1; transform:scale(1) }
+  .draw-stage.reveal .draw-beam.l { opacity:.7; transform:rotate(-19deg) }
+  .draw-stage.reveal .draw-beam.r { opacity:.7; transform:rotate(19deg) }
+  .draw-overlay, .draw-sheet { transition:none }
+  .draw-phrase .dots::after { content:'...' }
+}
+}
 .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .btn-primary {
@@ -2643,6 +2786,12 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 </div>
 
 <!-- Lightbox -->
+  <div id="draw-overlay" class="draw-overlay" onclick="if(event.target===this)closeDraw()">
+    <div class="draw-sheet">
+      <button class="draw-close" onclick="closeDraw()" aria-label="Close">&times;</button>
+      <div class="draw-stage" id="draw-stage"></div>
+    </div>
+  </div>
 <div id="lightbox-overlay" style="display:none" onclick="closeLightbox()">
   <div id="lightbox-stage" onclick="closeLightbox()">
     <img id="lightbox-img" src="" alt="" onclick="closeLightbox()">
@@ -2862,7 +3011,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.33</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.42</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -2957,7 +3106,6 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 // ── Config ────────────────────────────────────────────────────────────────────
 const TMDB_BASE   = "https://movie-night-proxy.dafa4me.workers.dev/tmdb";
 const TMDB_IMG    = "https://image.tmdb.org/t/p/w300";
-const ANTHROPIC_KEY = "enabled";
 const PROXY_URL   = "https://movie-night-proxy.dafa4me.workers.dev";
 // Every link the app hands to ANOTHER PERSON points here, never at location.origin -
 // inside the App Store build that is `capacitor://localhost` and the link opens nowhere.
@@ -3485,7 +3633,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Select a friend to invite:", add_friends_first:"Add friends first to invite them",
     invite_valid_48:"Valid for 48 hours", invite_connect_hint:"When they open it, you'll connect as friends in one tap.",
     join_list_q:"Join the list", join_invited_sub:"You've been invited to a shared movie list",
-    list_picker_title:"Add to List", filter_friends:"Filter friends…", searching:"Searching…", not_found:"Not found", friends_empty:"No friends yet. Use the invite link below to add the people you watch with.", friend_remove_suffix:"— remove from friends?", friends_no_match:"No friends match", edit_modal_title:"EDIT REVIEW", share_modal_title:"RECOMMEND A FILM", send_btn:"Send", note_ph:"What did you think?", share_msg_ph:"Why you'd love this…", add_modal_seen:"MARK AS WATCHED", add_modal_list:"ADD TO LIST", ob8_picks:"✨ Personal picks for you", err_bad_login:"Wrong email or password.", signin_create_cta:"New here? Create an account", recs_empty_title:"Get Personal Picks", recs_empty_sub:"Enter a prompt, or leave it blank and tap Suggest", recs_thinking:"Thinking…", recs_still_thinking:"Still thinking, hang tight…", based_on_label:"Based on watched films", recs_hint_empty:"Add watched films for personalised picks", picks_left_today:"personal picks left today", picks_left_week:"personal picks left this week", picks_random:"Random Picks", picks_tonight:"Picks For Tonight", picks_for_you:"Picks For You", where_to_watch:"Where to watch", watch_attrib:"Streaming data by JustWatch",
+    list_picker_title:"Add to List", filter_friends:"Filter friends…", searching:"Searching…", not_found:"Not found", friends_empty:"No friends yet. Use the invite link below to add the people you watch with.", friend_remove_suffix:"— remove from friends?", friends_no_match:"No friends match", edit_modal_title:"EDIT REVIEW", share_modal_title:"RECOMMEND A FILM", send_btn:"Send", note_ph:"What did you think?", share_msg_ph:"Why you'd love this…", add_modal_seen:"MARK AS WATCHED", add_modal_list:"ADD TO LIST", ob8_picks:"✨ Personal picks for you", err_bad_login:"Wrong email or password.", signin_create_cta:"New here? Create an account", recs_empty_title:"Get Personal Picks", recs_empty_sub:"Enter a prompt, or leave it blank and tap Suggest", recs_thinking:"Thinking…", recs_still_thinking:"Still thinking, hang tight…", based_on_label:"Based on watched films", recs_hint_empty:"Add watched films for personalised picks", picks_left_today:"personal picks left today", picks_left_week:"personal picks left this week", why_off_many:"Recommended off {n} of your favourites: {films}", why_off_one:"Because you liked {film}", why_season:"Fits {season} evenings", why_acclaimed:"Highly rated, from the {decade}", season_winter:"winter", season_spring:"spring", season_summer:"summer", season_autumn:"autumn", draw_btn:"Decide for me", draw_title:"Let the app pick one", draw_phrase:"and the winner is", draw_open:"Open it", draw_again:"Draw again", picks_random:"Random Picks", picks_tonight:"Picks For Tonight", picks_for_you:"Picks For You", where_to_watch:"Where to watch", watch_attrib:"Streaming data by JustWatch",
     loading_lbl:"Loading…", err_no_results_title:"No Results", err_no_results_sub:"Try just the title without the year", err_connection:"Connection Error", err_generic:"Error", report:"Report", report_prefill:"Reporting a message from {name}. What happened:", err_not_found_title:"Not Found", err_no_results_for:"No results for", err_took_long_title:"Took Too Long", err_took_long_sub:"Try again in a moment", recs_none_title:"No Picks Found", recs_none_sub:"Try a different prompt", recs_unavail_title:"Picks Unavailable", recs_unavail_sub:"Please try again later", inbox_empty_title:"No Chats Yet", inbox_empty_sub:"Share a film from search results or your list to start a conversation",
     continue_as_guest:"Start without an account", guest_label:"Guest", guest_banner:"Saved on this device only", guest_join_btn:"Join Cinemail", guest_save_sub:"Keep your films safe across devices and share them with friends - free forever.", guest_join_free:"Join free", guest_maybe_later:"Maybe later", guest_already_acct:"Already have an account?",
     del_acct_guest:"You are signed in as a guest, so there is no email to sign back in with. This cannot be undone and nothing can be recovered.", ob_mock_mylist:"My List", ob_mock_name:"Your name", block:"Block", block_q:"Block {name}?", block_warn:"They will not be able to send you films, messages or friend requests. You can undo this in your account.", block_done:"Blocked", block_failed:"Could not block", unblock:"Unblock", err_not_allowed:"That did not go through.", unblock_note:"Unblocking lifts the block but does not restore the friendship. They would have to send a new request.", unblock_done:"Unblocked", blocked_header:"Blocked people", block_someone:"Someone", del_acct_q:"Delete account?", del_acct_warn:"This will permanently delete your watch history, all lists, friends and account data. This cannot be undone.", del_acct_confirm:"Delete my account", del_acct_working:"Deleting…", del_acct_done:"Account deleted.", del_acct_failed:"Could not delete account",
@@ -3617,7 +3765,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Выбери друга для приглашения:", add_friends_first:"Сначала добавь друзей, чтобы приглашать",
     invite_valid_48:"Действует 48 часов", invite_connect_hint:"Когда откроют - вы добавитесь в друзья одним касанием.",
     join_list_q:"Вступить в список", join_invited_sub:"Тебя пригласили в общий список фильмов",
-    list_picker_title:"В список", filter_friends:"Фильтр друзей…", searching:"Поиск…", not_found:"Не найдено", friends_empty:"Друзей пока нет. Используй ссылку-приглашение ниже, чтобы добавить тех, с кем смотришь.", friend_remove_suffix:"— убрать из друзей?", friends_no_match:"Нет друзей по запросу", edit_modal_title:"РЕДАКТИРОВАТЬ ОТЗЫВ", share_modal_title:"ПОСОВЕТОВАТЬ ФИЛЬМ", send_btn:"Отправить", note_ph:"Что думаешь?", share_msg_ph:"Почему тебе это понравится…", add_modal_seen:"ОТМЕТИТЬ ПРОСМОТРЕННЫМ", add_modal_list:"ДОБАВИТЬ В СПИСОК", ob8_picks:"✨ Персональные подборки для тебя", err_bad_login:"Неверный email или пароль.", signin_create_cta:"Впервые здесь? Создать аккаунт", recs_empty_title:"Персональные подборки", recs_empty_sub:"Введи запрос или оставь пустым и нажми «Подобрать»", recs_thinking:"Думаю…", recs_still_thinking:"Ещё думаю, секунду…", based_on_label:"На основе просмотренных фильмов", recs_hint_empty:"Добавь просмотренные фильмы для персональных подборок", picks_left_today:"персональных подборок осталось сегодня", picks_left_week:"персональных подборок осталось на этой неделе", picks_random:"Случайные подборки", picks_tonight:"Подборка на вечер", picks_for_you:"Подборка для тебя", where_to_watch:"Где смотреть", watch_attrib:"Данные о стримингах: JustWatch",
+    list_picker_title:"В список", filter_friends:"Фильтр друзей…", searching:"Поиск…", not_found:"Не найдено", friends_empty:"Друзей пока нет. Используй ссылку-приглашение ниже, чтобы добавить тех, с кем смотришь.", friend_remove_suffix:"— убрать из друзей?", friends_no_match:"Нет друзей по запросу", edit_modal_title:"РЕДАКТИРОВАТЬ ОТЗЫВ", share_modal_title:"ПОСОВЕТОВАТЬ ФИЛЬМ", send_btn:"Отправить", note_ph:"Что думаешь?", share_msg_ph:"Почему тебе это понравится…", add_modal_seen:"ОТМЕТИТЬ ПРОСМОТРЕННЫМ", add_modal_list:"ДОБАВИТЬ В СПИСОК", ob8_picks:"✨ Персональные подборки для тебя", err_bad_login:"Неверный email или пароль.", signin_create_cta:"Впервые здесь? Создать аккаунт", recs_empty_title:"Персональные подборки", recs_empty_sub:"Введи запрос или оставь пустым и нажми «Подобрать»", recs_thinking:"Думаю…", recs_still_thinking:"Ещё думаю, секунду…", based_on_label:"На основе просмотренных фильмов", recs_hint_empty:"Добавь просмотренные фильмы для персональных подборок", picks_left_today:"персональных подборок осталось сегодня", picks_left_week:"персональных подборок осталось на этой неделе", why_off_many:"Советуют к {n} твоим любимым: {films}", why_off_one:"Потому что тебе понравился {film}", why_season:"Под {season} вечера", why_acclaimed:"Высокие оценки, {decade}", season_winter:"зимние", season_spring:"весенние", season_summer:"летние", season_autumn:"осенние", draw_btn:"Реши за меня", draw_title:"Пусть приложение выберет", draw_phrase:"и победитель", draw_open:"Открыть", draw_again:"Ещё раз", picks_random:"Случайные подборки", picks_tonight:"Подборка на вечер", picks_for_you:"Подборка для тебя", where_to_watch:"Где смотреть", watch_attrib:"Данные о стримингах: JustWatch",
     loading_lbl:"Загрузка…", err_no_results_title:"Ничего не найдено", err_no_results_sub:"Попробуй только название, без года", err_connection:"Ошибка соединения", err_generic:"Ошибка", report:"Пожаловаться", report_prefill:"Жалоба на {name}. Что произошло:", err_not_found_title:"Не найдено", err_no_results_for:"Нет результатов по", err_took_long_title:"Слишком долго", err_took_long_sub:"Попробуй через мгновение", recs_none_title:"Подборок не нашлось", recs_none_sub:"Попробуй другой запрос", recs_unavail_title:"Подборки недоступны", recs_unavail_sub:"Попробуй позже", inbox_empty_title:"Пока нет чатов", inbox_empty_sub:"Поделись фильмом из поиска или списка, чтобы начать разговор",
     continue_as_guest:"Начать без аккаунта", guest_label:"Гость", guest_banner:"Сохраняется только на этом устройстве", guest_join_btn:"Создать аккаунт", guest_save_sub:"Сохрани фильмы на всех устройствах и делись с друзьями - бесплатно навсегда.", guest_join_free:"Зарегистрироваться бесплатно", guest_maybe_later:"Позже", guest_already_acct:"Уже есть аккаунт?",
     del_acct_guest:"Вы вошли как гость - почты, чтобы войти снова, нет. Отменить или восстановить будет нечем.", ob_mock_mylist:"Мой список", ob_mock_name:"Ваше имя", block:"Заблокировать", block_q:"Заблокировать {name}?", block_warn:"Он больше не сможет присылать вам фильмы, сообщения и запросы в друзья. Отменить можно в настройках аккаунта.", block_done:"Заблокирован", block_failed:"Не удалось заблокировать", unblock:"Разблокировать", err_not_allowed:"Не удалось.", unblock_note:"Разблокировка снимает блокировку, но не возвращает дружбу - человеку придётся отправить новую заявку.", unblock_done:"Разблокирован", blocked_header:"Заблокированные", block_someone:"Кто-то", del_acct_q:"Удалить аккаунт?", del_acct_warn:"Это навсегда удалит историю просмотров, все списки, друзей и данные аккаунта. Отменить будет нельзя.", del_acct_confirm:"Удалить мой аккаунт", del_acct_working:"Удаляем…", del_acct_done:"Аккаунт удалён.", del_acct_failed:"Не удалось удалить аккаунт",
@@ -3749,7 +3897,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Обери друга для запрошення:", add_friends_first:"Спершу додай друзів, щоб запрошувати",
     invite_valid_48:"Дійсне 48 годин", invite_connect_hint:"Коли відкриють - ви додастеся в друзі одним дотиком.",
     join_list_q:"Приєднатися до списку", join_invited_sub:"Тебе запросили до спільного списку фільмів",
-    list_picker_title:"До списку", filter_friends:"Фільтр друзів…", searching:"Пошук…", not_found:"Не знайдено", friends_empty:"Друзів поки немає. Скористайся посиланням нижче, щоб додати тих, з ким дивишся.", friend_remove_suffix:"— прибрати з друзів?", friends_no_match:"Немає друзів за запитом", edit_modal_title:"РЕДАГУВАТИ ВІДГУК", share_modal_title:"ПОРАДИТИ ФІЛЬМ", send_btn:"Надіслати", note_ph:"Що думаєш?", share_msg_ph:"Чому тобі це сподобається…", add_modal_seen:"ПОЗНАЧИТИ ПЕРЕГЛЯНУТИМ", add_modal_list:"ДОДАТИ ДО СПИСКУ", ob8_picks:"✨ Персональні добірки для тебе", err_bad_login:"Невірний email або пароль.", signin_create_cta:"Вперше тут? Створити акаунт", recs_empty_title:"Персональні добірки", recs_empty_sub:"Введи запит або залиш порожнім і натисни «Підібрати»", recs_thinking:"Думаю…", recs_still_thinking:"Ще думаю, секунду…", based_on_label:"На основі переглянутих фільмів", recs_hint_empty:"Додай переглянуті фільми для персональних добірок", picks_left_today:"персональних добірок залишилось сьогодні", picks_left_week:"персональних добірок залишилось цього тижня", picks_random:"Випадкові добірки", picks_tonight:"Добірка на вечір", picks_for_you:"Добірка для тебе", where_to_watch:"Де дивитися", watch_attrib:"Дані про стримінги: JustWatch",
+    list_picker_title:"До списку", filter_friends:"Фільтр друзів…", searching:"Пошук…", not_found:"Не знайдено", friends_empty:"Друзів поки немає. Скористайся посиланням нижче, щоб додати тих, з ким дивишся.", friend_remove_suffix:"— прибрати з друзів?", friends_no_match:"Немає друзів за запитом", edit_modal_title:"РЕДАГУВАТИ ВІДГУК", share_modal_title:"ПОРАДИТИ ФІЛЬМ", send_btn:"Надіслати", note_ph:"Що думаєш?", share_msg_ph:"Чому тобі це сподобається…", add_modal_seen:"ПОЗНАЧИТИ ПЕРЕГЛЯНУТИМ", add_modal_list:"ДОДАТИ ДО СПИСКУ", ob8_picks:"✨ Персональні добірки для тебе", err_bad_login:"Невірний email або пароль.", signin_create_cta:"Вперше тут? Створити акаунт", recs_empty_title:"Персональні добірки", recs_empty_sub:"Введи запит або залиш порожнім і натисни «Підібрати»", recs_thinking:"Думаю…", recs_still_thinking:"Ще думаю, секунду…", based_on_label:"На основі переглянутих фільмів", recs_hint_empty:"Додай переглянуті фільми для персональних добірок", picks_left_today:"персональних добірок залишилось сьогодні", picks_left_week:"персональних добірок залишилось цього тижня", why_off_many:"Радять до {n} твоїх улюблених: {films}", why_off_one:"Бо тобі сподобався {film}", why_season:"Під {season} вечори", why_acclaimed:"Високі оцінки, {decade}", season_winter:"зимові", season_spring:"весняні", season_summer:"літні", season_autumn:"осінні", draw_btn:"Виріши за мене", draw_title:"Хай застосунок обере", draw_phrase:"і переможець", draw_open:"Відкрити", draw_again:"Ще раз", picks_random:"Випадкові добірки", picks_tonight:"Добірка на вечір", picks_for_you:"Добірка для тебе", where_to_watch:"Де дивитися", watch_attrib:"Дані про стримінги: JustWatch",
     loading_lbl:"Завантаження…", err_no_results_title:"Нічого не знайдено", err_no_results_sub:"Спробуй лише назву, без року", err_connection:"Помилка з'єднання", err_generic:"Помилка", report:"Поскаржитися", report_prefill:"Скарга на {name}. Що сталося:", err_not_found_title:"Не знайдено", err_no_results_for:"Немає результатів за", err_took_long_title:"Занадто довго", err_took_long_sub:"Спробуй за мить", recs_none_title:"Добірок не знайшлося", recs_none_sub:"Спробуй інший запит", recs_unavail_title:"Добірки недоступні", recs_unavail_sub:"Спробуй пізніше", inbox_empty_title:"Поки немає чатів", inbox_empty_sub:"Поділись фільмом з пошуку або списку, щоб почати розмову",
     continue_as_guest:"Почати без акаунта", guest_label:"Гість", guest_banner:"Зберігається лише на цьому пристрої", guest_join_btn:"Створити акаунт", guest_save_sub:"Збережи фільми на всіх пристроях і ділись з друзями - безкоштовно назавжди.", guest_join_free:"Зареєструватися безкоштовно", guest_maybe_later:"Пізніше", guest_already_acct:"Вже є акаунт?",
     del_acct_guest:"Ви увійшли як гість - пошти, щоб увійти знову, немає. Скасувати або відновити буде нічим.", ob_mock_mylist:"Мій список", ob_mock_name:"Ваше ім\u2019я", block:"Заблокувати", block_q:"Заблокувати {name}?", block_warn:"Він більше не зможе надсилати вам фільми, повідомлення та запити в друзі. Скасувати можна в налаштуваннях.", block_done:"Заблоковано", block_failed:"Не вдалося заблокувати", unblock:"Розблокувати", err_not_allowed:"Не вдалося.", unblock_note:"Розблокування знімає блокування, але не повертає дружбу - людині доведеться надіслати новий запит.", unblock_done:"Розблоковано", blocked_header:"Заблоковані", block_someone:"Хтось", del_acct_q:"Видалити акаунт?", del_acct_warn:"Це назавжди видалить історію переглядів, усі списки, друзів і дані акаунта. Скасувати буде неможливо.", del_acct_confirm:"Видалити мій акаунт", del_acct_working:"Видаляємо…", del_acct_done:"Акаунт видалено.", del_acct_failed:"Не вдалося видалити акаунт",
@@ -3881,7 +4029,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"აირჩიე მოსაწვევი მეგობარი:", add_friends_first:"ჯერ დაამატე მეგობრები მოსაწვევად",
     invite_valid_48:"მოქმედებს 48 საათი", invite_connect_hint:"გახსნისას ერთი შეხებით დაუმეგობრდებით.",
     join_list_q:"სიაში გაწევრიანება", join_invited_sub:"მოგიწვიეს საერთო ფილმების სიაში",
-    list_picker_title:"სიაში დამატება", filter_friends:"გაფილტრე მეგობრები…", searching:"ძიება…", not_found:"ვერ მოიძებნა", friends_empty:"ჯერ მეგობრები არ არის. გამოიყენე ქვემოთ მოცემული ბმული, რომ დაამატო ისინი, ვისთანაც უყურებ.", friend_remove_suffix:"— ამოშალო მეგობრებიდან?", friends_no_match:"ვერ მოიძებნა მეგობარი", edit_modal_title:"შეფასების რედაქტირება", share_modal_title:"ფილმის რეკომენდაცია", send_btn:"გაგზავნა", note_ph:"რას ფიქრობ?", share_msg_ph:"რატომ მოგეწონება…", add_modal_seen:"მონიშნე ნანახად", add_modal_list:"სიაში დამატება", ob8_picks:"✨ პერსონალური რჩევები შენთვის", err_bad_login:"არასწორი email ან პაროლი.", signin_create_cta:"ახალი ხარ? შექმენი ანგარიში", recs_empty_title:"პერსონალური რჩევები", recs_empty_sub:"შეიყვანე მოთხოვნა ან დატოვე ცარიელი და დააჭირე ღილაკს „მირჩიე“", recs_thinking:"ვფიქრობ…", recs_still_thinking:"ჯერ კიდევ ვფიქრობ, მოითმინე…", based_on_label:"ნანახი ფილმების მიხედვით", recs_hint_empty:"დაამატე ნანახი ფილმები პერსონალური რჩევებისთვის", picks_left_today:"პერსონალური რჩევა დარჩა დღეს", picks_left_week:"პერსონალური რჩევა დარჩა ამ კვირას", picks_random:"შემთხვევითი რჩევები", picks_tonight:"რჩევები საღამოსთვის", picks_for_you:"რჩევები შენთვის", where_to_watch:"სად ვუყუროთ", watch_attrib:"სტრიმინგის მონაცემები: JustWatch",
+    list_picker_title:"სიაში დამატება", filter_friends:"გაფილტრე მეგობრები…", searching:"ძიება…", not_found:"ვერ მოიძებნა", friends_empty:"ჯერ მეგობრები არ არის. გამოიყენე ქვემოთ მოცემული ბმული, რომ დაამატო ისინი, ვისთანაც უყურებ.", friend_remove_suffix:"— ამოშალო მეგობრებიდან?", friends_no_match:"ვერ მოიძებნა მეგობარი", edit_modal_title:"შეფასების რედაქტირება", share_modal_title:"ფილმის რეკომენდაცია", send_btn:"გაგზავნა", note_ph:"რას ფიქრობ?", share_msg_ph:"რატომ მოგეწონება…", add_modal_seen:"მონიშნე ნანახად", add_modal_list:"სიაში დამატება", ob8_picks:"✨ პერსონალური რჩევები შენთვის", err_bad_login:"არასწორი email ან პაროლი.", signin_create_cta:"ახალი ხარ? შექმენი ანგარიში", recs_empty_title:"პერსონალური რჩევები", recs_empty_sub:"შეიყვანე მოთხოვნა ან დატოვე ცარიელი და დააჭირე ღილაკს „მირჩიე“", recs_thinking:"ვფიქრობ…", recs_still_thinking:"ჯერ კიდევ ვფიქრობ, მოითმინე…", based_on_label:"ნანახი ფილმების მიხედვით", recs_hint_empty:"დაამატე ნანახი ფილმები პერსონალური რჩევებისთვის", picks_left_today:"პერსონალური რჩევა დარჩა დღეს", picks_left_week:"პერსონალური რჩევა დარჩა ამ კვირას", why_off_many:"გირჩევენ შენი {n} საყვარელი ფილმიდან: {films}", why_off_one:"რადგან მოგეწონა {film}", why_season:"{season} საღამოებისთვის", why_acclaimed:"მაღალი შეფასება, {decade}", season_winter:"ზამთრის", season_spring:"გაზაფხულის", season_summer:"ზაფხულის", season_autumn:"შემოდგომის", draw_btn:"შენ გადაწყვიტე", draw_title:"დაე აპლიკაციამ აირჩიოს", draw_phrase:"და გამარჯვებულია", draw_open:"გახსნა", draw_again:"თავიდან", picks_random:"შემთხვევითი რჩევები", picks_tonight:"რჩევები საღამოსთვის", picks_for_you:"რჩევები შენთვის", where_to_watch:"სად ვუყუროთ", watch_attrib:"სტრიმინგის მონაცემები: JustWatch",
     loading_lbl:"იტვირთება…", err_no_results_title:"ვერაფერი მოიძებნა", err_no_results_sub:"სცადე მხოლოდ სათაური, წლის გარეშე", err_connection:"კავშირის შეცდომა", err_generic:"შეცდომა", report:"საჩივარი", report_prefill:"საჩივარი {name}-ზე. რა მოხდა:", err_not_found_title:"ვერ მოიძებნა", err_no_results_for:"ვერაფერი მოიძებნა:", err_took_long_title:"ძალიან დიდხანს", err_took_long_sub:"სცადე ცოტა ხანში", recs_none_title:"რჩევები ვერ მოიძებნა", recs_none_sub:"სცადე სხვა მოთხოვნა", recs_unavail_title:"რჩევები მიუწვდომელია", recs_unavail_sub:"სცადე მოგვიანებით", inbox_empty_title:"ჩატები ჯერ არ არის", inbox_empty_sub:"გააზიარე ფილმი ძიებიდან ან სიიდან, რომ დაიწყო საუბარი",
     continue_as_guest:"დაიწყე ანგარიშის გარეშე", guest_label:"სტუმარი", guest_banner:"ინახება მხოლოდ ამ მოწყობილობაზე", guest_join_btn:"შემოუერთდი Cinemail-ს", guest_save_sub:"შეინახე ფილმები ყველა მოწყობილობაზე და გაუზიარე მეგობრებს - უფასოდ, სამუდამოდ.", guest_join_free:"უფასოდ შემოუერთდი", guest_maybe_later:"მოგვიანებით", guest_already_acct:"უკვე გაქვს ანგარიში?",
     del_acct_guest:"თქვენ სტუმრად ხართ - ხელახლა შესასვლელი ელფოსტა არ არსებობს. აღდგენა შეუძლებელია.", ob_mock_mylist:"ჩემი სია", ob_mock_name:"თქვენი სახელი", block:"დაბლოკვა", block_q:"დაიბლოკოს {name}?", block_warn:"ის ვეღარ გამოგიგზავნით ფილმებს, შეტყობინებებს და მეგობრობის მოთხოვნებს. გაუქმება შესაძლებელია ანგარიშში.", block_done:"დაბლოკილია", block_failed:"დაბლოკვა ვერ მოხერხდა", unblock:"განბლოკვა", err_not_allowed:"ვერ შესრულდა.", unblock_note:"განბლოკვა ხსნის ბლოკს, მაგრამ მეგობრობას არ აღადგენს - მას ხელახლა მოუწევს მოთხოვნის გაგზავნა.", unblock_done:"განიბლოკა", blocked_header:"დაბლოკილები", block_someone:"ვიღაც", del_acct_q:"წავშალოთ ანგარიში?", del_acct_warn:"სამუდამოდ წაიშლება ნანახის ისტორია, ყველა სია, მეგობრები და ანგარიშის მონაცემები. დაბრუნება შეუძლებელია.", del_acct_confirm:"წაშალე ჩემი ანგარიში", del_acct_working:"იშლება…", del_acct_done:"ანგარიში წაიშალა.", del_acct_failed:"ანგარიშის წაშლა ვერ მოხერხდა",
@@ -4013,7 +4161,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Elige un amigo para invitar:", add_friends_first:"Añade amigos primero para invitarlos",
     invite_valid_48:"Válido 48 horas", invite_connect_hint:"Cuando lo abran, os conectaréis como amigos al instante.",
     join_list_q:"Unirse a la lista", join_invited_sub:"Te han invitado a una lista compartida de películas",
-    list_picker_title:"Añadir a lista", filter_friends:"Filtrar amigos…", searching:"Buscando…", not_found:"No encontrado", friends_empty:"Aún no tienes amigos. Usa el enlace de invitación de abajo para añadir a quienes ves películas.", friend_remove_suffix:"— ¿quitar de amigos?", friends_no_match:"Sin coincidencias", edit_modal_title:"EDITAR RESEÑA", share_modal_title:"RECOMENDAR UNA PELÍCULA", send_btn:"Enviar", note_ph:"¿Qué te pareció?", share_msg_ph:"Por qué te encantará…", add_modal_seen:"MARCAR COMO VISTA", add_modal_list:"AÑADIR A LISTA", ob8_picks:"✨ Selección personal para ti", err_bad_login:"Email o contraseña incorrectos.", signin_create_cta:"¿Eres nuevo? Crea una cuenta", recs_empty_title:"Recomendaciones personales", recs_empty_sub:"Escribe una idea o déjalo vacío y toca Sugerir", recs_thinking:"Pensando…", recs_still_thinking:"Sigo pensando, un momento…", based_on_label:"Según tus películas vistas", recs_hint_empty:"Añade películas vistas para recomendaciones personales", picks_left_today:"selecciones personales restantes hoy", picks_left_week:"selecciones personales restantes esta semana", picks_random:"Selección al azar", picks_tonight:"Para esta noche", picks_for_you:"Para ti", where_to_watch:"Dónde ver", watch_attrib:"Datos de streaming por JustWatch",
+    list_picker_title:"Añadir a lista", filter_friends:"Filtrar amigos…", searching:"Buscando…", not_found:"No encontrado", friends_empty:"Aún no tienes amigos. Usa el enlace de invitación de abajo para añadir a quienes ves películas.", friend_remove_suffix:"— ¿quitar de amigos?", friends_no_match:"Sin coincidencias", edit_modal_title:"EDITAR RESEÑA", share_modal_title:"RECOMENDAR UNA PELÍCULA", send_btn:"Enviar", note_ph:"¿Qué te pareció?", share_msg_ph:"Por qué te encantará…", add_modal_seen:"MARCAR COMO VISTA", add_modal_list:"AÑADIR A LISTA", ob8_picks:"✨ Selección personal para ti", err_bad_login:"Email o contraseña incorrectos.", signin_create_cta:"¿Eres nuevo? Crea una cuenta", recs_empty_title:"Recomendaciones personales", recs_empty_sub:"Escribe una idea o déjalo vacío y toca Sugerir", recs_thinking:"Pensando…", recs_still_thinking:"Sigo pensando, un momento…", based_on_label:"Según tus películas vistas", recs_hint_empty:"Añade películas vistas para recomendaciones personales", picks_left_today:"selecciones personales restantes hoy", picks_left_week:"selecciones personales restantes esta semana", why_off_many:"Recomendada a partir de {n} de tus favoritas: {films}", why_off_one:"Porque te gustó {film}", why_season:"Para las tardes de {season}", why_acclaimed:"Muy valorada, de los {decade}", season_winter:"invierno", season_spring:"primavera", season_summer:"verano", season_autumn:"otoño", draw_btn:"Elige por mí", draw_title:"Deja que la app elija", draw_phrase:"y la ganadora es", draw_open:"Abrir", draw_again:"Otra vez", picks_random:"Selección al azar", picks_tonight:"Para esta noche", picks_for_you:"Para ti", where_to_watch:"Dónde ver", watch_attrib:"Datos de streaming por JustWatch",
     loading_lbl:"Cargando…", err_no_results_title:"Sin resultados", err_no_results_sub:"Prueba solo el título, sin el año", err_connection:"Error de conexión", err_generic:"Error", report:"Denunciar", report_prefill:"Denuncia sobre un mensaje de {name}. Qué ha pasado:", err_not_found_title:"No encontrado", err_no_results_for:"Sin resultados para", err_took_long_title:"Tardó demasiado", err_took_long_sub:"Inténtalo en un momento", recs_none_title:"Sin recomendaciones", recs_none_sub:"Prueba otra pista", recs_unavail_title:"Recomendaciones no disponibles", recs_unavail_sub:"Inténtalo más tarde", inbox_empty_title:"Aún no hay chats", inbox_empty_sub:"Comparte una película desde la búsqueda o tu lista para iniciar una conversación",
     continue_as_guest:"Empezar sin cuenta", guest_label:"Invitado", guest_banner:"Se guarda solo en este dispositivo", guest_join_btn:"Unirse a Cinemail", guest_save_sub:"Guarda tus películas en todos tus dispositivos y compártelas con amigos - gratis para siempre.", guest_join_free:"Unirse gratis", guest_maybe_later:"Quizás luego", guest_already_acct:"¿Ya tienes cuenta?",
     del_acct_guest:"Has entrado como invitado, así que no hay correo para volver a entrar. No se podrá deshacer ni recuperar nada.", ob_mock_mylist:"Mi lista", ob_mock_name:"Tu nombre", block:"Bloquear", block_q:"¿Bloquear a {name}?", block_warn:"No podrá enviarte películas, mensajes ni solicitudes de amistad. Puedes deshacerlo en tu cuenta.", block_done:"Bloqueado", block_failed:"No se pudo bloquear", unblock:"Desbloquear", err_not_allowed:"No se pudo completar.", unblock_note:"Desbloquear quita el bloqueo pero no restaura la amistad. Tendrían que enviarte una nueva solicitud.", unblock_done:"Desbloqueado", blocked_header:"Personas bloqueadas", block_someone:"Alguien", del_acct_q:"¿Eliminar la cuenta?", del_acct_warn:"Se borrarán para siempre tu historial de películas vistas, todas tus listas, tus amigos y los datos de la cuenta. No se puede deshacer.", del_acct_confirm:"Eliminar mi cuenta", del_acct_working:"Eliminando…", del_acct_done:"Cuenta eliminada.", del_acct_failed:"No se pudo eliminar la cuenta",
@@ -4145,7 +4293,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Choisis un ami à inviter :", add_friends_first:"Ajoute d'abord des amis pour les inviter",
     invite_valid_48:"Valable 48 heures", invite_connect_hint:"À l'ouverture, vous deviendrez amis en un clic.",
     join_list_q:"Rejoindre la liste", join_invited_sub:"Tu es invité à une liste de films partagée",
-    list_picker_title:"Ajouter à la liste", filter_friends:"Filtrer les amis…", searching:"Recherche…", not_found:"Introuvable", friends_empty:"Pas encore d'amis. Utilise le lien d'invitation ci-dessous pour ajouter tes compagnons de visionnage.", friend_remove_suffix:"— retirer des amis ?", friends_no_match:"Aucun ami trouvé", edit_modal_title:"MODIFIER L'AVIS", share_modal_title:"RECOMMANDER UN FILM", send_btn:"Envoyer", note_ph:"Qu'en as-tu pensé ?", share_msg_ph:"Pourquoi tu vas adorer…", add_modal_seen:"MARQUER COMME VU", add_modal_list:"AJOUTER À LA LISTE", ob8_picks:"✨ Sélections personnelles pour toi", err_bad_login:"Email ou mot de passe incorrect.", signin_create_cta:"Nouveau ? Crée un compte", recs_empty_title:"Sélections personnelles", recs_empty_sub:"Saisis une idée ou laisse vide et appuie sur Suggérer", recs_thinking:"Réflexion…", recs_still_thinking:"Je réfléchis encore, un instant…", based_on_label:"D'après tes films vus", recs_hint_empty:"Ajoute des films vus pour des recommandations personnelles", picks_left_today:"sélections personnelles restantes aujourd'hui", picks_left_week:"sélections personnelles restantes cette semaine", picks_random:"Au hasard", picks_tonight:"Pour ce soir", picks_for_you:"Pour toi", where_to_watch:"Où regarder", watch_attrib:"Données de streaming par JustWatch",
+    list_picker_title:"Ajouter à la liste", filter_friends:"Filtrer les amis…", searching:"Recherche…", not_found:"Introuvable", friends_empty:"Pas encore d'amis. Utilise le lien d'invitation ci-dessous pour ajouter tes compagnons de visionnage.", friend_remove_suffix:"— retirer des amis ?", friends_no_match:"Aucun ami trouvé", edit_modal_title:"MODIFIER L'AVIS", share_modal_title:"RECOMMANDER UN FILM", send_btn:"Envoyer", note_ph:"Qu'en as-tu pensé ?", share_msg_ph:"Pourquoi tu vas adorer…", add_modal_seen:"MARQUER COMME VU", add_modal_list:"AJOUTER À LA LISTE", ob8_picks:"✨ Sélections personnelles pour toi", err_bad_login:"Email ou mot de passe incorrect.", signin_create_cta:"Nouveau ? Crée un compte", recs_empty_title:"Sélections personnelles", recs_empty_sub:"Saisis une idée ou laisse vide et appuie sur Suggérer", recs_thinking:"Réflexion…", recs_still_thinking:"Je réfléchis encore, un instant…", based_on_label:"D'après tes films vus", recs_hint_empty:"Ajoute des films vus pour des recommandations personnelles", picks_left_today:"sélections personnelles restantes aujourd'hui", picks_left_week:"sélections personnelles restantes cette semaine", why_off_many:"Recommandé d'après {n} de tes préférés : {films}", why_off_one:"Parce que tu as aimé {film}", why_season:"Pour les soirées d'{season}", why_acclaimed:"Très bien noté, des années {decade}", season_winter:"hiver", season_spring:"printemps", season_summer:"été", season_autumn:"automne", draw_btn:"Choisis pour moi", draw_title:"Laisse l'app choisir", draw_phrase:"et le gagnant est", draw_open:"Ouvrir", draw_again:"Relancer", picks_random:"Au hasard", picks_tonight:"Pour ce soir", picks_for_you:"Pour toi", where_to_watch:"Où regarder", watch_attrib:"Données de streaming par JustWatch",
     loading_lbl:"Chargement…", err_no_results_title:"Aucun résultat", err_no_results_sub:"Essaie juste le titre, sans l'année", err_connection:"Erreur de connexion", err_generic:"Erreur", report:"Signaler", report_prefill:"Signalement d'un message de {name}. Que s'est-il passé :", err_not_found_title:"Introuvable", err_no_results_for:"Aucun résultat pour", err_took_long_title:"Trop long", err_took_long_sub:"Réessaie dans un instant", recs_none_title:"Aucune sélection", recs_none_sub:"Essaie une autre idée", recs_unavail_title:"Sélections indisponibles", recs_unavail_sub:"Réessaie plus tard", inbox_empty_title:"Pas encore de discussions", inbox_empty_sub:"Partage un film depuis la recherche ou ta liste pour démarrer une conversation",
     continue_as_guest:"Commencer sans compte", guest_label:"Invité", guest_banner:"Enregistré uniquement sur cet appareil", guest_join_btn:"Rejoindre Cinemail", guest_save_sub:"Garde tes films sur tous tes appareils et partage-les avec tes amis - gratuit pour toujours.", guest_join_free:"Rejoindre gratuitement", guest_maybe_later:"Plus tard", guest_already_acct:"Tu as deja un compte ?",
     del_acct_guest:"Tu es connecté en tant qu\u2019invité, il n\u2019y a donc pas d\u2019e-mail pour revenir. Rien ne pourra être récupéré.", ob_mock_mylist:"Ma liste", ob_mock_name:"Ton nom", block:"Bloquer", block_q:"Bloquer {name} ?", block_warn:"Cette personne ne pourra plus t\u2019envoyer de films, de messages ni de demandes d\u2019ami. Réversible depuis ton compte.", block_done:"Bloqué", block_failed:"Impossible de bloquer", unblock:"Débloquer", err_not_allowed:"Cela n'a pas abouti.", unblock_note:"Débloquer lève le blocage mais ne rétablit pas l'amitié. La personne devra envoyer une nouvelle demande.", unblock_done:"Débloqué", blocked_header:"Personnes bloquées", block_someone:"Quelqu\u2019un", del_acct_q:"Supprimer le compte ?", del_acct_warn:"Cela supprimera définitivement ton historique de films, toutes tes listes, tes amis et les données du compte. C'est irréversible.", del_acct_confirm:"Supprimer mon compte", del_acct_working:"Suppression…", del_acct_done:"Compte supprimé.", del_acct_failed:"Impossible de supprimer le compte",
@@ -4277,7 +4425,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Wähle einen Freund zum Einladen:", add_friends_first:"Füge erst Freunde hinzu, um sie einzuladen",
     invite_valid_48:"48 Stunden gültig", invite_connect_hint:"Wenn sie ihn öffnen, werdet ihr mit einem Tipp Freunde.",
     join_list_q:"Der Liste beitreten", join_invited_sub:"Du wurdest zu einer geteilten Filmliste eingeladen",
-    list_picker_title:"Zur Liste", filter_friends:"Freunde filtern…", searching:"Suche…", not_found:"Nicht gefunden", friends_empty:"Noch keine Freunde. Nutze den Einladungslink unten, um die Leute hinzuzufügen, mit denen du schaust.", friend_remove_suffix:"— aus Freunden entfernen?", friends_no_match:"Keine passenden Freunde", edit_modal_title:"BEWERTUNG BEARBEITEN", share_modal_title:"FILM EMPFEHLEN", send_btn:"Senden", note_ph:"Wie fandest du ihn?", share_msg_ph:"Warum du ihn lieben wirst…", add_modal_seen:"ALS GESEHEN MARKIEREN", add_modal_list:"ZUR LISTE HINZUFÜGEN", ob8_picks:"✨ Persönliche Tipps für dich", err_bad_login:"Falsche E-Mail oder Passwort.", signin_create_cta:"Neu hier? Konto erstellen", recs_empty_title:"Persönliche Tipps", recs_empty_sub:"Gib eine Idee ein oder lass es leer und tippe auf Vorschlagen", recs_thinking:"Denke nach…", recs_still_thinking:"Denke noch nach, einen Moment…", based_on_label:"Basierend auf gesehenen Filmen", recs_hint_empty:"Füge gesehene Filme für persönliche Tipps hinzu", picks_left_today:"persönliche Tipps heute übrig", picks_left_week:"persönliche Tipps diese Woche übrig", picks_random:"Zufällige Tipps", picks_tonight:"Tipps für heute Abend", picks_for_you:"Tipps für dich", where_to_watch:"Wo zu sehen", watch_attrib:"Streaming-Daten von JustWatch",
+    list_picker_title:"Zur Liste", filter_friends:"Freunde filtern…", searching:"Suche…", not_found:"Nicht gefunden", friends_empty:"Noch keine Freunde. Nutze den Einladungslink unten, um die Leute hinzuzufügen, mit denen du schaust.", friend_remove_suffix:"— aus Freunden entfernen?", friends_no_match:"Keine passenden Freunde", edit_modal_title:"BEWERTUNG BEARBEITEN", share_modal_title:"FILM EMPFEHLEN", send_btn:"Senden", note_ph:"Wie fandest du ihn?", share_msg_ph:"Warum du ihn lieben wirst…", add_modal_seen:"ALS GESEHEN MARKIEREN", add_modal_list:"ZUR LISTE HINZUFÜGEN", ob8_picks:"✨ Persönliche Tipps für dich", err_bad_login:"Falsche E-Mail oder Passwort.", signin_create_cta:"Neu hier? Konto erstellen", recs_empty_title:"Persönliche Tipps", recs_empty_sub:"Gib eine Idee ein oder lass es leer und tippe auf Vorschlagen", recs_thinking:"Denke nach…", recs_still_thinking:"Denke noch nach, einen Moment…", based_on_label:"Basierend auf gesehenen Filmen", recs_hint_empty:"Füge gesehene Filme für persönliche Tipps hinzu", picks_left_today:"persönliche Tipps heute übrig", picks_left_week:"persönliche Tipps diese Woche übrig", why_off_many:"Empfohlen auf Basis von {n} deiner Favoriten: {films}", why_off_one:"Weil dir {film} gefallen hat", why_season:"Für {season}abende", why_acclaimed:"Hoch bewertet, aus den {decade}ern", season_winter:"Winter", season_spring:"Frühlings", season_summer:"Sommer", season_autumn:"Herbst", draw_btn:"Entscheide für mich", draw_title:"Lass die App wählen", draw_phrase:"und der Gewinner ist", draw_open:"Öffnen", draw_again:"Nochmal", picks_random:"Zufällige Tipps", picks_tonight:"Tipps für heute Abend", picks_for_you:"Tipps für dich", where_to_watch:"Wo zu sehen", watch_attrib:"Streaming-Daten von JustWatch",
     loading_lbl:"Lädt…", err_no_results_title:"Keine Ergebnisse", err_no_results_sub:"Versuch nur den Titel, ohne Jahr", err_connection:"Verbindungsfehler", err_generic:"Fehler", report:"Melden", report_prefill:"Meldung zu einer Nachricht von {name}. Was ist passiert:", err_not_found_title:"Nicht gefunden", err_no_results_for:"Keine Ergebnisse für", err_took_long_title:"Hat zu lange gedauert", err_took_long_sub:"Versuch es gleich nochmal", recs_none_title:"Keine Tipps gefunden", recs_none_sub:"Versuch eine andere Idee", recs_unavail_title:"Tipps nicht verfügbar", recs_unavail_sub:"Bitte versuch es später", inbox_empty_title:"Noch keine Chats", inbox_empty_sub:"Teile einen Film aus der Suche oder deiner Liste, um ein Gespräch zu starten",
     continue_as_guest:"Ohne Konto starten", guest_label:"Gast", guest_banner:"Nur auf diesem Gerät gespeichert", guest_join_btn:"Cinemail beitreten", guest_save_sub:"Sichere deine Filme auf allen Geräten und teile sie mit Freunden - für immer kostenlos.", guest_join_free:"Kostenlos beitreten", guest_maybe_later:"Vielleicht später", guest_already_acct:"Hast du schon ein Konto?",
     del_acct_guest:"Du bist als Gast angemeldet - es gibt keine E-Mail, um dich wieder anzumelden. Nichts lässt sich wiederherstellen.", ob_mock_mylist:"Meine Liste", ob_mock_name:"Dein Name", block:"Blockieren", block_q:"{name} blockieren?", block_warn:"Diese Person kann dir keine Filme, Nachrichten oder Freundschaftsanfragen mehr senden. In deinem Konto rückgängig zu machen.", block_done:"Blockiert", block_failed:"Blockieren fehlgeschlagen", unblock:"Entsperren", err_not_allowed:"Das hat nicht funktioniert.", unblock_note:"Die Entsperrung hebt die Blockierung auf, stellt die Freundschaft aber nicht wieder her. Die Person müsste eine neue Anfrage senden.", unblock_done:"Entsperrt", blocked_header:"Blockierte Personen", block_someone:"Jemand", del_acct_q:"Konto löschen?", del_acct_warn:"Damit werden dein Filmverlauf, alle Listen, Freunde und Kontodaten endgültig gelöscht. Das lässt sich nicht rückgängig machen.", del_acct_confirm:"Mein Konto löschen", del_acct_working:"Wird gelöscht…", del_acct_done:"Konto gelöscht.", del_acct_failed:"Konto konnte nicht gelöscht werden",
@@ -4409,7 +4557,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Scegli un amico da invitare:", add_friends_first:"Aggiungi prima degli amici per invitarli",
     invite_valid_48:"Valido per 48 ore", invite_connect_hint:"Quando lo aprono, diventerete amici con un tocco.",
     join_list_q:"Unisciti alla lista", join_invited_sub:"Sei stato invitato a una lista di film condivisa",
-    list_picker_title:"Alla lista", filter_friends:"Filtra amici…", searching:"Ricerca…", not_found:"Non trovato", friends_empty:"Ancora nessun amico. Usa il link d'invito qui sotto per aggiungere le persone con cui guardi i film.", friend_remove_suffix:"— rimuovere dagli amici?", friends_no_match:"Nessun amico corrisponde", edit_modal_title:"MODIFICA RECENSIONE", share_modal_title:"CONSIGLIA UN FILM", send_btn:"Invia", note_ph:"Cosa ne pensi?", share_msg_ph:"Perché ti piacerà…", add_modal_seen:"SEGNA COME VISTO", add_modal_list:"AGGIUNGI ALLA LISTA", ob8_picks:"✨ Consigli personali per te", err_bad_login:"Email o password errati.", signin_create_cta:"Nuovo qui? Crea un account", recs_empty_title:"Consigli personali", recs_empty_sub:"Inserisci un'idea o lascia vuoto e tocca Consiglia", recs_thinking:"Sto pensando…", recs_still_thinking:"Sto ancora pensando, un attimo…", based_on_label:"In base ai film visti", recs_hint_empty:"Aggiungi film visti per consigli personali", picks_left_today:"consigli personali rimasti oggi", picks_left_week:"consigli personali rimasti questa settimana", picks_random:"Consigli casuali", picks_tonight:"Per stasera", picks_for_you:"Per te", where_to_watch:"Dove vederlo", watch_attrib:"Dati streaming da JustWatch",
+    list_picker_title:"Alla lista", filter_friends:"Filtra amici…", searching:"Ricerca…", not_found:"Non trovato", friends_empty:"Ancora nessun amico. Usa il link d'invito qui sotto per aggiungere le persone con cui guardi i film.", friend_remove_suffix:"— rimuovere dagli amici?", friends_no_match:"Nessun amico corrisponde", edit_modal_title:"MODIFICA RECENSIONE", share_modal_title:"CONSIGLIA UN FILM", send_btn:"Invia", note_ph:"Cosa ne pensi?", share_msg_ph:"Perché ti piacerà…", add_modal_seen:"SEGNA COME VISTO", add_modal_list:"AGGIUNGI ALLA LISTA", ob8_picks:"✨ Consigli personali per te", err_bad_login:"Email o password errati.", signin_create_cta:"Nuovo qui? Crea un account", recs_empty_title:"Consigli personali", recs_empty_sub:"Inserisci un'idea o lascia vuoto e tocca Consiglia", recs_thinking:"Sto pensando…", recs_still_thinking:"Sto ancora pensando, un attimo…", based_on_label:"In base ai film visti", recs_hint_empty:"Aggiungi film visti per consigli personali", picks_left_today:"consigli personali rimasti oggi", picks_left_week:"consigli personali rimasti questa settimana", why_off_many:"Consigliato a partire da {n} dei tuoi preferiti: {films}", why_off_one:"Perché ti è piaciuto {film}", why_season:"Per le sere d'{season}", why_acclaimed:"Molto apprezzato, dagli anni {decade}", season_winter:"inverno", season_spring:"primavera", season_summer:"estate", season_autumn:"autunno", draw_btn:"Scegli tu", draw_title:"Lascia scegliere all'app", draw_phrase:"e il vincitore è", draw_open:"Apri", draw_again:"Di nuovo", picks_random:"Consigli casuali", picks_tonight:"Per stasera", picks_for_you:"Per te", where_to_watch:"Dove vederlo", watch_attrib:"Dati streaming da JustWatch",
     loading_lbl:"Caricamento…", err_no_results_title:"Nessun risultato", err_no_results_sub:"Prova solo il titolo, senza l'anno", err_connection:"Errore di connessione", err_generic:"Errore", report:"Segnala", report_prefill:"Segnalazione di un messaggio di {name}. Che cosa è successo:", err_not_found_title:"Non trovato", err_no_results_for:"Nessun risultato per", err_took_long_title:"Ha impiegato troppo", err_took_long_sub:"Riprova tra un attimo", recs_none_title:"Nessun consiglio trovato", recs_none_sub:"Prova un'altra idea", recs_unavail_title:"Consigli non disponibili", recs_unavail_sub:"Riprova più tardi", inbox_empty_title:"Ancora nessuna chat", inbox_empty_sub:"Condividi un film dalla ricerca o dalla tua lista per iniziare una conversazione",
     continue_as_guest:"Inizia senza account", guest_label:"Ospite", guest_banner:"Salvato solo su questo dispositivo", guest_join_btn:"Unisciti a Cinemail", guest_save_sub:"Conserva i tuoi film su tutti i dispositivi e condividili con gli amici - gratis per sempre.", guest_join_free:"Unisciti gratis", guest_maybe_later:"Forse più tardi", guest_already_acct:"Hai già un account?",
     del_acct_guest:"Sei entrato come ospite, quindi non c\u2019è un\u2019email per rientrare. Non si potrà recuperare nulla.", ob_mock_mylist:"La mia lista", ob_mock_name:"Il tuo nome", block:"Blocca", block_q:"Bloccare {name}?", block_warn:"Non potrà più inviarti film, messaggi o richieste di amicizia. Puoi annullare dal tuo account.", block_done:"Bloccato", block_failed:"Impossibile bloccare", unblock:"Sblocca", err_not_allowed:"Non è stato possibile.", unblock_note:"Sbloccare rimuove il blocco ma non ripristina l'amicizia. La persona dovrebbe inviare una nuova richiesta.", unblock_done:"Sbloccato", blocked_header:"Persone bloccate", block_someone:"Qualcuno", del_acct_q:"Eliminare l'account?", del_acct_warn:"Verranno eliminati per sempre la cronologia dei film, tutte le liste, gli amici e i dati dell'account. L'operazione è irreversibile.", del_acct_confirm:"Elimina il mio account", del_acct_working:"Eliminazione…", del_acct_done:"Account eliminato.", del_acct_failed:"Impossibile eliminare l'account",
@@ -4745,34 +4893,6 @@ async function doGuestConvert() {
 // helper - is twenty lines to write again on the day Pro is real. Writing it early
 // bought nothing and cost a question at review.
 
-// Instruction appended to recommendation prompts: localise the "why" text to the
-// current UI language, informal & warm, no em dashes / emoji, keep titles original.
-// Never let it name the crew of the film it is RECOMMENDING. Checked against TMDB on
-// a real account, all three crew claims in one round of picks were invented: Holy
-// Spider was credited to Kasper Tuxen (it is Nadim Carlsen), The Eternal Memory to
-// Óscar Fuentes and Álvaro Díaz de la Iguera (Miguel Miranda and José Miguel Tobar),
-// Strange Days to Elliot Goldenthal (Graeme Revell). They were not random - Kasper
-// Tuxen sits in this user's own top cinematographers, so the model was borrowing
-// names from the taste profile to make the connection sound earned.
-//
-// The card directly underneath prints the real director, cinematographer and
-// composer from TMDB, so an invented name contradicts the app on the same screen -
-// in the one area the app exists to be trusted about. There is nothing to verify
-// against at generation time, because the crew is only fetched after the titles come
-// back, so the fix is to forbid the claim rather than to check it.
-//
-// Lives here, not inside one caller: it was written for loadRecs and the three
-// surpriseMe prompts never got it, so the guard stood on the text field almost
-// nobody types into and was absent from the three mode buttons people actually
-// press. A rule that has to be remembered at each site is a rule with a hole in it.
-function _crewRule() {
-  return `NEVER name the director, cinematographer, composer, or any crew member OF A FILM YOU ARE SUGGESTING - you do not have their credits and any name you produce will be wrong. Describe what the film does instead. You MAY name people from the person's own watched list, because those credits are given to you above.`;
-}
-function _recLangRule() {
-  const names = { en:'English', ru:'Russian', uk:'Ukrainian', ka:'Georgian', es:'Spanish', fr:'French', de:'German', it:'Italian' };
-  const lang = names[_lang] || 'English';
-  return `\n\nWrite every "why" value in ${lang}, speaking to the user directly, informally and warmly (use the informal "you" where the language distinguishes it). Do NOT use em dashes or any emoji in "why". Keep each "title" in its original language - do not translate titles.`;
-}
 let _lang = localStorage.getItem('lang') || (function(){
   const n = (navigator.language || 'en').slice(0,2).toLowerCase();
   return ['ru','uk','ka','es','fr','de','it'].includes(n) ? n : 'en';
@@ -5626,57 +5746,9 @@ async function workerFetch(path, body) {
   });
 }
 
-function extractJSON(text) {
-  const cleaned = text.replace(/```json|```/g, "").trim();
-  const match = cleaned.match(/\[[\s\S]*\]/);
-  if (!match) throw new Error("No JSON array in response");
-  return JSON.parse(match[0]);
-}
 
-async function proxyFetchWithRetry(body) {
-  let data = await proxyFetch(body);
-  let text = (data.content||[]).map(b=>b.text||"").join("");
-  try { return extractJSON(text); } catch(e) {
-    const retryMessages = [...body.messages,
-      { role: "assistant", content: text },
-      { role: "user", content: "Your response was not valid JSON. Reply ONLY with a valid JSON array, no prose, no markdown." }
-    ];
-    data = await proxyFetch({ ...body, messages: retryMessages });
-    text = (data.content||[]).map(b=>b.text||"").join("");
-    return extractJSON(text);
-  }
-}
 
-let _aiAbortController = null;
-function cancelAIRequest() { if (_aiAbortController) { _aiAbortController.abort(); _aiAbortController = null; } }
 
-async function proxyFetch(body) {
-  const { data: { session } } = await sbClient.auth.getSession();
-  if (!session) throw new Error("Not signed in");
-  _aiAbortController = new AbortController();
-  const timeoutId = setTimeout(() => _aiAbortController?.abort(), 15000);
-  let res;
-  try {
-    res = await fetch(PROXY_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + session.access_token },
-      body: JSON.stringify(body),
-      signal: _aiAbortController.signal,
-    });
-  } catch(e) {
-    clearTimeout(timeoutId);
-    if (e.name === "AbortError") throw new Error("timeout_or_cancelled");
-    throw e;
-  } finally { clearTimeout(timeoutId); }
-  const remaining = res.headers.get("X-RateLimit-Remaining");
-  const limit = res.headers.get("X-RateLimit-Limit");
-  const period = res.headers.get("X-RateLimit-Period");
-  if (remaining !== null && limit !== null) updateAICounter(+remaining, +limit, period);
-  if (res.status === 429) { const data = await res.json().catch(() => ({})); handleRateLimitHit(data); throw new Error("rate_limited"); }
-  if (res.status === 401) { showToast(t('toast_session_expired')); throw new Error("unauthorized"); }
-  if (!res.ok) throw new Error("Proxy error " + res.status);
-  return res.json();
-}
 
 function formatReset(iso) {
   if (!iso) return "midnight UTC";
@@ -5692,20 +5764,6 @@ function formatReset(iso) {
   return hours > 0 ? `in ${hours}h ${minutes}m` : `in ${minutes}m`;
 }
 
-function handleRateLimitHit(data) {
-  const resetStr = formatReset(data.reset_at);
-  // An IP refusal is not this person's budget running out - it is everyone behind one
-  // address sharing a wall. The old code showed them the IP's numbers, so someone with
-  // 50 a week was told they had "used all 200" while the counter beside it still read
-  // 47 left: two parts of one screen disagreeing, and the louder one untrue.
-  if (data.scope === "ip") {
-    showToast(t('limit_ip_shared').replace('{reset}', resetStr));
-    return;
-  }
-  const seen = localStorage.getItem("seenLimitExplainer") === "1";
-  if (!seen) { showLimitExplainer(data, resetStr); localStorage.setItem("seenLimitExplainer", "1"); }
-  else showToast(t('limit_picks_reached').replace('{n}', data.limit || 5).replace('{reset}', resetStr));
-}
 
 function showLimitExplainer(data, resetStr) {
   const ov = document.createElement("div");
@@ -5725,16 +5783,6 @@ function showLimitExplainer(data, resetStr) {
 }
 
 let _aiQuota = { remaining: null, limit: null };
-function updateAICounter(remaining, limit, period) {
-  _aiQuota = { remaining, limit, period };
-  const el = document.getElementById("ai-counter");
-  if (!el) return;
-  if (remaining === null || limit === null) { el.textContent = ""; return; }
-  // Labelled from the server's own answer, so an app deployed before the worker still
-  // says "today" and is right, instead of saying "this week" and being wrong.
-  el.textContent = `${remaining}/${limit} ${t(period === "week" ? 'picks_left_week' : 'picks_left_today')}`;
-  el.style.color = remaining <= 3 ? "#f87171" : "var(--muted)";
-}
 
 // ── Supabase ──────────────────────────────────────────────────────────────────
 async function sbFetch(path, opts = {}) {
@@ -5890,15 +5938,6 @@ async function tmdbFetch(path) {
   return body || { error: "bad_json" };
 }
 function hasCyrillic(str) { return /[а-яёА-ЯЁ]/.test(str); }
-async function translateQuery(q) {
-  if (!ANTHROPIC_KEY) return q;
-  try {
-    const d = await proxyFetch({ model: "claude-haiku-4-5-20251001", max_tokens: 100,
-      messages: [{ role: "user", content: `Translate this movie/show title to English for searching. Reply with ONLY the English title, nothing else: "${q}"` }]
-    });
-    return d.content?.[0]?.text?.trim() || q;
-  } catch { return q; }
-}
 // Resolve a title the model named to a real TMDB entry.
 //
 // The year must go in as a PARAMETER, never glued onto the query text. Measured against
@@ -6172,8 +6211,10 @@ function loadingHTML(quote, withSkeletons, cancellable) {
         <div class="skel-line" style="height:11px;width:35%;animation-delay:${i*.1+.1}s"></div>
       </div>
     </div>`).join("") : "";
-  const cancelBtn = cancellable ? `
-    <button id="ai-cancel-btn" onclick="cancelAIRequest()" style="margin-top:14px;padding:7px 18px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#888;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#f87171';this.style.color='#f87171'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='#888'" data-i18n="cancel">Cancel</button>` : "";
+  // `cancellable` used to draw a Cancel button whose only job was aborting the model request.
+  // There is no model request to abort now - every path is a TMDB read that either answers or
+  // fails on its own - so the parameter is kept for the call sites and draws nothing.
+  const cancelBtn = "";
   return `
     <div class="loading-box">
       <div class="loading-dots">${[0,1,2,3,4].map(()=>`<div class="loading-dot"></div>`).join("")}</div>
@@ -6190,19 +6231,50 @@ function startSlowLoadingIndicator() {
     if (sub) sub.textContent = t('recs_still_thinking');
   }, 7000);
 }
+// watchHistory holds rows belonging to OTHER members of shared lists as well as my own -
+// loadHistoryFromDB queries `user_id.eq.me OR list_id IN (my shared lists)`. So "is this film
+// watched" is not a question about the film, it is a question about a person, and it has to name
+// which one. Without the owner test a film a friend rated reads as watched by me, with their
+// stars and their note. Rows with no addedBy are local/guest rows and count as mine.
+function _myRows(tmdbID) {
+  const uid = currentUser?.id || null;
+  return watchHistory.filter(h => h.tmdbID === String(tmdbID) && (!h.addedBy || !uid || h.addedBy === uid));
+}
+// My own opinion of a film, wherever it happens to be filed. One film can occupy several rows -
+// one per list it sits in - and only one of them carries the watched status, the stars and the
+// note. This is how any view asks for that one, instead of reading whichever row it is holding.
+function _myWatchedEntry(tmdbID) {
+  return _myRows(tmdbID).find(h => h.status === 'watched') || null;
+}
 function getEntryStatus(tmdbID) {
-  const e = watchHistory.find(h => h.tmdbID === String(tmdbID));
-  return e ? e.status : null;
+  const mine = _myRows(tmdbID);
+  if (!mine.length) return null;
+  // Watched wins over plan: the same film can be a plan row in one list and a watched row in
+  // another, and "have I seen it" is answered yes by any single watched row.
+  return mine.some(h => h.status === 'watched') ? 'watched' : mine[0].status;
 }
 
+// Being watched and being in a list are two independent facts about a film, and this used to
+// file each row into exactly one bucket with an else-chain that tested 'watched' first. So a row
+// that was both "in list X" and "watched" was recorded only as watchedEntry and never reached
+// listEntries: the checklist drew list X unticked, and tapping that empty tick inserted a SECOND
+// row for the same film in the same list. One of the duplicate generators, and the visible half
+// of the bug reported as "the film does not stay in the list".
+//
+// Membership is keyed off listId; watched is recorded alongside it, not instead of it.
+// personalPlanEntry stays exclusive to unwatched, listless rows, because My List is a queue and
+// a watched film genuinely does not belong in it.
 function _filmListStatus(tmdbID) {
   const all = watchHistory.filter(h => h.tmdbID === String(tmdbID));
   const result = { watchedEntry: null, personalPlanEntry: null, listEntries: {} };
+  // listEntries answers "is this film in that list", which is true whoever put it there - a
+  // shared list shows every member's additions. watchedEntry answers "have I seen it", which is
+  // about me alone, so it comes from _myWatchedEntry rather than from this loop.
   all.forEach(h => {
-    if (h.status === 'watched') result.watchedEntry = h;
-    else if (!h.listId) result.personalPlanEntry = h;
-    else result.listEntries[h.listId] = h;
+    if (h.listId) result.listEntries[h.listId] = h;
+    else if (h.status !== 'watched') result.personalPlanEntry = h;
   });
+  result.watchedEntry = _myWatchedEntry(tmdbID);
   return result;
 }
 
@@ -6243,11 +6315,46 @@ async function toggleFilmInList(listId, tmdbID) {
   const movie = window._detailMovie;
   try {
     if (existing) {
-      // Optimistic remove — update UI instantly, then persist
-      watchHistory = watchHistory.filter(h => h.id !== existing.id);
-      _refreshDetailChecklist(tmdbID); renderHistory();
-      await deleteEntryFromDB(existing.id);
+      // Untick: take the film out of this list.
+      //
+      // Now that a WATCHED film can sit in a list, the row being unticked may be carrying the
+      // user's stars, note and watched date. Deleting it - which is all this branch used to do -
+      // would throw that away to remove a list membership, which is not what the tap asked for
+      // and is not recoverable. So a watched row is detached from the list and kept; only a
+      // plan-only row, which holds nothing but the membership itself, is deleted.
+      if (existing.status === 'watched') {
+        watchHistory = watchHistory.map(h => h.id === existing.id ? { ...h, listId: null } : h);
+        _refreshDetailChecklist(tmdbID); renderHistory();
+        await updateEntryInDB(existing.id, { list_id: null });
+      } else {
+        // Optimistic remove — update UI instantly, then persist
+        watchHistory = watchHistory.filter(h => h.id !== existing.id);
+        _refreshDetailChecklist(tmdbID); renderHistory();
+        await deleteEntryFromDB(existing.id);
+      }
     } else {
+      // Tick: put the film into this list.
+      //
+      // If the film is already watched and its row is not in any list yet, move THAT row into
+      // the list rather than inserting a fresh one. Inserting would leave the same film present
+      // twice - once watched, once as a plan row - which is the shape the user sees as a
+      // duplicate, and it would split one film's history across two rows.
+      //
+      // This is where the one-row-per-film model runs out: a watched film can be carried into
+      // one list this way, not into two, because a single row holds a single list_id. Putting a
+      // watched film into a second list still inserts a plan row. The real answer is the
+      // library / list_films split - see docs/audit-2026-09-14.md item 14 - and this guard is
+      // the part of it that can be had today without a migration.
+      const _watchedLoose = fls.watchedEntry && !fls.watchedEntry.listId ? fls.watchedEntry : null;
+      if (_watchedLoose && listId) {
+        watchHistory = watchHistory.map(h => h.id === _watchedLoose.id ? { ...h, listId } : h);
+        _refreshDetailChecklist(tmdbID); renderHistory();
+        await updateEntryInDB(_watchedLoose.id, { list_id: listId });
+        watchHistory = await loadHistoryFromDB();
+        _refreshDetailChecklist(tmdbID); renderHistory();
+        _togglingLists.delete(key);
+        return;
+      }
       if (!movie) { _togglingLists.delete(key); return; }
       // Optimistic add — show the checkmark instantly with a temp row, then persist
       const temp = {
@@ -6391,29 +6498,26 @@ async function doSearch() {
   el.innerHTML = loadingHTML(randQuote(), false);
   try {
     const { title, year } = parseQuery(raw);
-    let q = title;
-    if (hasCyrillic(q) && ANTHROPIC_KEY) q = await translateQuery(q);
+    // This used to translate a Cyrillic query to English through Haiku first, then search both
+    // forms. The model is gone, and measuring showed the translation was not carrying the
+    // search anyway: TMDB indexes alternative titles per country, so "Крепкий орешек" returns
+    // the whole Die Hard series from TMDB's own index with no translation involved.
+    const q = title;
 
     // Films
     let results = await tmdbSearchWithYear(q, year);
-    if (hasCyrillic(title) && q !== title) {
-      const ruResults = await tmdbSearchWithYear(title, year);
-      const seen = new Set(results.map(r => r.tmdbID));
-      ruResults.forEach(r => { if (!seen.has(r.tmdbID)) results.push(r); });
-    }
 
     // People: search both the translated query AND the original (Cyrillic) one, merge by id.
     // No hard popularity filter so classic / non-English creators surface too.
     let people = [];
     if (!year) {
       const pqs = [q];
-      if (hasCyrillic(title) && q !== title) pqs.push(title);
       // Rank WITHIN each query, then keep the queries in order - which is what the film
       // half already does by appending the second query's results after the first.
       //
       // Sorting the merged pile by popularity alone loses which question a person answered.
-      // Measured on "Рук": translateQuery sends "Fist" to TMDB, the original Cyrillic goes
-      // too, and Shah Rukh Khan - matched only through his Russian alias, popularity far
+      // Measured on "Рук" when a translation step still existed: an English hit and a Cyrillic
+      // one arrived together, and Shah Rukh Khan - matched only through his Russian alias, far
       // above anyone in the "Fist" results - took first place over the people who matched
       // what was actually being searched for.
       const seenP = new Set(), merged = [];
@@ -6603,8 +6707,12 @@ async function openDetail(id, type) {
     const _fls = _filmListStatus(String(id));
     const _hasLists = _listsCache.length > 0;
     const _inAnyList = _fls.personalPlanEntry || Object.keys(_fls.listEntries).length > 0;
-    // Checklist is the single UI for lists - shown for plannable films, hidden once watched
-    const showChecklist = (status !== "watched");
+    // Was `status !== "watched"`, on the reasoning that the checklist is for plannable films.
+    // The consequence was that a watched film could not be put into any list at all, so a list
+    // like "best of 2025" - which consists of nothing BUT watched films - was impossible to
+    // build. Both IMDb and Letterboxd offer add-to-list on any film in any state; on IMDb
+    // watched is not a container at all, it is a separate watch history page.
+    const showChecklist = true;
 
     const checklistSection = showChecklist
       ? `<div class="list-check-section"><div class="list-check-header">${t('lists_header')}</div><div id="detail-list-checklist">${_buildListChecklistHTML(String(id))}</div></div>`
@@ -7223,7 +7331,14 @@ async function confirmAdd() {
   if (!sbClient) { alert(t('alert_not_connected')); btn.textContent = "Save"; btn.disabled = false; return; }
   if (!currentUser) { alert(t('alert_session_expired')); btn.textContent = "Save"; btn.disabled = false; return; }
   const tmdbID = String(m.tmdbID || m.id || "");
-  const existing = watchHistory.find(h => h.tmdbID === tmdbID);
+  // This was `watchHistory.find(h => h.tmdbID === tmdbID)`: the FIRST row for this film, whoever
+  // it belonged to and whichever list it sat in. Two consequences, both measured.
+  // In a shared list it could patch another member's row, writing my stars over theirs.
+  // And with the film in several lists it patched an arbitrary one, so marking it watched left
+  // the personal My List row untouched and the film stayed in the queue it had just left.
+  // Take my own rows, and prefer the one that already carries my opinion.
+  const _mine = _myRows(tmdbID);
+  const existing = _mine.find(h => h.status === 'watched') || _mine[0] || null;
   let composer = m.Composer || "";
   let director = m.Director || "";
   let cinematographer = m.Cinematographer || "";
@@ -7242,8 +7357,20 @@ async function confirmAdd() {
       if (currentAddStatus === "watched") {
         fields.stars = currentStars;
         fields.comment = document.getElementById("add-note").value;
-        // Film "moves" to global Watched view — drop list affiliation on transition
-        if (existing.listId) fields.list_id = null;
+        // This used to also write `fields.list_id = null`, described as the film "moving" to the
+        // global Watched view. It was not a move, it was a deletion: the row stopped recording
+        // which list the film belonged to, nothing else held that fact, and no undo existed.
+        // A user reported it as "no film stays in a list after I rate it" and was right.
+        //
+        // The line could only ever fire for a NAMED list - personal My List rows already carry a
+        // null list_id - so its entire effect was destroying curated membership. The queue
+        // behaviour it was supposed to implement is already handled by the status change alone,
+        // because My List renders on `status === 'plan' && !listId` (renderHistory).
+        //
+        // Both references behave this way and neither auto-touches a user list: Letterboxd's FAQ
+        // says "Films in your watchlist are automatically removed when you mark them as watched"
+        // and says it only about the watchlist; IMDb does not even do that, its Watchlist FAQ
+        // tells you to rate a title BEFORE removing it by hand.
       }
       if (composer        && !existing.composer)        fields.composer = composer;
       if (director        && !existing.director)        fields.director = director;
@@ -7251,6 +7378,16 @@ async function confirmAdd() {
       if (actors          && !existing.actors)          fields.actors = actors;
       if (runtime         && !existing.runtime)         fields.runtime = _parseRuntimeMin(runtime);
       await updateEntryInDB(existing.id, fields);
+      // My List is a queue, and a film just marked watched has left it. The queue row is a
+      // different row from the one holding the opinion whenever the film also sits in a named
+      // list, so it has to be cleared explicitly - that is the half of scenario 1 that used to
+      // fail silently, leaving a watched film sitting in the personal list for ever.
+      // Safe to delete: a plan row carries no stars and no note (see the insert below, which
+      // writes 0 and "" for plan), only the membership that is now spent.
+      if (currentAddStatus === "watched") {
+        const queueRow = _mine.find(h => h.id !== existing.id && !h.listId && h.status === 'plan');
+        if (queueRow) { try { await deleteEntryFromDB(queueRow.id); } catch (_) {} }
+      }
     } else {
       await saveEntryToDB({ tmdbID, title: m.Title||"", year: m.Year||"", poster: m.Poster||"",
         stars: currentAddStatus==="plan"?0:currentStars,
@@ -7337,9 +7474,9 @@ function _armDeleteInvite(id, btn) {
 function renderHistory() {
   const el = document.getElementById("history-list");
   // New filter logic based on active list tab:
-  //   'watched' → all status='watched' entries (regardless of original list)
-  //   'personal' → status='plan' AND no list_id
-  //   <uuid>    → status='plan' AND list_id matches
+  //   'watched' → all status='watched' entries (regardless of which list they also sit in)
+  //   'personal' → status='plan' AND no list_id   (a queue: watching removes it)
+  //   <uuid>    → list_id matches, ANY status     (curation: watching does not remove it)
   let filtered;
   const isWatchedTab = _activeListId === 'watched';
   // Your Cinema Profile sits above the Watched list and nowhere else: it is computed from
@@ -7352,9 +7489,14 @@ function renderHistory() {
   if (isWatchedTab) {
     filtered = watchHistory.filter(h => h.status === 'watched');
   } else if (_activeListId === 'personal') {
+    // My List is a QUEUE, so `plan` belongs here: a watched film has left the queue by watching.
     filtered = watchHistory.filter(h => h.status === 'plan' && !h.listId);
   } else {
-    filtered = watchHistory.filter(h => h.status === 'plan' && h.listId === _activeListId);
+    // A named list is CURATION, not a queue, so watched films stay in it. This carried
+    // `status === 'plan'` too, which was a second, independent way for a rated film to vanish
+    // from its list - it would have kept vanishing here even after the delete in confirmAdd was
+    // removed, because the view filtered it out whatever the database said.
+    filtered = watchHistory.filter(h => h.listId === _activeListId);
   }
   if (!watchHistory.length) {
     el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">${t('empty_list_title')}</div><p>${t('empty_list_sub')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
@@ -7403,30 +7545,47 @@ function renderHistory() {
       : (_listsCache.find(l => l.id === _activeListId)?.name || 'List');
     headerHTML = `<span>${filtered.length} to watch</span><span style="color:var(--muted)">${tabName}</span>`;
   }
+  // The draw belongs on the list it draws from, and only when there is something to decide
+  // between. One film is not a choice and two is barely one, so it appears at three.
+  const _canDraw = filtered.length >= 3;
+  const drawBtn = _canDraw
+    ? `<button class="draw-btn" onclick="openDraw()" title="${escapeHtml(t('draw_title'))}">${icon('shuffle',15)} <span>${escapeHtml(t('draw_btn'))}</span></button>`
+    : '';
   el.innerHTML = `
     <div class="history-header">${headerHTML}</div>
+    ${drawBtn}
     <div class="card-list">
       ${filtered.map(item => {
         const key = regMovie({ tmdbID: item.tmdbID, Title: item.title, Year: item.year, Poster: item.poster, type: item.mediaType||"movie" });
+        // A film in four lists is four rows, and only the one that was marked carries the stars
+        // and the note. Reading `item` directly meant the film looked watched and rated in the
+        // list you happened to mark it from, and unwatched everywhere else - the same film,
+        // four different opinions. The opinion belongs to the film, so look it up once:
+        // `op` is my watched row if I have one, otherwise this row.
+        const op = (item.status === 'watched' ? item : _myWatchedEntry(item.tmdbID)) || item;
+        const opStatus  = op.status;
+        const opStars   = op.stars;
+        const opComment = op.comment;
+        const opDate    = op.date;
         return `
-        <div class="hist-card ${item.status==='plan'?'plan':''}" data-movie-id="${item.id}" onclick="${item.tmdbID?`openDetail('${escapeJsAttr(item.tmdbID)}','${escapeJsAttr(item.mediaType||"movie")}')`:''}">
+        <div class="hist-card ${opStatus==='plan'?'plan':''}" data-movie-id="${item.id}" onclick="${item.tmdbID?`openDetail('${escapeJsAttr(item.tmdbID)}','${escapeJsAttr(item.mediaType||"movie")}')`:''}">
           <div style="display:flex;gap:11px;width:100%">
             <div class="hist-poster">${item.poster&&item.poster!=="N/A"?`<img src="${escapeHtml(item.poster)}" alt="" class="poster-zoomable" onclick="event.stopPropagation();openLightbox('${escapeJsAttr(item.poster)}','${escapeJsAttr(item.title)}${item.year?' ('+escapeJsAttr(item.year)+')':''}')" onerror="this.parentNode.innerHTML=icon('film',26)"`+`>`:icon('film',22)}</div>
             <div style="flex:1;min-width:0">
               <div class="hist-title">${escapeHtml(item.title)}</div>
               <div class="hist-meta">${item.year} · ${item.date}</div>
-              ${item.status==="watched"
-                ? `<div style="display:flex;gap:2px;margin-top:3px">${starsHTML(item.stars)}</div>`
+              ${opStatus==="watched"
+                ? `<div style="display:flex;gap:2px;margin-top:3px">${starsHTML(opStars)}</div>`
                 : ''}
-              ${item.comment?`<div class="hist-note">"${escapeHtml(item.comment)}" <span style="color:var(--muted);font-style:normal;font-size:10px">— ${item.date}</span></div>`:""}
+              ${opComment?`<div class="hist-note">"${escapeHtml(opComment)}" <span style="color:var(--muted);font-style:normal;font-size:10px">— ${opDate}</span></div>`:""}
             </div>
             <button class="hist-del" data-del-id="${item.id}" onclick="event.stopPropagation();_armDelete(${item.id}, this)" title="${t('list_delete')}" style="align-self:flex-start;flex-shrink:0;margin-left:8px">×</button>
           </div>
           <div style="position:relative;display:flex;justify-content:center;align-items:center;margin-top:8px;min-height:28px">
             ${!isWatchedTab ? `<div class="movie-drag-handle" onpointerdown="event.stopPropagation();_movieDragStart(event,this.closest('.hist-card'))"><div class="movie-drag-dots">${'<span></span>'.repeat(10)}</div></div>` : ''}
             <div style="position:absolute;right:0;bottom:0;display:flex;gap:6px;align-items:center">
-              ${item.status==="watched"
-                ? `<button class="act-btn act-btn-ico" onclick="event.stopPropagation();openEdit(${item.id})" title="${t('edit_modal_title')}">${_icoPencil()}</button>`
+              ${opStatus==="watched"
+                ? `<button class="act-btn act-btn-ico" onclick="event.stopPropagation();openEdit(${op.id})" title="${t('edit_modal_title')}">${_icoPencil()}</button>`
                 : `<button class="act-btn act-btn-ico" onclick="event.stopPropagation();openAdd(_movieRegistry['${key}'],'watched')" title="${t('mark_watched')}">${_icoEye(false)}</button>`}
               <button class="act-btn act-btn-ico" onclick="event.stopPropagation();openShare(_movieRegistry['${key}'])" title="${t('act_share')}">${_icoShare()}</button>
             </div>
@@ -7460,24 +7619,6 @@ function getSeasonalContext() {
   if (hour>=22) parts.push("late night"); else if (hour>=20) parts.push("evening");
   return parts.join(", ");
 }
-function getTasteContext(watchedEntries) {
-  if (!watchedEntries||!watchedEntries.length) return "";
-  function topNames(field, min, max) {
-    const map = {};
-    watchedEntries.forEach(h => { if (!h[field]) return; h[field].split(", ").forEach(name => { name=name.trim(); if(name) map[name]=(map[name]||0)+1; }); });
-    return Object.entries(map).filter(([,c])=>c>=min).sort((a,b)=>b[1]-a[1]).slice(0,max).map(([name,c])=>`${name} (${c})`).join(", ");
-  }
-  const composers        = topNames("composer",2,3);
-  const directors        = topNames("director",2,3);
-  const cinematographers = topNames("cinematographer",2,3);
-  const actors           = topNames("actors",2,4);
-  const lines = [];
-  if (composers)        lines.push(`Favourite composers by films watched: ${composers}`);
-  if (directors)        lines.push(`Favourite directors by films watched: ${directors}`);
-  if (cinematographers) lines.push(`Favourite cinematographers by films watched: ${cinematographers}`);
-  if (actors)           lines.push(`Favourite actors by films watched: ${actors}`);
-  return lines.join("\n");
-}
 
 // "Surprise me" is only impressive when it has taste to work from. Below this many
 // watched films it degrades into near-random suggestions, which wastes the killer
@@ -7487,23 +7628,6 @@ function getTasteContext(watchedEntries) {
 // on its own without history.
 const SURPRISE_MIN_WATCHED = 5;
 
-// Which watched films to describe to the model. Recency alone is a poor proxy for
-// taste: a run of forgettable films watched last week would drown out the ones the
-// user actually loves. Send the highest-rated first, then top up with a couple of
-// recent ones so current interests still register. Falls back to plain recency when
-// nothing is rated yet.
-function _tasteSample(entries, limit = 12) {
-  const rated = entries.filter(e => Number(e.stars) > 0)
-                       .sort((a, b) => Number(b.stars) - Number(a.stars));
-  const picked = rated.slice(0, Math.max(0, limit - 3));
-  const ids = new Set(picked.map(e => e.id ?? e.title));
-  for (const e of [...entries].reverse()) {            // newest first
-    if (picked.length >= limit) break;
-    const key = e.id ?? e.title;
-    if (!ids.has(key)) { picked.push(e); ids.add(key); }
-  }
-  return picked;
-}
 
 // How much the picks can actually be trusted, given how much taste data exists.
 // Told plainly instead of quietly under-delivering: below ~15 films the model can
@@ -7513,6 +7637,280 @@ function _pickQualityHint(seen) {
   if (seen >= 15) return "";
   const key = seen < 10 ? 'picks_hint_early' : 'picks_hint_mid';
   return `<div style="color:var(--muted);font-size:12px;text-align:center;padding:12px 8px 0;line-height:1.5">${escapeHtml(t(key).replace('{n}', seen))}</div>`;
+}
+
+// ── The draw ──────────────────────────────────────────────────────────────────
+// Press it and the app decides for you. It reads the list already on screen, picks one film,
+// and hands it over in the Cinemail envelope with "and the winner is...".
+//
+// Everything about it is deliberate and worth stating, because the obvious implementations are
+// worse. It touches NO network: the list is already in memory, so the draw works on a plane and
+// in a tunnel. It touches NO poster: the envelope and the phrase carry the moment, and a bare
+// title is enough - the value is that the decision left your hands, not that we rendered art.
+// And it writes NOTHING: a draw is not a commitment, so pressing it changes no data. Drawing
+// again is free, which is the point - the ritual survives a result you did not want.
+let _drawTimer = null;
+const _DRAW_SPIN_MS = 1400;
+
+function _drawPool() {
+  // Exactly what is on screen. Drawing from something the person cannot see would look broken.
+  const isWatchedTab = _activeListId === 'watched';
+  if (isWatchedTab) return watchHistory.filter(h => h.status === 'watched');
+  if (_activeListId === 'personal') return watchHistory.filter(h => h.status === 'plan' && !h.listId);
+  return watchHistory.filter(h => h.listId === _activeListId);
+}
+
+function openDraw() {
+  const pool = _drawPool();
+  if (pool.length < 2) return;
+  const ov = document.getElementById('draw-overlay');
+  if (!ov) return;
+  ov.style.display = 'flex';
+  requestAnimationFrame(() => requestAnimationFrame(() => ov.classList.add('visible')));
+  _runDraw();
+}
+
+function closeDraw() {
+  clearTimeout(_drawTimer); _drawTimer = null;
+  const ov = document.getElementById('draw-overlay');
+  if (!ov) return;
+  ov.classList.remove('visible');
+  setTimeout(() => { ov.style.display = 'none'; }, 220);
+}
+
+function _runDraw() {
+  const pool = _drawPool();
+  if (!pool.length) return;
+  const stage = document.getElementById('draw-stage');
+  const winner = pool[Math.floor(Math.random() * pool.length)];
+  const LOGO = `<img src="logo.png" alt="" width="58" height="58" style="filter:drop-shadow(0 0 22px rgba(245,197,24,0.30))">`;
+
+  // THE SPIN. Not decoration: without a moment of not-knowing, an instant answer reads as a
+  // list being filtered rather than a decision being taken. Titles flick past, then stop.
+  stage.className = 'draw-stage spinning';
+  stage.innerHTML = `
+    <div class="draw-envelope">${LOGO}</div>
+    <div class="draw-reel" id="draw-reel"></div>`;
+  const reel = document.getElementById('draw-reel');
+  const tick = () => { const t2 = pool[Math.floor(Math.random() * pool.length)];
+                       if (reel) reel.textContent = t2.title || ''; };
+  const spin = setInterval(tick, 70); tick();
+
+  clearTimeout(_drawTimer);
+  _drawTimer = setTimeout(() => {
+    clearInterval(spin);
+    const yr = winner.year ? ` (${escapeHtml(String(winner.year))})` : '';
+    // THE REVEAL, and the order is the whole effect. The phrase with its live ellipsis is
+    // already there; then the beams swing down from the corners and cross; then the brand
+    // circle blooms where they land; then the envelope lifts and the letter slides up out of
+    // it; and only then is the title printed on the paper. Every step is CSS with its own
+    // delay, so nothing here is timed in JavaScript beyond setting the class.
+    stage.innerHTML = `
+      <div class="draw-beams"><span class="draw-beam l"></span><span class="draw-beam r"></span></div>
+      <div class="draw-pool"></div>
+      <div class="draw-phrase">${escapeHtml(t('draw_phrase'))}<span class="dots"></span></div>
+      <div class="draw-envelope open">${LOGO}</div>
+      <div class="draw-letter"><div class="draw-winner">${escapeHtml(winner.title || '')}${yr}</div></div>
+      <div class="draw-actions">
+        <button class="btn-modal-primary" onclick="closeDraw();openDetail('${escapeJsAttr(String(winner.tmdbID||''))}','${escapeJsAttr(winner.mediaType||'movie')}')">${escapeHtml(t('draw_open'))}</button>
+        <button class="btn-modal-secondary" onclick="_runDraw()">${escapeHtml(t('draw_again'))}</button>
+      </div>`;
+    // Set the class on the NEXT frame, so the browser has laid the new nodes out first and the
+    // animations actually run from their start values instead of snapping to the end.
+    requestAnimationFrame(() => requestAnimationFrame(() => { stage.className = 'draw-stage reveal'; }));
+  }, _DRAW_SPIN_MS);
+}
+
+// ── Picks without a model ─────────────────────────────────────────────────────
+// The three Surprise Me buttons used to build a prompt and call Claude Haiku through the
+// worker. They do not any more, by Dafa's decision of 15 Sep 2026, and the reason is not cost:
+// TMDB API Terms section 1.C prohibits using TMDB Content "in connection with ... a machine
+// learning (ML) or artificial intelligence (AI) based Application", is not gated on revenue,
+// and was the largest unresolved item standing in front of the Content Rights declaration.
+// The model version is archived at the git tag `ai-picks-archive`.
+//
+// What replaces it is arithmetic over TMDB's own recommendation graph. The claim being relied
+// on - that a film recommended off five of your favourites is a different order of signal from
+// one recommended off one - was measured with docs/picks-tally.mjs before any of this was
+// built, on a real 806-film library: 57 candidates scored 2 or more, which is a real ranking to
+// sort on. None scored 3, so the tail is thin and the engine is honest about that rather than
+// pretending to more confidence than it has.
+
+// Seeds are the user's own highest-rated films. We already hold their TMDB ids, so unlike the
+// measuring script this costs no search requests at all - it starts from what is in the table.
+// Shuffled within a wider band than we need, so pressing twice does not give the same three.
+let _lastSeeds = [];
+const _SEED_MIN_STARS = 3.5;
+function _pickSeeds(entries, n = 8) {
+  const withId = entries.filter(e => e.tmdbID);
+  // A LOW RATING IS A NEGATIVE SIGNAL AND MUST NOT SEED. Measured on a real 15-film library:
+  // The Room, rated ONE star, was seeding the tally, and produced "Newness - recommended off
+  // The Room and The Pokrovsky Gates", a pairing that means nothing. The old code sorted by
+  // stars and then took a band twice the size it needed, which on a small library is the whole
+  // list including the films the person disliked.
+  const loved = withId.filter(e => Number(e.stars) >= _SEED_MIN_STARS);
+  const rated = withId.filter(e => Number(e.stars) > 0);
+  // Fall back only when there is genuinely nothing loved to work from.
+  const pool = loved.length >= 3 ? loved : (rated.length >= 3 ? rated : withId);
+  const band = pool.slice().sort((a, b) => Number(b.stars) - Number(a.stars)).slice(0, Math.max(n * 2, 14));
+  for (let i = band.length - 1; i > 0; i--) {           // Fisher-Yates
+    const j = Math.floor(Math.random() * (i + 1));
+    [band[i], band[j]] = [band[j], band[i]];
+  }
+  return band.slice(0, n);
+}
+
+// SEEDS ARE NOT INDEPENDENT, and the tally assumed they were. Measured on the same library:
+// Breaking Bad and Better Call Saul are one universe, they recommend each other's neighbours,
+// and ten of the top twelve carried the identical provenance "Breaking Bad, Better Call Saul".
+// Two votes from those two is ONE signal counted twice, so the whole head of the ranking was a
+// single franchise cluster wearing the costume of a consensus.
+//
+// The fix is at selection rather than at counting: a candidate's provenance - the SET of seeds
+// that produced it - may fill only one slot. The second film with the same provenance is not
+// new information, whatever its score.
+function _diversify(ranked, limit) {
+  const usedProvenance = new Set(), usedSeed = new Map(), out = [];
+  for (const c of ranked) {
+    const prov = c.from.slice().sort().join('|');
+    if (usedProvenance.has(prov)) continue;
+    // Also stop any single seed dominating through different pairings.
+    const over = c.from.some(f => (usedSeed.get(f) || 0) >= 2);
+    if (over) continue;
+    usedProvenance.add(prov);
+    c.from.forEach(f => usedSeed.set(f, (usedSeed.get(f) || 0) + 1));
+    out.push(c);
+    if (out.length >= limit) break;
+  }
+  // Top up only to the MINIMUM the caller needs, never to the full limit. Topping up to the
+  // limit walked the whole fix back: diversity had rejected nine films from one franchise
+  // cluster, and the top-up put three of them straight back because they were next in rank.
+  // A short, varied band beats a long, monotonous one - only three cards are ever shown.
+  const MIN = 3;
+  if (out.length < MIN) {
+    const have = new Set(out.map(c => c.id));
+    for (const c of ranked) { if (!have.has(c.id)) { out.push(c); if (out.length >= MIN) break; } }
+  }
+  return out;
+}
+
+// A film app that answers with eleven series out of twelve is answering a different question.
+// Keep the output's share of series near the seeds' share rather than letting two series seeds
+// carry the whole list, and never let series take every slot.
+function _balanceKinds(list, seeds, limit) {
+  const seedTv = seeds.filter(s => s.mediaType === 'tv').length;
+  const maxTv = Math.max(1, Math.round(limit * (seedTv / Math.max(1, seeds.length))));
+  const films = list.filter(c => c.type !== 'tv'), series = list.filter(c => c.type === 'tv');
+  const out = [...series.slice(0, maxTv), ...films].slice(0, limit);
+  return out.length ? out : list.slice(0, limit);
+}
+
+// ONE VOTE PER SEED. Reading two pages meant a candidate appearing on both pages of the SAME
+// seed's recommendations scored twice, which inflated the whole distribution in the measuring
+// script until it was caught. The tally's claim is about how many DIFFERENT films a candidate
+// was recommended off, so it has to be deduplicated per seed.
+async function _tallyFromSeeds(seeds, pages = 2) {
+  const tally = new Map();
+  for (const s of seeds) {
+    const kind = s.mediaType === 'tv' ? 'tv' : 'movie';
+    const seenThisSeed = new Set();
+    for (let page = 1; page <= pages; page++) {
+      let res;
+      try { res = await tmdbFetch(`/${kind}/${encodeURIComponent(s.tmdbID)}/recommendations?page=${page}&language=${_tmdbLang()}`); }
+      catch (e) { break; }
+      // tmdbFetch returns the parsed body whatever the status, so the worker's daily refusal
+      // arrives as an ordinary object. Reading that as "no recommendations" would quietly
+      // produce an empty tally and look like a taste problem instead of a rate limit.
+      if (res && res.error) { const err = new Error(res.error); err.tmdb = res; throw err; }
+      const got = (res && res.results) || [];
+      for (const c of got) {
+        if (seenThisSeed.has(c.id)) continue;
+        seenThisSeed.add(c.id);
+        if (!tally.has(c.id)) tally.set(c.id, {
+          id: c.id,
+          Title: c.title || c.name,
+          Year: (c.release_date || c.first_air_date || "").slice(0, 4),
+          type: c.media_type || (c.first_air_date ? 'tv' : 'movie'),
+          Poster: c.poster_path ? TMDB_IMG + c.poster_path : "",
+          Rating: c.vote_average ? c.vote_average.toFixed(1) : null,
+          Genre: "", tmdbID: String(c.id),
+          votes: 0, from: [], voteCount: c.vote_count || 0,
+        });
+        const t = tally.get(c.id);
+        t.votes++; t.from.push(s.title);
+      }
+      if (got.length < 20) break;
+    }
+  }
+  return tally;
+}
+
+// Everything the person already has, by TMDB id AND by normalised title. The id alone is not
+// enough: a film imported from IMDb before its tt-id resolved, or added on another device,
+// can sit in the table under a different id for the same film.
+function _libraryKeys() {
+  const ids = new Set(), titles = new Set();
+  const norm = x => String(x || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  watchHistory.forEach(h => { if (h.tmdbID) ids.add(String(h.tmdbID)); if (h.title) titles.add(norm(h.title)); });
+  return { ids, titles, norm };
+}
+
+// The sentence under each card. It used to come from the model, which is exactly why it had to
+// be forbidden from naming crew - it did not have their credits and invented them. This one
+// states only what the tally actually computed, so it cannot be wrong about a fact.
+function _tallyWhy(c) {
+  const names = c.from.slice(0, 2).join(", ");
+  return c.votes >= 2
+    ? t('why_off_many').replace('{n}', c.votes).replace('{films}', names)
+    : t('why_off_one').replace('{film}', c.from[0] || "");
+}
+
+const _SEASON_KEY = () => {
+  const m = new Date().getMonth() + 1;
+  if (m === 12 || m <= 2) return 'winter';
+  if (m <= 5) return 'spring';
+  if (m <= 8) return 'summer';
+  return 'autumn';
+};
+// The mood phrasebook, minimal first version: a season maps to TMDB genres and a runtime hint.
+// A lookup table, not a model - see docs/ideas.md, "The free-text field".
+const _SEASON_DISCOVER = {
+  winter: { with_genres: '18,10751,14',  note: 'winter'  },   // drama, family, fantasy
+  spring: { with_genres: '35,10749,12',  note: 'spring'  },   // comedy, romance, adventure
+  summer: { with_genres: '12,28,35',     note: 'summer'  },   // adventure, action, comedy
+  autumn: { with_genres: '18,9648,53',   note: 'autumn'  },   // drama, mystery, thriller
+};
+
+async function _discoverPicks(mode) {
+  const season = _SEASON_KEY();
+  const p = new URLSearchParams({
+    sort_by: 'vote_average.desc',
+    'vote_count.gte': '600',
+    include_adult: 'false',
+    language: _tmdbLang(),
+    page: String(1 + Math.floor(Math.random() * 12)),
+  });
+  if (mode === 'seasonal') p.set('with_genres', _SEASON_DISCOVER[season].with_genres);
+  else {
+    // Random: pin a decade at random so repeated presses roam the century rather than
+    // circling the same acclaimed shortlist.
+    const from = 1930 + Math.floor(Math.random() * 9) * 10;
+    p.set('primary_release_date.gte', `${from}-01-01`);
+    p.set('primary_release_date.lte', `${from + 9}-12-31`);
+  }
+  const res = await tmdbFetch(`/discover/movie?${p.toString()}`);
+  if (res && res.error) { const err = new Error(res.error); err.tmdb = res; throw err; }
+  return ((res && res.results) || []).map(c => ({
+    id: c.id, tmdbID: String(c.id), type: 'movie',
+    Title: c.title || c.name,
+    Year: (c.release_date || "").slice(0, 4),
+    Poster: c.poster_path ? TMDB_IMG + c.poster_path : "",
+    Rating: c.vote_average ? c.vote_average.toFixed(1) : null, Genre: "",
+    votes: 0, from: [], voteCount: c.vote_count || 0,
+    _why: mode === 'seasonal'
+      ? t('why_season').replace('{season}', t('season_' + season))
+      : t('why_acclaimed').replace('{decade}', `${p.get('primary_release_date.gte').slice(0, 4)}s`),
+  }));
 }
 
 async function surpriseMe() {
@@ -7531,25 +7929,37 @@ async function surpriseMe() {
   const slowTimer = startSlowLoadingIndicator();
   try {
     const mode = getSurpriseMode();
-    const recentlyShown = _shownSurprises.slice(-9).join(", ");
+    const recentlyShown = new Set(_shownSurprises.slice(-30));
     const watchedEntries = watchHistory.filter(h=>h.status==="watched");
-    const watched = _tasteSample(watchedEntries).map(m=>`${m.title} (${m.year})${m.stars?" "+m.stars+"\u2605":""}`).join(", ");
-    const planned = watchHistory.filter(h=>h.status==="plan").slice(-6).map(m=>m.title).join(", ");
-    const tasteCtx = getTasteContext(watchedEntries);
-    const angles = ["Focus on films from non-English speaking countries.","Focus on films from the 1970s or 1980s.","Focus on documentary or animated films.","Focus on recent films from the last 3 years.","Focus on cult classics or underrated gems.","Focus on films from Asia or Latin America.","Include at least one silent era or black-and-white film.","Focus on films with female directors.","Mix decades: one classic, one from 90s-2000s, one recent."];
-    const angle = angles[Math.floor(Math.random()*angles.length)];
-    let prompt = "";
-    if (mode==="random") prompt = `Pick 3 great films or shows completely at random — pure instinct, no context. ${angle} Make them wildly different in genre, era, country.${recentlyShown?"\nDO NOT repeat: "+recentlyShown:""}${tasteCtx?"\n"+tasteCtx:""}\n${_crewRule()}${_recLangRule()}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why it's a must-watch"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
-    else if (mode==="seasonal") { const ctx=getSeasonalContext(); prompt = `Suggest 3 films perfectly suited for right now: ${ctx}. Match the mood of the moment. ${angle}${recentlyShown?"\nDO NOT repeat: "+recentlyShown:""}${watched?"\nAlready watched — skip: "+watched:""}${tasteCtx?"\n"+tasteCtx:""}\n${_crewRule()}${_recLangRule()}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why it fits tonight"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`; }
-    else prompt = `Suggest 3 films based on taste. ${angle} Vary genre, era, country.${watched?"\nWatch history: "+watched:" No history — use acclaimed films."}${planned?"\nDO NOT suggest from watchlist: "+planned:""}${recentlyShown?"\nDO NOT repeat recently shown: "+recentlyShown:""}${watched?"\nDO NOT suggest already watched: "+watched:""}${tasteCtx?"\n"+tasteCtx:""}\n${_crewRule()}${_recLangRule()}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why they'd love it"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
-    let suggestions;
-    try { suggestions = await proxyFetchWithRetry({ model:"claude-haiku-4-5-20251001", max_tokens:700, messages:[{role:"user",content:prompt}] }); }
-    catch(e) { if (e.message==="rate_limited") { el.innerHTML=""; return; } throw e; }
-    if (!Array.isArray(suggestions)) suggestions = [suggestions];
-    const details = await Promise.all(suggestions.map(async s => {
-      const pick = await tmdbResolveTitle(s.title, s.year, s.type);
-      return pick ? {...pick,why:s.why} : {Title:s.title,Year:s.year||"",Poster:"",tmdbID:null,type:s.type||"movie",why:s.why};
-    }));
+    const lib = _libraryKeys();
+    let pool;
+    if (mode === "taste") {
+      const seeds = _pickSeeds(watchedEntries);
+      _lastSeeds = seeds;
+      const tally = await _tallyFromSeeds(seeds);
+      pool = [...tally.values()];
+    } else {
+      pool = await _discoverPicks(mode);
+    }
+    // Drop what they already have, and what they were shown in the last few presses. The
+    // shown-list is checked by title rather than id because the discover and tally paths
+    // reach the same film by different routes.
+    pool = pool.filter(c => c.Title
+                         && !lib.ids.has(String(c.id))
+                         && !lib.titles.has(lib.norm(c.Title))
+                         && !recentlyShown.has(c.Title));
+    // Rank: how many of your favourites recommended it, then how many people have rated it at
+    // all - the second only breaks ties, so it never promotes a popular film over a fitting one.
+    pool.sort((a, b) => b.votes - a.votes || b.voteCount - a.voteCount);
+    // Rank, then diversify, then balance films against series, and only then shuffle for
+    // variety. Shuffling first would just reorder one franchise cluster.
+    let band = mode === 'taste' ? _balanceKinds(_diversify(pool, 8), _lastSeeds || [], 8) : pool.slice(0, 8);
+    for (let i = band.length - 1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [band[i],band[j]]=[band[j],band[i]]; }
+    const details = band.slice(0, 3).map(c => ({ ...c, why: c._why || _tallyWhy(c) }));
+    if (!details.length) {
+      el.innerHTML = `<div class="empty-state"><div class="empty-state-title">${t('recs_none_title')}</div><p>${t('recs_none_sub')}</p></div>`;
+      return;
+    }
     details.forEach(m=>{if(m.Title)_shownSurprises.push(m.Title);});
     sessionStorage.setItem("shownSurprises", JSON.stringify(_shownSurprises.slice(-30)));
     const modeLabel = "✨ " + (mode==="random"?t('picks_random'):mode==="seasonal"?t('picks_tonight'):t('picks_for_you'));
@@ -7558,9 +7968,361 @@ async function surpriseMe() {
       <div class="card-list">${details.map(m=>movieCardHTML(m,m.why)).join("")}</div>
       ${_pickQualityHint(watchedEntries.length)}`;
   } catch(e) {
-    if (e.message==="timeout_or_cancelled") el.innerHTML=`<div class="empty-state"><div class="empty-state-icon">⏱</div><div class="empty-state-title">${t('err_took_long_title')}</div><p>${t('err_took_long_sub')}</p></div>`;
+    // A refusal from the proxy is not an absence of films, and saying "no picks found" when the
+    // daily TMDB allowance ran out is the same mistake the import made on 7 Sep: it reported a
+    // rate limit as 806 missing films and gave no hint why.
+    if (e.message==="limit_reached") el.innerHTML=`<div class="empty-state"><div class="empty-state-title">${t('recs_unavail_title')}</div><p>${t('recs_unavail_sub')}</p></div>`;
+    else if (e.message==="timeout_or_cancelled") el.innerHTML=`<div class="empty-state"><div class="empty-state-icon">⏱</div><div class="empty-state-title">${t('err_took_long_title')}</div><p>${t('err_took_long_sub')}</p></div>`;
     else el.innerHTML=`<div class="empty-state"><div class="empty-state-title">${t('err_generic')}</div><p>${e.message}</p></div>`;
-  } finally { clearTimeout(slowTimer); _aiAbortController=null; }
+  } finally { clearTimeout(slowTimer); }
+}
+
+// ── The free-text field, without a model ──────────────────────────────────────
+// A query like "films about cats with an autumn mood" is two different questions wearing one
+// coat. "About cats" is a SUBJECT, and TMDB keeps a keyword vocabulary that contains `cat` - an
+// exact lookup. "With an autumn mood" is a MOOD, which no vocabulary has, but the moods people
+// actually type number in the dozens. So: a phrasebook for the second half, TMDB's own index
+// for the first. See docs/ideas.md, "The free-text field", for why the local-model answer was
+// rejected - 140 MB of model against an 817 KB app, and it re-enters TMDB terms section 1.C.
+//
+// The honest limit, stated here so nobody mistakes this for comprehension: a phrase that is not
+// in the table is not understood. What IS in it is answered exactly rather than approximately,
+// which is the opposite failure from a model and the better one at this size.
+const _MOODS = [
+  // terms are matched as substrings against the normalised query, so stems are enough and a
+  // single entry covers inflections: "уютн" catches уютный / уютное / уютную.
+  { id:'cosy',    g:'35,10751,10749', terms:'cosy cozy warm feelgood уютн тепл добр затишн gemutlich gemütlich accogliente douillet acogedor затишн' },
+  { id:'autumn',  g:'18,9648',        terms:'autumn fall melanchol осен меланхол грусн сумрачн herbst autunno automne otoño otono შემოდგომ' },
+  { id:'heavy',   g:'18,10752,36',    terms:'heavy hard bleak grim тяжел мрачн жестк schwer pesante lourd duro' },
+  { id:'light',   g:'35,10749,16',    terms:'light easy fun лёгк легк весел непринужд leicht leggero léger ligero' },
+  { id:'slow',    g:'18',             terms:'slow quiet contemplative медленн тих созерцат langsam lento lent' },
+  { id:'think',   g:'18,878,9648',    terms:'think clever mind подумать умн сложн интеллект nachdenk riflessiv réfléch pensar' },
+  { id:'cry',     g:'18,10749',       terms:'cry sad tears поплакать груст слёз слез traurig triste piangere pleurer' },
+  { id:'scary',   g:'27,53',          terms:'scary horror tense страшн ужас напряж gruselig spavent effrayant miedo' },
+  { id:'funny',   g:'35',             terms:'funny laugh comedy смешн смеш комед lustig divertente drôle drole gracioso' },
+  { id:'real',    g:'99,36',          terms:'true real documentary реальн документ истинн wahr vero vrai real' },
+];
+// GENRE WORDS, and this layer is the one that matters most in practice.
+//
+// TMDB's keyword vocabulary is ENGLISH ONLY: /search/keyword?query=романтический returns
+// nothing, and so does every other non-English subject word. That is what translateQuery used
+// Haiku for, and with the model gone the gap has to be closed by hand or eight-language queries
+// simply do not work. Genre IDS, unlike keywords, are language-independent - so a table from
+// the genre word in each language to the id closes most of it for the cost of a table.
+//
+// Coverage is honest rather than complete: these are the words people type as a whole query
+// ("романтический", "ужасы", "документалка"). A compound phrase still needs the mood table
+// above, and an arbitrary noun in a non-English language still cannot reach TMDB's index.
+const _GENRE_WORDS = [
+  { g:'10749', terms:'romance romantic романт мелодрам romantik romantico romantique romantica რომანტ' },
+  { g:'35',    terms:'comedy комеди komodie komödie commedia comedie comédia კომედ' },
+  { g:'27',    terms:'horror ужас хоррор страшилк schrecken orrore horreur terror საშინელ' },
+  { g:'53',    terms:'thriller триллер spannung thriller suspense' },
+  { g:'9648',  terms:'mystery detective детектив загадк krimi giallo policier misterio დეტექტ' },
+  { g:'878',   terms:'scifi science fiction фантастик sciencefiction fantascienza fantascience ფანტასტ' },
+  { g:'14',    terms:'fantasy фэнтези фентези fantasie fantasia fantaisie' },
+  { g:'16',    terms:'animation anime cartoon анимаци мультфильм мультик zeichentrick animazione animacion ანიმაც' },
+  { g:'99',    terms:'documentary докуметал документал докуфильм dokumentarfilm documentario documentaire documental' },
+  { g:'18',    terms:'drama драм dramma drame' },
+  { g:'28',    terms:'action боевик экшн actionfilm azione' },
+  { g:'80',    terms:'crime криминал mafia гангстер krimi crimine' },
+  { g:'10752', terms:'war военн война krieg guerra guerre' },
+  { g:'37',    terms:'western вестерн' },
+  { g:'36',    terms:'history историч geschicht storico historique historico' },
+  { g:'10751', terms:'family семейн familie famiglia famille familiar' },
+  { g:'12',    terms:'adventure приключен abenteuer avventura aventure aventura' },
+];
+// SUBJECTS, and this table exists because of one measured fact: TMDB's keyword vocabulary is
+// ENGLISH ONLY. /search/keyword?query=котиков returns nothing, and so does every non-English
+// noun, which is precisely the gap translateQuery used to close by asking Haiku to translate
+// the query first. With the model gone, "фильмы про котиков" reaches nothing at all unless the
+// word is carried across by hand.
+//
+// So this is not a translation layer and does not pretend to be one. It is a list of what
+// people actually type into a film search, in the eight languages the app speaks, pointed at
+// the English term TMDB indexes. Roughly sixty entries covering animals, creatures, places,
+// professions and the handful of themes that dominate the field.
+//
+// `k` is sent to /search/keyword verbatim. Stems are matched whole-word, so "котиков" hits
+// "коти" and "который" does not, provided the stems stay specific - see the STOP list for the
+// two collisions that needed help anyway.
+const _SUBJECTS = [
+  { k:'cat',          terms:'кошк коти котик кот коты кіт кішк katze chat gato gatt კატ' },
+  { k:'dog',          terms:'собак пес псы собач hund chien perro cane ძაღლ' },
+  { k:'horse',        terms:'лошад конь кон pferd cheval caballo cavallo ცხენ' },
+  { k:'wolf',         terms:'волк вовк wolf loup lobo lupo მგელ' },
+  { k:'bear',         terms:'медвед ведмід baer bär ours oso orso' },
+  { k:'shark',        terms:'акул hai requin tiburon squalo' },
+  { k:'dinosaur',     terms:'динозавр dinosaur dinosaurier dinosaure dinosaurio' },
+  { k:'bird',         terms:'птиц птах vogel oiseau pajaro uccell ფრინველ' },
+  { k:'space',        terms:'космос космич weltraum espace espacio spazio კოსმ' },
+  { k:'alien',        terms:'инопланет пришелец ausserirdisch außerirdisch extraterrestre alieno' },
+  { k:'robot',        terms:'робот roboter' },
+  { k:'time travel',  terms:'путешествиевовремени времени zeitreise voyagedanstemps' },
+  { k:'vampire',      terms:'вампир vampir vampire vampiro' },
+  { k:'zombie',       terms:'зомби zombi' },
+  { k:'ghost',        terms:'привид призрак дух geist fantome fantôme fantasma' },
+  { k:'witch',        terms:'ведьм відьм hexe sorciere sorcière bruja strega' },
+  { k:'dragon',       terms:'дракон drache dragon drago' },
+  { k:'monster',      terms:'монстр чудовищ ungeheuer monstre monstruo mostro' },
+  { k:'superhero',    terms:'супергеро superheld superheros superheroe supereroe' },
+  { k:'school',       terms:'школ шкіл schule ecole école escuela scuola სკოლ' },
+  { k:'prison',       terms:'тюрьм вязниц gefangnis gefängnis prison carcel prigione' },
+  { k:'hospital',     terms:'больниц лікарн krankenhaus hopital hôpital hospital ospedale' },
+  { k:'train',        terms:'поезд потяг zug train tren treno მატარებ' },
+  { k:'ship',         terms:'корабл судн schiff navire barco nave გემ' },
+  { k:'island',       terms:'остров острів insel ile île isla isola კუნძულ' },
+  { k:'desert',       terms:'пустын wuste wüste desert desierto deserto' },
+  { k:'mountain',     terms:'гора горы горн berg montagne montana montagna მთა' },
+  { k:'forest',       terms:'лес ліс wald foret forêt bosque foresta ტყე' },
+  { k:'sea',          terms:'море морск meer mer mare ზღვა' },
+  { k:'road trip',    terms:'дорог путешеств road reise voyage viaje viaggio' },
+  { k:'village',      terms:'деревн село dorf village pueblo paese სოფელ' },
+  { k:'war',          terms:'военн войн війн krieg guerre guerra ომი' },
+  { k:'love',         terms:'любов кохан liebe amour amor amore სიყვარულ' },
+  { k:'friendship',   terms:'дружб freundschaft amitie amitié amistad amicizia მეგობრ' },
+  { k:'family',       terms:'семь семей сім familie famille familia famiglia ოჯახ' },
+  { k:'revenge',      terms:'мест помст rache vengeance venganza vendetta' },
+  { k:'survival',     terms:'выживан виживан uberleben überleben survie supervivencia sopravvivenza' },
+  { k:'heist',        terms:'ограблен пограбуван raub braquage atraco rapina' },
+  { k:'spy',          terms:'шпион шпигун spion espion espia spia' },
+  { k:'mafia',        terms:'мафи гангстер mafia gangster' },
+  { k:'serial killer',terms:'маньяк серийн serienmorder serienmörder tueur asesinoserie' },
+  { k:'boxing',       terms:'бокс boxen boxe boxeo pugilato' },
+  { k:'football',     terms:'футбол fussball fußball football futbol calcio' },
+  { k:'chess',        terms:'шахмат шахи schach echecs échecs ajedrez scacchi' },
+  { k:'music',        terms:'музык музик musik musique musica მუსიკ' },
+  { k:'rock band',    terms:'группа рокгруп band groupe banda' },
+  { k:'painter',      terms:'художник маляр maler peintre pintor pittore მხატვ' },
+  { k:'writer',       terms:'писател письмен schriftsteller ecrivain écrivain escritor scrittore მწერალ' },
+  { k:'dance',        terms:'танц tanz danse baile danza ცეკვ' },
+  { k:'theatre',      terms:'театр theater theatre théâtre teatro' },
+  { k:'doctor',       terms:'врач лікар arzt medecin médecin medico ექიმ' },
+  { k:'teacher',      terms:'учител вчител lehrer professeur maestro insegnante მასწავლ' },
+  { k:'journalist',   terms:'журналист journalist journaliste periodista giornalista' },
+  { k:'lawyer',       terms:'адвокат юрист anwalt avocat abogado avvocato' },
+  { k:'police',       terms:'полиц міліц полицейск polizei police policia polizia პოლიც' },
+  { k:'soldier',      terms:'солдат soldat soldado soldato ჯარისკაც' },
+  { k:'chef',         terms:'повар кухн koch cuisinier cocinero cuoco' },
+  { k:'pilot',        terms:'пилот лётчик летчик pilot pilote piloto' },
+  { k:'childhood',    terms:'детств дитинств kindheit enfance infancia infanzia ბავშვ' },
+  { k:'old age',      terms:'старост пожил alter vieillesse vejez vecchiaia' },
+  { k:'death',        terms:'смерт tod mort muerte morte სიკვდილ' },
+  { k:'illness',      terms:'болезн хвороб krankheit maladie enfermedad malattia' },
+  { k:'addiction',    terms:'наркот зависим sucht drogue droga' },
+  { k:'immigration',  terms:'эмигра иммигра emigra einwander immigration inmigra immigra' },
+  { k:'christmas',    terms:'рождеств різдв weihnacht noel noël navidad natale' },
+  { k:'wedding',      terms:'свадьб весілл hochzeit mariage boda matrimonio ქორწ' },
+  { k:'winter',       terms:'зим winter hiver invierno inverno ზამთარ' },
+  { k:'snow',         terms:'снег снег schnee neige nieve neve თოვლ' },
+];
+// MOVEMENTS, SCHOOLS AND ERAS. Each is a country, a stretch of years, and sometimes a handful
+// of people - which is to say each is an exact query, not an approximation. "Французская новая
+// волна" is not a mood and not a keyword: it is France, 1958 to 1968. TMDB can answer that
+// precisely, and no model is needed to know it.
+//
+// Matched as PHRASES against the whole normalised query, before the word-by-word pass, because
+// almost every entry here is two or three words and the word matcher would never see them.
+// Spaces are stripped on both sides, so "новая волна" and "новаяволна" both hit.
+//
+// Coverage note, because "all of them" has no edge: this is every movement, school and era that
+// is named consistently enough in film writing to be worth typing into a search box. It is not
+// a canon and nobody agrees on one. Where a movement has no agreed dates, the range is the one
+// most commonly cited and is deliberately generous.
+const _MOVEMENTS = [
+  // ── silent and early ──────────────────────────────────────────────────────
+  { c:'DE', y:[1919,1931], t:'немецкийэкспрессионизм экспрессионизм germanexpressionism expressionism deutscherexpressionismus' },
+  { c:'SU,RU', y:[1924,1934], t:'советскиймонтаж монтажнаяшкола sovietmontage montagecinema' },
+  { c:'FR', y:[1918,1930], t:'французскийавангард импрессионизм frenchimpressionism frenchavantgarde avantgarde' },
+  { c:'FR,ES', y:[1924,1934], t:'сюрреализм surrealism surrealisme surrealismo' },
+  { c:'DE', y:[1921,1929], t:'каммершпиль kammerspiel chamberdrama' },
+  { c:'US', y:[1912,1929], t:'немоекино немаякомедия silentera silentcinema silentfilm slapstick' },
+  { c:'US', y:[1929,1934], t:'прекод precode precodehollywood' },
+  { c:'SU,RU', y:[1926,1935], t:'киноглаз kinoglaz kinopravda' },
+  // ── classical ─────────────────────────────────────────────────────────────
+  { c:'FR', y:[1934,1940], t:'поэтическийреализм poeticrealism realismepoetique' },
+  { c:'US', y:[1930,1948], t:'золотойвекголливуда классическийголливуд goldenageofhollywood classicalhollywood' },
+  { c:'US', y:[1934,1942], t:'скрюболл screwball screwballcomedy' },
+  { c:'US', y:[1940,1959], t:'нуар filmnoir noir' },
+  { c:'US', y:[1967,1999], t:'неонуар neonoir' },
+  // ── post-war ──────────────────────────────────────────────────────────────
+  { c:'IT', y:[1943,1954], t:'неореализм итальянскийнеореализм neorealism italianneorealism neorealismo' },
+  { c:'GB', y:[1956,1963], t:'фрисинема freecinema' },
+  { c:'GB', y:[1959,1966], t:'британскаяноваяволна кухоннаяраковина britishnewwave kitchensink kitchensinkrealism' },
+  { c:'FR', y:[1958,1968], t:'французскаяноваяволна новаяволна nouvellevague frenchnewwave' },
+  { c:'FR', y:[1955,1968], t:'группалевогоберега leftbank rivegauche' },
+  { c:'FR,CA', y:[1958,1972], t:'синемаверите cinemaverite verite' },
+  { c:'US', y:[1958,1972], t:'прямоекино directcinema' },
+  { c:'SU,RU', y:[1956,1968], t:'оттепель оттепельноекино thaw thawcinema' },
+  // ── the sixties and seventies ─────────────────────────────────────────────
+  { c:'US', y:[1967,1980], t:'новыйголливуд newhollywood hollywoodrenaissance' },
+  { c:'CZ,SK', y:[1962,1970], t:'чехословацкаяноваяволна чешскаяноваяволна czechoslovaknewwave czechnewwave' },
+  { c:'PL', y:[1955,1965], t:'польскаякиношкола polishfilmschool polishschool' },
+  { c:'RS,HR,BA', y:[1963,1972], t:'югославскаячернаяволна чернаяволна blackwave yugoslavblackwave' },
+  { c:'DE', y:[1962,1982], t:'новоенемецкоекино newgermancinema neuerdeutscherfilm' },
+  { c:'BR', y:[1960,1972], t:'синеманово cinemanovo' },
+  { c:'AR,BO,CU', y:[1960,1975], t:'третьекино thirdcinema tercercine' },
+  { c:'JP', y:[1956,1976], t:'японскаяноваяволна nubberubagu japanesenewwave' },
+  { c:'IR', y:[1964,1979], t:'иранскаяноваяволна iraniannewwave' },
+  { c:'IN', y:[1952,1976], t:'параллельноекино индийскаяноваяволна parallelcinema indiannewwave' },
+  { c:'HU', y:[1961,1975], t:'венгерскаяноваяволна hungariannewwave budapestschool' },
+  { c:'GR', y:[1965,1980], t:'новыйгреческийкинематограф newgreekcinema' },
+  // ── eighties and nineties ─────────────────────────────────────────────────
+  { c:'HK', y:[1979,1995], t:'гонконгскаяноваяволна hongkongnewwave' },
+  { c:'CN', y:[1984,1996], t:'пятоепоколение fifthgeneration' },
+  { c:'TW', y:[1982,1990], t:'новоетайваньскоекино taiwanesenewwave newtaiwancinema' },
+  { c:'FR', y:[1981,1991], t:'синемадюлук cinemadulook' },
+  { c:'DK', y:[1995,2005], t:'догма догма95 dogme dogme95 dogma95' },
+  { c:'US', y:[1991,2000], t:'новоеквиркино newqueercinema' },
+  { c:'US', y:[1989,2005], t:'американскоенезависимое сандэнс americanindependent indiefilm sundance' },
+  { c:'IR', y:[1987,2005], t:'иранскоекино iraniancinema' },
+  // ── two thousands onward ──────────────────────────────────────────────────
+  { c:'RO', y:[2004,2015], t:'румынскаяноваяволна romaniannewwave' },
+  { c:'CN', y:[1990,2010], t:'шестоепоколение sixthgeneration' },
+  { c:'FR', y:[1998,2010], t:'новаяфранцузскаяжестокость newfrenchextremity' },
+  { c:'US', y:[2002,2013], t:'мамблкор mumblecore' },
+  { c:'GR', y:[2009,2020], t:'греческаястраннаяволна weirdwave greekweirdwave' },
+  { c:'DE', y:[2000,2015], t:'берлинскаяшкола berlinschool berlinerschule' },
+  { c:'AR', y:[1995,2010], t:'новоеаргентинскоекино newargentinecinema' },
+  { c:'MX', y:[1990,2010], t:'новоемексиканскоекино nuevocinemexicano' },
+  { c:'KR', y:[1996,2015], t:'корейскаяноваяволна koreannewwave' },
+  { c:'', y:[1995,2025], t:'медленноекино созерцательноекино slowcinema contemplativecinema' },
+];
+const _qNorm = s => String(s||"").toLowerCase().replace(/[ё]/g,'е').replace(/[^\p{L}\p{N} ]/gu,' ').replace(/\s+/g,' ').trim();
+
+// Strip the mood words out and hand back what is left, which is the subject.
+// Words that carry no subject and must be removed BEFORE matching, not after. Filtering them
+// afterwards let "который" match the stem "кот" and turn "тот который живет" into a search for
+// cat films - the stop list was right and was simply consulted too late. Matched as prefixes,
+// so one entry covers "настроение", "настроением" and "настроения".
+const _QSTOP = ('про про about with films film movie movies кино фильм кинo о об на и с а но ' +
+  'который котор которые которая которое которых что чтобы как это тот та те такой ' +
+  'настроен настроени mood mit und der die das ein eine ' +
+  'de la le les des du un une et avec sur pour ' +
+  'el los las con y e por sobre para pelicula peliculas ' +
+  'di il lo gli un una su per film sul ' +
+  'та і з на що який яка які').split(' ').filter(Boolean);
+
+function _splitQuery(q) {
+  // Phrases first. A movement name is two or three words, so the word-by-word matcher below
+  // could never see one however good its stems were.
+  const flat = _qNorm(q).replace(/\s+/g, '');
+  // LONGEST MATCH WINS, and this is not a refinement - without it the table is wrong.
+  // "румынская новая волна" contains "новаяволна", so plain array order handed it to France,
+  // and the same went for the British, Japanese, Korean and Taiwanese new waves. The specific
+  // name must beat the general one it contains, so each entry is scored by the length of its
+  // own longest hit and the table is read in that order.
+  const movements = _MOVEMENTS
+    .map(m => {
+      const best = m.t.split(' ').filter(term => term && flat.includes(term))
+                      .sort((a, b) => b.length - a.length)[0];
+      return best ? { ...m, _hit: best } : null;
+    })
+    .filter(Boolean)
+    .sort((a, b) => b._hit.length - a._hit.length);
+  let qLeft = q;
+  if (movements.length) {
+    // Remove the winning phrase from the query so its words do not also seed the subject pass.
+    const win = movements[0];
+    const re = new RegExp(win._hit.split('').join('\\s*'), 'gi');
+    qLeft = qLeft.replace(re, ' ');
+  }
+  const words = _qNorm(qLeft).split(' ').filter(Boolean)
+    // Prefix matching only for stop words long enough to be unambiguous. Italian "per" was
+    // eating Spanish "perros" and losing the dog: eight languages in one flat list means short
+    // entries collide across them, so short ones must match exactly or not at all.
+    .filter(w => !_QSTOP.some(st => w === st || (st.length >= 5 && w.startsWith(st) && w.length - st.length <= 3)));
+  // Match WHOLE WORDS against stems, and consume the whole word when one hits. Stripping the
+  // stem as a substring instead left the tail behind: "романтический" minus "романт" became
+  // "ический", which then went to /search/keyword as if it were a subject.
+  const matchedWords = new Set();
+  const hit = tbl => tbl.filter(row => {
+    const stems = row.terms.split(' ').filter(s => s.length > 2);
+    let found = false;
+    words.forEach(w => { if (stems.some(s => w.startsWith(s) || s.startsWith(w) && w.length > 3)) { matchedWords.add(w); found = true; } });
+    return found;
+  });
+  const moods = hit(_MOODS);
+  const genres = hit(_GENRE_WORDS);
+  const subjects = hit(_SUBJECTS);
+  let rest = words.filter(w => !matchedWords.has(w)).join(' ');
+  rest = rest.split(' ').filter(w => w.length > 2).join(' ').trim();
+  return { movements, moods, genres, subjects, subject: rest };
+}
+
+async function _keywordIds(subject) {
+  if (!subject) return [];
+  const res = await tmdbFetch(`/search/keyword?query=${encodeURIComponent(subject)}`);
+  if (res && res.error) { const e = new Error(res.error); e.tmdb = res; throw e; }
+  return ((res && res.results) || []).slice(0, 3).map(k => k.id);
+}
+
+// "Tarkovsky" is a very common shape for this field and is not a keyword. Ask TMDB whether the
+// leftover subject is a person before treating it as a topic.
+async function _personId(subject) {
+  if (!subject || subject.split(' ').length > 3) return null;
+  const res = await tmdbFetch(`/search/person?query=${encodeURIComponent(subject)}&include_adult=false`);
+  if (res && res.error) return null;
+  const hit = ((res && res.results) || [])[0];
+  return hit && hit.popularity > 1 ? { id: hit.id, name: hit.name } : null;
+}
+
+async function _searchByQuery(q) {
+  const { movements, moods, genres, subjects, subject } = _splitQuery(q);
+  const p = new URLSearchParams({ include_adult:'false', language:_tmdbLang(), sort_by:'vote_average.desc', 'vote_count.gte':'120' });
+  let why = t('why_for_query').replace('{q}', q);
+  let matched = false;
+
+  // A movement pins country and years, which is the hardest constraint available and the one
+  // the person most clearly asked for, so it is applied before anything else.
+  if (movements.length) {
+    const m = movements[0];
+    if (m.c) p.set('with_origin_country', m.c);
+    p.set('primary_release_date.gte', `${m.y[0]}-01-01`);
+    p.set('primary_release_date.lte', `${m.y[1]}-12-31`);
+    p.set('vote_count.gte', '30');           // a 1920s movement has few voters by now
+    matched = true;
+  }
+  const person = movements.length ? null : await _personId(subject);
+  if (person) {
+    p.set('with_people', String(person.id));
+    p.delete('vote_count.gte'); p.set('vote_count.gte','20');   // a director's early work is thin
+    why = t('why_person').replace('{name}', person.name);
+    matched = true;
+  } else if (subjects.length || subject) {
+    // Recognised subjects first: those are English terms TMDB actually indexes. The raw
+    // leftover is tried only when nothing was recognised, and it will find something just
+    // when the person typed English in the first place.
+    const terms = subjects.length ? subjects.map(x => x.k) : [subject];
+    const found = [];
+    for (const term of terms.slice(0, 2)) found.push(...await _keywordIds(term));
+    if (found.length) { p.set('with_keywords', found.slice(0, 4).join('|')); matched = true; }
+  }
+  // A named genre is a harder constraint than a mood, so it wins the genre slot outright:
+  // "романтический" must return romance, not romance-OR-whatever-the-mood-table-guessed.
+  // Moods only fill the slot when no genre was named.
+  const genreIds = (genres.length ? genres.map(g => g.g) : moods.map(m => m.g))
+    .join(',').split(',').map(x => x.trim()).filter(Boolean)
+    .filter((v,i,a) => a.indexOf(v) === i).slice(0, 3);
+  if (genreIds.length) {
+    // OR between them: AND across three genres returns almost nothing on TMDB.
+    p.set('with_genres', genreIds.join('|'));
+    matched = true;
+  }
+  if (!matched) {
+    // Nothing in the phrasebook and nothing TMDB indexes: treat it as a title. This is the
+    // branch that answers "Oppenheimer" typed into the picks field, which people do.
+    const r = await tmdbSearch(q);
+    return (r || []).slice(0, 12).map(m => ({ ...m, why }));
+  }
+  const res = await tmdbFetch(`/discover/movie?${p.toString()}`);
+  if (res && res.error) { const e = new Error(res.error); e.tmdb = res; throw e; }
+  return ((res && res.results) || []).map(c => ({
+    id:c.id, tmdbID:String(c.id), type:'movie',
+    Title:c.title || c.name, Year:(c.release_date||"").slice(0,4),
+    Poster:c.poster_path ? TMDB_IMG + c.poster_path : "",
+    Rating:c.vote_average ? c.vote_average.toFixed(1) : null, Genre:"", why,
+  }));
 }
 
 async function loadRecs() {
@@ -7571,33 +8333,13 @@ async function loadRecs() {
   el.innerHTML=loadingHTML(randQuote(),true,true);
   const slowTimer = startSlowLoadingIndicator();
   try {
-    let suggestions = [];
-    if (ANTHROPIC_KEY) {
-      const watchedEntries = watchHistory.filter(h=>h.status==="watched");
-      const watched = _tasteSample(watchedEntries).map(m=>`${m.title} (${m.year})${m.stars?" "+m.stars+"★":""}${m.comment?` — "${m.comment}"`:""}"`).join("\n");
-      const planned = watchHistory.filter(h=>h.status==="plan").slice(-6).map(m=>m.title).join(", ");
-      const tasteCtx = getTasteContext(watchedEntries);
-      const hasQ = !!q;
-      const requestBlock = hasQ
-        ? `THE REQUEST (this is the PRIMARY filter): "${q}"\n\nEvery suggestion MUST clearly satisfy this request. If the request names a specific person, title, franchise, place, year, or era, stay precise and literal — do NOT drift to only loosely-related films. Broaden interpretation only when the request is a vague mood or theme.`
-        : `No specific request — surprise them with excellent films matched to their taste below.`;
-      const whyRule = hasQ
-        ? `Each "why" MUST first state how the film satisfies the request "${q}" (name the explicit connection), then it may add how it fits their taste.`
-        : `Each "why" explains in one sentence why it fits their taste.`;
-      const prompt = `You are a film expert helping someone find what to watch.\n\n${requestBlock}\n\n${watched?`The person has watched these (use ONLY as a secondary tie-breaker for tone/quality — and DO NOT suggest any of them):\n${watched}`:"No watch history yet."}${planned?`\nOn their watchlist — DO NOT suggest: ${planned}`:""}${tasteCtx?`\n${tasteCtx}`:""}\n\nSuggest exactly 7 films or TV shows.\nRules:\n- CRITICAL: none may appear in the watched or watchlist lists above.\n- ${whyRule}\n- ${_crewRule()}\n- Vary genres/eras only when the request does not imply a specific style.${_recLangRule()}\n\nReply ONLY with a JSON array, no other text:\n[{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
-      try { suggestions = await proxyFetchWithRetry({ model:"claude-haiku-4-5-20251001", max_tokens:1200, messages:[{role:"user",content:prompt}] }); }
-      catch(e) { if (e.message==="rate_limited") { el.innerHTML=""; btn.disabled=false; btn.textContent=t('find_btn'); return; } throw e; }
-    } else {
-      el.innerHTML=`<div class="empty-state"><div class="empty-state-icon">🔑</div><div class="empty-state-title">${t('recs_unavail_title')}</div><p>${t('recs_unavail_sub')}</p></div>`;
-      btn.disabled=false; btn.textContent=t('find_btn'); return;
-    }
-    const details = await Promise.all(suggestions.map(async s => {
-      const pick = await tmdbResolveTitle(s.title, s.year, s.type);
-      return pick ? {...pick,why:s.why} : {Title:s.title,Year:s.year||"",Poster:"",tmdbID:null,type:s.type||"movie",why:s.why};
-    }));
+    // An empty field is not an error and should not be one: it means "anything good for me",
+    // which is exactly what the taste tally answers. Hand it over rather than scolding.
+    if (!q) { btn.disabled=false; btn.textContent=t('find_btn'); _setSurpriseMode('taste'); return surpriseMe(); }
+    const details = await _searchByQuery(q);
     // Drop anything already in the library. The prompt does say "none may appear in the
     // watched or watchlist lists above", and the model obeys it - but it is only ever
-    // SHOWN a sample: _tasteSample sends 12 of the watched films and the watchlist is
+    // SHOWN a sample of the library, and the watchlist was
     // trimmed to the last 6. A film it never saw can therefore come back as a
     // recommendation, which is how Felicity's picks returned The Power of the Dog, a film
     // she had watched and rated 4 stars. Nothing in the prompt can fix that; the check has
@@ -7617,7 +8359,7 @@ async function loadRecs() {
   } catch(e) {
     if (e.message==="timeout_or_cancelled") el.innerHTML=`<div class="empty-state"><div class="empty-state-icon">⏱</div><div class="empty-state-title">${t('err_took_long_title')}</div><p>${t('err_took_long_sub')}</p></div>`;
     else el.innerHTML=`<div class="empty-state"><div class="empty-state-title">${t('err_generic')}</div><p>${e.message}</p></div>`;
-  } finally { clearTimeout(slowTimer); _aiAbortController=null; }
+  } finally { clearTimeout(slowTimer); }
   btn.disabled=false; btn.textContent=t('find_btn');
 }
 
@@ -9756,6 +10498,10 @@ function _renderInvThread(inv) {
 const ICONS = {
   "camera": '<path d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z" /><circle cx="12" cy="13" r="3" />',
   "check": '<path d="M20 6 9 17l-5-5" />',
+  // Same thin-stroke family as the rest of the map, drawn on the same 24x24 grid: two crossing
+  // paths with arrowheads. Added for the draw, which is the one place the app says "decide for
+  // me" and so needs a glyph of its own rather than a borrowed one.
+  "shuffle": '<path d="M2 18h1.4a4 4 0 0 0 3.3-1.8l6.6-9.4A4 4 0 0 1 16.6 5H22" /><path d="m18 2 4 3-4 3" /><path d="M2 6h1.4a4 4 0 0 1 3.3 1.8l.6.9" /><path d="M14.7 15.3l.6.9a4 4 0 0 0 3.3 1.8H22" /><path d="m18 22 4-3-4-3" />',
   "film": '<rect width="18" height="18" x="3" y="3" rx="2" /><path d="M7 3v18" /><path d="M3 7.5h4" /><path d="M3 12h18" /><path d="M3 16.5h4" /><path d="M17 3v18" /><path d="M17 7.5h4" /><path d="M17 16.5h4" />',
   "globe": '<circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /><path d="M2 12h20" />',
   "inbox": '<polyline points="22 12 16 12 14 15 10 15 8 12 2 12" /><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />',
