@@ -260,149 +260,6 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 @media (prefers-contrast: more) {
   :root { --muted: #c9c9d2; --border: rgba(255,255,255,0.38); }
 }
-/* ── The draw ─────────────────────────────────────────────────────────────── */
-.draw-btn {
-  display:flex; align-items:center; justify-content:center; gap:7px;
-  width:100%; margin:0 0 10px; padding:.72em 1.1em; line-height:1;
-  font:inherit; font-size:13px; font-weight:600; letter-spacing:.02em;
-  border-radius:11px; cursor:pointer; box-sizing:border-box;
-  -webkit-appearance:none; appearance:none;
-  text-box:trim-both cap alphabetic;
-  background:color-mix(in srgb, var(--primary) 13%, transparent);
-  border:1px solid color-mix(in srgb, var(--primary) 45%, transparent);
-  color:var(--primary);
-  transition:background .16s, border-color .16s;
-}
-.draw-btn:hover { background:color-mix(in srgb, var(--primary) 22%, transparent);
-                  border-color:color-mix(in srgb, var(--primary) 80%, transparent); }
-.draw-btn svg { flex-shrink:0 }
-
-.draw-overlay {
-  display:none; position:fixed; inset:0; z-index:9000;
-  align-items:center; justify-content:center; padding:20px;
-  background:rgba(5,5,12,.82); -webkit-backdrop-filter:blur(7px); backdrop-filter:blur(7px);
-  opacity:0; transition:opacity .22s;
-}
-.draw-overlay.visible { opacity:1 }
-.draw-sheet {
-  position:relative; width:100%; max-width:340px; padding:30px 22px 24px;
-  border-radius:var(--radius-lg); background:var(--surface); overflow:hidden;
-  border:1px solid var(--border); text-align:center;
-  transform:translateY(10px) scale(.98); transition:transform .22s;
-}
-.draw-overlay.visible .draw-sheet { transform:none }
-.draw-close {
-  position:absolute; top:8px; right:8px; width:34px; height:34px;
-  display:flex; align-items:center; justify-content:center;
-  background:transparent; border:none; color:var(--muted);
-  font-size:22px; line-height:1; cursor:pointer; border-radius:50%;
-}
-.draw-stage { position:relative; min-height:250px; display:flex; flex-direction:column;
-              align-items:center; justify-content:center; gap:10px; overflow:hidden }
-
-/* Spotlights, thrown UPWARD from two sources at the bottom - the premiere searchlight, not
-   a stage lamp. They start almost vertical, then lean in and cross in the middle. Drawn with
-   gradients rather than images so they cost nothing and stay sharp at any size.
-   The cone is narrow at the source and wide at the far end, which is how a beam actually
-   spreads; brightest at the bottom, gone by the top. */
-.draw-beams { position:absolute; inset:0; z-index:0; pointer-events:none; opacity:0 }
-.draw-stage.reveal .draw-beams { opacity:1 }
-.draw-beam {
-  position:absolute; bottom:-8%; width:62%; height:140%;
-  background:linear-gradient(to top,
-    color-mix(in srgb, var(--primary) 46%, transparent) 0%,
-    color-mix(in srgb, var(--primary) 16%, transparent) 40%,
-    transparent 76%);
-  filter:blur(8px); opacity:0;
-  /* wide at the top, pinched to a source at the bottom */
-  clip-path:polygon(0% 0%, 100% 0%, 57% 100%, 43% 100%);
-  transform-origin:50% 100%;
-}
-.draw-beam.l { left:-16%; transform:rotate(-3deg) }
-.draw-beam.r { right:-16%; transform:rotate(3deg) }
-/* Nearly vertical first, then leaning in. The hold at 45% is what makes it read as two lamps
-   being aimed rather than one shape opening. */
-.draw-stage.reveal .draw-beam.l { animation:beamL 1.15s cubic-bezier(.3,.8,.25,1) forwards }
-.draw-stage.reveal .draw-beam.r { animation:beamR 1.15s cubic-bezier(.3,.8,.25,1) forwards }
-@keyframes beamL {
-  0%   { transform:rotate(-3deg); opacity:0 }
-  22%  { transform:rotate(-3deg); opacity:.95 }
-  45%  { transform:rotate(-1deg); opacity:.95 }
-  100% { transform:rotate(19deg); opacity:.72 }
-}
-@keyframes beamR {
-  0%   { transform:rotate(3deg); opacity:0 }
-  22%  { transform:rotate(3deg); opacity:.95 }
-  45%  { transform:rotate(1deg); opacity:.95 }
-  100% { transform:rotate(-19deg); opacity:.72 }
-}
-
-/* The brand circle, where the two beams meet. It blooms only once they have leaned in. */
-.draw-pool {
-  position:absolute; left:50%; top:46%; width:210px; height:210px; margin:-105px 0 0 -105px;
-  border-radius:50%; z-index:0; pointer-events:none; transform:scale(.2); opacity:0;
-  background:radial-gradient(circle,
-    color-mix(in srgb, var(--primary) 38%, transparent) 0%,
-    color-mix(in srgb, var(--primary) 16%, transparent) 46%,
-    transparent 70%);
-}
-.draw-stage.reveal .draw-pool { animation:poolBloom .6s .72s cubic-bezier(.2,.8,.3,1) forwards }
-@keyframes poolBloom { to { transform:scale(1); opacity:1 } }
-
-.draw-envelope { position:relative; z-index:2; transition:transform .45s cubic-bezier(.2,.8,.3,1) }
-.draw-stage.spinning .draw-envelope { animation:drawShake .5s ease-in-out infinite }
-.draw-stage.reveal .draw-envelope { animation:envLift .6s .6s cubic-bezier(.2,.8,.3,1) forwards }
-@keyframes envLift { to { transform:translateY(-6px) rotate(-4deg) scale(1.05) } }
-@keyframes drawShake { 0%,100% { transform:rotate(-3deg) } 50% { transform:rotate(3deg) } }
-
-/* The letter. It slides up from behind the envelope - the mark is an OPEN envelope already,
-   so a sheet emerging from it is the motion the logo is drawn for. */
-.draw-letter {
-  position:relative; z-index:1; margin-top:-16px; width:230px; max-width:100%;
-  padding:20px 14px 16px; border-radius:3px;
-  background:linear-gradient(180deg,#faf8f2 0%,#efede4 100%);
-  box-shadow:0 12px 30px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.8) inset;
-  transform:translateY(-46px) scale(.96); opacity:0;
-}
-.draw-stage.reveal .draw-letter { animation:letterOut .62s .85s cubic-bezier(.2,.85,.3,1) forwards }
-@keyframes letterOut { to { transform:translateY(0) scale(1); opacity:1 } }
-.draw-winner {
-  font-family:'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif;
-  font-size:24px; line-height:1.1; letter-spacing:.03em; color:#16161f;
-  word-wrap:break-word; opacity:0;
-}
-.draw-stage.reveal .draw-winner { animation:winnerIn .45s 1.3s ease-out forwards }
-@keyframes winnerIn { from { opacity:0; transform:translateY(5px) } to { opacity:1; transform:none } }
-
-.draw-phrase {
-  position:relative; z-index:2;
-  font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
-}
-.draw-phrase .dots::after { content:''; animation:dots 1.1s steps(4,end) infinite }
-@keyframes dots { 0% { content:'' } 25% { content:'.' } 50% { content:'..' } 75%,100% { content:'...' } }
-
-.draw-reel { font-size:13px; color:var(--muted); min-height:18px; position:relative; z-index:2;
-             max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
-.draw-actions { position:relative; z-index:2; display:flex; flex-direction:column; gap:8px;
-                width:100%; margin-top:10px; opacity:0 }
-.draw-stage.reveal .draw-actions { animation:winnerIn .4s 1.65s ease-out forwards }
-
-@media (prefers-reduced-motion: reduce) {
-  .draw-stage.spinning .draw-envelope,
-  .draw-stage.reveal .draw-envelope,
-  .draw-stage.reveal .draw-beam.l, .draw-stage.reveal .draw-beam.r,
-  .draw-stage.reveal .draw-pool, .draw-stage.reveal .draw-letter,
-  .draw-stage.reveal .draw-winner, .draw-stage.reveal .draw-actions,
-  .draw-phrase .dots::after { animation:none }
-  .draw-stage.reveal .draw-letter, .draw-stage.reveal .draw-winner,
-  .draw-stage.reveal .draw-actions { opacity:1; transform:none }
-  .draw-stage.reveal .draw-pool { opacity:1; transform:scale(1) }
-  .draw-stage.reveal .draw-beam.l { opacity:.7; transform:rotate(-19deg) }
-  .draw-stage.reveal .draw-beam.r { opacity:.7; transform:rotate(19deg) }
-  .draw-overlay, .draw-sheet { transition:none }
-  .draw-phrase .dots::after { content:'...' }
-}
-}
 .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .btn-primary {
@@ -2503,6 +2360,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <div class="form-group">
         <label data-i18n="email">Email</label>
         <input type="email" id="signin-email" placeholder="you@example.com" autocomplete="email">
+        <div id="signin-email-hint" class="email-hint" style="display:none"></div>
       </div>
       <div class="form-group">
         <label data-i18n="password">Password</label>
@@ -2542,6 +2400,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <div class="form-group">
         <label data-i18n="email">Email</label>
         <input type="email" id="signup-email" placeholder="you@example.com" autocomplete="email">
+        <div id="signup-email-hint" class="email-hint" style="display:none"></div>
       </div>
       <div class="form-group">
         <label data-i18n="password">Password</label>
@@ -2592,6 +2451,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <label data-i18n="email">Email</label>
         <input type="email" id="forgot-email" placeholder="you@example.com" autocomplete="email"
           onkeydown="if(event.key==='Enter')doForgotPassword()">
+        <div id="forgot-email-hint" class="email-hint" style="display:none"></div>
       </div>
       <div style="margin-top:4px">
         <button class="btn btn-primary" id="forgot-btn" onclick="doForgotPassword()" data-i18n="forgot_send">Send reset link</button>
@@ -2639,6 +2499,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     <div class="form-group">
       <label data-i18n="email">Email</label>
       <input type="email" id="gc-email" placeholder="you@example.com" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('gc-password').focus()">
+        <div id="gc-email-hint" class="email-hint" style="display:none"></div>
     </div>
     <div class="form-group">
       <label data-i18n="password">Password</label>
@@ -2786,12 +2647,6 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 </div>
 
 <!-- Lightbox -->
-  <div id="draw-overlay" class="draw-overlay" onclick="if(event.target===this)closeDraw()">
-    <div class="draw-sheet">
-      <button class="draw-close" onclick="closeDraw()" aria-label="Close">&times;</button>
-      <div class="draw-stage" id="draw-stage"></div>
-    </div>
-  </div>
 <div id="lightbox-overlay" style="display:none" onclick="closeLightbox()">
   <div id="lightbox-stage" onclick="closeLightbox()">
     <img id="lightbox-img" src="" alt="" onclick="closeLightbox()">
@@ -3011,7 +2866,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.42</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.56</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -3633,7 +3488,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Select a friend to invite:", add_friends_first:"Add friends first to invite them",
     invite_valid_48:"Valid for 48 hours", invite_connect_hint:"When they open it, you'll connect as friends in one tap.",
     join_list_q:"Join the list", join_invited_sub:"You've been invited to a shared movie list",
-    list_picker_title:"Add to List", filter_friends:"Filter friends…", searching:"Searching…", not_found:"Not found", friends_empty:"No friends yet. Use the invite link below to add the people you watch with.", friend_remove_suffix:"— remove from friends?", friends_no_match:"No friends match", edit_modal_title:"EDIT REVIEW", share_modal_title:"RECOMMEND A FILM", send_btn:"Send", note_ph:"What did you think?", share_msg_ph:"Why you'd love this…", add_modal_seen:"MARK AS WATCHED", add_modal_list:"ADD TO LIST", ob8_picks:"✨ Personal picks for you", err_bad_login:"Wrong email or password.", signin_create_cta:"New here? Create an account", recs_empty_title:"Get Personal Picks", recs_empty_sub:"Enter a prompt, or leave it blank and tap Suggest", recs_thinking:"Thinking…", recs_still_thinking:"Still thinking, hang tight…", based_on_label:"Based on watched films", recs_hint_empty:"Add watched films for personalised picks", picks_left_today:"personal picks left today", picks_left_week:"personal picks left this week", why_off_many:"Recommended off {n} of your favourites: {films}", why_off_one:"Because you liked {film}", why_season:"Fits {season} evenings", why_acclaimed:"Highly rated, from the {decade}", season_winter:"winter", season_spring:"spring", season_summer:"summer", season_autumn:"autumn", draw_btn:"Decide for me", draw_title:"Let the app pick one", draw_phrase:"and the winner is", draw_open:"Open it", draw_again:"Draw again", picks_random:"Random Picks", picks_tonight:"Picks For Tonight", picks_for_you:"Picks For You", where_to_watch:"Where to watch", watch_attrib:"Streaming data by JustWatch",
+    list_picker_title:"Add to List", filter_friends:"Filter friends…", searching:"Searching…", not_found:"Not found", friends_empty:"No friends yet. Use the invite link below to add the people you watch with.", friend_remove_suffix:"— remove from friends?", friends_no_match:"No friends match", edit_modal_title:"EDIT REVIEW", share_modal_title:"RECOMMEND A FILM", send_btn:"Send", note_ph:"What did you think?", share_msg_ph:"Why you'd love this…", add_modal_seen:"MARK AS WATCHED", add_modal_list:"ADD TO LIST", ob8_picks:"✨ Personal picks for you", err_bad_login:"Wrong email or password.", signin_create_cta:"New here? Create an account", recs_empty_title:"Get Personal Picks", recs_empty_sub:"Enter a prompt, or leave it blank and tap Suggest", recs_thinking:"Thinking…", recs_still_thinking:"Still thinking, hang tight…", based_on_label:"Based on watched films", recs_hint_empty:"Add watched films for personalised picks", picks_left_today:"personal picks left today", picks_left_week:"personal picks left this week", why_off_many:"Recommended off {n} of your favourites: {films}", why_off_one:"Because you liked {film}", why_season:"Fits {season} evenings", why_acclaimed:"Highly rated, from the {decade}", season_winter:"winter", season_spring:"spring", season_summer:"summer", season_autumn:"autumn", email_did_you_mean:"Did you mean", picks_random:"Random Picks", picks_tonight:"Picks For Tonight", picks_for_you:"Picks For You", where_to_watch:"Where to watch", watch_attrib:"Streaming data by JustWatch",
     loading_lbl:"Loading…", err_no_results_title:"No Results", err_no_results_sub:"Try just the title without the year", err_connection:"Connection Error", err_generic:"Error", report:"Report", report_prefill:"Reporting a message from {name}. What happened:", err_not_found_title:"Not Found", err_no_results_for:"No results for", err_took_long_title:"Took Too Long", err_took_long_sub:"Try again in a moment", recs_none_title:"No Picks Found", recs_none_sub:"Try a different prompt", recs_unavail_title:"Picks Unavailable", recs_unavail_sub:"Please try again later", inbox_empty_title:"No Chats Yet", inbox_empty_sub:"Share a film from search results or your list to start a conversation",
     continue_as_guest:"Start without an account", guest_label:"Guest", guest_banner:"Saved on this device only", guest_join_btn:"Join Cinemail", guest_save_sub:"Keep your films safe across devices and share them with friends - free forever.", guest_join_free:"Join free", guest_maybe_later:"Maybe later", guest_already_acct:"Already have an account?",
     del_acct_guest:"You are signed in as a guest, so there is no email to sign back in with. This cannot be undone and nothing can be recovered.", ob_mock_mylist:"My List", ob_mock_name:"Your name", block:"Block", block_q:"Block {name}?", block_warn:"They will not be able to send you films, messages or friend requests. You can undo this in your account.", block_done:"Blocked", block_failed:"Could not block", unblock:"Unblock", err_not_allowed:"That did not go through.", unblock_note:"Unblocking lifts the block but does not restore the friendship. They would have to send a new request.", unblock_done:"Unblocked", blocked_header:"Blocked people", block_someone:"Someone", del_acct_q:"Delete account?", del_acct_warn:"This will permanently delete your watch history, all lists, friends and account data. This cannot be undone.", del_acct_confirm:"Delete my account", del_acct_working:"Deleting…", del_acct_done:"Account deleted.", del_acct_failed:"Could not delete account",
@@ -3765,7 +3620,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Выбери друга для приглашения:", add_friends_first:"Сначала добавь друзей, чтобы приглашать",
     invite_valid_48:"Действует 48 часов", invite_connect_hint:"Когда откроют - вы добавитесь в друзья одним касанием.",
     join_list_q:"Вступить в список", join_invited_sub:"Тебя пригласили в общий список фильмов",
-    list_picker_title:"В список", filter_friends:"Фильтр друзей…", searching:"Поиск…", not_found:"Не найдено", friends_empty:"Друзей пока нет. Используй ссылку-приглашение ниже, чтобы добавить тех, с кем смотришь.", friend_remove_suffix:"— убрать из друзей?", friends_no_match:"Нет друзей по запросу", edit_modal_title:"РЕДАКТИРОВАТЬ ОТЗЫВ", share_modal_title:"ПОСОВЕТОВАТЬ ФИЛЬМ", send_btn:"Отправить", note_ph:"Что думаешь?", share_msg_ph:"Почему тебе это понравится…", add_modal_seen:"ОТМЕТИТЬ ПРОСМОТРЕННЫМ", add_modal_list:"ДОБАВИТЬ В СПИСОК", ob8_picks:"✨ Персональные подборки для тебя", err_bad_login:"Неверный email или пароль.", signin_create_cta:"Впервые здесь? Создать аккаунт", recs_empty_title:"Персональные подборки", recs_empty_sub:"Введи запрос или оставь пустым и нажми «Подобрать»", recs_thinking:"Думаю…", recs_still_thinking:"Ещё думаю, секунду…", based_on_label:"На основе просмотренных фильмов", recs_hint_empty:"Добавь просмотренные фильмы для персональных подборок", picks_left_today:"персональных подборок осталось сегодня", picks_left_week:"персональных подборок осталось на этой неделе", why_off_many:"Советуют к {n} твоим любимым: {films}", why_off_one:"Потому что тебе понравился {film}", why_season:"Под {season} вечера", why_acclaimed:"Высокие оценки, {decade}", season_winter:"зимние", season_spring:"весенние", season_summer:"летние", season_autumn:"осенние", draw_btn:"Реши за меня", draw_title:"Пусть приложение выберет", draw_phrase:"и победитель", draw_open:"Открыть", draw_again:"Ещё раз", picks_random:"Случайные подборки", picks_tonight:"Подборка на вечер", picks_for_you:"Подборка для тебя", where_to_watch:"Где смотреть", watch_attrib:"Данные о стримингах: JustWatch",
+    list_picker_title:"В список", filter_friends:"Фильтр друзей…", searching:"Поиск…", not_found:"Не найдено", friends_empty:"Друзей пока нет. Используй ссылку-приглашение ниже, чтобы добавить тех, с кем смотришь.", friend_remove_suffix:"— убрать из друзей?", friends_no_match:"Нет друзей по запросу", edit_modal_title:"РЕДАКТИРОВАТЬ ОТЗЫВ", share_modal_title:"ПОСОВЕТОВАТЬ ФИЛЬМ", send_btn:"Отправить", note_ph:"Что думаешь?", share_msg_ph:"Почему тебе это понравится…", add_modal_seen:"ОТМЕТИТЬ ПРОСМОТРЕННЫМ", add_modal_list:"ДОБАВИТЬ В СПИСОК", ob8_picks:"✨ Персональные подборки для тебя", err_bad_login:"Неверный email или пароль.", signin_create_cta:"Впервые здесь? Создать аккаунт", recs_empty_title:"Персональные подборки", recs_empty_sub:"Введи запрос или оставь пустым и нажми «Подобрать»", recs_thinking:"Думаю…", recs_still_thinking:"Ещё думаю, секунду…", based_on_label:"На основе просмотренных фильмов", recs_hint_empty:"Добавь просмотренные фильмы для персональных подборок", picks_left_today:"персональных подборок осталось сегодня", picks_left_week:"персональных подборок осталось на этой неделе", why_off_many:"Советуют к {n} твоим любимым: {films}", why_off_one:"Потому что тебе понравился {film}", why_season:"Под {season} вечера", why_acclaimed:"Высокие оценки, {decade}", season_winter:"зимние", season_spring:"весенние", season_summer:"летние", season_autumn:"осенние", email_did_you_mean:"Возможно, вы имели в виду", picks_random:"Случайные подборки", picks_tonight:"Подборка на вечер", picks_for_you:"Подборка для тебя", where_to_watch:"Где смотреть", watch_attrib:"Данные о стримингах: JustWatch",
     loading_lbl:"Загрузка…", err_no_results_title:"Ничего не найдено", err_no_results_sub:"Попробуй только название, без года", err_connection:"Ошибка соединения", err_generic:"Ошибка", report:"Пожаловаться", report_prefill:"Жалоба на {name}. Что произошло:", err_not_found_title:"Не найдено", err_no_results_for:"Нет результатов по", err_took_long_title:"Слишком долго", err_took_long_sub:"Попробуй через мгновение", recs_none_title:"Подборок не нашлось", recs_none_sub:"Попробуй другой запрос", recs_unavail_title:"Подборки недоступны", recs_unavail_sub:"Попробуй позже", inbox_empty_title:"Пока нет чатов", inbox_empty_sub:"Поделись фильмом из поиска или списка, чтобы начать разговор",
     continue_as_guest:"Начать без аккаунта", guest_label:"Гость", guest_banner:"Сохраняется только на этом устройстве", guest_join_btn:"Создать аккаунт", guest_save_sub:"Сохрани фильмы на всех устройствах и делись с друзьями - бесплатно навсегда.", guest_join_free:"Зарегистрироваться бесплатно", guest_maybe_later:"Позже", guest_already_acct:"Уже есть аккаунт?",
     del_acct_guest:"Вы вошли как гость - почты, чтобы войти снова, нет. Отменить или восстановить будет нечем.", ob_mock_mylist:"Мой список", ob_mock_name:"Ваше имя", block:"Заблокировать", block_q:"Заблокировать {name}?", block_warn:"Он больше не сможет присылать вам фильмы, сообщения и запросы в друзья. Отменить можно в настройках аккаунта.", block_done:"Заблокирован", block_failed:"Не удалось заблокировать", unblock:"Разблокировать", err_not_allowed:"Не удалось.", unblock_note:"Разблокировка снимает блокировку, но не возвращает дружбу - человеку придётся отправить новую заявку.", unblock_done:"Разблокирован", blocked_header:"Заблокированные", block_someone:"Кто-то", del_acct_q:"Удалить аккаунт?", del_acct_warn:"Это навсегда удалит историю просмотров, все списки, друзей и данные аккаунта. Отменить будет нельзя.", del_acct_confirm:"Удалить мой аккаунт", del_acct_working:"Удаляем…", del_acct_done:"Аккаунт удалён.", del_acct_failed:"Не удалось удалить аккаунт",
@@ -3897,7 +3752,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Обери друга для запрошення:", add_friends_first:"Спершу додай друзів, щоб запрошувати",
     invite_valid_48:"Дійсне 48 годин", invite_connect_hint:"Коли відкриють - ви додастеся в друзі одним дотиком.",
     join_list_q:"Приєднатися до списку", join_invited_sub:"Тебе запросили до спільного списку фільмів",
-    list_picker_title:"До списку", filter_friends:"Фільтр друзів…", searching:"Пошук…", not_found:"Не знайдено", friends_empty:"Друзів поки немає. Скористайся посиланням нижче, щоб додати тих, з ким дивишся.", friend_remove_suffix:"— прибрати з друзів?", friends_no_match:"Немає друзів за запитом", edit_modal_title:"РЕДАГУВАТИ ВІДГУК", share_modal_title:"ПОРАДИТИ ФІЛЬМ", send_btn:"Надіслати", note_ph:"Що думаєш?", share_msg_ph:"Чому тобі це сподобається…", add_modal_seen:"ПОЗНАЧИТИ ПЕРЕГЛЯНУТИМ", add_modal_list:"ДОДАТИ ДО СПИСКУ", ob8_picks:"✨ Персональні добірки для тебе", err_bad_login:"Невірний email або пароль.", signin_create_cta:"Вперше тут? Створити акаунт", recs_empty_title:"Персональні добірки", recs_empty_sub:"Введи запит або залиш порожнім і натисни «Підібрати»", recs_thinking:"Думаю…", recs_still_thinking:"Ще думаю, секунду…", based_on_label:"На основі переглянутих фільмів", recs_hint_empty:"Додай переглянуті фільми для персональних добірок", picks_left_today:"персональних добірок залишилось сьогодні", picks_left_week:"персональних добірок залишилось цього тижня", why_off_many:"Радять до {n} твоїх улюблених: {films}", why_off_one:"Бо тобі сподобався {film}", why_season:"Під {season} вечори", why_acclaimed:"Високі оцінки, {decade}", season_winter:"зимові", season_spring:"весняні", season_summer:"літні", season_autumn:"осінні", draw_btn:"Виріши за мене", draw_title:"Хай застосунок обере", draw_phrase:"і переможець", draw_open:"Відкрити", draw_again:"Ще раз", picks_random:"Випадкові добірки", picks_tonight:"Добірка на вечір", picks_for_you:"Добірка для тебе", where_to_watch:"Де дивитися", watch_attrib:"Дані про стримінги: JustWatch",
+    list_picker_title:"До списку", filter_friends:"Фільтр друзів…", searching:"Пошук…", not_found:"Не знайдено", friends_empty:"Друзів поки немає. Скористайся посиланням нижче, щоб додати тих, з ким дивишся.", friend_remove_suffix:"— прибрати з друзів?", friends_no_match:"Немає друзів за запитом", edit_modal_title:"РЕДАГУВАТИ ВІДГУК", share_modal_title:"ПОРАДИТИ ФІЛЬМ", send_btn:"Надіслати", note_ph:"Що думаєш?", share_msg_ph:"Чому тобі це сподобається…", add_modal_seen:"ПОЗНАЧИТИ ПЕРЕГЛЯНУТИМ", add_modal_list:"ДОДАТИ ДО СПИСКУ", ob8_picks:"✨ Персональні добірки для тебе", err_bad_login:"Невірний email або пароль.", signin_create_cta:"Вперше тут? Створити акаунт", recs_empty_title:"Персональні добірки", recs_empty_sub:"Введи запит або залиш порожнім і натисни «Підібрати»", recs_thinking:"Думаю…", recs_still_thinking:"Ще думаю, секунду…", based_on_label:"На основі переглянутих фільмів", recs_hint_empty:"Додай переглянуті фільми для персональних добірок", picks_left_today:"персональних добірок залишилось сьогодні", picks_left_week:"персональних добірок залишилось цього тижня", why_off_many:"Радять до {n} твоїх улюблених: {films}", why_off_one:"Бо тобі сподобався {film}", why_season:"Під {season} вечори", why_acclaimed:"Високі оцінки, {decade}", season_winter:"зимові", season_spring:"весняні", season_summer:"літні", season_autumn:"осінні", email_did_you_mean:"Можливо, ви мали на увазі", picks_random:"Випадкові добірки", picks_tonight:"Добірка на вечір", picks_for_you:"Добірка для тебе", where_to_watch:"Де дивитися", watch_attrib:"Дані про стримінги: JustWatch",
     loading_lbl:"Завантаження…", err_no_results_title:"Нічого не знайдено", err_no_results_sub:"Спробуй лише назву, без року", err_connection:"Помилка з'єднання", err_generic:"Помилка", report:"Поскаржитися", report_prefill:"Скарга на {name}. Що сталося:", err_not_found_title:"Не знайдено", err_no_results_for:"Немає результатів за", err_took_long_title:"Занадто довго", err_took_long_sub:"Спробуй за мить", recs_none_title:"Добірок не знайшлося", recs_none_sub:"Спробуй інший запит", recs_unavail_title:"Добірки недоступні", recs_unavail_sub:"Спробуй пізніше", inbox_empty_title:"Поки немає чатів", inbox_empty_sub:"Поділись фільмом з пошуку або списку, щоб почати розмову",
     continue_as_guest:"Почати без акаунта", guest_label:"Гість", guest_banner:"Зберігається лише на цьому пристрої", guest_join_btn:"Створити акаунт", guest_save_sub:"Збережи фільми на всіх пристроях і ділись з друзями - безкоштовно назавжди.", guest_join_free:"Зареєструватися безкоштовно", guest_maybe_later:"Пізніше", guest_already_acct:"Вже є акаунт?",
     del_acct_guest:"Ви увійшли як гість - пошти, щоб увійти знову, немає. Скасувати або відновити буде нічим.", ob_mock_mylist:"Мій список", ob_mock_name:"Ваше ім\u2019я", block:"Заблокувати", block_q:"Заблокувати {name}?", block_warn:"Він більше не зможе надсилати вам фільми, повідомлення та запити в друзі. Скасувати можна в налаштуваннях.", block_done:"Заблоковано", block_failed:"Не вдалося заблокувати", unblock:"Розблокувати", err_not_allowed:"Не вдалося.", unblock_note:"Розблокування знімає блокування, але не повертає дружбу - людині доведеться надіслати новий запит.", unblock_done:"Розблоковано", blocked_header:"Заблоковані", block_someone:"Хтось", del_acct_q:"Видалити акаунт?", del_acct_warn:"Це назавжди видалить історію переглядів, усі списки, друзів і дані акаунта. Скасувати буде неможливо.", del_acct_confirm:"Видалити мій акаунт", del_acct_working:"Видаляємо…", del_acct_done:"Акаунт видалено.", del_acct_failed:"Не вдалося видалити акаунт",
@@ -4029,7 +3884,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"აირჩიე მოსაწვევი მეგობარი:", add_friends_first:"ჯერ დაამატე მეგობრები მოსაწვევად",
     invite_valid_48:"მოქმედებს 48 საათი", invite_connect_hint:"გახსნისას ერთი შეხებით დაუმეგობრდებით.",
     join_list_q:"სიაში გაწევრიანება", join_invited_sub:"მოგიწვიეს საერთო ფილმების სიაში",
-    list_picker_title:"სიაში დამატება", filter_friends:"გაფილტრე მეგობრები…", searching:"ძიება…", not_found:"ვერ მოიძებნა", friends_empty:"ჯერ მეგობრები არ არის. გამოიყენე ქვემოთ მოცემული ბმული, რომ დაამატო ისინი, ვისთანაც უყურებ.", friend_remove_suffix:"— ამოშალო მეგობრებიდან?", friends_no_match:"ვერ მოიძებნა მეგობარი", edit_modal_title:"შეფასების რედაქტირება", share_modal_title:"ფილმის რეკომენდაცია", send_btn:"გაგზავნა", note_ph:"რას ფიქრობ?", share_msg_ph:"რატომ მოგეწონება…", add_modal_seen:"მონიშნე ნანახად", add_modal_list:"სიაში დამატება", ob8_picks:"✨ პერსონალური რჩევები შენთვის", err_bad_login:"არასწორი email ან პაროლი.", signin_create_cta:"ახალი ხარ? შექმენი ანგარიში", recs_empty_title:"პერსონალური რჩევები", recs_empty_sub:"შეიყვანე მოთხოვნა ან დატოვე ცარიელი და დააჭირე ღილაკს „მირჩიე“", recs_thinking:"ვფიქრობ…", recs_still_thinking:"ჯერ კიდევ ვფიქრობ, მოითმინე…", based_on_label:"ნანახი ფილმების მიხედვით", recs_hint_empty:"დაამატე ნანახი ფილმები პერსონალური რჩევებისთვის", picks_left_today:"პერსონალური რჩევა დარჩა დღეს", picks_left_week:"პერსონალური რჩევა დარჩა ამ კვირას", why_off_many:"გირჩევენ შენი {n} საყვარელი ფილმიდან: {films}", why_off_one:"რადგან მოგეწონა {film}", why_season:"{season} საღამოებისთვის", why_acclaimed:"მაღალი შეფასება, {decade}", season_winter:"ზამთრის", season_spring:"გაზაფხულის", season_summer:"ზაფხულის", season_autumn:"შემოდგომის", draw_btn:"შენ გადაწყვიტე", draw_title:"დაე აპლიკაციამ აირჩიოს", draw_phrase:"და გამარჯვებულია", draw_open:"გახსნა", draw_again:"თავიდან", picks_random:"შემთხვევითი რჩევები", picks_tonight:"რჩევები საღამოსთვის", picks_for_you:"რჩევები შენთვის", where_to_watch:"სად ვუყუროთ", watch_attrib:"სტრიმინგის მონაცემები: JustWatch",
+    list_picker_title:"სიაში დამატება", filter_friends:"გაფილტრე მეგობრები…", searching:"ძიება…", not_found:"ვერ მოიძებნა", friends_empty:"ჯერ მეგობრები არ არის. გამოიყენე ქვემოთ მოცემული ბმული, რომ დაამატო ისინი, ვისთანაც უყურებ.", friend_remove_suffix:"— ამოშალო მეგობრებიდან?", friends_no_match:"ვერ მოიძებნა მეგობარი", edit_modal_title:"შეფასების რედაქტირება", share_modal_title:"ფილმის რეკომენდაცია", send_btn:"გაგზავნა", note_ph:"რას ფიქრობ?", share_msg_ph:"რატომ მოგეწონება…", add_modal_seen:"მონიშნე ნანახად", add_modal_list:"სიაში დამატება", ob8_picks:"✨ პერსონალური რჩევები შენთვის", err_bad_login:"არასწორი email ან პაროლი.", signin_create_cta:"ახალი ხარ? შექმენი ანგარიში", recs_empty_title:"პერსონალური რჩევები", recs_empty_sub:"შეიყვანე მოთხოვნა ან დატოვე ცარიელი და დააჭირე ღილაკს „მირჩიე“", recs_thinking:"ვფიქრობ…", recs_still_thinking:"ჯერ კიდევ ვფიქრობ, მოითმინე…", based_on_label:"ნანახი ფილმების მიხედვით", recs_hint_empty:"დაამატე ნანახი ფილმები პერსონალური რჩევებისთვის", picks_left_today:"პერსონალური რჩევა დარჩა დღეს", picks_left_week:"პერსონალური რჩევა დარჩა ამ კვირას", why_off_many:"გირჩევენ შენი {n} საყვარელი ფილმიდან: {films}", why_off_one:"რადგან მოგეწონა {film}", why_season:"{season} საღამოებისთვის", why_acclaimed:"მაღალი შეფასება, {decade}", season_winter:"ზამთრის", season_spring:"გაზაფხულის", season_summer:"ზაფხულის", season_autumn:"შემოდგომის", email_did_you_mean:"იქნებ იგულისხმეთ", picks_random:"შემთხვევითი რჩევები", picks_tonight:"რჩევები საღამოსთვის", picks_for_you:"რჩევები შენთვის", where_to_watch:"სად ვუყუროთ", watch_attrib:"სტრიმინგის მონაცემები: JustWatch",
     loading_lbl:"იტვირთება…", err_no_results_title:"ვერაფერი მოიძებნა", err_no_results_sub:"სცადე მხოლოდ სათაური, წლის გარეშე", err_connection:"კავშირის შეცდომა", err_generic:"შეცდომა", report:"საჩივარი", report_prefill:"საჩივარი {name}-ზე. რა მოხდა:", err_not_found_title:"ვერ მოიძებნა", err_no_results_for:"ვერაფერი მოიძებნა:", err_took_long_title:"ძალიან დიდხანს", err_took_long_sub:"სცადე ცოტა ხანში", recs_none_title:"რჩევები ვერ მოიძებნა", recs_none_sub:"სცადე სხვა მოთხოვნა", recs_unavail_title:"რჩევები მიუწვდომელია", recs_unavail_sub:"სცადე მოგვიანებით", inbox_empty_title:"ჩატები ჯერ არ არის", inbox_empty_sub:"გააზიარე ფილმი ძიებიდან ან სიიდან, რომ დაიწყო საუბარი",
     continue_as_guest:"დაიწყე ანგარიშის გარეშე", guest_label:"სტუმარი", guest_banner:"ინახება მხოლოდ ამ მოწყობილობაზე", guest_join_btn:"შემოუერთდი Cinemail-ს", guest_save_sub:"შეინახე ფილმები ყველა მოწყობილობაზე და გაუზიარე მეგობრებს - უფასოდ, სამუდამოდ.", guest_join_free:"უფასოდ შემოუერთდი", guest_maybe_later:"მოგვიანებით", guest_already_acct:"უკვე გაქვს ანგარიში?",
     del_acct_guest:"თქვენ სტუმრად ხართ - ხელახლა შესასვლელი ელფოსტა არ არსებობს. აღდგენა შეუძლებელია.", ob_mock_mylist:"ჩემი სია", ob_mock_name:"თქვენი სახელი", block:"დაბლოკვა", block_q:"დაიბლოკოს {name}?", block_warn:"ის ვეღარ გამოგიგზავნით ფილმებს, შეტყობინებებს და მეგობრობის მოთხოვნებს. გაუქმება შესაძლებელია ანგარიშში.", block_done:"დაბლოკილია", block_failed:"დაბლოკვა ვერ მოხერხდა", unblock:"განბლოკვა", err_not_allowed:"ვერ შესრულდა.", unblock_note:"განბლოკვა ხსნის ბლოკს, მაგრამ მეგობრობას არ აღადგენს - მას ხელახლა მოუწევს მოთხოვნის გაგზავნა.", unblock_done:"განიბლოკა", blocked_header:"დაბლოკილები", block_someone:"ვიღაც", del_acct_q:"წავშალოთ ანგარიში?", del_acct_warn:"სამუდამოდ წაიშლება ნანახის ისტორია, ყველა სია, მეგობრები და ანგარიშის მონაცემები. დაბრუნება შეუძლებელია.", del_acct_confirm:"წაშალე ჩემი ანგარიში", del_acct_working:"იშლება…", del_acct_done:"ანგარიში წაიშალა.", del_acct_failed:"ანგარიშის წაშლა ვერ მოხერხდა",
@@ -4161,7 +4016,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Elige un amigo para invitar:", add_friends_first:"Añade amigos primero para invitarlos",
     invite_valid_48:"Válido 48 horas", invite_connect_hint:"Cuando lo abran, os conectaréis como amigos al instante.",
     join_list_q:"Unirse a la lista", join_invited_sub:"Te han invitado a una lista compartida de películas",
-    list_picker_title:"Añadir a lista", filter_friends:"Filtrar amigos…", searching:"Buscando…", not_found:"No encontrado", friends_empty:"Aún no tienes amigos. Usa el enlace de invitación de abajo para añadir a quienes ves películas.", friend_remove_suffix:"— ¿quitar de amigos?", friends_no_match:"Sin coincidencias", edit_modal_title:"EDITAR RESEÑA", share_modal_title:"RECOMENDAR UNA PELÍCULA", send_btn:"Enviar", note_ph:"¿Qué te pareció?", share_msg_ph:"Por qué te encantará…", add_modal_seen:"MARCAR COMO VISTA", add_modal_list:"AÑADIR A LISTA", ob8_picks:"✨ Selección personal para ti", err_bad_login:"Email o contraseña incorrectos.", signin_create_cta:"¿Eres nuevo? Crea una cuenta", recs_empty_title:"Recomendaciones personales", recs_empty_sub:"Escribe una idea o déjalo vacío y toca Sugerir", recs_thinking:"Pensando…", recs_still_thinking:"Sigo pensando, un momento…", based_on_label:"Según tus películas vistas", recs_hint_empty:"Añade películas vistas para recomendaciones personales", picks_left_today:"selecciones personales restantes hoy", picks_left_week:"selecciones personales restantes esta semana", why_off_many:"Recomendada a partir de {n} de tus favoritas: {films}", why_off_one:"Porque te gustó {film}", why_season:"Para las tardes de {season}", why_acclaimed:"Muy valorada, de los {decade}", season_winter:"invierno", season_spring:"primavera", season_summer:"verano", season_autumn:"otoño", draw_btn:"Elige por mí", draw_title:"Deja que la app elija", draw_phrase:"y la ganadora es", draw_open:"Abrir", draw_again:"Otra vez", picks_random:"Selección al azar", picks_tonight:"Para esta noche", picks_for_you:"Para ti", where_to_watch:"Dónde ver", watch_attrib:"Datos de streaming por JustWatch",
+    list_picker_title:"Añadir a lista", filter_friends:"Filtrar amigos…", searching:"Buscando…", not_found:"No encontrado", friends_empty:"Aún no tienes amigos. Usa el enlace de invitación de abajo para añadir a quienes ves películas.", friend_remove_suffix:"— ¿quitar de amigos?", friends_no_match:"Sin coincidencias", edit_modal_title:"EDITAR RESEÑA", share_modal_title:"RECOMENDAR UNA PELÍCULA", send_btn:"Enviar", note_ph:"¿Qué te pareció?", share_msg_ph:"Por qué te encantará…", add_modal_seen:"MARCAR COMO VISTA", add_modal_list:"AÑADIR A LISTA", ob8_picks:"✨ Selección personal para ti", err_bad_login:"Email o contraseña incorrectos.", signin_create_cta:"¿Eres nuevo? Crea una cuenta", recs_empty_title:"Recomendaciones personales", recs_empty_sub:"Escribe una idea o déjalo vacío y toca Sugerir", recs_thinking:"Pensando…", recs_still_thinking:"Sigo pensando, un momento…", based_on_label:"Según tus películas vistas", recs_hint_empty:"Añade películas vistas para recomendaciones personales", picks_left_today:"selecciones personales restantes hoy", picks_left_week:"selecciones personales restantes esta semana", why_off_many:"Recomendada a partir de {n} de tus favoritas: {films}", why_off_one:"Porque te gustó {film}", why_season:"Para las tardes de {season}", why_acclaimed:"Muy valorada, de los {decade}", season_winter:"invierno", season_spring:"primavera", season_summer:"verano", season_autumn:"otoño", email_did_you_mean:"¿Quisiste decir", picks_random:"Selección al azar", picks_tonight:"Para esta noche", picks_for_you:"Para ti", where_to_watch:"Dónde ver", watch_attrib:"Datos de streaming por JustWatch",
     loading_lbl:"Cargando…", err_no_results_title:"Sin resultados", err_no_results_sub:"Prueba solo el título, sin el año", err_connection:"Error de conexión", err_generic:"Error", report:"Denunciar", report_prefill:"Denuncia sobre un mensaje de {name}. Qué ha pasado:", err_not_found_title:"No encontrado", err_no_results_for:"Sin resultados para", err_took_long_title:"Tardó demasiado", err_took_long_sub:"Inténtalo en un momento", recs_none_title:"Sin recomendaciones", recs_none_sub:"Prueba otra pista", recs_unavail_title:"Recomendaciones no disponibles", recs_unavail_sub:"Inténtalo más tarde", inbox_empty_title:"Aún no hay chats", inbox_empty_sub:"Comparte una película desde la búsqueda o tu lista para iniciar una conversación",
     continue_as_guest:"Empezar sin cuenta", guest_label:"Invitado", guest_banner:"Se guarda solo en este dispositivo", guest_join_btn:"Unirse a Cinemail", guest_save_sub:"Guarda tus películas en todos tus dispositivos y compártelas con amigos - gratis para siempre.", guest_join_free:"Unirse gratis", guest_maybe_later:"Quizás luego", guest_already_acct:"¿Ya tienes cuenta?",
     del_acct_guest:"Has entrado como invitado, así que no hay correo para volver a entrar. No se podrá deshacer ni recuperar nada.", ob_mock_mylist:"Mi lista", ob_mock_name:"Tu nombre", block:"Bloquear", block_q:"¿Bloquear a {name}?", block_warn:"No podrá enviarte películas, mensajes ni solicitudes de amistad. Puedes deshacerlo en tu cuenta.", block_done:"Bloqueado", block_failed:"No se pudo bloquear", unblock:"Desbloquear", err_not_allowed:"No se pudo completar.", unblock_note:"Desbloquear quita el bloqueo pero no restaura la amistad. Tendrían que enviarte una nueva solicitud.", unblock_done:"Desbloqueado", blocked_header:"Personas bloqueadas", block_someone:"Alguien", del_acct_q:"¿Eliminar la cuenta?", del_acct_warn:"Se borrarán para siempre tu historial de películas vistas, todas tus listas, tus amigos y los datos de la cuenta. No se puede deshacer.", del_acct_confirm:"Eliminar mi cuenta", del_acct_working:"Eliminando…", del_acct_done:"Cuenta eliminada.", del_acct_failed:"No se pudo eliminar la cuenta",
@@ -4293,7 +4148,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Choisis un ami à inviter :", add_friends_first:"Ajoute d'abord des amis pour les inviter",
     invite_valid_48:"Valable 48 heures", invite_connect_hint:"À l'ouverture, vous deviendrez amis en un clic.",
     join_list_q:"Rejoindre la liste", join_invited_sub:"Tu es invité à une liste de films partagée",
-    list_picker_title:"Ajouter à la liste", filter_friends:"Filtrer les amis…", searching:"Recherche…", not_found:"Introuvable", friends_empty:"Pas encore d'amis. Utilise le lien d'invitation ci-dessous pour ajouter tes compagnons de visionnage.", friend_remove_suffix:"— retirer des amis ?", friends_no_match:"Aucun ami trouvé", edit_modal_title:"MODIFIER L'AVIS", share_modal_title:"RECOMMANDER UN FILM", send_btn:"Envoyer", note_ph:"Qu'en as-tu pensé ?", share_msg_ph:"Pourquoi tu vas adorer…", add_modal_seen:"MARQUER COMME VU", add_modal_list:"AJOUTER À LA LISTE", ob8_picks:"✨ Sélections personnelles pour toi", err_bad_login:"Email ou mot de passe incorrect.", signin_create_cta:"Nouveau ? Crée un compte", recs_empty_title:"Sélections personnelles", recs_empty_sub:"Saisis une idée ou laisse vide et appuie sur Suggérer", recs_thinking:"Réflexion…", recs_still_thinking:"Je réfléchis encore, un instant…", based_on_label:"D'après tes films vus", recs_hint_empty:"Ajoute des films vus pour des recommandations personnelles", picks_left_today:"sélections personnelles restantes aujourd'hui", picks_left_week:"sélections personnelles restantes cette semaine", why_off_many:"Recommandé d'après {n} de tes préférés : {films}", why_off_one:"Parce que tu as aimé {film}", why_season:"Pour les soirées d'{season}", why_acclaimed:"Très bien noté, des années {decade}", season_winter:"hiver", season_spring:"printemps", season_summer:"été", season_autumn:"automne", draw_btn:"Choisis pour moi", draw_title:"Laisse l'app choisir", draw_phrase:"et le gagnant est", draw_open:"Ouvrir", draw_again:"Relancer", picks_random:"Au hasard", picks_tonight:"Pour ce soir", picks_for_you:"Pour toi", where_to_watch:"Où regarder", watch_attrib:"Données de streaming par JustWatch",
+    list_picker_title:"Ajouter à la liste", filter_friends:"Filtrer les amis…", searching:"Recherche…", not_found:"Introuvable", friends_empty:"Pas encore d'amis. Utilise le lien d'invitation ci-dessous pour ajouter tes compagnons de visionnage.", friend_remove_suffix:"— retirer des amis ?", friends_no_match:"Aucun ami trouvé", edit_modal_title:"MODIFIER L'AVIS", share_modal_title:"RECOMMANDER UN FILM", send_btn:"Envoyer", note_ph:"Qu'en as-tu pensé ?", share_msg_ph:"Pourquoi tu vas adorer…", add_modal_seen:"MARQUER COMME VU", add_modal_list:"AJOUTER À LA LISTE", ob8_picks:"✨ Sélections personnelles pour toi", err_bad_login:"Email ou mot de passe incorrect.", signin_create_cta:"Nouveau ? Crée un compte", recs_empty_title:"Sélections personnelles", recs_empty_sub:"Saisis une idée ou laisse vide et appuie sur Suggérer", recs_thinking:"Réflexion…", recs_still_thinking:"Je réfléchis encore, un instant…", based_on_label:"D'après tes films vus", recs_hint_empty:"Ajoute des films vus pour des recommandations personnelles", picks_left_today:"sélections personnelles restantes aujourd'hui", picks_left_week:"sélections personnelles restantes cette semaine", why_off_many:"Recommandé d'après {n} de tes préférés : {films}", why_off_one:"Parce que tu as aimé {film}", why_season:"Pour les soirées d'{season}", why_acclaimed:"Très bien noté, des années {decade}", season_winter:"hiver", season_spring:"printemps", season_summer:"été", season_autumn:"automne", email_did_you_mean:"Vouliez-vous dire", picks_random:"Au hasard", picks_tonight:"Pour ce soir", picks_for_you:"Pour toi", where_to_watch:"Où regarder", watch_attrib:"Données de streaming par JustWatch",
     loading_lbl:"Chargement…", err_no_results_title:"Aucun résultat", err_no_results_sub:"Essaie juste le titre, sans l'année", err_connection:"Erreur de connexion", err_generic:"Erreur", report:"Signaler", report_prefill:"Signalement d'un message de {name}. Que s'est-il passé :", err_not_found_title:"Introuvable", err_no_results_for:"Aucun résultat pour", err_took_long_title:"Trop long", err_took_long_sub:"Réessaie dans un instant", recs_none_title:"Aucune sélection", recs_none_sub:"Essaie une autre idée", recs_unavail_title:"Sélections indisponibles", recs_unavail_sub:"Réessaie plus tard", inbox_empty_title:"Pas encore de discussions", inbox_empty_sub:"Partage un film depuis la recherche ou ta liste pour démarrer une conversation",
     continue_as_guest:"Commencer sans compte", guest_label:"Invité", guest_banner:"Enregistré uniquement sur cet appareil", guest_join_btn:"Rejoindre Cinemail", guest_save_sub:"Garde tes films sur tous tes appareils et partage-les avec tes amis - gratuit pour toujours.", guest_join_free:"Rejoindre gratuitement", guest_maybe_later:"Plus tard", guest_already_acct:"Tu as deja un compte ?",
     del_acct_guest:"Tu es connecté en tant qu\u2019invité, il n\u2019y a donc pas d\u2019e-mail pour revenir. Rien ne pourra être récupéré.", ob_mock_mylist:"Ma liste", ob_mock_name:"Ton nom", block:"Bloquer", block_q:"Bloquer {name} ?", block_warn:"Cette personne ne pourra plus t\u2019envoyer de films, de messages ni de demandes d\u2019ami. Réversible depuis ton compte.", block_done:"Bloqué", block_failed:"Impossible de bloquer", unblock:"Débloquer", err_not_allowed:"Cela n'a pas abouti.", unblock_note:"Débloquer lève le blocage mais ne rétablit pas l'amitié. La personne devra envoyer une nouvelle demande.", unblock_done:"Débloqué", blocked_header:"Personnes bloquées", block_someone:"Quelqu\u2019un", del_acct_q:"Supprimer le compte ?", del_acct_warn:"Cela supprimera définitivement ton historique de films, toutes tes listes, tes amis et les données du compte. C'est irréversible.", del_acct_confirm:"Supprimer mon compte", del_acct_working:"Suppression…", del_acct_done:"Compte supprimé.", del_acct_failed:"Impossible de supprimer le compte",
@@ -4425,7 +4280,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Wähle einen Freund zum Einladen:", add_friends_first:"Füge erst Freunde hinzu, um sie einzuladen",
     invite_valid_48:"48 Stunden gültig", invite_connect_hint:"Wenn sie ihn öffnen, werdet ihr mit einem Tipp Freunde.",
     join_list_q:"Der Liste beitreten", join_invited_sub:"Du wurdest zu einer geteilten Filmliste eingeladen",
-    list_picker_title:"Zur Liste", filter_friends:"Freunde filtern…", searching:"Suche…", not_found:"Nicht gefunden", friends_empty:"Noch keine Freunde. Nutze den Einladungslink unten, um die Leute hinzuzufügen, mit denen du schaust.", friend_remove_suffix:"— aus Freunden entfernen?", friends_no_match:"Keine passenden Freunde", edit_modal_title:"BEWERTUNG BEARBEITEN", share_modal_title:"FILM EMPFEHLEN", send_btn:"Senden", note_ph:"Wie fandest du ihn?", share_msg_ph:"Warum du ihn lieben wirst…", add_modal_seen:"ALS GESEHEN MARKIEREN", add_modal_list:"ZUR LISTE HINZUFÜGEN", ob8_picks:"✨ Persönliche Tipps für dich", err_bad_login:"Falsche E-Mail oder Passwort.", signin_create_cta:"Neu hier? Konto erstellen", recs_empty_title:"Persönliche Tipps", recs_empty_sub:"Gib eine Idee ein oder lass es leer und tippe auf Vorschlagen", recs_thinking:"Denke nach…", recs_still_thinking:"Denke noch nach, einen Moment…", based_on_label:"Basierend auf gesehenen Filmen", recs_hint_empty:"Füge gesehene Filme für persönliche Tipps hinzu", picks_left_today:"persönliche Tipps heute übrig", picks_left_week:"persönliche Tipps diese Woche übrig", why_off_many:"Empfohlen auf Basis von {n} deiner Favoriten: {films}", why_off_one:"Weil dir {film} gefallen hat", why_season:"Für {season}abende", why_acclaimed:"Hoch bewertet, aus den {decade}ern", season_winter:"Winter", season_spring:"Frühlings", season_summer:"Sommer", season_autumn:"Herbst", draw_btn:"Entscheide für mich", draw_title:"Lass die App wählen", draw_phrase:"und der Gewinner ist", draw_open:"Öffnen", draw_again:"Nochmal", picks_random:"Zufällige Tipps", picks_tonight:"Tipps für heute Abend", picks_for_you:"Tipps für dich", where_to_watch:"Wo zu sehen", watch_attrib:"Streaming-Daten von JustWatch",
+    list_picker_title:"Zur Liste", filter_friends:"Freunde filtern…", searching:"Suche…", not_found:"Nicht gefunden", friends_empty:"Noch keine Freunde. Nutze den Einladungslink unten, um die Leute hinzuzufügen, mit denen du schaust.", friend_remove_suffix:"— aus Freunden entfernen?", friends_no_match:"Keine passenden Freunde", edit_modal_title:"BEWERTUNG BEARBEITEN", share_modal_title:"FILM EMPFEHLEN", send_btn:"Senden", note_ph:"Wie fandest du ihn?", share_msg_ph:"Warum du ihn lieben wirst…", add_modal_seen:"ALS GESEHEN MARKIEREN", add_modal_list:"ZUR LISTE HINZUFÜGEN", ob8_picks:"✨ Persönliche Tipps für dich", err_bad_login:"Falsche E-Mail oder Passwort.", signin_create_cta:"Neu hier? Konto erstellen", recs_empty_title:"Persönliche Tipps", recs_empty_sub:"Gib eine Idee ein oder lass es leer und tippe auf Vorschlagen", recs_thinking:"Denke nach…", recs_still_thinking:"Denke noch nach, einen Moment…", based_on_label:"Basierend auf gesehenen Filmen", recs_hint_empty:"Füge gesehene Filme für persönliche Tipps hinzu", picks_left_today:"persönliche Tipps heute übrig", picks_left_week:"persönliche Tipps diese Woche übrig", why_off_many:"Empfohlen auf Basis von {n} deiner Favoriten: {films}", why_off_one:"Weil dir {film} gefallen hat", why_season:"Für {season}abende", why_acclaimed:"Hoch bewertet, aus den {decade}ern", season_winter:"Winter", season_spring:"Frühlings", season_summer:"Sommer", season_autumn:"Herbst", email_did_you_mean:"Meintest du", picks_random:"Zufällige Tipps", picks_tonight:"Tipps für heute Abend", picks_for_you:"Tipps für dich", where_to_watch:"Wo zu sehen", watch_attrib:"Streaming-Daten von JustWatch",
     loading_lbl:"Lädt…", err_no_results_title:"Keine Ergebnisse", err_no_results_sub:"Versuch nur den Titel, ohne Jahr", err_connection:"Verbindungsfehler", err_generic:"Fehler", report:"Melden", report_prefill:"Meldung zu einer Nachricht von {name}. Was ist passiert:", err_not_found_title:"Nicht gefunden", err_no_results_for:"Keine Ergebnisse für", err_took_long_title:"Hat zu lange gedauert", err_took_long_sub:"Versuch es gleich nochmal", recs_none_title:"Keine Tipps gefunden", recs_none_sub:"Versuch eine andere Idee", recs_unavail_title:"Tipps nicht verfügbar", recs_unavail_sub:"Bitte versuch es später", inbox_empty_title:"Noch keine Chats", inbox_empty_sub:"Teile einen Film aus der Suche oder deiner Liste, um ein Gespräch zu starten",
     continue_as_guest:"Ohne Konto starten", guest_label:"Gast", guest_banner:"Nur auf diesem Gerät gespeichert", guest_join_btn:"Cinemail beitreten", guest_save_sub:"Sichere deine Filme auf allen Geräten und teile sie mit Freunden - für immer kostenlos.", guest_join_free:"Kostenlos beitreten", guest_maybe_later:"Vielleicht später", guest_already_acct:"Hast du schon ein Konto?",
     del_acct_guest:"Du bist als Gast angemeldet - es gibt keine E-Mail, um dich wieder anzumelden. Nichts lässt sich wiederherstellen.", ob_mock_mylist:"Meine Liste", ob_mock_name:"Dein Name", block:"Blockieren", block_q:"{name} blockieren?", block_warn:"Diese Person kann dir keine Filme, Nachrichten oder Freundschaftsanfragen mehr senden. In deinem Konto rückgängig zu machen.", block_done:"Blockiert", block_failed:"Blockieren fehlgeschlagen", unblock:"Entsperren", err_not_allowed:"Das hat nicht funktioniert.", unblock_note:"Die Entsperrung hebt die Blockierung auf, stellt die Freundschaft aber nicht wieder her. Die Person müsste eine neue Anfrage senden.", unblock_done:"Entsperrt", blocked_header:"Blockierte Personen", block_someone:"Jemand", del_acct_q:"Konto löschen?", del_acct_warn:"Damit werden dein Filmverlauf, alle Listen, Freunde und Kontodaten endgültig gelöscht. Das lässt sich nicht rückgängig machen.", del_acct_confirm:"Mein Konto löschen", del_acct_working:"Wird gelöscht…", del_acct_done:"Konto gelöscht.", del_acct_failed:"Konto konnte nicht gelöscht werden",
@@ -4557,7 +4412,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Scegli un amico da invitare:", add_friends_first:"Aggiungi prima degli amici per invitarli",
     invite_valid_48:"Valido per 48 ore", invite_connect_hint:"Quando lo aprono, diventerete amici con un tocco.",
     join_list_q:"Unisciti alla lista", join_invited_sub:"Sei stato invitato a una lista di film condivisa",
-    list_picker_title:"Alla lista", filter_friends:"Filtra amici…", searching:"Ricerca…", not_found:"Non trovato", friends_empty:"Ancora nessun amico. Usa il link d'invito qui sotto per aggiungere le persone con cui guardi i film.", friend_remove_suffix:"— rimuovere dagli amici?", friends_no_match:"Nessun amico corrisponde", edit_modal_title:"MODIFICA RECENSIONE", share_modal_title:"CONSIGLIA UN FILM", send_btn:"Invia", note_ph:"Cosa ne pensi?", share_msg_ph:"Perché ti piacerà…", add_modal_seen:"SEGNA COME VISTO", add_modal_list:"AGGIUNGI ALLA LISTA", ob8_picks:"✨ Consigli personali per te", err_bad_login:"Email o password errati.", signin_create_cta:"Nuovo qui? Crea un account", recs_empty_title:"Consigli personali", recs_empty_sub:"Inserisci un'idea o lascia vuoto e tocca Consiglia", recs_thinking:"Sto pensando…", recs_still_thinking:"Sto ancora pensando, un attimo…", based_on_label:"In base ai film visti", recs_hint_empty:"Aggiungi film visti per consigli personali", picks_left_today:"consigli personali rimasti oggi", picks_left_week:"consigli personali rimasti questa settimana", why_off_many:"Consigliato a partire da {n} dei tuoi preferiti: {films}", why_off_one:"Perché ti è piaciuto {film}", why_season:"Per le sere d'{season}", why_acclaimed:"Molto apprezzato, dagli anni {decade}", season_winter:"inverno", season_spring:"primavera", season_summer:"estate", season_autumn:"autunno", draw_btn:"Scegli tu", draw_title:"Lascia scegliere all'app", draw_phrase:"e il vincitore è", draw_open:"Apri", draw_again:"Di nuovo", picks_random:"Consigli casuali", picks_tonight:"Per stasera", picks_for_you:"Per te", where_to_watch:"Dove vederlo", watch_attrib:"Dati streaming da JustWatch",
+    list_picker_title:"Alla lista", filter_friends:"Filtra amici…", searching:"Ricerca…", not_found:"Non trovato", friends_empty:"Ancora nessun amico. Usa il link d'invito qui sotto per aggiungere le persone con cui guardi i film.", friend_remove_suffix:"— rimuovere dagli amici?", friends_no_match:"Nessun amico corrisponde", edit_modal_title:"MODIFICA RECENSIONE", share_modal_title:"CONSIGLIA UN FILM", send_btn:"Invia", note_ph:"Cosa ne pensi?", share_msg_ph:"Perché ti piacerà…", add_modal_seen:"SEGNA COME VISTO", add_modal_list:"AGGIUNGI ALLA LISTA", ob8_picks:"✨ Consigli personali per te", err_bad_login:"Email o password errati.", signin_create_cta:"Nuovo qui? Crea un account", recs_empty_title:"Consigli personali", recs_empty_sub:"Inserisci un'idea o lascia vuoto e tocca Consiglia", recs_thinking:"Sto pensando…", recs_still_thinking:"Sto ancora pensando, un attimo…", based_on_label:"In base ai film visti", recs_hint_empty:"Aggiungi film visti per consigli personali", picks_left_today:"consigli personali rimasti oggi", picks_left_week:"consigli personali rimasti questa settimana", why_off_many:"Consigliato a partire da {n} dei tuoi preferiti: {films}", why_off_one:"Perché ti è piaciuto {film}", why_season:"Per le sere d'{season}", why_acclaimed:"Molto apprezzato, dagli anni {decade}", season_winter:"inverno", season_spring:"primavera", season_summer:"estate", season_autumn:"autunno", email_did_you_mean:"Intendevi", picks_random:"Consigli casuali", picks_tonight:"Per stasera", picks_for_you:"Per te", where_to_watch:"Dove vederlo", watch_attrib:"Dati streaming da JustWatch",
     loading_lbl:"Caricamento…", err_no_results_title:"Nessun risultato", err_no_results_sub:"Prova solo il titolo, senza l'anno", err_connection:"Errore di connessione", err_generic:"Errore", report:"Segnala", report_prefill:"Segnalazione di un messaggio di {name}. Che cosa è successo:", err_not_found_title:"Non trovato", err_no_results_for:"Nessun risultato per", err_took_long_title:"Ha impiegato troppo", err_took_long_sub:"Riprova tra un attimo", recs_none_title:"Nessun consiglio trovato", recs_none_sub:"Prova un'altra idea", recs_unavail_title:"Consigli non disponibili", recs_unavail_sub:"Riprova più tardi", inbox_empty_title:"Ancora nessuna chat", inbox_empty_sub:"Condividi un film dalla ricerca o dalla tua lista per iniziare una conversazione",
     continue_as_guest:"Inizia senza account", guest_label:"Ospite", guest_banner:"Salvato solo su questo dispositivo", guest_join_btn:"Unisciti a Cinemail", guest_save_sub:"Conserva i tuoi film su tutti i dispositivi e condividili con gli amici - gratis per sempre.", guest_join_free:"Unisciti gratis", guest_maybe_later:"Forse più tardi", guest_already_acct:"Hai già un account?",
     del_acct_guest:"Sei entrato come ospite, quindi non c\u2019è un\u2019email per rientrare. Non si potrà recuperare nulla.", ob_mock_mylist:"La mia lista", ob_mock_name:"Il tuo nome", block:"Blocca", block_q:"Bloccare {name}?", block_warn:"Non potrà più inviarti film, messaggi o richieste di amicizia. Puoi annullare dal tuo account.", block_done:"Bloccato", block_failed:"Impossibile bloccare", unblock:"Sblocca", err_not_allowed:"Non è stato possibile.", unblock_note:"Sbloccare rimuove il blocco ma non ripristina l'amicizia. La persona dovrebbe inviare una nuova richiesta.", unblock_done:"Sbloccato", blocked_header:"Persone bloccate", block_someone:"Qualcuno", del_acct_q:"Eliminare l'account?", del_acct_warn:"Verranno eliminati per sempre la cronologia dei film, tutte le liste, gli amici e i dati dell'account. L'operazione è irreversibile.", del_acct_confirm:"Elimina il mio account", del_acct_working:"Eliminazione…", del_acct_done:"Account eliminato.", del_acct_failed:"Impossibile eliminare l'account",
@@ -4789,10 +4644,118 @@ function isGuestUser() {
   return currentUser?.is_anonymous === true;
 }
 
+// EVERY CALL TO signInAnonymously CREATES A PERMANENT USER, and this had no guard at all.
+// Measured on the live database 16 Sep 2026: 73 anonymous users created on 23 August alone,
+// plus 7 on the 28th - one day of trying the guest flow, one permanent row per press, none of
+// them ever cleaned up. They also count towards Supabase's monthly active users, which is a
+// billed number, so at any traffic this stops being untidy and starts being a bill.
+//
+// Two guards. An existing anonymous session is REUSED rather than replaced, which covers the
+// ordinary case of someone returning or pressing twice. And a press already in flight is
+// ignored, because the button's disabled state is a visual thing and a fast second tap beat it.
+// What remains unavoidable is a guest whose storage was cleared: Supabase has no way to hand
+// back the same anonymous identity, so that genuinely is a new user. Those are what the
+// periodic cleanup in docs/cleanup-anonymous-users.sql is for.
+// ── Email typos ───────────────────────────────────────────────────────────────
+// A real person registered on 17 Aug 2026 as harmonybatumi@gmail.CON. The confirmation went
+// nowhere, they could not confirm, and nobody found out until the accounts were audited a month
+// later. `type="email"` accepts it happily, because gmail.con is a perfectly well-formed
+// address - it is just not the one they meant.
+//
+// This SUGGESTS and never blocks. An unusual domain is somebody's real address, and a form that
+// refuses it is worse than one that lets a typo through: the typo costs one signup, the refusal
+// costs everyone whose domain is not on a list someone wrote.
+const _MAIL_DOMAINS = [
+  'gmail.com','googlemail.com','yahoo.com','yahoo.co.uk','hotmail.com','hotmail.co.uk',
+  'outlook.com','outlook.co.uk','live.com','msn.com','icloud.com','me.com','mac.com',
+  'aol.com','proton.me','protonmail.com','protonmail.ch','pm.me','tutanota.com','tuta.io',
+  'zoho.com','gmx.com','gmx.de','gmx.net','web.de','mail.com','fastmail.com','hey.com',
+  'mail.ru','yandex.ru','yandex.com','ya.ru','bk.ru','inbox.ru','list.ru','rambler.ru',
+  'ukr.net','i.ua','meta.ua','qq.com','163.com','126.com','naver.com','daum.net',
+  'seznam.cz','wp.pl','o2.pl','onet.pl','interia.pl','libero.it','virgilio.it','alice.it',
+  'orange.fr','wanadoo.fr','free.fr','laposte.net','sfr.fr','t-online.de','freenet.de',
+  'bluewin.ch','telenet.be','ziggo.nl','hotmail.fr','hotmail.it','hotmail.es','yahoo.fr',
+  'yahoo.de','yahoo.it','yahoo.es','yahoo.co.jp','comcast.net','verizon.net','att.net',
+  'sbcglobal.net','bellsouth.net','cox.net','charter.net','earthlink.net','btinternet.com',
+  'sky.com','virginmedia.com','ntlworld.com','optusnet.com.au','bigpond.com','xtra.co.nz',
+];
+// Top-level domains people fat-finger. Checked FIRST and separately from the domain list,
+// because "someunusualcompany.con" is a typo even though the name before it is unknown to us.
+const _TLD_TYPOS = {
+  'con':'com','cmo':'com','cim':'com','ocm':'com','cm':'com','om':'com','co':'com','comm':'com',
+  'cpm':'com','clm':'com','vom':'com','xom':'com','dom':'com','como':'com','com1':'com',
+  'nte':'net','ner':'net','nrt':'net','met':'net','ney':'net',
+  'ogr':'org','rog':'org','orh':'org','ort':'org','or':'org',
+  'ri':'ru','ru1':'ru','tu':'ru','rj':'ru','eu1':'eu','couk':'co.uk','c0m':'com',
+};
+function _lev(a, b) {
+  if (Math.abs(a.length - b.length) > 2) return 9;
+  const m = a.length, n = b.length;
+  let prev = Array.from({length:n+1}, (_,j) => j);
+  for (let i = 1; i <= m; i++) {
+    const cur = [i];
+    for (let j = 1; j <= n; j++)
+      cur[j] = Math.min(prev[j]+1, cur[j-1]+1, prev[j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+    prev = cur;
+  }
+  return prev[n];
+}
+// Returns the address they probably meant, or null when there is nothing to say.
+function _emailSuggestion(raw) {
+  const v = String(raw || '').trim().toLowerCase();
+  const at = v.lastIndexOf('@');
+  if (at < 1 || at === v.length - 1) return null;
+  const local = v.slice(0, at), domain = v.slice(at + 1);
+  if (!domain.includes('.')) return null;
+  if (_MAIL_DOMAINS.includes(domain)) return null;          // known-good, say nothing
+
+  // 1. the tail. Catches gmail.con AND anycompany.con.
+  const dot = domain.lastIndexOf('.');
+  const head = domain.slice(0, dot), tld = domain.slice(dot + 1);
+  if (_TLD_TYPOS[tld]) return `${local}@${head}.${_TLD_TYPOS[tld]}`;
+
+  // 2. the whole domain against the list, one or two characters out.
+  let best = null, bestD = 3;
+  for (const d of _MAIL_DOMAINS) {
+    const dist = _lev(domain, d);
+    if (dist < bestD) { bestD = dist; best = d; }
+  }
+  // One character out is a typo. Two is only a typo on a longer domain, or "gmail" and "gmx"
+  // start correcting each other.
+  if (best && (bestD === 1 || (bestD === 2 && domain.length >= 9))) return `${local}@${best}`;
+  return null;
+}
+
+// Wires an input to show its suggestion under itself. Clicking the suggestion accepts it.
+function _wireEmailHint(inputId, hintId) {
+  const inp = document.getElementById(inputId);
+  const hint = document.getElementById(hintId);
+  if (!inp || !hint) return;
+  const check = () => {
+    const sug = _emailSuggestion(inp.value);
+    if (!sug) { hint.style.display = 'none'; hint.textContent = ''; return; }
+    hint.style.display = 'block';
+    hint.innerHTML = `${escapeHtml(t('email_did_you_mean'))} <button type="button" class="email-fix">${escapeHtml(sug)}</button>`;
+    const b = hint.querySelector('.email-fix');
+    if (b) b.onclick = () => { inp.value = sug; hint.style.display = 'none'; inp.focus(); };
+  };
+  inp.addEventListener('blur', check);
+  inp.addEventListener('change', check);
+  inp.addEventListener('input', () => { if (hint.style.display === 'block') check(); });
+}
+
+let _guestSignInFlight = false;
 async function doGuestSignIn() {
+  if (_guestSignInFlight) return;
+  _guestSignInFlight = true;
   const btns = ['guest-signin-btn','guest-signup-btn'].map(id => document.getElementById(id)).filter(Boolean);
   btns.forEach(b => { b.style.opacity = '0.5'; b.style.pointerEvents = 'none'; });
   try {
+    const { data: { session: existing } } = await sbClient.auth.getSession();
+    if (existing && existing.user && existing.user.is_anonymous) {
+      await onSignedIn(existing.user);
+      return;
+    }
     const { data, error } = await sbClient.auth.signInAnonymously();
     if (error) throw error;
     // onSignedIn handles showing the app; guests load their data like anyone else,
@@ -4801,8 +4764,21 @@ async function doGuestSignIn() {
   } catch(e) {
     btns.forEach(b => { b.style.opacity = ''; b.style.pointerEvents = ''; });
     showToast(_safeErr(e) || 'Error starting guest session');
-  }
+  } finally { _guestSignInFlight = false; }
 }
+
+// Wired once at boot. All four places a person types an address get the same check - signing
+// in, signing up, asking for a reset, and converting a guest - because the typo that cost a
+// real signup could have happened at any of them.
+function _wireAllEmailHints() {
+  _wireEmailHint('signin-email','signin-email-hint');
+  _wireEmailHint('signup-email','signup-email-hint');
+  _wireEmailHint('forgot-email','forgot-email-hint');
+  _wireEmailHint('gc-email','gc-email-hint');
+}
+if (document.readyState === 'loading')
+  document.addEventListener('DOMContentLoaded', _wireAllEmailHints);
+else _wireAllEmailHints();
 
 function renderGuestBanner() {
   const banner = document.getElementById('guest-banner');
@@ -7545,15 +7521,8 @@ function renderHistory() {
       : (_listsCache.find(l => l.id === _activeListId)?.name || 'List');
     headerHTML = `<span>${filtered.length} to watch</span><span style="color:var(--muted)">${tabName}</span>`;
   }
-  // The draw belongs on the list it draws from, and only when there is something to decide
-  // between. One film is not a choice and two is barely one, so it appears at three.
-  const _canDraw = filtered.length >= 3;
-  const drawBtn = _canDraw
-    ? `<button class="draw-btn" onclick="openDraw()" title="${escapeHtml(t('draw_title'))}">${icon('shuffle',15)} <span>${escapeHtml(t('draw_btn'))}</span></button>`
-    : '';
   el.innerHTML = `
     <div class="history-header">${headerHTML}</div>
-    ${drawBtn}
     <div class="card-list">
       ${filtered.map(item => {
         const key = regMovie({ tmdbID: item.tmdbID, Title: item.title, Year: item.year, Poster: item.poster, type: item.mediaType||"movie" });
@@ -7650,76 +7619,9 @@ function _pickQualityHint(seen) {
 // And it writes NOTHING: a draw is not a commitment, so pressing it changes no data. Drawing
 // again is free, which is the point - the ritual survives a result you did not want.
 let _drawTimer = null;
-const _DRAW_SPIN_MS = 1400;
-
-function _drawPool() {
-  // Exactly what is on screen. Drawing from something the person cannot see would look broken.
-  const isWatchedTab = _activeListId === 'watched';
-  if (isWatchedTab) return watchHistory.filter(h => h.status === 'watched');
-  if (_activeListId === 'personal') return watchHistory.filter(h => h.status === 'plan' && !h.listId);
-  return watchHistory.filter(h => h.listId === _activeListId);
-}
-
-function openDraw() {
-  const pool = _drawPool();
-  if (pool.length < 2) return;
-  const ov = document.getElementById('draw-overlay');
-  if (!ov) return;
-  ov.style.display = 'flex';
-  requestAnimationFrame(() => requestAnimationFrame(() => ov.classList.add('visible')));
-  _runDraw();
-}
-
-function closeDraw() {
-  clearTimeout(_drawTimer); _drawTimer = null;
-  const ov = document.getElementById('draw-overlay');
-  if (!ov) return;
-  ov.classList.remove('visible');
-  setTimeout(() => { ov.style.display = 'none'; }, 220);
-}
-
-function _runDraw() {
-  const pool = _drawPool();
-  if (!pool.length) return;
-  const stage = document.getElementById('draw-stage');
-  const winner = pool[Math.floor(Math.random() * pool.length)];
-  const LOGO = `<img src="logo.png" alt="" width="58" height="58" style="filter:drop-shadow(0 0 22px rgba(245,197,24,0.30))">`;
-
-  // THE SPIN. Not decoration: without a moment of not-knowing, an instant answer reads as a
-  // list being filtered rather than a decision being taken. Titles flick past, then stop.
-  stage.className = 'draw-stage spinning';
-  stage.innerHTML = `
-    <div class="draw-envelope">${LOGO}</div>
-    <div class="draw-reel" id="draw-reel"></div>`;
-  const reel = document.getElementById('draw-reel');
-  const tick = () => { const t2 = pool[Math.floor(Math.random() * pool.length)];
-                       if (reel) reel.textContent = t2.title || ''; };
-  const spin = setInterval(tick, 70); tick();
-
-  clearTimeout(_drawTimer);
-  _drawTimer = setTimeout(() => {
-    clearInterval(spin);
-    const yr = winner.year ? ` (${escapeHtml(String(winner.year))})` : '';
-    // THE REVEAL, and the order is the whole effect. The phrase with its live ellipsis is
-    // already there; then the beams swing down from the corners and cross; then the brand
-    // circle blooms where they land; then the envelope lifts and the letter slides up out of
-    // it; and only then is the title printed on the paper. Every step is CSS with its own
-    // delay, so nothing here is timed in JavaScript beyond setting the class.
-    stage.innerHTML = `
-      <div class="draw-beams"><span class="draw-beam l"></span><span class="draw-beam r"></span></div>
-      <div class="draw-pool"></div>
-      <div class="draw-phrase">${escapeHtml(t('draw_phrase'))}<span class="dots"></span></div>
-      <div class="draw-envelope open">${LOGO}</div>
-      <div class="draw-letter"><div class="draw-winner">${escapeHtml(winner.title || '')}${yr}</div></div>
-      <div class="draw-actions">
-        <button class="btn-modal-primary" onclick="closeDraw();openDetail('${escapeJsAttr(String(winner.tmdbID||''))}','${escapeJsAttr(winner.mediaType||'movie')}')">${escapeHtml(t('draw_open'))}</button>
-        <button class="btn-modal-secondary" onclick="_runDraw()">${escapeHtml(t('draw_again'))}</button>
-      </div>`;
-    // Set the class on the NEXT frame, so the browser has laid the new nodes out first and the
-    // animations actually run from their start values instead of snapping to the end.
-    requestAnimationFrame(() => requestAnimationFrame(() => { stage.className = 'draw-stage reveal'; }));
-  }, _DRAW_SPIN_MS);
-}
+// Longer than it was, because there are now eighteen envelopes in flight and the scene needs
+// a beat to be looked at before it is taken away.
+const _DRAW_SPIN_MS = 1900;
 
 // ── Picks without a model ─────────────────────────────────────────────────────
 // The three Surprise Me buttons used to build a prompt and call Claude Haiku through the
@@ -10498,10 +10400,6 @@ function _renderInvThread(inv) {
 const ICONS = {
   "camera": '<path d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z" /><circle cx="12" cy="13" r="3" />',
   "check": '<path d="M20 6 9 17l-5-5" />',
-  // Same thin-stroke family as the rest of the map, drawn on the same 24x24 grid: two crossing
-  // paths with arrowheads. Added for the draw, which is the one place the app says "decide for
-  // me" and so needs a glyph of its own rather than a borrowed one.
-  "shuffle": '<path d="M2 18h1.4a4 4 0 0 0 3.3-1.8l6.6-9.4A4 4 0 0 1 16.6 5H22" /><path d="m18 2 4 3-4 3" /><path d="M2 6h1.4a4 4 0 0 1 3.3 1.8l.6.9" /><path d="M14.7 15.3l.6.9a4 4 0 0 0 3.3 1.8H22" /><path d="m18 22 4-3-4-3" />',
   "film": '<rect width="18" height="18" x="3" y="3" rx="2" /><path d="M7 3v18" /><path d="M3 7.5h4" /><path d="M3 12h18" /><path d="M3 16.5h4" /><path d="M17 3v18" /><path d="M17 7.5h4" /><path d="M17 16.5h4" />',
   "globe": '<circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /><path d="M2 12h20" />',
   "inbox": '<polyline points="22 12 16 12 14 15 10 15 8 12 2 12" /><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />',
