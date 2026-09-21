@@ -2866,7 +2866,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.72</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.73</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8703,6 +8703,13 @@ async function _searchByQuery(q) {
       const pp = new URLSearchParams(p.toString());
       pp.set('with_people', _taste.crewIds.map(c => c.id).join('|'));
       pp.delete('page');
+      // The person IS the specificity here, so the keywords come off: with_people AND three
+      // keywords AND a genre AND three hundred votes is empty almost every time, which is why
+      // this layer fired and returned nothing on every query it was tried on. The vote floor
+      // drops with it - the point of asking about somebody you already like is to reach the
+      // work of theirs you have not seen, and that is rarely the famous one.
+      pp.delete('with_keywords');
+      pp.set('vote_count.gte', '50');
       const r2 = await tmdbFetch(`/discover/movie?${pp.toString()}`);
       const mine = ((r2 && !r2.error && r2.results) || [])
         .filter(c => !_lib.ids.has(String(c.id)) && !_lib.titles.has(_lib.norm(c.title || c.name)))
