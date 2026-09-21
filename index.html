@@ -2866,7 +2866,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.70</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.71</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8408,7 +8408,7 @@ async function _tasteIndex() {
   const loved = watched.filter(e => Number(e.stars) >= _SEED_MIN_STARS);
   // Below three loved films there is nothing to read, and guessing from two would be worse
   // than admitting we do not know. The caller falls back to plain quality order.
-  if (loved.length < 3) return (_tasteCache = { thin: true, tally: new Map(), crew: new Set(), decades: {} });
+  if (loved.length < 3) return (_tasteCache = { thin: true, tally: new Map(), crew: new Set(), crewIds: [], decades: {} });
 
   let tally = new Map();
   try { tally = await _tallyFromSeeds(_pickSeeds(loved), 2); } catch (e) { /* taste is optional */ }
@@ -8424,7 +8424,19 @@ async function _tasteIndex() {
   const decades = {};
   loved.forEach(e => { const d = Math.floor(Number(e.year) / 10) * 10; if (d > 1880) decades[d] = (decades[d] || 0) + 1; });
 
-  return (_tasteCache = { thin: false, tally, crew, decades });
+  // NAMES ARE USELESS TO TMDB, IDS ARE NOT. This set was being computed and then never read
+  // by anything - the single most personal signal in the library, collected and thrown away.
+  // Resolved here, once a session, so a query can be asked of these people directly.
+  const crewIds = [];
+  for (const name of [...crew].slice(0, 4)) {
+    try {
+      const r = await tmdbFetch(`/search/person?query=${encodeURIComponent(name)}&include_adult=false`);
+      const p0 = ((r && r.results) || [])[0];
+      if (p0 && p0.id) crewIds.push({ id: p0.id, name: p0.name || name });
+    } catch (e) { /* a name that will not resolve is simply not used */ }
+  }
+
+  return (_tasteCache = { thin: false, tally, crew, crewIds, decades });
 }
 
 // Orders a candidate set that the query has already narrowed. Returns the films with a `why`
@@ -8624,11 +8636,33 @@ async function _searchByQuery(q) {
   // is simply the all-time top list wearing a mood. A mood by itself is the weakest thing this
   // engine can be told, so it earns the widest window; a movement or a decade has already done
   // the narrowing and can stay near the top of its own list.
-  const _pinned = movements.length || decade || countries.length || subjects.length || person;
-  p.set('page', String(1 + Math.floor(Math.random() * (_pinned ? 2 : 5))));
+  // Counted, not merely present. A decade ALONE is weak: "дождь токио 90х и киберпреступники"
+  // used one word of four and came back with Schindler's List, Forrest Gump and GoodFellas -
+  // the top of the nineties, which is what a rating sort over a whole decade always returns.
+  // Two constraints or more and the list is genuinely narrow; one and we should roam.
+  const _pins = (movements.length ? 1 : 0) + (decade ? 1 : 0) + (countries.length ? 1 : 0)
+              + (subjects.length ? 1 : 0) + (person ? 1 : 0);
+  p.set('page', String(1 + Math.floor(Math.random() * (_pins >= 2 ? 2 : 5))));
 
-  const res = await tmdbFetch(`/discover/movie?${p.toString()}`);
+  // AN EMPTY ANSWER IS NOT AN ANSWER, AND WE WERE GIVING TWO OF THEM IN FOUR QUERIES.
+  // "тёмное фэнтези про средневековых уличных музыкантов и бродячий цирк" became fantasy AND
+  // three music keywords AND three hundred votes, and that intersection is empty on TMDB - so
+  // a query we understood well came back with nothing, which reads as "we have no idea" rather
+  // than "you asked for something nobody filmed".
+  //
+  // So when the first attempt is empty we loosen in order of how much each constraint was
+  // actually asked for. Keywords are the most specific thing the person said, so the genre
+  // goes first; the genre is often a mood's guess anyway. Then the keywords. The date range,
+  // the country and the vote floor are never dropped: those are what they typed, plainly.
+  let res = await tmdbFetch(`/discover/movie?${p.toString()}`);
   if (res && res.error) { const e = new Error(res.error); e.tmdb = res; throw e; }
+  for (const drop of ['with_genres', 'with_keywords']) {
+    if (((res && res.results) || []).length) break;
+    if (!p.has(drop)) continue;
+    p.delete(drop);
+    res = await tmdbFetch(`/discover/movie?${p.toString()}`);
+    if (res && res.error) break;
+  }
   // Drop what they already have. Note this is NOT done for the title branch above: somebody
   // who types "Oppenheimer" is looking for that film, and hiding it because they own it would
   // be the app refusing to answer the question it was asked.
@@ -8641,8 +8675,43 @@ async function _searchByQuery(q) {
     Poster:c.poster_path ? TMDB_IMG + c.poster_path : "",
     Rating:c.vote_average ? c.vote_average.toFixed(1) : null, Genre:"", why,
   }));
-  // The words narrowed the field; taste decides the order within it.
-  return _rankByTaste(_cands, await _tasteIndex(), why);
+  // THE SAME QUESTION, ASKED OF THE PEOPLE THEY ALREADY CHOOSE.
+  //
+  // Ranking the first answer by taste was not enough and the reason is arithmetic: the taste
+  // tally knows about three hundred films and a text query is asked of TMDB's entire database,
+  // so they almost never meet. Measured on forty live results 21 Sep 2026: not one carried a
+  // personal reason. The promise on the tab says personal picks, and sorting a stranger's list
+  // is not that.
+  //
+  // So the query is asked a second time with with_people set to the directors, composers and
+  // cinematographers who recur in what they rated highly. Those results are the same request,
+  // by people they have already chosen, and they go first - with a reason that names the person
+  // rather than repeating the question back.
+  const _taste = await _tasteIndex();
+  let ranked = _rankByTaste(_cands, _taste, why);
+
+  if (_taste.crewIds && _taste.crewIds.length) {
+    try {
+      const pp = new URLSearchParams(p.toString());
+      pp.set('with_people', _taste.crewIds.map(c => c.id).join('|'));
+      pp.delete('page');
+      const r2 = await tmdbFetch(`/discover/movie?${pp.toString()}`);
+      const mine = ((r2 && !r2.error && r2.results) || [])
+        .filter(c => !_lib.ids.has(String(c.id)) && !_lib.titles.has(_lib.norm(c.title || c.name)))
+        .slice(0, 4)
+        .map(c => ({
+          id: c.id, tmdbID: String(c.id), type: 'movie',
+          Title: c.title || c.name, Year: (c.release_date || '').slice(0, 4),
+          Poster: c.poster_path ? TMDB_IMG + c.poster_path : '',
+          Rating: c.vote_average ? c.vote_average.toFixed(1) : null, Genre: '',
+          why: t('why_person').replace('{name}', _taste.crewIds[0].name),
+        }));
+      // In front, and never duplicated further down.
+      const seen = new Set(mine.map(m => String(m.id)));
+      ranked = [...mine, ...ranked.filter(m => !seen.has(String(m.id)))];
+    } catch (e) { /* personal layer is a bonus, never a blocker */ }
+  }
+  return ranked;
 }
 
 async function loadRecs() {
