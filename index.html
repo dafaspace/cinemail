@@ -2866,7 +2866,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.75</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.76</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8225,6 +8225,101 @@ const _MOVEMENTS = [
   { c:'KR', y:[1996,2015], t:'корейскаяноваяволна koreannewwave' },
   { c:'', y:[1995,2025], t:'медленноекино созерцательноекино slowcinema contemplativecinema' },
 ];
+// ── МОРФОЛОГИЯ ВМЕСТО МОИХ ДОГАДОК О НЕЙ ────────────────────────────────────
+// Snowball-стеммер для русского, он же алгоритм Портера. Здесь он потому, что каждая
+// строчка вида "тих тихи тихо" в таблицах ниже была моей догадкой об окончаниях, и каждая
+// из них однажды оказалась неполной: "тихой" не доставало до slow, "любви" до love,
+// "медитативные" до медитации. Это давно решённая задача, и решена она правилами языка,
+// а не перечислением форм.
+//
+// Стеммер приводит к одной основе И слово из запроса, И термин из таблицы, поэтому таблицы
+// можно писать обычными словами. Старое совпадение по приставке остаётся рядом: они ловят
+// разное, и вместе покрывают больше, чем каждое по отдельности.
+//
+// Чего он НЕ делает, и это свойство алгоритма, а не недоделка: беглая гласная. "Подросток"
+// и "подростки" дают разные основы, потому что "о" в косвенных падежах исчезает. Такие
+// слова по-прежнему нужны в таблице обеими формами.
+const _SV = 'аеиоуыэюя';
+function _svRegions(w) {
+  let i = 0;
+  while (i < w.length && _SV.indexOf(w[i]) < 0) i++;
+  const rv = i + 1 < w.length ? i + 1 : w.length;
+  let r1 = w.length;
+  for (let j = 1; j < w.length; j++)
+    if (_SV.indexOf(w[j]) < 0 && _SV.indexOf(w[j - 1]) >= 0) { r1 = j + 1; break; }
+  let r2 = w.length;
+  for (let j = r1 + 1; j < w.length; j++)
+    if (_SV.indexOf(w[j]) < 0 && _SV.indexOf(w[j - 1]) >= 0) { r2 = j + 1; break; }
+  return { rv, r2 };
+}
+const _SW = {
+  perf1: ['вшись','вши','в'],
+  perf2: ['ившись','ывшись','ивши','ывши','ив','ыв'],
+  adj:   ['ими','ыми','его','ого','ему','ому','ее','ие','ые','ое','ей','ий','ый','ой',
+          'ем','им','ым','ом','их','ых','ую','юю','ая','яя','ою','ею'],
+  part1: ['ем','нн','вш','ющ','щ'],
+  part2: ['ивш','ывш','уют','ующ','ем','нн','вш','ющ','щ'],
+  refl:  ['ся','сь'],
+  verb1: ['ла','на','ете','йте','ли','й','л','ем','н','ло','но','ет','ют','ны','ть','ешь','нно'],
+  verb2: ['ила','ыла','ена','ейте','уйте','ите','или','ыли','ей','уй','ил','ыл','им','ым','ен',
+          'ило','ыло','ено','ят','ует','уют','ит','ыт','ены','ить','ыть','ишь','ую','ю'],
+  noun:  ['а','ев','ов','ие','ье','е','иями','ями','ами','еи','ии','и','ией','ей','ой','ий','й',
+          'иям','ям','ием','ем','ам','ом','о','у','ах','иях','ях','ы','ь','ию','ью','ю','ия','ья','я'],
+  der:   ['ост','ость'],
+  sup:   ['ейш','ейше'],
+};
+function _svCut(w, list, region, needAY) {
+  for (const e of list.slice().sort((a, b) => b.length - a.length)) {
+    if (w.length - e.length < region || !w.endsWith(e)) continue;
+    if (needAY) { const c = w[w.length - e.length - 1]; if (c !== 'а' && c !== 'я') continue; }
+    return w.slice(0, w.length - e.length);
+  }
+  return null;
+}
+function _stemRu(word) {
+  let w = String(word || '').toLowerCase().replace(/ё/g, 'е');
+  if (w.length < 3 || !/[а-я]/.test(w)) return w;
+  const { rv, r2 } = _svRegions(w);
+  let s = _svCut(w, _SW.perf1, rv, true) || _svCut(w, _SW.perf2, rv, false);
+  if (s !== null) w = s;
+  else {
+    const r = _svCut(w, _SW.refl, rv, false); if (r !== null) w = r;
+    s = _svCut(w, _SW.adj, rv, false);
+    if (s !== null) {
+      w = s;
+      const pt = _svCut(w, _SW.part1, rv, true) || _svCut(w, _SW.part2, rv, false);
+      if (pt !== null) w = pt;
+    } else {
+      s = _svCut(w, _SW.verb1, rv, true) || _svCut(w, _SW.verb2, rv, false);
+      if (s !== null) w = s;
+      else { s = _svCut(w, _SW.noun, rv, false); if (s !== null) w = s; }
+    }
+  }
+  if (w.length - 1 >= rv && w.endsWith('и')) w = w.slice(0, -1);
+  const d = _svCut(w, _SW.der, r2, false); if (d !== null) w = d;
+  if (w.endsWith('нн')) w = w.slice(0, -1);
+  else {
+    const su = _svCut(w, _SW.sup, rv, false);
+    if (su !== null) { w = su; if (w.endsWith('нн')) w = w.slice(0, -1); }
+    else if (w.length - 1 >= rv && w.endsWith('ь')) w = w.slice(0, -1);
+  }
+  return w;
+}
+// Английский и остальные латинские: плоскостная нормализация окончаний. Полный Porter2 здесь
+// не нужен - таблицы уже написаны базовыми формами, а запросы приходят в единственном или
+// множественном числе.
+function _stemLat(word) {
+  let w = String(word || '').toLowerCase();
+  if (w.length < 4) return w;
+  for (const e of ['ies', 'ing', 'ed', 'es', 's']) {
+    if (w.length - e.length >= 3 && w.endsWith(e)) {
+      return e === 'ies' ? w.slice(0, -3) + 'y' : w.slice(0, w.length - e.length);
+    }
+  }
+  return w;
+}
+function _stem(word) { return /[а-яё]/i.test(word) ? _stemRu(word) : _stemLat(word); }
+
 const _qNorm = s => String(s||"").toLowerCase().replace(/[ё]/g,'е').replace(/[^\p{L}\p{N} ]/gu,' ').replace(/\s+/g,' ').trim();
 
 // Strip the mood words out and hand back what is left, which is the subject.
@@ -8351,7 +8446,13 @@ function _splitQuery(q) {
     const stems = row.terms.split(' ').filter(s => s.length > 2);
     let found = false;
     words.forEach(w => {
-      if (stems.some(s => s.length >= 4 ? w.startsWith(s) : w === s)) { matchedWords.add(w); found = true; }
+      const ws = _stem(w);
+      // Две мерки, и они ловят разное. Стеммер сводит формы ОДНОГО слова: тихой и тихий,
+      // любви и любовь, коты и кошки. Приставка перекрывает границу между частями речи,
+      // где стеммер бессилен: фантастика и фантастические расходятся по правилам языка,
+      // но обе начинаются с "фантаст".
+      if (stems.some(st => (st.length >= 4 && w.startsWith(st)) || (st.length < 4 && w === st)
+                        || ws === _stem(st))) { matchedWords.add(w); found = true; }
     });
     return found;
   });
