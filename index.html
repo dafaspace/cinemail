@@ -2866,7 +2866,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.67</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.69</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8060,87 +8060,87 @@ const _SUBJECT_FILMS = {
 };
 
 const _SUBJECTS = [
-  { k:'cat',          terms:'кошк коти котик кот коты кіт кішк katze chat gato gatt კატ' },
-  { k:'dog',          terms:'собак пес псы собач щено hund chien perro cane ძაღლ' },
-  { k:'horse',        terms:'лошад конь кон pferd cheval caballo cavallo ცხენ' },
+  { k:'cat',          terms:'кошк коти котик кот коты кіт кішк katze chat gato gatt კატ cat cats' },
+  { k:'dog',          terms:'собак пес псы собач щено hund chien perro cane ძაღლ dog dogs' },
+  { k:'horse',        terms:'лошад конь кон pferd cheval caballo cavallo ცხენ horse' },
   { k:'wolf',         terms:'волк вовк wolf loup lobo lupo მგელ' },
-  { k:'bear',         terms:'медвед ведмід baer bär ours oso orso' },
-  { k:'shark',        terms:'акул hai requin tiburon squalo' },
+  { k:'bear',         terms:'медвед ведмід baer bär ours oso orso bear' },
+  { k:'shark',        terms:'акул hai requin tiburon squalo shark' },
   { k:'dinosaur',     terms:'динозавр dinosaur dinosaurier dinosaure dinosaurio' },
-  { k:'bird',         terms:'птиц птах vogel oiseau pajaro uccell ფრინველ' },
-  { k:'space',        terms:'космос космич weltraum espace espacio spazio კოსმ' },
-  { k:'alien',        terms:'инопланет пришелец ausserirdisch außerirdisch extraterrestre alieno' },
-  { k:'robot',        terms:'робот roboter' },
-  { k:'time travel',  terms:'путешествиевовремени времени zeitreise voyagedanstemps' },
+  { k:'bird',         terms:'птиц птах vogel oiseau pajaro uccell ფრინველ bird' },
+  { k:'space',        terms:'космос космич weltraum espace espacio spazio კოსმ space' },
+  { k:'alien',        terms:'инопланет пришелец ausserirdisch außerirdisch extraterrestre alieno alien' },
+  { k:'robot',        terms:'робот roboter robot' },
+  { k:'time travel',  terms:'путешествиевовремени времени zeitreise voyagedanstemps time travel' },
   { k:'vampire',      terms:'вампир vampir vampire vampiro' },
   { k:'zombie',       terms:'зомби zombi' },
-  { k:'ghost',        terms:'привид призрак дух духи привиден geist fantome fantôme fantasma' },
-  { k:'witch',        terms:'ведьм відьм hexe sorciere sorcière bruja strega' },
+  { k:'ghost',        terms:'привид призрак дух духи привиден geist fantome fantôme fantasma ghost' },
+  { k:'witch',        terms:'ведьм відьм hexe sorciere sorcière bruja strega witch' },
   { k:'dragon',       terms:'дракон drache dragon drago' },
-  { k:'monster',      terms:'монстр чудовищ ungeheuer monstre monstruo mostro' },
-  { k:'superhero',    terms:'супергеро superheld superheros superheroe supereroe' },
-  { k:'school',       terms:'школ шкіл schule ecole école escuela scuola სკოლ' },
+  { k:'monster',      terms:'монстр чудовищ ungeheuer monstre monstruo mostro monster' },
+  { k:'superhero',    terms:'супергеро superheld superheros superheroe supereroe superhero' },
+  { k:'school',       terms:'школ шкіл schule ecole école escuela scuola სკოლ school' },
   { k:'prison',       terms:'тюрьм вязниц gefangnis gefängnis prison carcel prigione' },
   { k:'hospital',     terms:'больниц лікарн krankenhaus hopital hôpital hospital ospedale' },
   { k:'train',        terms:'поезд потяг zug train tren treno მატარებ' },
-  { k:'ship',         terms:'корабл судн schiff navire barco nave გემ' },
+  { k:'ship',         terms:'корабл судн schiff navire barco nave გემ ship' },
   { k:'island',       terms:'остров острів insel ile île isla isola კუნძულ' },
   { k:'desert',       terms:'пустын wuste wüste desert desierto deserto' },
-  { k:'mountain',     terms:'гора горы горн berg montagne montana montagna მთა' },
-  { k:'forest',       terms:'лес леса лесу лесн ліс лісов wald foret forêt bosque foresta ტყე' },
-  { k:'sea',          terms:'море морск meer mer mare океан mare ზღვა' },
-  { k:'road trip',    terms:'дорог путешеств road reise voyage viaje viaggio' },
-  { k:'city',         terms:'город мегаполис урбан stadt ville ciudad citta city' },
+  { k:'mountain',     terms:'гора горы горн berg montagne montana montagna მთა mountain' },
+  { k:'forest',       terms:'лес леса лесу лесн ліс лісов wald foret forêt bosque foresta ტყე forest' },
+  { k:'sea',          terms:'море морск meer mer mare океан mare ზღვა sea seas' },
+  { k:'road trip',    terms:'дорог путешеств road reise voyage viaje viaggio trip' },
+  { k:'city',         terms:'город мегаполис урбан stadt ville ciudad citta city cities' },
   { k:'village',      terms:'деревн село dorf village pueblo paese სოფელ' },
-  { k:'war',          terms:'военн войн війн воен krieg guerre guerra ომი' },
-  { k:'love',         terms:'любов любв кохан liebe amour amor amore სიყვარულ' },
-  { k:'friendship',   terms:'дружб freundschaft amitie amitié amistad amicizia მეგობრ' },
-  { k:'family',       terms:'семь семей сім familie famille familia famiglia ოჯახ' },
-  { k:'revenge',      terms:'мест помст rache vengeance venganza vendetta' },
-  { k:'survival',     terms:'выживан виживан uberleben überleben survie supervivencia sopravvivenza' },
-  { k:'heist',        terms:'ограблен пограбуван raub braquage atraco rapina' },
-  { k:'spy',          terms:'шпион шпигун spion espion espia spia' },
+  { k:'war',          terms:'военн войн війн воен krieg guerre guerra ომი war wars' },
+  { k:'love',         terms:'любов любв кохан liebe amour amor amore სიყვარულ love' },
+  { k:'friendship',   terms:'дружб freundschaft amitie amitié amistad amicizia მეგობრ friendship' },
+  { k:'family',       terms:'семь семей сім familie famille familia famiglia ოჯახ family' },
+  { k:'revenge',      terms:'мест помст rache vengeance venganza vendetta revenge' },
+  { k:'survival',     terms:'выживан виживан uberleben überleben survie supervivencia sopravvivenza survival' },
+  { k:'heist',        terms:'ограблен пограбуван raub braquage atraco rapina heist' },
+  { k:'spy',          terms:'шпион шпигун spion espion espia spia spy spies' },
   { k:'mafia',        terms:'мафи гангстер mafia gangster' },
-  { k:'serial killer',terms:'маньяк серийн serienmorder serienmörder tueur asesinoserie' },
-  { k:'boxing',       terms:'бокс boxen boxe boxeo pugilato' },
+  { k:'serial killer',terms:'маньяк серийн serienmorder serienmörder tueur asesinoserie serial killer' },
+  { k:'boxing',       terms:'бокс boxen boxe boxeo pugilato boxing' },
   { k:'football',     terms:'футбол fussball fußball football futbol calcio' },
-  { k:'chess',        terms:'шахмат шахи schach echecs échecs ajedrez scacchi' },
-  { k:'music',        terms:'музык музик musik musique musica მუსიკ' },
-  { k:'rock band',    terms:'группа рокгруп band groupe banda' },
-  { k:'painter',      terms:'художник маляр maler peintre pintor pittore მხატვ' },
-  { k:'writer',       terms:'писател письмен schriftsteller ecrivain écrivain escritor scrittore მწერალ' },
-  { k:'dance',        terms:'танц tanz danse baile danza ცეკვ' },
+  { k:'chess',        terms:'шахмат шахи schach echecs échecs ajedrez scacchi chess' },
+  { k:'music',        terms:'музык музик musik musique musica მუსიკ music' },
+  { k:'rock band',    terms:'группа рокгруп band groupe banda rock' },
+  { k:'painter',      terms:'художник маляр maler peintre pintor pittore მხატვ painter' },
+  { k:'writer',       terms:'писател письмен schriftsteller ecrivain écrivain escritor scrittore მწერალ writer' },
+  { k:'dance',        terms:'танц tanz danse baile danza ცეკვ dance' },
   { k:'theatre',      terms:'театр theater theatre théâtre teatro' },
-  { k:'doctor',       terms:'врач лікар arzt medecin médecin medico ექიმ' },
-  { k:'teacher',      terms:'учител вчител lehrer professeur maestro insegnante მასწავლ' },
+  { k:'doctor',       terms:'врач лікар arzt medecin médecin medico ექიმ doctor' },
+  { k:'teacher',      terms:'учител вчител lehrer professeur maestro insegnante მასწავლ teacher' },
   { k:'journalist',   terms:'журналист journalist journaliste periodista giornalista' },
-  { k:'lawyer',       terms:'адвокат юрист anwalt avocat abogado avvocato' },
+  { k:'lawyer',       terms:'адвокат юрист anwalt avocat abogado avvocato lawyer' },
   { k:'police',       terms:'полиц міліц полицейск polizei police policia polizia პოლიც' },
-  { k:'soldier',      terms:'солдат soldat soldado soldato ჯარისკაც' },
-  { k:'chef',         terms:'повар кухн koch cuisinier cocinero cuoco' },
+  { k:'soldier',      terms:'солдат soldat soldado soldato ჯარისკაც soldier' },
+  { k:'chef',         terms:'повар кухн koch cuisinier cocinero cuoco chef' },
   { k:'pilot',        terms:'пилот лётчик летчик pilot pilote piloto' },
-  { k:'childhood',    terms:'детств дитинств kindheit enfance infancia infanzia ბავშვ' },
-  { k:'old age',      terms:'старост пожил alter vieillesse vejez vecchiaia' },
-  { k:'death',        terms:'смерт tod mort muerte morte სიკვდილ' },
-  { k:'illness',      terms:'болезн хвороб krankheit maladie enfermedad malattia' },
-  { k:'addiction',    terms:'наркот зависим sucht drogue droga' },
+  { k:'childhood',    terms:'детств дитинств kindheit enfance infancia infanzia ბავშვ childhood' },
+  { k:'old age',      terms:'старост пожил alter vieillesse vejez vecchiaia old olds age ages' },
+  { k:'death',        terms:'смерт tod mort muerte morte სიკვდილ death' },
+  { k:'illness',      terms:'болезн хвороб krankheit maladie enfermedad malattia illness' },
+  { k:'addiction',    terms:'наркот зависим sucht drogue droga addiction' },
   { k:'immigration',  terms:'эмигра иммигра emigra einwander immigration inmigra immigra' },
-  { k:'cooking',      terms:'кулинар готовк приготовлен повар еда еды кухн кухня kochen cuisine cocina cucina food' },
+  { k:'cooking',      terms:'кулинар готовк приготовлен повар еда еды кухн кухня kochen cuisine cocina cucina food cooking' },
   { k:'teenager',     terms:'подрост тинейдж юност старшеклассник teenager jugendlich adolescent adolescente' },
-  { k:'lighthouse',   terms:'маяк leuchtturm phare faro' },
-  { k:'scientist',    terms:'учён ученый научн лаборатор эксперимент wissenschaftler scientifique cientifico scienziato' },
-  { k:'bureaucracy',  terms:'бюрократ чиновник канцеляр burokratie bürokratie bureaucratie burocracia burocrazia' },
+  { k:'lighthouse',   terms:'маяк leuchtturm phare faro lighthouse' },
+  { k:'scientist',    terms:'учён ученый научн лаборатор эксперимент wissenschaftler scientifique cientifico scienziato scientist' },
+  { k:'bureaucracy',  terms:'бюрократ чиновник канцеляр burokratie bürokratie bureaucratie burocracia burocrazia bureaucracy bureaucracies' },
   { k:'jazz',         terms:'джаз jazz' },
-  { k:'loneliness',   terms:'одиночеств einsamkeit solitude soledad solitudine' },
-  { k:'dream',        terms:'сновиден сюрреалист абсурдист traum reve rêve sueno sogno surreal' },
+  { k:'loneliness',   terms:'одиночеств одинок lonel einsamkeit solitude soledad solitudine loneliness' },
+  { k:'dream',        terms:'сновиден сюрреалист абсурдист traum reve rêve sueno sogno surreal dream' },
   { k:'skateboarding',terms:'скейт skateboard' },
-  { k:'artist',       terms:'художествен искусств творчеств kunst artiste arte' },
-  { k:'silent film',  terms:'безмолвн бездиалог безсловес silentfilm' },
-  { k:'road movie',   terms:'роудмуви roadmovie' },
-  { k:'christmas',    terms:'рождеств різдв weihnacht noel noël navidad natale' },
-  { k:'wedding',      terms:'свадьб весілл hochzeit mariage boda matrimonio ქორწ' },
+  { k:'artist',       terms:'художествен искусств творчеств kunst artiste arte artist' },
+  { k:'silent film',  terms:'безмолвн бездиалог безсловес silentfilm silent film' },
+  { k:'road movie',   terms:'роудмуви roadmovie road movie' },
+  { k:'christmas',    terms:'рождеств різдв weihnacht noel noël navidad natale christmas' },
+  { k:'wedding',      terms:'свадьб весілл hochzeit mariage boda matrimonio ქორწ wedding' },
   { k:'winter',       terms:'зим зимн winter hiver invierno inverno ზამთარ' },
-  { k:'snow',         terms:'снег снег schnee neige nieve neve თოვლ' },
+  { k:'snow',         terms:'снег снег schnee neige nieve neve თოვლ snow' },
 ];
 // MOVEMENTS, SCHOOLS AND ERAS. Each is a country, a stretch of years, and sometimes a handful
 // of people - which is to say each is an exact query, not an approximation. "Французская новая
@@ -8290,8 +8290,8 @@ function _decadeFrom(flatQ, rawQ) {
 
 const _QSTOP = ('про про about with films film movie movies кино фильм кинo о об на и с а но ' +
   'который котор которые которая которое которых что чтобы как это тот та те такой ' +
-  'настроен настроени mood mit und der die das ein eine ' +
-  'de la le les des du un une et avec sur pour ' +
+  'настроен настроени года году годов year years jahr annee anno mood mit und der die das ein eine ' +
+  'the of from de la le les des du un une et avec sur pour ' +
   'el los las con y e por sobre para pelicula peliculas ' +
   'di il lo gli un una su per film sul ' +
   'та і з на що який яка які').split(' ').filter(Boolean);
@@ -8349,6 +8349,17 @@ function _splitQuery(q) {
   const subjects = hit(_SUBJECTS);
   const countries = hit(_COUNTRIES);
   const decade = _decadeFrom(flat, q);
+  // A decade word has done its job and must not go on to the keyword search as if it were a
+  // subject: "японский хоррор восьмидесятых" left "восьмидесятых" in the remainder, which then
+  // went to TMDB's English-only keyword index and coloured the "why" with a word nobody asked
+  // to see there.
+  if (decade) {
+    const dRow = _DECADES.find(d => d.y === decade);
+    (dRow ? dRow.t.split(' ') : []).forEach(term => {
+      words.forEach(w => { if (term && (w === term || w.startsWith(term))) matchedWords.add(w); });
+    });
+    words.forEach(w => { if (/^(19|20)?\d0(х|е|ых|ые|s|er|ern|ies)?$/i.test(w) || /^(19|20)\d\d$/.test(w)) matchedWords.add(w); });
+  }
   let rest = words.filter(w => !matchedWords.has(w)).join(' ');
   rest = rest.split(' ').filter(w => w.length > 2).join(' ').trim();
   return { movements, moods, genres, subjects, countries, decade, subject: rest };
