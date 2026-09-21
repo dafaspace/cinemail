@@ -2866,7 +2866,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.74</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.75</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8238,15 +8238,15 @@ const _qNorm = s => String(s||"").toLowerCase().replace(/[ё]/g,'е').replace(/[
 // for it constantly, so it gets its own table rather than waiting for someone to say
 // "nouvelle vague".
 const _COUNTRIES = [
-  { c:'FR', terms:'франци france paris париж французск францз french francais française francese franzosisch französisch frances' },
-  { c:'IT', terms:'итали italy rome рим итальянск italian italiano italien italienisch' },
-  { c:'JP', terms:'япони japan tokyo токио японск japanese japonais giapponese japanisch japones' },
+  { c:'FR', terms:'марсел marseille канн cannes франци france paris париж французск францз french francais française francese franzosisch französisch frances' },
+  { c:'IT', terms:'венеци venice неапол naples итали italy rome рим итальянск italian italiano italien italienisch' },
+  { c:'JP', terms:'киото kyoto осак osaka япони japan tokyo токио японск japanese japonais giapponese japanisch japones' },
   { c:'KR', terms:'коре korea seoul сеул корейск korean coreen coreano koreanisch' },
   { c:'CN,HK,TW', terms:'кита china hongkong гонконг китайск гонконгск chinese hongkong cinese chinois chinesisch' },
-  { c:'DE', terms:'германи germany berlin берлин немецк германск german deutsch allemand tedesco aleman' },
-  { c:'ES', terms:'испани spain madrid мадрид испанск spanish espanol español espagnol spagnolo spanisch' },
-  { c:'GB', terms:'англи britain england london лондон британск английск british english britannique britannico britisch' },
-  { c:'US', terms:'америк usa hollywood голливуд newyork ньюйорк американск american americain americano amerikanisch' },
+  { c:'DE', terms:'мюнхен munich германи germany berlin берлин немецк германск german deutsch allemand tedesco aleman' },
+  { c:'ES', terms:'барселон barcelona испани spain madrid мадрид испанск spanish espanol español espagnol spagnolo spanisch' },
+  { c:'GB', terms:'эдинбург edinburgh англи britain england london лондон британск английск british english britannique britannico britisch' },
+  { c:'US', terms:'лосандж losangeles чикаго chicago америк usa hollywood голливуд newyork ньюйорк американск american americain americano amerikanisch' },
   { c:'SU,RU', terms:'росси ссср russia moscow москв советск русск российск soviet russian russe russo russisch sowjetisch' },
   { c:'IN', terms:'инди india индийск болливуд indian bollywood indien indiano indisch' },
   { c:'IR', terms:'иран iran tehran тегеран иранск персидск iranian persian iranien iraniano iranisch' },
@@ -8405,18 +8405,90 @@ function _toLatin(str) {
   return /[a-z]/.test(out) ? out : '';
 }
 
+// NAMES THAT DO NOT TRANSLITERATE BACK. Russian writes foreign names by ear, so the spelling
+// cannot be recovered by rule: "вуди" gives vudi and never woody, "хичкок" gives hichkok and
+// never hitchcock. Measured 21 Sep 2026 - both came back with nothing, and "триллер, хичкок"
+// returned a generic list of thrillers as though no name had been typed.
+//
+// Same answer as the cat films: a table. Forty names covers most of what somebody actually
+// types, it is checked before the transliteration guess, and adding to it is one line.
+const _NAME_ALIASES = {
+  хичкок:'hitchcock', вудиаллен:'woody allen', аллен:'woody allen', скорсезе:'scorsese',
+  кубрик:'kubrick', спилберг:'spielberg', линч:'david lynch', финчер:'fincher',
+  нолан:'nolan', тарантино:'tarantino', коэн:'coen', джармуш:'jarmusch',
+  андерсон:'wes anderson', иньярриту:'inarritu', кэмерон:'cameron', скотт:'ridley scott',
+  бертон:'tim burton', полански:'polanski', формана:'forman', форман:'forman',
+  феллини:'fellini', антониони:'antonioni', висконти:'visconti', пазолини:'pasolini',
+  бертолуччи:'bertolucci', соррентино:'sorrentino', ларс:'lars von trier', триер:'lars von trier',
+  бергман:'ingmar bergman', дрейер:'dreyer', ханеке:'haneke', альмодовар:'almodovar',
+  годар:'godard', трюффо:'truffaut', брессон:'bresson', мельвиль:'melville',
+  варда:'agnes varda', рене:'alain resnais', куросава:'kurosawa', одзу:'ozu',
+  мидзогути:'mizoguchi', китано:'kitano', миядзаки:'miyazaki', корээда:'kore-eda',
+  пакчанук:'park chan-wook', пончжунхо:'bong joon-ho', вонгкарвай:'wong kar-wai',
+  тарковский:'tarkovsky', тарковского:'tarkovsky', параджанов:'parajanov',
+  звягинцев:'zvyagintsev', балабанов:'balabanov', сокуров:'sokurov', герман:'aleksei german',
+  иоселиани:'iosseliani', данелия:'daneliya', рязанов:'ryazanov', гайдай:'gaidai',
+  стрип:'meryl streep', депп:'johnny depp', дикаприо:'dicaprio', скорсезе2:'scorsese',
+  олдман:'gary oldman', бланшет:'cate blanchett', суинтон:'tilda swinton',
+  зиммер:'hans zimmer', мориконе:'morricone', десплат:'desplat', гринвуд:'jonny greenwood',
+  дойл:'christopher doyle', дикинс:'roger deakins', любецки:'lubezki',
+};
+function _aliasFor(q) {
+  const flat = String(q || '').toLowerCase().replace(/[^\p{L}]/gu, '');
+  if (_NAME_ALIASES[flat]) return _NAME_ALIASES[flat];
+  // Одно слово из двух тоже бывает именем: "фильмы Тарковского", "музыка Зиммера".
+  for (const w of String(q || '').toLowerCase().split(/\s+/)) {
+    const k = w.replace(/[^\p{L}]/gu, '');
+    if (k.length > 3 && _NAME_ALIASES[k]) return _NAME_ALIASES[k];
+  }
+  return '';
+}
+
+// A NAME BURIED IN A LONGER SENTENCE. The old version gave up whenever the remainder ran to
+// more than three words, so "хавьер, вуди аллен, барселона" never asked about Woody Allen at
+// all and came back with nothing. Names arrive inside sentences; that is where people put them.
+// Windows of three words then two, left to right, and the first real person wins.
 async function _personId(subject) {
-  if (!subject || subject.split(' ').length > 3) return null;
-  const tries = [subject];
-  const lat = _toLatin(subject);
-  if (lat && lat !== subject.toLowerCase()) tries.push(lat);
-  for (const q of tries) {
+  const words = String(subject || '').split(' ').filter(Boolean);
+  if (!words.length) return null;
+  const windows = [];
+  if (words.length <= 3) windows.push(words.join(' '));
+  for (const size of [3, 2]) {
+    if (words.length < size) continue;
+    for (let i = 0; i + size <= words.length; i++) windows.push(words.slice(i, i + size).join(' '));
+  }
+  if (words.length === 1) windows.push(words[0]);
+
+  const seen = new Set();
+  for (const w of windows) {
+    if (seen.has(w) || w.length < 4) continue;
+    seen.add(w);
+    const hit = await _personLookup(w);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+// THE MOST POPULAR MATCH, NOT THE FIRST ONE. "Тарантино" transliterated to "tarantino" and
+// came back as Bianca Belle, because the first row of TMDB's answer is not its best row and
+// popularity > 1 is a floor almost anybody clears. A transliteration is a guess to begin with,
+// so it has to clear a higher bar than a name that matched as typed.
+async function _personLookup(q) {
+  // Алиас идёт перед догадкой: он точный, а транслитерация - приблизительная.
+  const tries = [[q, 1]];
+  const alias = _aliasFor(q);
+  if (alias) tries.push([alias, 1]);
+  const lat = _toLatin(q);
+  if (lat && lat !== q.toLowerCase()) tries.push([lat, 5]);
+  for (const [term, floor] of tries) {
     let res;
-    try { res = await tmdbFetch(`/search/person?query=${encodeURIComponent(q)}&include_adult=false`); }
+    try { res = await tmdbFetch(`/search/person?query=${encodeURIComponent(term)}&include_adult=false`); }
     catch (e) { return null; }
     if (res && res.error) return null;
-    const hit = ((res && res.results) || [])[0];
-    if (hit && hit.popularity > 1) return { id: hit.id, name: hit.name };
+    const best = ((res && res.results) || [])
+      .slice(0, 5)
+      .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))[0];
+    if (best && (best.popularity || 0) > floor) return { id: best.id, name: best.name };
   }
   return null;
 }
