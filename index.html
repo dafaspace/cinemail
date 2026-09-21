@@ -2866,7 +2866,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.76</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.77</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8506,6 +8506,30 @@ function _toLatin(str) {
   return /[a-z]/.test(out) ? out : '';
 }
 
+// Карта имён, собранная из Wikidata, а не написанная мной. Лежит рядом с приложением,
+// тянется один раз и оседает в localStorage - в service worker её нет намеренно: без неё
+// приложение работает, и задерживать из-за неё старт незачем.
+//
+// Порядок обращения в _aliasFor: сначала карта (она выведена из данных), потом моя таблица
+// на семьдесят позиций (заплатка для того, чего в карте нет), потом транслитерация (догадка).
+let _nameMap = null, _nameMapTried = false;
+const _NAME_MAP_KEY = 'cm_namemap_v1';
+async function _loadNameMap() {
+  if (_nameMap || _nameMapTried) return _nameMap;
+  _nameMapTried = true;
+  try {
+    const cached = localStorage.getItem(_NAME_MAP_KEY);
+    if (cached) { _nameMap = JSON.parse(cached); return _nameMap; }
+  } catch (e) { /* приватное окно или очищенное хранилище - просто тянем заново */ }
+  try {
+    const r = await fetch('./name-map.json', { cache: 'force-cache' });
+    if (!r.ok) return null;
+    _nameMap = await r.json();
+    try { localStorage.setItem(_NAME_MAP_KEY, JSON.stringify(_nameMap)); } catch (e) {}
+    return _nameMap;
+  } catch (e) { return null; }
+}
+
 // NAMES THAT DO NOT TRANSLITERATE BACK. Russian writes foreign names by ear, so the spelling
 // cannot be recovered by rule: "вуди" gives vudi and never woody, "хичкок" gives hichkok and
 // never hitchcock. Measured 21 Sep 2026 - both came back with nothing, and "триллер, хичкок"
@@ -8545,6 +8569,28 @@ function _aliasFor(q) {
   return '';
 }
 
+// Карта отвечает СРАЗУ идентификатором - искать по имени уже не нужно, и это лучше алиаса:
+// алиас даёт строку, которую TMDB ещё предстоит понять, а здесь понимать нечего.
+function _idFromNameMap(q) {
+  if (!_nameMap) return 0;
+  const norm = x => String(x || '').toLowerCase().normalize('NFD')
+    .replace(/\p{M}/gu, '').replace(/[^\p{L}\p{N}]/gu, '');
+  const whole = norm(q);
+  if (_nameMap[whole]) return _nameMap[whole];
+  const words = String(q || '').split(/\s+/).filter(Boolean);
+  // Фамилия отдельным словом: "фильмы Тарковского", "музыка Зиммера".
+  for (const w of words) {
+    const k = norm(w);
+    if (k.length > 3 && _nameMap[k]) return _nameMap[k];
+  }
+  // И пары соседних слов: "вуди аллен" внутри длинной фразы.
+  for (let i = 0; i + 1 < words.length; i++) {
+    const k = norm(words[i] + words[i + 1]);
+    if (_nameMap[k]) return _nameMap[k];
+  }
+  return 0;
+}
+
 // A NAME BURIED IN A LONGER SENTENCE. The old version gave up whenever the remainder ran to
 // more than three words, so "хавьер, вуди аллен, барселона" never asked about Woody Allen at
 // all and came back with nothing. Names arrive inside sentences; that is where people put them.
@@ -8575,6 +8621,15 @@ async function _personId(subject) {
 // popularity > 1 is a floor almost anybody clears. A transliteration is a guess to begin with,
 // so it has to clear a higher bar than a name that matched as typed.
 async function _personLookup(q) {
+  // Карта первой: она отвечает идентификатором, а не строкой для поиска.
+  await _loadNameMap();
+  const mapped = _idFromNameMap(q);
+  if (mapped) {
+    try {
+      const r = await tmdbFetch(`/person/${mapped}?language=${_tmdbLang()}`);
+      if (r && !r.error && r.name) return { id: r.id, name: r.name };
+    } catch (e) { /* карта могла устареть - падаем в обычный поиск */ }
+  }
   // Алиас идёт перед догадкой: он точный, а транслитерация - приблизительная.
   const tries = [[q, 1]];
   const alias = _aliasFor(q);
