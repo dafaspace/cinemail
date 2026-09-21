@@ -2866,7 +2866,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.71</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.72</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -7992,7 +7992,7 @@ const _GENRE_WORDS = [
   { g:'9648',  terms:'mystery detective детектив загадк krimi giallo policier misterio დეტექტ' },
   { g:'878',   terms:'scifi science fiction фантаст sci scifi sciencefiction fantascienza fantascience ფანტასტ' },
   { g:'14',    terms:'fantasy фэнтези фентези fantasie fantasia fantaisie' },
-  { g:'16',    terms:'animation anime cartoon анимаци мультфильм мультик мультиплика zeichentrick animazione animacion ანიმაც' },
+  { g:'16',    terms:'animation anime cartoon аниме анимаци мультфильм мультик мультиплика zeichentrick animazione animacion ანიმაც' },
   { g:'99',    terms:'documentary докуметал документал докуфильм dokumentarfilm documentario documentaire documental' },
   { g:'18',    terms:'drama драм dramma drame' },
   { g:'28',    terms:'action боевик экшн actionfilm azione' },
@@ -8090,6 +8090,14 @@ const _SUBJECTS = [
   { k:'forest',       terms:'лес леса лесу лесн ліс лісов wald foret forêt bosque foresta ტყე forest' },
   { k:'sea',          terms:'море морск meer mer mare океан mare ზღვა sea seas' },
   { k:'road trip',    terms:'дорог путешеств road reise voyage viaje viaggio trip' },
+  { k:'courtroom',    terms:'судебн залсуда суда присяжн адвокатск courtroom trial gericht tribunal juicio processo' },
+  { k:'single location', terms:'камерн однойкомнат однакомнат singlelocation onelocation huisclos' },
+  { k:'radio',        terms:'радио радиостанц radio funk' },
+  { k:'cyberpunk',    terms:'киберпанк cyberpunk' },
+  { k:'hacker',       terms:'хакер киберпреступ hacker hacking' },
+  { k:'rain',         terms:'дожд rain regen pluie lluvia pioggia' },
+  { k:'circus',       terms:'цирк circus zirkus cirque circo' },
+  { k:'mansion',      terms:'поместь особняк усадьб mansion manor herrenhaus mansion' },
   { k:'night',        terms:'ночн ночь ноч night nacht nuit noche notte' },
   { k:'subway',       terms:'метро подземк subway metro untergrundbahn metropolitana' },
   { k:'stranger',     terms:'незнаком попутчик stranger fremde inconnu desconocido sconosciuto' },
@@ -8230,28 +8238,28 @@ const _qNorm = s => String(s||"").toLowerCase().replace(/[ё]/g,'е').replace(/[
 // for it constantly, so it gets its own table rather than waiting for someone to say
 // "nouvelle vague".
 const _COUNTRIES = [
-  { c:'FR', terms:'французск францз french francais française francese franzosisch französisch frances' },
-  { c:'IT', terms:'итальянск italian italiano italien italienisch' },
-  { c:'JP', terms:'японск japanese japonais giapponese japanisch japones' },
-  { c:'KR', terms:'корейск korean coreen coreano koreanisch' },
-  { c:'CN,HK,TW', terms:'китайск гонконгск chinese hongkong cinese chinois chinesisch' },
-  { c:'DE', terms:'немецк германск german deutsch allemand tedesco aleman' },
-  { c:'ES', terms:'испанск spanish espanol español espagnol spagnolo spanisch' },
-  { c:'GB', terms:'британск английск british english britannique britannico britisch' },
-  { c:'US', terms:'американск american americain americano amerikanisch' },
-  { c:'SU,RU', terms:'советск русск российск soviet russian russe russo russisch sowjetisch' },
-  { c:'IN', terms:'индийск болливуд indian bollywood indien indiano indisch' },
-  { c:'IR', terms:'иранск персидск iranian persian iranien iraniano iranisch' },
-  { c:'SE', terms:'шведск swedish suedois svedese schwedisch sueco' },
-  { c:'DK', terms:'датск danish danois danese danisch dänisch danes' },
-  { c:'PL', terms:'польск polish polonais polacco polnisch polaco' },
-  { c:'CZ,SK', terms:'чешск чехословацк czech tcheque ceco tschechisch checo' },
-  { c:'MX', terms:'мексиканск mexican mexicain messicano mexikanisch mexicano' },
-  { c:'BR', terms:'бразильск brazilian bresilien brasiliano brasilianisch brasileno' },
-  { c:'AR', terms:'аргентинск argentine argentinian argentino argentinisch' },
-  { c:'TR', terms:'турецк turkish turc turco turkisch türkisch' },
-  { c:'GE', terms:'грузинск georgian georgien georgiano georgisch' },
-  { c:'UA', terms:'украинск ukrainian ukrainien ucraino ukrainisch ucraniano' },
+  { c:'FR', terms:'франци france paris париж французск францз french francais française francese franzosisch französisch frances' },
+  { c:'IT', terms:'итали italy rome рим итальянск italian italiano italien italienisch' },
+  { c:'JP', terms:'япони japan tokyo токио японск japanese japonais giapponese japanisch japones' },
+  { c:'KR', terms:'коре korea seoul сеул корейск korean coreen coreano koreanisch' },
+  { c:'CN,HK,TW', terms:'кита china hongkong гонконг китайск гонконгск chinese hongkong cinese chinois chinesisch' },
+  { c:'DE', terms:'германи germany berlin берлин немецк германск german deutsch allemand tedesco aleman' },
+  { c:'ES', terms:'испани spain madrid мадрид испанск spanish espanol español espagnol spagnolo spanisch' },
+  { c:'GB', terms:'англи britain england london лондон британск английск british english britannique britannico britisch' },
+  { c:'US', terms:'америк usa hollywood голливуд newyork ньюйорк американск american americain americano amerikanisch' },
+  { c:'SU,RU', terms:'росси ссср russia moscow москв советск русск российск soviet russian russe russo russisch sowjetisch' },
+  { c:'IN', terms:'инди india индийск болливуд indian bollywood indien indiano indisch' },
+  { c:'IR', terms:'иран iran tehran тегеран иранск персидск iranian persian iranien iraniano iranisch' },
+  { c:'SE', terms:'швеци sweden шведск swedish suedois svedese schwedisch sueco' },
+  { c:'DK', terms:'дани denmark copenhagen датск danish danois danese danisch dänisch danes' },
+  { c:'PL', terms:'польш poland warsaw польск polish polonais polacco polnisch polaco' },
+  { c:'CZ,SK', terms:'чехи czechia prague прага чешск чехословацк czech tcheque ceco tschechisch checo' },
+  { c:'MX', terms:'мексик mexico мексиканск mexican mexicain messicano mexikanisch mexicano' },
+  { c:'BR', terms:'бразил brazil бразильск brazilian bresilien brasiliano brasilianisch brasileno' },
+  { c:'AR', terms:'аргентин argentina аргентинск argentine argentinian argentino argentinisch' },
+  { c:'TR', terms:'турци turkey istanbul стамбул турецк turkish turc turco turkisch türkisch' },
+  { c:'GE', terms:'грузи georgia tbilisi тбилиси грузинск georgian georgien georgiano georgisch' },
+  { c:'UA', terms:'украин ukraine kyiv киев украинск ukrainian ukrainien ucraino ukrainisch ucraniano' },
   { c:'AR,CL,CO,PE', terms:'латиноамериканск latinamerican latino' },
   { c:'FI,NO,SE,DK,IS', terms:'скандинавск nordic scandinavian scandinave scandinavo skandinavisch' },
 ];
