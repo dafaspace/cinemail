@@ -2866,7 +2866,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.73</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.74</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8385,12 +8385,40 @@ async function _keywordIds(subject) {
 
 // "Tarkovsky" is a very common shape for this field and is not a keyword. Ask TMDB whether the
 // leftover subject is a person before treating it as a topic.
+// NON-LATIN NAMES, because TMDB indexes people in Latin and answers Cyrillic only sometimes.
+// Measured 21 Sep 2026: "мерил стрип" resolved, "ханс зиммер" did not, and the second is the
+// ordinary case. Three of this app's eight interface languages are non-Latin, so losing every
+// name typed in them is not an edge.
+//
+// A transliteration is a guess, not a translation - "ханс зиммер" becomes "hans zimmer" and
+// "тарковский" becomes "tarkovskiy", which TMDB's fuzzy search does reach. It is tried only
+// AFTER the direct search has failed, so a name TMDB does know in Cyrillic keeps its own
+// spelling and its own result.
+const _TRANSLIT = {
+  а:'a', б:'b', в:'v', г:'g', д:'d', е:'e', ё:'e', ж:'zh', з:'z', и:'i', й:'y', к:'k', л:'l',
+  м:'m', н:'n', о:'o', п:'p', р:'r', с:'s', т:'t', у:'u', ф:'f', х:'h', ц:'ts', ч:'ch',
+  ш:'sh', щ:'sch', ъ:'', ы:'y', ь:'', э:'e', ю:'yu', я:'ya',
+  і:'i', ї:'yi', є:'ye', ґ:'g',
+};
+function _toLatin(str) {
+  const out = String(str || '').toLowerCase().split('').map(c => _TRANSLIT[c] !== undefined ? _TRANSLIT[c] : c).join('');
+  return /[a-z]/.test(out) ? out : '';
+}
+
 async function _personId(subject) {
   if (!subject || subject.split(' ').length > 3) return null;
-  const res = await tmdbFetch(`/search/person?query=${encodeURIComponent(subject)}&include_adult=false`);
-  if (res && res.error) return null;
-  const hit = ((res && res.results) || [])[0];
-  return hit && hit.popularity > 1 ? { id: hit.id, name: hit.name } : null;
+  const tries = [subject];
+  const lat = _toLatin(subject);
+  if (lat && lat !== subject.toLowerCase()) tries.push(lat);
+  for (const q of tries) {
+    let res;
+    try { res = await tmdbFetch(`/search/person?query=${encodeURIComponent(q)}&include_adult=false`); }
+    catch (e) { return null; }
+    if (res && res.error) return null;
+    const hit = ((res && res.results) || [])[0];
+    if (hit && hit.popularity > 1) return { id: hit.id, name: hit.name };
+  }
+  return null;
 }
 
 // ONE MODEL OF THE PERSON'S TASTE, built once a session and used by every path.
@@ -8662,6 +8690,7 @@ async function _searchByQuery(q) {
   // actually asked for. Keywords are the most specific thing the person said, so the genre
   // goes first; the genre is often a mood's guess anyway. Then the keywords. The date range,
   // the country and the vote floor are never dropped: those are what they typed, plainly.
+  const _asAsked = new URLSearchParams(p.toString());   // до ослабления, для запроса по людям
   let res = await tmdbFetch(`/discover/movie?${p.toString()}`);
   if (res && res.error) { const e = new Error(res.error); e.tmdb = res; throw e; }
   for (const drop of ['with_genres', 'with_keywords']) {
@@ -8698,9 +8727,13 @@ async function _searchByQuery(q) {
   const _taste = await _tasteIndex();
   let ranked = _rankByTaste(_cands, _taste, why);
 
-  if (_taste.crewIds && _taste.crewIds.length) {
+  // NOT WHEN THEY NAMED SOMEBODY THEMSELVES. "Уютный детектив мерил стрип" found Meryl
+  // Streep correctly and then had the taste layer push its own names in front of her - the
+  // composer of a series he rated highly, with a making-of documentary at the top. An explicit
+  // request beats our guess about him every time.
+  if (!person && _taste.crewIds && _taste.crewIds.length) {
     try {
-      const pp = new URLSearchParams(p.toString());
+      const pp = new URLSearchParams(_asAsked.toString());
       pp.set('with_people', _taste.crewIds.map(c => c.id).join('|'));
       pp.delete('page');
       // The person IS the specificity here, so the keywords come off: with_people AND three
@@ -8710,10 +8743,19 @@ async function _searchByQuery(q) {
       // work of theirs you have not seen, and that is rarely the famous one.
       pp.delete('with_keywords');
       pp.set('vote_count.gte', '50');
+      // A low floor is the point - the unseen work of somebody they like is rarely the famous
+      // one - but it let in "No Half Measures: Creating the Final Season of Breaking Bad".
+      // Making-of documentaries are not an evening, so the genre is excluded unless asked for.
+      if (!genreIds.includes('99')) pp.set('without_genres', '99');
+      // AND NOT THEIR WEAK WORK. A composer with few credits had Term Life at 6.0 and
+      // Ultraviolet at 5.2 as his best in the genre, and we put both above everything the
+      // person had actually asked for. Reaching the unseen is the point; reaching the bad
+      // is not. Two films, not four: this is seasoning, not the dish.
+      pp.set('vote_average.gte', '6.5');
       const r2 = await tmdbFetch(`/discover/movie?${pp.toString()}`);
       const mine = ((r2 && !r2.error && r2.results) || [])
         .filter(c => !_lib.ids.has(String(c.id)) && !_lib.titles.has(_lib.norm(c.title || c.name)))
-        .slice(0, 4)
+        .slice(0, 2)
         .map(c => ({
           id: c.id, tmdbID: String(c.id), type: 'movie',
           Title: c.title || c.name, Year: (c.release_date || '').slice(0, 4),
