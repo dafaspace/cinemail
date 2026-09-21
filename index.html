@@ -2866,7 +2866,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.65</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.66</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -7990,9 +7990,9 @@ const _GENRE_WORDS = [
   { g:'27',    terms:'horror ужас хоррор страшилк schrecken orrore horreur terror საშინელ' },
   { g:'53',    terms:'thriller триллер spannung thriller suspense' },
   { g:'9648',  terms:'mystery detective детектив загадк krimi giallo policier misterio დეტექტ' },
-  { g:'878',   terms:'scifi science fiction фантастик sciencefiction fantascienza fantascience ფანტასტ' },
+  { g:'878',   terms:'scifi science fiction фантаст sci scifi sciencefiction fantascienza fantascience ფანტასტ' },
   { g:'14',    terms:'fantasy фэнтези фентези fantasie fantasia fantaisie' },
-  { g:'16',    terms:'animation anime cartoon анимаци мультфильм мультик zeichentrick animazione animacion ანიმაც' },
+  { g:'16',    terms:'animation anime cartoon анимаци мультфильм мультик мультиплика zeichentrick animazione animacion ანიმაც' },
   { g:'99',    terms:'documentary докуметал документал докуфильм dokumentarfilm documentario documentaire documental' },
   { g:'18',    terms:'drama драм dramma drame' },
   { g:'28',    terms:'action боевик экшн actionfilm azione' },
@@ -8061,7 +8061,7 @@ const _SUBJECT_FILMS = {
 
 const _SUBJECTS = [
   { k:'cat',          terms:'кошк коти котик кот коты кіт кішк katze chat gato gatt კატ' },
-  { k:'dog',          terms:'собак пес псы собач hund chien perro cane ძაღლ' },
+  { k:'dog',          terms:'собак пес псы собач щено hund chien perro cane ძაღლ' },
   { k:'horse',        terms:'лошад конь кон pferd cheval caballo cavallo ცხენ' },
   { k:'wolf',         terms:'волк вовк wolf loup lobo lupo მგელ' },
   { k:'bear',         terms:'медвед ведмід baer bär ours oso orso' },
@@ -8074,7 +8074,7 @@ const _SUBJECTS = [
   { k:'time travel',  terms:'путешествиевовремени времени zeitreise voyagedanstemps' },
   { k:'vampire',      terms:'вампир vampir vampire vampiro' },
   { k:'zombie',       terms:'зомби zombi' },
-  { k:'ghost',        terms:'привид призрак дух geist fantome fantôme fantasma' },
+  { k:'ghost',        terms:'привид призрак дух духи привиден geist fantome fantôme fantasma' },
   { k:'witch',        terms:'ведьм відьм hexe sorciere sorcière bruja strega' },
   { k:'dragon',       terms:'дракон drache dragon drago' },
   { k:'monster',      terms:'монстр чудовищ ungeheuer monstre monstruo mostro' },
@@ -8087,11 +8087,11 @@ const _SUBJECTS = [
   { k:'island',       terms:'остров острів insel ile île isla isola კუნძულ' },
   { k:'desert',       terms:'пустын wuste wüste desert desierto deserto' },
   { k:'mountain',     terms:'гора горы горн berg montagne montana montagna მთა' },
-  { k:'forest',       terms:'лес ліс wald foret forêt bosque foresta ტყე' },
-  { k:'sea',          terms:'море морск meer mer mare ზღვა' },
+  { k:'forest',       terms:'лес леса лесу лесн ліс лісов wald foret forêt bosque foresta ტყე' },
+  { k:'sea',          terms:'море морск meer mer mare океан mare ზღვა' },
   { k:'road trip',    terms:'дорог путешеств road reise voyage viaje viaggio' },
   { k:'village',      terms:'деревн село dorf village pueblo paese სოფელ' },
-  { k:'war',          terms:'военн войн війн krieg guerre guerra ომი' },
+  { k:'war',          terms:'военн войн війн воен krieg guerre guerra ომი' },
   { k:'love',         terms:'любов кохан liebe amour amor amore სიყვარულ' },
   { k:'friendship',   terms:'дружб freundschaft amitie amitié amistad amicizia მეგობრ' },
   { k:'family',       terms:'семь семей сім familie famille familia famiglia ოჯახ' },
@@ -8126,7 +8126,7 @@ const _SUBJECTS = [
   { k:'immigration',  terms:'эмигра иммигра emigra einwander immigration inmigra immigra' },
   { k:'christmas',    terms:'рождеств різдв weihnacht noel noël navidad natale' },
   { k:'wedding',      terms:'свадьб весілл hochzeit mariage boda matrimonio ქორწ' },
-  { k:'winter',       terms:'зим winter hiver invierno inverno ზამთარ' },
+  { k:'winter',       terms:'зим зимн winter hiver invierno inverno ზამთარ' },
   { k:'snow',         terms:'снег снег schnee neige nieve neve თოვლ' },
 ];
 // MOVEMENTS, SCHOOLS AND ERAS. Each is a country, a stretch of years, and sometimes a handful
@@ -8281,10 +8281,19 @@ function _splitQuery(q) {
   // stem as a substring instead left the tail behind: "романтический" minus "романт" became
   // "ический", which then went to /search/keyword as if it were a subject.
   const matchedWords = new Set();
+  // A STEM OF THREE LETTERS MATCHES BY EXACT WORD ONLY, never by prefix. Measured on twenty
+  // real queries 21 Sep 2026: "рваным монтажом, историю любви от конца к началу" came back
+  // as films about HORSES, because the horse stem is "кон" and "конца" starts with it. So did
+  // "контрастной черно-белой картинкой". The same trap is loaded in every language here -
+  // "пес" catches песня, English "war" catches warm, "fun" catches funeral, "sad" catches
+  // saddle. Four letters is where a prefix starts meaning something; below that the word has
+  // to be the word.
   const hit = tbl => tbl.filter(row => {
     const stems = row.terms.split(' ').filter(s => s.length > 2);
     let found = false;
-    words.forEach(w => { if (stems.some(s => w.startsWith(s) || s.startsWith(w) && w.length > 3)) { matchedWords.add(w); found = true; } });
+    words.forEach(w => {
+      if (stems.some(s => s.length >= 4 ? w.startsWith(s) : w === s)) { matchedWords.add(w); found = true; }
+    });
     return found;
   });
   const moods = hit(_MOODS);
