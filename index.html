@@ -2866,7 +2866,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.77</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.78</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -7963,7 +7963,7 @@ const _MOODS = [
   // terms are matched as substrings against the normalised query, so stems are enough and a
   // single entry covers inflections: "уютн" catches уютный / уютное / уютную.
   { id:'cosy',    g:'35,10751,10749', terms:'cosy cozy warm feelgood уютн тепл добр ностальг винтажн затишн gemutlich gemütlich accogliente douillet acogedor затишн' },
-  { id:'autumn',  g:'18,9648',        terms:'autumn fall melanchol осен меланхол грусн сумрачн herbst autunno automne otoño otono შემოდგომ' },
+  { id:'autumn',  g:'18,9648',        terms:'autumn fall melanchol осенн меланхол грусн сумрачн herbst autunno automne otoño otono შემოდგომ' },
   { id:'heavy',   g:'18,10752,36',    terms:'heavy hard bleak grim тяжел мрачн жестк готич депресс schwer pesante lourd duro' },
   { id:'light',   g:'35,10749,16',    terms:'light easy fun лёгк легк весел непринужд leicht leggero léger ligero' },
   { id:'slow',    g:'18',             terms:'slow quiet contemplative медленн тих тихи тихо созерцат медитат гипнотич langsam lento lent' },
@@ -8074,7 +8074,7 @@ const _SUBJECTS = [
   { k:'time travel',  terms:'путешествиевовремени времени машинавремени zeitreise voyagedanstemps time travel' },
   { k:'vampire',      terms:'вампир vampir vampire vampiro' },
   { k:'zombie',       terms:'зомби zombi' },
-  { k:'ghost',        terms:'привид призрак дух духи привиден geist fantome fantôme fantasma ghost' },
+  { k:'ghost',        terms:'привид призрак привиден полтергейст geist fantome fantôme fantasma ghost' },
   { k:'witch',        terms:'ведьм відьм hexe sorciere sorcière bruja strega witch' },
   { k:'dragon',       terms:'дракон drache dragon drago' },
   { k:'monster',      terms:'монстр чудовищ ungeheuer monstre monstruo mostro monster' },
@@ -8083,31 +8083,31 @@ const _SUBJECTS = [
   { k:'prison',       terms:'тюрьм вязниц gefangnis gefängnis prison carcel prigione' },
   { k:'hospital',     terms:'больниц лікарн krankenhaus hopital hôpital hospital ospedale' },
   { k:'train',        terms:'поезд потяг zug train tren treno მატარებ' },
-  { k:'ship',         terms:'корабл судн schiff navire barco nave გემ ship' },
-  { k:'island',       terms:'остров острів insel ile île isla isola კუნძულ' },
+  { k:'ship',         terms:'корабл судно судна schiff navire barco nave გემ ship' },
+  { k:'island',       terms:'остров острова острове острів insel ile île isla isola კუნძულ' },
   { k:'desert',       terms:'пустын wuste wüste desert desierto deserto' },
-  { k:'mountain',     terms:'гора горы горн berg montagne montana montagna მთა mountain' },
+  { k:'mountain',     terms:'гора горы горный горах альпин berg montagne montana montagna მთა mountain' },
   { k:'forest',       terms:'лес леса лесу лесн ліс лісов wald foret forêt bosque foresta ტყე forest' },
   { k:'sea',          terms:'море морск meer mer mare океан mare ზღვა sea seas' },
   { k:'road trip',    terms:'дорог путешеств road reise voyage viaje viaggio trip' },
   { k:'courtroom',    terms:'судебн залсуда суда присяжн адвокатск courtroom trial gericht tribunal juicio processo' },
   { k:'single location', terms:'камерн однойкомнат однакомнат singlelocation onelocation huisclos' },
-  { k:'radio',        terms:'радио радиостанц radio funk' },
+  { k:'radio',        terms:'радиостанц радиоэфир радиовед radio funk' },
   { k:'cyberpunk',    terms:'киберпанк cyberpunk' },
   { k:'hacker',       terms:'хакер киберпреступ hacker hacking' },
   { k:'rain',         terms:'дожд rain regen pluie lluvia pioggia' },
   { k:'circus',       terms:'цирк circus zirkus cirque circo' },
   { k:'mansion',      terms:'поместь особняк усадьб mansion manor herrenhaus mansion' },
   { k:'night',        terms:'ночн ночь ноч night nacht nuit noche notte' },
-  { k:'subway',       terms:'метро подземк subway metro untergrundbahn metropolitana' },
+  { k:'subway',       terms:'метрополитен подземк метро subway metro untergrundbahn metropolitana' },
   { k:'stranger',     terms:'незнаком попутчик stranger fremde inconnu desconocido sconosciuto' },
   { k:'city',         terms:'город мегаполис урбан stadt ville ciudad citta city cities' },
-  { k:'village',      terms:'деревн село dorf village pueblo paese სოფელ' },
+  { k:'village',      terms:'деревн сельск деревенск dorf village pueblo paese სოფელ' },
   { k:'war',          terms:'военн войн війн воен krieg guerre guerra ომი war wars' },
-  { k:'love',         terms:'любов любв кохан liebe amour amor amore სიყვარულ love' },
+  { k:'love',         terms:'любовь любви любовн кохання кохан liebe amour amor amore სიყვარულ love' },
   { k:'friendship',   terms:'дружб freundschaft amitie amitié amistad amicizia მეგობრ friendship' },
-  { k:'family',       terms:'семь семей сім familie famille familia famiglia ოჯახ family' },
-  { k:'revenge',      terms:'мест помст rache vengeance venganza vendetta revenge' },
+  { k:'family',       terms:'семья семьи семейн сімʼя сімей familie famille familia famiglia ოჯახ family' },
+  { k:'revenge',      terms:'месть мести мстит мстител помста помсти rache vengeance venganza vendetta revenge' },
   { k:'survival',     terms:'выживан виживан uberleben überleben survie supervivencia sopravvivenza survival' },
   { k:'heist',        terms:'ограблен пограбуван raub braquage atraco rapina heist' },
   { k:'spy',          terms:'шпион шпигун spion espion espia spia spy spies' },
@@ -8115,7 +8115,7 @@ const _SUBJECTS = [
   { k:'serial killer',terms:'маньяк серийн серийныйубийца serienmorder serienmörder tueur asesinoserie serial killer' },
   { k:'boxing',       terms:'бокс boxen boxe boxeo pugilato boxing' },
   { k:'football',     terms:'футбол fussball fußball football futbol calcio' },
-  { k:'chess',        terms:'шахмат шахи schach echecs échecs ajedrez scacchi chess' },
+  { k:'chess',        terms:'шахмат шахів шахова schach echecs échecs ajedrez scacchi chess' },
   { k:'music',        terms:'музык музик musik musique musica მუსიკ music' },
   { k:'rock band',    terms:'группа рокгруп band groupe banda rock' },
   { k:'painter',      terms:'художник маляр maler peintre pintor pittore მხატვ painter' },
@@ -8131,15 +8131,15 @@ const _SUBJECTS = [
   { k:'chef',         terms:'повар кухн koch cuisinier cocinero cuoco chef' },
   { k:'pilot',        terms:'пилот лётчик летчик pilot pilote piloto' },
   { k:'childhood',    terms:'детств дитинств kindheit enfance infancia infanzia ბავშვ childhood' },
-  { k:'old age',      terms:'старост пожил alter vieillesse vejez vecchiaia old olds age ages' },
+  { k:'old age',      terms:'старость старик пожилой пожилые alter vieillesse vejez vecchiaia old olds age ages' },
   { k:'death',        terms:'смерт tod mort muerte morte სიკვდილ death' },
   { k:'illness',      terms:'болезн хвороб krankheit maladie enfermedad malattia illness' },
   { k:'addiction',    terms:'наркот зависим sucht drogue droga addiction' },
   { k:'immigration',  terms:'эмигра иммигра emigra einwander immigration inmigra immigra' },
-  { k:'cooking',      terms:'кулинар готовк приготовлен повар еда еды кухн кухня kochen cuisine cocina cucina food cooking' },
+  { k:'cooking',      terms:'кулинар готовк приготовлен повар кухня кухни ресторан kochen cuisine cocina cucina food cooking' },
   { k:'teenager',     terms:'подрост тинейдж юност старшеклассник teenager jugendlich adolescent adolescente' },
   { k:'lighthouse',   terms:'маяк leuchtturm phare faro lighthouse' },
-  { k:'scientist',    terms:'учён ученый научн лаборатор эксперимент wissenschaftler scientifique cientifico scienziato scientist' },
+  { k:'scientist',    terms:'учёный ученый научн лаборат лаборатор эксперимент wissenschaftler scientifique cientifico scienziato scientist' },
   { k:'bureaucracy',  terms:'бюрократ чиновник канцеляр burokratie bürokratie bureaucratie burocracia burocrazia bureaucracy bureaucracies' },
   { k:'jazz',         terms:'джаз jazz' },
   { k:'loneliness',   terms:'одиночеств одинок lonel einsamkeit solitude soledad solitudine loneliness' },
@@ -8147,7 +8147,7 @@ const _SUBJECTS = [
   { k:'skateboarding',terms:'скейт skateboard' },
   { k:'artist',       terms:'художествен искусств творчеств kunst artiste arte artist' },
   { k:'silent film',  terms:'безмолвн бездиалог безсловес silentfilm silent film' },
-  { k:'road movie',   terms:'роудмуви роуд муви roadmovie road movie' },
+  { k:'road movie',   terms:'роудмуви роуд-муви роуд roadmovie road movie' },
   { k:'christmas',    terms:'рождеств різдв weihnacht noel noël navidad natale christmas' },
   { k:'wedding',      terms:'свадьб весілл hochzeit mariage boda matrimonio ქორწ wedding' },
   { k:'winter',       terms:'зим зимн winter hiver invierno inverno ზამთარ' },
@@ -8334,19 +8334,19 @@ const _qNorm = s => String(s||"").toLowerCase().replace(/[ё]/g,'е').replace(/[
 // "nouvelle vague".
 const _COUNTRIES = [
   { c:'FR', terms:'марсел marseille канн cannes франци france paris париж французск францз french francais française francese franzosisch französisch frances' },
-  { c:'IT', terms:'венеци venice неапол naples итали italy rome рим итальянск italian italiano italien italienisch' },
-  { c:'JP', terms:'киото kyoto осак osaka япони japan tokyo токио японск japanese japonais giapponese japanisch japones' },
-  { c:'KR', terms:'коре korea seoul сеул корейск korean coreen coreano koreanisch' },
-  { c:'CN,HK,TW', terms:'кита china hongkong гонконг китайск гонконгск chinese hongkong cinese chinois chinesisch' },
+  { c:'IT', terms:'венеци venice неапол naples италия итальянц italy rome рим итальянск italian italiano italien italienisch' },
+  { c:'JP', terms:'киото kyoto осак osaka япони japan tokyo токийск токио японск japanese japonais giapponese japanisch japones' },
+  { c:'KR', terms:'корея корейц korea seoul сеул корейск korean coreen coreano koreanisch' },
+  { c:'CN,HK,TW', terms:'китай китайц china hongkong гонконг китайск гонконгск chinese hongkong cinese chinois chinesisch' },
   { c:'DE', terms:'мюнхен munich германи germany berlin берлин немецк германск german deutsch allemand tedesco aleman' },
   { c:'ES', terms:'барселон barcelona испани spain madrid мадрид испанск spanish espanol español espagnol spagnolo spanisch' },
   { c:'GB', terms:'эдинбург edinburgh англи britain england london лондон британск английск british english britannique britannico britisch' },
   { c:'US', terms:'лосандж losangeles чикаго chicago америк usa hollywood голливуд newyork ньюйорк американск american americain americano amerikanisch' },
   { c:'SU,RU', terms:'росси ссср russia moscow москв советск русск российск soviet russian russe russo russisch sowjetisch' },
-  { c:'IN', terms:'инди india индийск болливуд indian bollywood indien indiano indisch' },
-  { c:'IR', terms:'иран iran tehran тегеран иранск персидск iranian persian iranien iraniano iranisch' },
+  { c:'IN', terms:'индия индийц india индийск болливуд indian bollywood indien indiano indisch' },
+  { c:'IR', terms:'иране иранск iran tehran тегеран иранск персидск iranian persian iranien iraniano iranisch' },
   { c:'SE', terms:'швеци sweden шведск swedish suedois svedese schwedisch sueco' },
-  { c:'DK', terms:'дани denmark copenhagen датск danish danois danese danisch dänisch danes' },
+  { c:'DK', terms:'дания датчан denmark copenhagen датск danish danois danese danisch dänisch danes' },
   { c:'PL', terms:'польш poland warsaw польск polish polonais polacco polnisch polaco' },
   { c:'CZ,SK', terms:'чехи czechia prague прага чешск чехословацк czech tcheque ceco tschechisch checo' },
   { c:'MX', terms:'мексик mexico мексиканск mexican mexicain messicano mexikanisch mexicano' },
@@ -8354,7 +8354,7 @@ const _COUNTRIES = [
   { c:'AR', terms:'аргентин argentina аргентинск argentine argentinian argentino argentinisch' },
   { c:'TR', terms:'турци turkey istanbul стамбул турецк turkish turc turco turkisch türkisch' },
   { c:'GE', terms:'грузи georgia tbilisi тбилиси грузинск georgian georgien georgiano georgisch' },
-  { c:'UA', terms:'украин ukraine kyiv киев украинск ukrainian ukrainien ucraino ukrainisch ucraniano' },
+  { c:'UA', terms:'украин ukraine kyiv киеве украинск ukrainian ukrainien ucraino ukrainisch ucraniano' },
   { c:'AR,CL,CO,PE', terms:'латиноамериканск latinamerican latino' },
   { c:'FI,NO,SE,DK,IS', terms:'скандинавск nordic scandinavian scandinave scandinavo skandinavisch' },
 ];
@@ -8396,7 +8396,7 @@ function _decadeFrom(flatQ, rawQ) {
 
 const _QSTOP = ('про про about with films film movie movies кино фильм кинo о об на и с а но ' +
   'который котор которые которая которое которых что чтобы как это тот та те такой ' +
-  'настроен настроени года году годов year years jahr annee anno mood mit und der die das ein eine ' +
+  'место места месте местом настроен настроени года году годов year years jahr annee anno mood mit und der die das ein eine ' +
   'the of from de la le les des du un une et avec sur pour ' +
   'el los las con y e por sobre para pelicula peliculas ' +
   'di il lo gli un una su per film sul ' +
@@ -8451,8 +8451,13 @@ function _splitQuery(q) {
       // любви и любовь, коты и кошки. Приставка перекрывает границу между частями речи,
       // где стеммер бессилен: фантастика и фантастические расходятся по правилам языка,
       // но обе начинаются с "фантаст".
+      // У пути через основу СВОЙ порог, и он нужен. Термины в таблицах местами написаны
+      // обрубками - "воен", "учён", "осен", - а обрубок, пропущенный через стеммер, даёт
+      // мусор: "воен" превращается в "во" и ловит воду, воздух и вокзал. Четыре символа с
+      // обеих сторон: и у слова из запроса, и у термина после нормализации.
       if (stems.some(st => (st.length >= 4 && w.startsWith(st)) || (st.length < 4 && w === st)
-                        || ws === _stem(st))) { matchedWords.add(w); found = true; }
+                        || (ws.length >= 4 && _stem(st).length >= 4 && ws === _stem(st))))
+        { matchedWords.add(w); found = true; }
     });
     return found;
   });
