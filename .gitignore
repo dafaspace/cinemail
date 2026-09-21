@@ -1,0 +1,6 @@
+# Working files. This repository is public and is what Cloudflare Pages deploys,
+# so anything here that is not part of the shipped app does not belong in it.
+_*.html
+*.psd
+logo-ink.png
+logo.svg

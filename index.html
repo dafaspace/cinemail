@@ -2490,7 +2490,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     <div style="width:36px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:0 auto 20px"></div>
     <div class="auth-logo" style="font-size:28px;margin-bottom:6px;text-align:center"><span>CINE</span>MAIL</div>
     <h2 id="gc-title" style="font-size:20px;font-weight:700;margin-bottom:6px;text-align:center" data-i18n="sign_up_title">Create Account</h2>
-    <p id="gc-sub" style="color:var(--muted);font-size:13px;margin-bottom:20px;text-align:center;line-height:1.5" data-i18n="guest_save_sub">Save films, get personal picks and share with friends - free forever.</p>
+    <p id="gc-sub" style="color:var(--muted);font-size:13px;margin-bottom:20px;text-align:center;line-height:1.5" data-i18n="guest_save_sub">Keep your films safe across devices and share them with friends - free forever.</p>
     <div id="guest-convert-error" class="error-msg"></div>
     <div class="form-group">
       <label data-i18n="display_name">Display Name</label>
@@ -2752,7 +2752,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 
       <!-- Guest card (shown only in guest mode) -->
       <div id="acc-guest-card" style="display:none;text-align:center;padding:0 0 8px">
-        <p style="color:var(--muted);font-size:13px;line-height:1.55;margin-bottom:18px" data-i18n="guest_save_sub">Save films, get personal picks and share with friends - free forever.</p>
+        <p style="color:var(--muted);font-size:13px;line-height:1.55;margin-bottom:18px" data-i18n="guest_save_sub">Keep your films safe across devices and share them with friends - free forever.</p>
         <button onclick="closeAccount();showGuestConvertModal()" data-i18n="guest_join_btn" style="width:100%;padding:12px;border-radius:10px;background:var(--accent);border:none;color:var(--on-accent);font-size:15px;font-weight:600;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;margin-bottom:8px">Join Cinemail</button>
       </div>
 
@@ -2866,7 +2866,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.56</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.65</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -3488,7 +3488,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Select a friend to invite:", add_friends_first:"Add friends first to invite them",
     invite_valid_48:"Valid for 48 hours", invite_connect_hint:"When they open it, you'll connect as friends in one tap.",
     join_list_q:"Join the list", join_invited_sub:"You've been invited to a shared movie list",
-    list_picker_title:"Add to List", filter_friends:"Filter friends…", searching:"Searching…", not_found:"Not found", friends_empty:"No friends yet. Use the invite link below to add the people you watch with.", friend_remove_suffix:"— remove from friends?", friends_no_match:"No friends match", edit_modal_title:"EDIT REVIEW", share_modal_title:"RECOMMEND A FILM", send_btn:"Send", note_ph:"What did you think?", share_msg_ph:"Why you'd love this…", add_modal_seen:"MARK AS WATCHED", add_modal_list:"ADD TO LIST", ob8_picks:"✨ Personal picks for you", err_bad_login:"Wrong email or password.", signin_create_cta:"New here? Create an account", recs_empty_title:"Get Personal Picks", recs_empty_sub:"Enter a prompt, or leave it blank and tap Suggest", recs_thinking:"Thinking…", recs_still_thinking:"Still thinking, hang tight…", based_on_label:"Based on watched films", recs_hint_empty:"Add watched films for personalised picks", picks_left_today:"personal picks left today", picks_left_week:"personal picks left this week", why_off_many:"Recommended off {n} of your favourites: {films}", why_off_one:"Because you liked {film}", why_season:"Fits {season} evenings", why_acclaimed:"Highly rated, from the {decade}", season_winter:"winter", season_spring:"spring", season_summer:"summer", season_autumn:"autumn", email_did_you_mean:"Did you mean", picks_random:"Random Picks", picks_tonight:"Picks For Tonight", picks_for_you:"Picks For You", where_to_watch:"Where to watch", watch_attrib:"Streaming data by JustWatch",
+    list_picker_title:"Add to List", filter_friends:"Filter friends…", searching:"Searching…", not_found:"Not found", friends_empty:"No friends yet. Use the invite link below to add the people you watch with.", friend_remove_suffix:"— remove from friends?", friends_no_match:"No friends match", edit_modal_title:"EDIT REVIEW", share_modal_title:"RECOMMEND A FILM", send_btn:"Send", note_ph:"What did you think?", share_msg_ph:"Why you'd love this…", add_modal_seen:"MARK AS WATCHED", add_modal_list:"ADD TO LIST", ob8_picks:"✨ Personal picks for you", err_bad_login:"Wrong email or password.", signin_create_cta:"New here? Create an account", recs_empty_title:"Get Personal Picks", recs_empty_sub:"Enter a prompt, or leave it blank and tap Suggest", recs_thinking:"Thinking…", recs_still_thinking:"Still thinking, hang tight…", based_on_label:"Based on watched films", recs_hint_empty:"Add watched films for personalised picks", picks_left_today:"personal picks left today", picks_left_week:"personal picks left this week", why_off_many:"Recommended off {n} of your favourites: {films}", why_off_one:"Because you liked {film}", why_season:"Fits {season} evenings", why_acclaimed:"Highly rated, from the {decade}", why_for_query:"Matches \"{q}\"", why_person:"With {name}", season_winter:"winter", season_spring:"spring", season_summer:"summer", season_autumn:"autumn", email_did_you_mean:"Did you mean", toast_list_limit:"You can have {n} lists of your own, plus your personal list. Lists shared with you do not count.", lists_header:"Lists", mark_watched:"Mark as watched", picks_exhausted:"You have used this week's picks. They come back next week.", toast_member_limit:"A list can hold {n} people, including you.", toast_list_full:"This list is full: {n} people, including the owner.", picks_random:"Random Picks", picks_tonight:"Picks For Tonight", picks_for_you:"Picks For You", where_to_watch:"Where to watch", watch_attrib:"Streaming data by JustWatch",
     loading_lbl:"Loading…", err_no_results_title:"No Results", err_no_results_sub:"Try just the title without the year", err_connection:"Connection Error", err_generic:"Error", report:"Report", report_prefill:"Reporting a message from {name}. What happened:", err_not_found_title:"Not Found", err_no_results_for:"No results for", err_took_long_title:"Took Too Long", err_took_long_sub:"Try again in a moment", recs_none_title:"No Picks Found", recs_none_sub:"Try a different prompt", recs_unavail_title:"Picks Unavailable", recs_unavail_sub:"Please try again later", inbox_empty_title:"No Chats Yet", inbox_empty_sub:"Share a film from search results or your list to start a conversation",
     continue_as_guest:"Start without an account", guest_label:"Guest", guest_banner:"Saved on this device only", guest_join_btn:"Join Cinemail", guest_save_sub:"Keep your films safe across devices and share them with friends - free forever.", guest_join_free:"Join free", guest_maybe_later:"Maybe later", guest_already_acct:"Already have an account?",
     del_acct_guest:"You are signed in as a guest, so there is no email to sign back in with. This cannot be undone and nothing can be recovered.", ob_mock_mylist:"My List", ob_mock_name:"Your name", block:"Block", block_q:"Block {name}?", block_warn:"They will not be able to send you films, messages or friend requests. You can undo this in your account.", block_done:"Blocked", block_failed:"Could not block", unblock:"Unblock", err_not_allowed:"That did not go through.", unblock_note:"Unblocking lifts the block but does not restore the friendship. They would have to send a new request.", unblock_done:"Unblocked", blocked_header:"Blocked people", block_someone:"Someone", del_acct_q:"Delete account?", del_acct_warn:"This will permanently delete your watch history, all lists, friends and account data. This cannot be undone.", del_acct_confirm:"Delete my account", del_acct_working:"Deleting…", del_acct_done:"Account deleted.", del_acct_failed:"Could not delete account",
@@ -3620,7 +3620,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Выбери друга для приглашения:", add_friends_first:"Сначала добавь друзей, чтобы приглашать",
     invite_valid_48:"Действует 48 часов", invite_connect_hint:"Когда откроют - вы добавитесь в друзья одним касанием.",
     join_list_q:"Вступить в список", join_invited_sub:"Тебя пригласили в общий список фильмов",
-    list_picker_title:"В список", filter_friends:"Фильтр друзей…", searching:"Поиск…", not_found:"Не найдено", friends_empty:"Друзей пока нет. Используй ссылку-приглашение ниже, чтобы добавить тех, с кем смотришь.", friend_remove_suffix:"— убрать из друзей?", friends_no_match:"Нет друзей по запросу", edit_modal_title:"РЕДАКТИРОВАТЬ ОТЗЫВ", share_modal_title:"ПОСОВЕТОВАТЬ ФИЛЬМ", send_btn:"Отправить", note_ph:"Что думаешь?", share_msg_ph:"Почему тебе это понравится…", add_modal_seen:"ОТМЕТИТЬ ПРОСМОТРЕННЫМ", add_modal_list:"ДОБАВИТЬ В СПИСОК", ob8_picks:"✨ Персональные подборки для тебя", err_bad_login:"Неверный email или пароль.", signin_create_cta:"Впервые здесь? Создать аккаунт", recs_empty_title:"Персональные подборки", recs_empty_sub:"Введи запрос или оставь пустым и нажми «Подобрать»", recs_thinking:"Думаю…", recs_still_thinking:"Ещё думаю, секунду…", based_on_label:"На основе просмотренных фильмов", recs_hint_empty:"Добавь просмотренные фильмы для персональных подборок", picks_left_today:"персональных подборок осталось сегодня", picks_left_week:"персональных подборок осталось на этой неделе", why_off_many:"Советуют к {n} твоим любимым: {films}", why_off_one:"Потому что тебе понравился {film}", why_season:"Под {season} вечера", why_acclaimed:"Высокие оценки, {decade}", season_winter:"зимние", season_spring:"весенние", season_summer:"летние", season_autumn:"осенние", email_did_you_mean:"Возможно, вы имели в виду", picks_random:"Случайные подборки", picks_tonight:"Подборка на вечер", picks_for_you:"Подборка для тебя", where_to_watch:"Где смотреть", watch_attrib:"Данные о стримингах: JustWatch",
+    list_picker_title:"В список", filter_friends:"Фильтр друзей…", searching:"Поиск…", not_found:"Не найдено", friends_empty:"Друзей пока нет. Используй ссылку-приглашение ниже, чтобы добавить тех, с кем смотришь.", friend_remove_suffix:"— убрать из друзей?", friends_no_match:"Нет друзей по запросу", edit_modal_title:"РЕДАКТИРОВАТЬ ОТЗЫВ", share_modal_title:"ПОСОВЕТОВАТЬ ФИЛЬМ", send_btn:"Отправить", note_ph:"Что думаешь?", share_msg_ph:"Почему тебе это понравится…", add_modal_seen:"ОТМЕТИТЬ ПРОСМОТРЕННЫМ", add_modal_list:"ДОБАВИТЬ В СПИСОК", ob8_picks:"✨ Персональные подборки для тебя", err_bad_login:"Неверный email или пароль.", signin_create_cta:"Впервые здесь? Создать аккаунт", recs_empty_title:"Персональные подборки", recs_empty_sub:"Введи запрос или оставь пустым и нажми «Подобрать»", recs_thinking:"Думаю…", recs_still_thinking:"Ещё думаю, секунду…", based_on_label:"На основе просмотренных фильмов", recs_hint_empty:"Добавь просмотренные фильмы для персональных подборок", picks_left_today:"персональных подборок осталось сегодня", picks_left_week:"персональных подборок осталось на этой неделе", why_off_many:"Советуют к {n} твоим любимым: {films}", why_off_one:"Потому что тебе понравился {film}", why_season:"Под {season} вечера", why_acclaimed:"Высокие оценки, {decade}", why_for_query:"По запросу «{q}»", why_person:"С участием {name}", season_winter:"зимние", season_spring:"весенние", season_summer:"летние", season_autumn:"осенние", email_did_you_mean:"Возможно, вы имели в виду", toast_list_limit:"У тебя может быть {n} своих списка, плюс личный. Списки, которыми поделились с тобой, не считаются.", lists_header:"Списки", mark_watched:"Отметить просмотренным", picks_exhausted:"Подборки на эту неделю закончились. Новые будут на следующей.", toast_member_limit:"В списке может быть {n} человека, включая тебя.", toast_list_full:"Список заполнен: {n} человека вместе с владельцем.", picks_random:"Случайные подборки", picks_tonight:"Подборка на вечер", picks_for_you:"Подборка для тебя", where_to_watch:"Где смотреть", watch_attrib:"Данные о стримингах: JustWatch",
     loading_lbl:"Загрузка…", err_no_results_title:"Ничего не найдено", err_no_results_sub:"Попробуй только название, без года", err_connection:"Ошибка соединения", err_generic:"Ошибка", report:"Пожаловаться", report_prefill:"Жалоба на {name}. Что произошло:", err_not_found_title:"Не найдено", err_no_results_for:"Нет результатов по", err_took_long_title:"Слишком долго", err_took_long_sub:"Попробуй через мгновение", recs_none_title:"Подборок не нашлось", recs_none_sub:"Попробуй другой запрос", recs_unavail_title:"Подборки недоступны", recs_unavail_sub:"Попробуй позже", inbox_empty_title:"Пока нет чатов", inbox_empty_sub:"Поделись фильмом из поиска или списка, чтобы начать разговор",
     continue_as_guest:"Начать без аккаунта", guest_label:"Гость", guest_banner:"Сохраняется только на этом устройстве", guest_join_btn:"Создать аккаунт", guest_save_sub:"Сохрани фильмы на всех устройствах и делись с друзьями - бесплатно навсегда.", guest_join_free:"Зарегистрироваться бесплатно", guest_maybe_later:"Позже", guest_already_acct:"Уже есть аккаунт?",
     del_acct_guest:"Вы вошли как гость - почты, чтобы войти снова, нет. Отменить или восстановить будет нечем.", ob_mock_mylist:"Мой список", ob_mock_name:"Ваше имя", block:"Заблокировать", block_q:"Заблокировать {name}?", block_warn:"Он больше не сможет присылать вам фильмы, сообщения и запросы в друзья. Отменить можно в настройках аккаунта.", block_done:"Заблокирован", block_failed:"Не удалось заблокировать", unblock:"Разблокировать", err_not_allowed:"Не удалось.", unblock_note:"Разблокировка снимает блокировку, но не возвращает дружбу - человеку придётся отправить новую заявку.", unblock_done:"Разблокирован", blocked_header:"Заблокированные", block_someone:"Кто-то", del_acct_q:"Удалить аккаунт?", del_acct_warn:"Это навсегда удалит историю просмотров, все списки, друзей и данные аккаунта. Отменить будет нельзя.", del_acct_confirm:"Удалить мой аккаунт", del_acct_working:"Удаляем…", del_acct_done:"Аккаунт удалён.", del_acct_failed:"Не удалось удалить аккаунт",
@@ -3752,7 +3752,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Обери друга для запрошення:", add_friends_first:"Спершу додай друзів, щоб запрошувати",
     invite_valid_48:"Дійсне 48 годин", invite_connect_hint:"Коли відкриють - ви додастеся в друзі одним дотиком.",
     join_list_q:"Приєднатися до списку", join_invited_sub:"Тебе запросили до спільного списку фільмів",
-    list_picker_title:"До списку", filter_friends:"Фільтр друзів…", searching:"Пошук…", not_found:"Не знайдено", friends_empty:"Друзів поки немає. Скористайся посиланням нижче, щоб додати тих, з ким дивишся.", friend_remove_suffix:"— прибрати з друзів?", friends_no_match:"Немає друзів за запитом", edit_modal_title:"РЕДАГУВАТИ ВІДГУК", share_modal_title:"ПОРАДИТИ ФІЛЬМ", send_btn:"Надіслати", note_ph:"Що думаєш?", share_msg_ph:"Чому тобі це сподобається…", add_modal_seen:"ПОЗНАЧИТИ ПЕРЕГЛЯНУТИМ", add_modal_list:"ДОДАТИ ДО СПИСКУ", ob8_picks:"✨ Персональні добірки для тебе", err_bad_login:"Невірний email або пароль.", signin_create_cta:"Вперше тут? Створити акаунт", recs_empty_title:"Персональні добірки", recs_empty_sub:"Введи запит або залиш порожнім і натисни «Підібрати»", recs_thinking:"Думаю…", recs_still_thinking:"Ще думаю, секунду…", based_on_label:"На основі переглянутих фільмів", recs_hint_empty:"Додай переглянуті фільми для персональних добірок", picks_left_today:"персональних добірок залишилось сьогодні", picks_left_week:"персональних добірок залишилось цього тижня", why_off_many:"Радять до {n} твоїх улюблених: {films}", why_off_one:"Бо тобі сподобався {film}", why_season:"Під {season} вечори", why_acclaimed:"Високі оцінки, {decade}", season_winter:"зимові", season_spring:"весняні", season_summer:"літні", season_autumn:"осінні", email_did_you_mean:"Можливо, ви мали на увазі", picks_random:"Випадкові добірки", picks_tonight:"Добірка на вечір", picks_for_you:"Добірка для тебе", where_to_watch:"Де дивитися", watch_attrib:"Дані про стримінги: JustWatch",
+    list_picker_title:"До списку", filter_friends:"Фільтр друзів…", searching:"Пошук…", not_found:"Не знайдено", friends_empty:"Друзів поки немає. Скористайся посиланням нижче, щоб додати тих, з ким дивишся.", friend_remove_suffix:"— прибрати з друзів?", friends_no_match:"Немає друзів за запитом", edit_modal_title:"РЕДАГУВАТИ ВІДГУК", share_modal_title:"ПОРАДИТИ ФІЛЬМ", send_btn:"Надіслати", note_ph:"Що думаєш?", share_msg_ph:"Чому тобі це сподобається…", add_modal_seen:"ПОЗНАЧИТИ ПЕРЕГЛЯНУТИМ", add_modal_list:"ДОДАТИ ДО СПИСКУ", ob8_picks:"✨ Персональні добірки для тебе", err_bad_login:"Невірний email або пароль.", signin_create_cta:"Вперше тут? Створити акаунт", recs_empty_title:"Персональні добірки", recs_empty_sub:"Введи запит або залиш порожнім і натисни «Підібрати»", recs_thinking:"Думаю…", recs_still_thinking:"Ще думаю, секунду…", based_on_label:"На основі переглянутих фільмів", recs_hint_empty:"Додай переглянуті фільми для персональних добірок", picks_left_today:"персональних добірок залишилось сьогодні", picks_left_week:"персональних добірок залишилось цього тижня", why_off_many:"Радять до {n} твоїх улюблених: {films}", why_off_one:"Бо тобі сподобався {film}", why_season:"Під {season} вечори", why_acclaimed:"Високі оцінки, {decade}", why_for_query:"За запитом «{q}»", why_person:"За участю {name}", season_winter:"зимові", season_spring:"весняні", season_summer:"літні", season_autumn:"осінні", email_did_you_mean:"Можливо, ви мали на увазі", toast_list_limit:"У тебе може бути {n} власних списки, плюс особистий. Списки, якими поділилися з тобою, не рахуються.", lists_header:"Списки", mark_watched:"Позначити переглянутим", picks_exhausted:"Добірки на цей тиждень закінчилися. Нові будуть наступного.", toast_member_limit:"У списку може бути {n} особи, включно з тобою.", toast_list_full:"Список заповнений: {n} особи разом із власником.", picks_random:"Випадкові добірки", picks_tonight:"Добірка на вечір", picks_for_you:"Добірка для тебе", where_to_watch:"Де дивитися", watch_attrib:"Дані про стримінги: JustWatch",
     loading_lbl:"Завантаження…", err_no_results_title:"Нічого не знайдено", err_no_results_sub:"Спробуй лише назву, без року", err_connection:"Помилка з'єднання", err_generic:"Помилка", report:"Поскаржитися", report_prefill:"Скарга на {name}. Що сталося:", err_not_found_title:"Не знайдено", err_no_results_for:"Немає результатів за", err_took_long_title:"Занадто довго", err_took_long_sub:"Спробуй за мить", recs_none_title:"Добірок не знайшлося", recs_none_sub:"Спробуй інший запит", recs_unavail_title:"Добірки недоступні", recs_unavail_sub:"Спробуй пізніше", inbox_empty_title:"Поки немає чатів", inbox_empty_sub:"Поділись фільмом з пошуку або списку, щоб почати розмову",
     continue_as_guest:"Почати без акаунта", guest_label:"Гість", guest_banner:"Зберігається лише на цьому пристрої", guest_join_btn:"Створити акаунт", guest_save_sub:"Збережи фільми на всіх пристроях і ділись з друзями - безкоштовно назавжди.", guest_join_free:"Зареєструватися безкоштовно", guest_maybe_later:"Пізніше", guest_already_acct:"Вже є акаунт?",
     del_acct_guest:"Ви увійшли як гість - пошти, щоб увійти знову, немає. Скасувати або відновити буде нічим.", ob_mock_mylist:"Мій список", ob_mock_name:"Ваше ім\u2019я", block:"Заблокувати", block_q:"Заблокувати {name}?", block_warn:"Він більше не зможе надсилати вам фільми, повідомлення та запити в друзі. Скасувати можна в налаштуваннях.", block_done:"Заблоковано", block_failed:"Не вдалося заблокувати", unblock:"Розблокувати", err_not_allowed:"Не вдалося.", unblock_note:"Розблокування знімає блокування, але не повертає дружбу - людині доведеться надіслати новий запит.", unblock_done:"Розблоковано", blocked_header:"Заблоковані", block_someone:"Хтось", del_acct_q:"Видалити акаунт?", del_acct_warn:"Це назавжди видалить історію переглядів, усі списки, друзів і дані акаунта. Скасувати буде неможливо.", del_acct_confirm:"Видалити мій акаунт", del_acct_working:"Видаляємо…", del_acct_done:"Акаунт видалено.", del_acct_failed:"Не вдалося видалити акаунт",
@@ -3884,7 +3884,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"აირჩიე მოსაწვევი მეგობარი:", add_friends_first:"ჯერ დაამატე მეგობრები მოსაწვევად",
     invite_valid_48:"მოქმედებს 48 საათი", invite_connect_hint:"გახსნისას ერთი შეხებით დაუმეგობრდებით.",
     join_list_q:"სიაში გაწევრიანება", join_invited_sub:"მოგიწვიეს საერთო ფილმების სიაში",
-    list_picker_title:"სიაში დამატება", filter_friends:"გაფილტრე მეგობრები…", searching:"ძიება…", not_found:"ვერ მოიძებნა", friends_empty:"ჯერ მეგობრები არ არის. გამოიყენე ქვემოთ მოცემული ბმული, რომ დაამატო ისინი, ვისთანაც უყურებ.", friend_remove_suffix:"— ამოშალო მეგობრებიდან?", friends_no_match:"ვერ მოიძებნა მეგობარი", edit_modal_title:"შეფასების რედაქტირება", share_modal_title:"ფილმის რეკომენდაცია", send_btn:"გაგზავნა", note_ph:"რას ფიქრობ?", share_msg_ph:"რატომ მოგეწონება…", add_modal_seen:"მონიშნე ნანახად", add_modal_list:"სიაში დამატება", ob8_picks:"✨ პერსონალური რჩევები შენთვის", err_bad_login:"არასწორი email ან პაროლი.", signin_create_cta:"ახალი ხარ? შექმენი ანგარიში", recs_empty_title:"პერსონალური რჩევები", recs_empty_sub:"შეიყვანე მოთხოვნა ან დატოვე ცარიელი და დააჭირე ღილაკს „მირჩიე“", recs_thinking:"ვფიქრობ…", recs_still_thinking:"ჯერ კიდევ ვფიქრობ, მოითმინე…", based_on_label:"ნანახი ფილმების მიხედვით", recs_hint_empty:"დაამატე ნანახი ფილმები პერსონალური რჩევებისთვის", picks_left_today:"პერსონალური რჩევა დარჩა დღეს", picks_left_week:"პერსონალური რჩევა დარჩა ამ კვირას", why_off_many:"გირჩევენ შენი {n} საყვარელი ფილმიდან: {films}", why_off_one:"რადგან მოგეწონა {film}", why_season:"{season} საღამოებისთვის", why_acclaimed:"მაღალი შეფასება, {decade}", season_winter:"ზამთრის", season_spring:"გაზაფხულის", season_summer:"ზაფხულის", season_autumn:"შემოდგომის", email_did_you_mean:"იქნებ იგულისხმეთ", picks_random:"შემთხვევითი რჩევები", picks_tonight:"რჩევები საღამოსთვის", picks_for_you:"რჩევები შენთვის", where_to_watch:"სად ვუყუროთ", watch_attrib:"სტრიმინგის მონაცემები: JustWatch",
+    list_picker_title:"სიაში დამატება", filter_friends:"გაფილტრე მეგობრები…", searching:"ძიება…", not_found:"ვერ მოიძებნა", friends_empty:"ჯერ მეგობრები არ არის. გამოიყენე ქვემოთ მოცემული ბმული, რომ დაამატო ისინი, ვისთანაც უყურებ.", friend_remove_suffix:"— ამოშალო მეგობრებიდან?", friends_no_match:"ვერ მოიძებნა მეგობარი", edit_modal_title:"შეფასების რედაქტირება", share_modal_title:"ფილმის რეკომენდაცია", send_btn:"გაგზავნა", note_ph:"რას ფიქრობ?", share_msg_ph:"რატომ მოგეწონება…", add_modal_seen:"მონიშნე ნანახად", add_modal_list:"სიაში დამატება", ob8_picks:"✨ პერსონალური რჩევები შენთვის", err_bad_login:"არასწორი email ან პაროლი.", signin_create_cta:"ახალი ხარ? შექმენი ანგარიში", recs_empty_title:"პერსონალური რჩევები", recs_empty_sub:"შეიყვანე მოთხოვნა ან დატოვე ცარიელი და დააჭირე ღილაკს „მირჩიე“", recs_thinking:"ვფიქრობ…", recs_still_thinking:"ჯერ კიდევ ვფიქრობ, მოითმინე…", based_on_label:"ნანახი ფილმების მიხედვით", recs_hint_empty:"დაამატე ნანახი ფილმები პერსონალური რჩევებისთვის", picks_left_today:"პერსონალური რჩევა დარჩა დღეს", picks_left_week:"პერსონალური რჩევა დარჩა ამ კვირას", why_off_many:"გირჩევენ შენი {n} საყვარელი ფილმიდან: {films}", why_off_one:"რადგან მოგეწონა {film}", why_season:"{season} საღამოებისთვის", why_acclaimed:"მაღალი შეფასება, {decade}", why_for_query:"მოთხოვნით «{q}»", why_person:"{name}-ის მონაწილეობით", season_winter:"ზამთრის", season_spring:"გაზაფხულის", season_summer:"ზაფხულის", season_autumn:"შემოდგომის", email_did_you_mean:"იქნებ იგულისხმეთ", toast_list_limit:"შეგიძლია გქონდეს {n} საკუთარი სია, პლუს პირადი. გაზიარებული სიები არ ითვლება.", lists_header:"სიები", mark_watched:"მონიშნე ნანახად", picks_exhausted:"ამ კვირის რჩევები ამოიწურა. ახლები მომავალ კვირას იქნება.", toast_member_limit:"სიაში შეიძლება იყოს {n} ადამიანი, შენ ჩათვლით.", toast_list_full:"სია სავსეა: {n} ადამიანი მფლობელთან ერთად.", picks_random:"შემთხვევითი რჩევები", picks_tonight:"რჩევები საღამოსთვის", picks_for_you:"რჩევები შენთვის", where_to_watch:"სად ვუყუროთ", watch_attrib:"სტრიმინგის მონაცემები: JustWatch",
     loading_lbl:"იტვირთება…", err_no_results_title:"ვერაფერი მოიძებნა", err_no_results_sub:"სცადე მხოლოდ სათაური, წლის გარეშე", err_connection:"კავშირის შეცდომა", err_generic:"შეცდომა", report:"საჩივარი", report_prefill:"საჩივარი {name}-ზე. რა მოხდა:", err_not_found_title:"ვერ მოიძებნა", err_no_results_for:"ვერაფერი მოიძებნა:", err_took_long_title:"ძალიან დიდხანს", err_took_long_sub:"სცადე ცოტა ხანში", recs_none_title:"რჩევები ვერ მოიძებნა", recs_none_sub:"სცადე სხვა მოთხოვნა", recs_unavail_title:"რჩევები მიუწვდომელია", recs_unavail_sub:"სცადე მოგვიანებით", inbox_empty_title:"ჩატები ჯერ არ არის", inbox_empty_sub:"გააზიარე ფილმი ძიებიდან ან სიიდან, რომ დაიწყო საუბარი",
     continue_as_guest:"დაიწყე ანგარიშის გარეშე", guest_label:"სტუმარი", guest_banner:"ინახება მხოლოდ ამ მოწყობილობაზე", guest_join_btn:"შემოუერთდი Cinemail-ს", guest_save_sub:"შეინახე ფილმები ყველა მოწყობილობაზე და გაუზიარე მეგობრებს - უფასოდ, სამუდამოდ.", guest_join_free:"უფასოდ შემოუერთდი", guest_maybe_later:"მოგვიანებით", guest_already_acct:"უკვე გაქვს ანგარიში?",
     del_acct_guest:"თქვენ სტუმრად ხართ - ხელახლა შესასვლელი ელფოსტა არ არსებობს. აღდგენა შეუძლებელია.", ob_mock_mylist:"ჩემი სია", ob_mock_name:"თქვენი სახელი", block:"დაბლოკვა", block_q:"დაიბლოკოს {name}?", block_warn:"ის ვეღარ გამოგიგზავნით ფილმებს, შეტყობინებებს და მეგობრობის მოთხოვნებს. გაუქმება შესაძლებელია ანგარიშში.", block_done:"დაბლოკილია", block_failed:"დაბლოკვა ვერ მოხერხდა", unblock:"განბლოკვა", err_not_allowed:"ვერ შესრულდა.", unblock_note:"განბლოკვა ხსნის ბლოკს, მაგრამ მეგობრობას არ აღადგენს - მას ხელახლა მოუწევს მოთხოვნის გაგზავნა.", unblock_done:"განიბლოკა", blocked_header:"დაბლოკილები", block_someone:"ვიღაც", del_acct_q:"წავშალოთ ანგარიში?", del_acct_warn:"სამუდამოდ წაიშლება ნანახის ისტორია, ყველა სია, მეგობრები და ანგარიშის მონაცემები. დაბრუნება შეუძლებელია.", del_acct_confirm:"წაშალე ჩემი ანგარიში", del_acct_working:"იშლება…", del_acct_done:"ანგარიში წაიშალა.", del_acct_failed:"ანგარიშის წაშლა ვერ მოხერხდა",
@@ -4016,7 +4016,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Elige un amigo para invitar:", add_friends_first:"Añade amigos primero para invitarlos",
     invite_valid_48:"Válido 48 horas", invite_connect_hint:"Cuando lo abran, os conectaréis como amigos al instante.",
     join_list_q:"Unirse a la lista", join_invited_sub:"Te han invitado a una lista compartida de películas",
-    list_picker_title:"Añadir a lista", filter_friends:"Filtrar amigos…", searching:"Buscando…", not_found:"No encontrado", friends_empty:"Aún no tienes amigos. Usa el enlace de invitación de abajo para añadir a quienes ves películas.", friend_remove_suffix:"— ¿quitar de amigos?", friends_no_match:"Sin coincidencias", edit_modal_title:"EDITAR RESEÑA", share_modal_title:"RECOMENDAR UNA PELÍCULA", send_btn:"Enviar", note_ph:"¿Qué te pareció?", share_msg_ph:"Por qué te encantará…", add_modal_seen:"MARCAR COMO VISTA", add_modal_list:"AÑADIR A LISTA", ob8_picks:"✨ Selección personal para ti", err_bad_login:"Email o contraseña incorrectos.", signin_create_cta:"¿Eres nuevo? Crea una cuenta", recs_empty_title:"Recomendaciones personales", recs_empty_sub:"Escribe una idea o déjalo vacío y toca Sugerir", recs_thinking:"Pensando…", recs_still_thinking:"Sigo pensando, un momento…", based_on_label:"Según tus películas vistas", recs_hint_empty:"Añade películas vistas para recomendaciones personales", picks_left_today:"selecciones personales restantes hoy", picks_left_week:"selecciones personales restantes esta semana", why_off_many:"Recomendada a partir de {n} de tus favoritas: {films}", why_off_one:"Porque te gustó {film}", why_season:"Para las tardes de {season}", why_acclaimed:"Muy valorada, de los {decade}", season_winter:"invierno", season_spring:"primavera", season_summer:"verano", season_autumn:"otoño", email_did_you_mean:"¿Quisiste decir", picks_random:"Selección al azar", picks_tonight:"Para esta noche", picks_for_you:"Para ti", where_to_watch:"Dónde ver", watch_attrib:"Datos de streaming por JustWatch",
+    list_picker_title:"Añadir a lista", filter_friends:"Filtrar amigos…", searching:"Buscando…", not_found:"No encontrado", friends_empty:"Aún no tienes amigos. Usa el enlace de invitación de abajo para añadir a quienes ves películas.", friend_remove_suffix:"— ¿quitar de amigos?", friends_no_match:"Sin coincidencias", edit_modal_title:"EDITAR RESEÑA", share_modal_title:"RECOMENDAR UNA PELÍCULA", send_btn:"Enviar", note_ph:"¿Qué te pareció?", share_msg_ph:"Por qué te encantará…", add_modal_seen:"MARCAR COMO VISTA", add_modal_list:"AÑADIR A LISTA", ob8_picks:"✨ Selección personal para ti", err_bad_login:"Email o contraseña incorrectos.", signin_create_cta:"¿Eres nuevo? Crea una cuenta", recs_empty_title:"Recomendaciones personales", recs_empty_sub:"Escribe una idea o déjalo vacío y toca Sugerir", recs_thinking:"Pensando…", recs_still_thinking:"Sigo pensando, un momento…", based_on_label:"Según tus películas vistas", recs_hint_empty:"Añade películas vistas para recomendaciones personales", picks_left_today:"selecciones personales restantes hoy", picks_left_week:"selecciones personales restantes esta semana", why_off_many:"Recomendada a partir de {n} de tus favoritas: {films}", why_off_one:"Porque te gustó {film}", why_season:"Para las tardes de {season}", why_acclaimed:"Muy valorada, de los {decade}", why_for_query:"Por tu búsqueda «{q}»", why_person:"Con {name}", season_winter:"invierno", season_spring:"primavera", season_summer:"verano", season_autumn:"otoño", email_did_you_mean:"¿Quisiste decir", toast_list_limit:"Puedes tener {n} listas propias, más tu lista personal. Las listas compartidas contigo no cuentan.", lists_header:"Listas", mark_watched:"Marcar como vista", picks_exhausted:"Has usado las selecciones de esta semana. Vuelven la semana que viene.", toast_member_limit:"Una lista puede tener {n} personas, incluyéndote.", toast_list_full:"Esta lista está llena: {n} personas con el propietario.", picks_random:"Selección al azar", picks_tonight:"Para esta noche", picks_for_you:"Para ti", where_to_watch:"Dónde ver", watch_attrib:"Datos de streaming por JustWatch",
     loading_lbl:"Cargando…", err_no_results_title:"Sin resultados", err_no_results_sub:"Prueba solo el título, sin el año", err_connection:"Error de conexión", err_generic:"Error", report:"Denunciar", report_prefill:"Denuncia sobre un mensaje de {name}. Qué ha pasado:", err_not_found_title:"No encontrado", err_no_results_for:"Sin resultados para", err_took_long_title:"Tardó demasiado", err_took_long_sub:"Inténtalo en un momento", recs_none_title:"Sin recomendaciones", recs_none_sub:"Prueba otra pista", recs_unavail_title:"Recomendaciones no disponibles", recs_unavail_sub:"Inténtalo más tarde", inbox_empty_title:"Aún no hay chats", inbox_empty_sub:"Comparte una película desde la búsqueda o tu lista para iniciar una conversación",
     continue_as_guest:"Empezar sin cuenta", guest_label:"Invitado", guest_banner:"Se guarda solo en este dispositivo", guest_join_btn:"Unirse a Cinemail", guest_save_sub:"Guarda tus películas en todos tus dispositivos y compártelas con amigos - gratis para siempre.", guest_join_free:"Unirse gratis", guest_maybe_later:"Quizás luego", guest_already_acct:"¿Ya tienes cuenta?",
     del_acct_guest:"Has entrado como invitado, así que no hay correo para volver a entrar. No se podrá deshacer ni recuperar nada.", ob_mock_mylist:"Mi lista", ob_mock_name:"Tu nombre", block:"Bloquear", block_q:"¿Bloquear a {name}?", block_warn:"No podrá enviarte películas, mensajes ni solicitudes de amistad. Puedes deshacerlo en tu cuenta.", block_done:"Bloqueado", block_failed:"No se pudo bloquear", unblock:"Desbloquear", err_not_allowed:"No se pudo completar.", unblock_note:"Desbloquear quita el bloqueo pero no restaura la amistad. Tendrían que enviarte una nueva solicitud.", unblock_done:"Desbloqueado", blocked_header:"Personas bloqueadas", block_someone:"Alguien", del_acct_q:"¿Eliminar la cuenta?", del_acct_warn:"Se borrarán para siempre tu historial de películas vistas, todas tus listas, tus amigos y los datos de la cuenta. No se puede deshacer.", del_acct_confirm:"Eliminar mi cuenta", del_acct_working:"Eliminando…", del_acct_done:"Cuenta eliminada.", del_acct_failed:"No se pudo eliminar la cuenta",
@@ -4148,7 +4148,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Choisis un ami à inviter :", add_friends_first:"Ajoute d'abord des amis pour les inviter",
     invite_valid_48:"Valable 48 heures", invite_connect_hint:"À l'ouverture, vous deviendrez amis en un clic.",
     join_list_q:"Rejoindre la liste", join_invited_sub:"Tu es invité à une liste de films partagée",
-    list_picker_title:"Ajouter à la liste", filter_friends:"Filtrer les amis…", searching:"Recherche…", not_found:"Introuvable", friends_empty:"Pas encore d'amis. Utilise le lien d'invitation ci-dessous pour ajouter tes compagnons de visionnage.", friend_remove_suffix:"— retirer des amis ?", friends_no_match:"Aucun ami trouvé", edit_modal_title:"MODIFIER L'AVIS", share_modal_title:"RECOMMANDER UN FILM", send_btn:"Envoyer", note_ph:"Qu'en as-tu pensé ?", share_msg_ph:"Pourquoi tu vas adorer…", add_modal_seen:"MARQUER COMME VU", add_modal_list:"AJOUTER À LA LISTE", ob8_picks:"✨ Sélections personnelles pour toi", err_bad_login:"Email ou mot de passe incorrect.", signin_create_cta:"Nouveau ? Crée un compte", recs_empty_title:"Sélections personnelles", recs_empty_sub:"Saisis une idée ou laisse vide et appuie sur Suggérer", recs_thinking:"Réflexion…", recs_still_thinking:"Je réfléchis encore, un instant…", based_on_label:"D'après tes films vus", recs_hint_empty:"Ajoute des films vus pour des recommandations personnelles", picks_left_today:"sélections personnelles restantes aujourd'hui", picks_left_week:"sélections personnelles restantes cette semaine", why_off_many:"Recommandé d'après {n} de tes préférés : {films}", why_off_one:"Parce que tu as aimé {film}", why_season:"Pour les soirées d'{season}", why_acclaimed:"Très bien noté, des années {decade}", season_winter:"hiver", season_spring:"printemps", season_summer:"été", season_autumn:"automne", email_did_you_mean:"Vouliez-vous dire", picks_random:"Au hasard", picks_tonight:"Pour ce soir", picks_for_you:"Pour toi", where_to_watch:"Où regarder", watch_attrib:"Données de streaming par JustWatch",
+    list_picker_title:"Ajouter à la liste", filter_friends:"Filtrer les amis…", searching:"Recherche…", not_found:"Introuvable", friends_empty:"Pas encore d'amis. Utilise le lien d'invitation ci-dessous pour ajouter tes compagnons de visionnage.", friend_remove_suffix:"— retirer des amis ?", friends_no_match:"Aucun ami trouvé", edit_modal_title:"MODIFIER L'AVIS", share_modal_title:"RECOMMANDER UN FILM", send_btn:"Envoyer", note_ph:"Qu'en as-tu pensé ?", share_msg_ph:"Pourquoi tu vas adorer…", add_modal_seen:"MARQUER COMME VU", add_modal_list:"AJOUTER À LA LISTE", ob8_picks:"✨ Sélections personnelles pour toi", err_bad_login:"Email ou mot de passe incorrect.", signin_create_cta:"Nouveau ? Crée un compte", recs_empty_title:"Sélections personnelles", recs_empty_sub:"Saisis une idée ou laisse vide et appuie sur Suggérer", recs_thinking:"Réflexion…", recs_still_thinking:"Je réfléchis encore, un instant…", based_on_label:"D'après tes films vus", recs_hint_empty:"Ajoute des films vus pour des recommandations personnelles", picks_left_today:"sélections personnelles restantes aujourd'hui", picks_left_week:"sélections personnelles restantes cette semaine", why_off_many:"Recommandé d'après {n} de tes préférés : {films}", why_off_one:"Parce que tu as aimé {film}", why_season:"Pour les soirées d'{season}", why_acclaimed:"Très bien noté, des années {decade}", why_for_query:"Pour la recherche « {q} »", why_person:"Avec {name}", season_winter:"hiver", season_spring:"printemps", season_summer:"été", season_autumn:"automne", email_did_you_mean:"Vouliez-vous dire", toast_list_limit:"Tu peux avoir {n} listes à toi, plus ta liste personnelle. Les listes partagées avec toi ne comptent pas.", lists_header:"Listes", mark_watched:"Marquer comme vu", picks_exhausted:"Tu as utilisé les sélections de cette semaine. Elles reviennent la semaine prochaine.", toast_member_limit:"Une liste peut compter {n} personnes, toi compris.", toast_list_full:"Cette liste est pleine : {n} personnes avec le propriétaire.", picks_random:"Au hasard", picks_tonight:"Pour ce soir", picks_for_you:"Pour toi", where_to_watch:"Où regarder", watch_attrib:"Données de streaming par JustWatch",
     loading_lbl:"Chargement…", err_no_results_title:"Aucun résultat", err_no_results_sub:"Essaie juste le titre, sans l'année", err_connection:"Erreur de connexion", err_generic:"Erreur", report:"Signaler", report_prefill:"Signalement d'un message de {name}. Que s'est-il passé :", err_not_found_title:"Introuvable", err_no_results_for:"Aucun résultat pour", err_took_long_title:"Trop long", err_took_long_sub:"Réessaie dans un instant", recs_none_title:"Aucune sélection", recs_none_sub:"Essaie une autre idée", recs_unavail_title:"Sélections indisponibles", recs_unavail_sub:"Réessaie plus tard", inbox_empty_title:"Pas encore de discussions", inbox_empty_sub:"Partage un film depuis la recherche ou ta liste pour démarrer une conversation",
     continue_as_guest:"Commencer sans compte", guest_label:"Invité", guest_banner:"Enregistré uniquement sur cet appareil", guest_join_btn:"Rejoindre Cinemail", guest_save_sub:"Garde tes films sur tous tes appareils et partage-les avec tes amis - gratuit pour toujours.", guest_join_free:"Rejoindre gratuitement", guest_maybe_later:"Plus tard", guest_already_acct:"Tu as deja un compte ?",
     del_acct_guest:"Tu es connecté en tant qu\u2019invité, il n\u2019y a donc pas d\u2019e-mail pour revenir. Rien ne pourra être récupéré.", ob_mock_mylist:"Ma liste", ob_mock_name:"Ton nom", block:"Bloquer", block_q:"Bloquer {name} ?", block_warn:"Cette personne ne pourra plus t\u2019envoyer de films, de messages ni de demandes d\u2019ami. Réversible depuis ton compte.", block_done:"Bloqué", block_failed:"Impossible de bloquer", unblock:"Débloquer", err_not_allowed:"Cela n'a pas abouti.", unblock_note:"Débloquer lève le blocage mais ne rétablit pas l'amitié. La personne devra envoyer une nouvelle demande.", unblock_done:"Débloqué", blocked_header:"Personnes bloquées", block_someone:"Quelqu\u2019un", del_acct_q:"Supprimer le compte ?", del_acct_warn:"Cela supprimera définitivement ton historique de films, toutes tes listes, tes amis et les données du compte. C'est irréversible.", del_acct_confirm:"Supprimer mon compte", del_acct_working:"Suppression…", del_acct_done:"Compte supprimé.", del_acct_failed:"Impossible de supprimer le compte",
@@ -4280,7 +4280,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Wähle einen Freund zum Einladen:", add_friends_first:"Füge erst Freunde hinzu, um sie einzuladen",
     invite_valid_48:"48 Stunden gültig", invite_connect_hint:"Wenn sie ihn öffnen, werdet ihr mit einem Tipp Freunde.",
     join_list_q:"Der Liste beitreten", join_invited_sub:"Du wurdest zu einer geteilten Filmliste eingeladen",
-    list_picker_title:"Zur Liste", filter_friends:"Freunde filtern…", searching:"Suche…", not_found:"Nicht gefunden", friends_empty:"Noch keine Freunde. Nutze den Einladungslink unten, um die Leute hinzuzufügen, mit denen du schaust.", friend_remove_suffix:"— aus Freunden entfernen?", friends_no_match:"Keine passenden Freunde", edit_modal_title:"BEWERTUNG BEARBEITEN", share_modal_title:"FILM EMPFEHLEN", send_btn:"Senden", note_ph:"Wie fandest du ihn?", share_msg_ph:"Warum du ihn lieben wirst…", add_modal_seen:"ALS GESEHEN MARKIEREN", add_modal_list:"ZUR LISTE HINZUFÜGEN", ob8_picks:"✨ Persönliche Tipps für dich", err_bad_login:"Falsche E-Mail oder Passwort.", signin_create_cta:"Neu hier? Konto erstellen", recs_empty_title:"Persönliche Tipps", recs_empty_sub:"Gib eine Idee ein oder lass es leer und tippe auf Vorschlagen", recs_thinking:"Denke nach…", recs_still_thinking:"Denke noch nach, einen Moment…", based_on_label:"Basierend auf gesehenen Filmen", recs_hint_empty:"Füge gesehene Filme für persönliche Tipps hinzu", picks_left_today:"persönliche Tipps heute übrig", picks_left_week:"persönliche Tipps diese Woche übrig", why_off_many:"Empfohlen auf Basis von {n} deiner Favoriten: {films}", why_off_one:"Weil dir {film} gefallen hat", why_season:"Für {season}abende", why_acclaimed:"Hoch bewertet, aus den {decade}ern", season_winter:"Winter", season_spring:"Frühlings", season_summer:"Sommer", season_autumn:"Herbst", email_did_you_mean:"Meintest du", picks_random:"Zufällige Tipps", picks_tonight:"Tipps für heute Abend", picks_for_you:"Tipps für dich", where_to_watch:"Wo zu sehen", watch_attrib:"Streaming-Daten von JustWatch",
+    list_picker_title:"Zur Liste", filter_friends:"Freunde filtern…", searching:"Suche…", not_found:"Nicht gefunden", friends_empty:"Noch keine Freunde. Nutze den Einladungslink unten, um die Leute hinzuzufügen, mit denen du schaust.", friend_remove_suffix:"— aus Freunden entfernen?", friends_no_match:"Keine passenden Freunde", edit_modal_title:"BEWERTUNG BEARBEITEN", share_modal_title:"FILM EMPFEHLEN", send_btn:"Senden", note_ph:"Wie fandest du ihn?", share_msg_ph:"Warum du ihn lieben wirst…", add_modal_seen:"ALS GESEHEN MARKIEREN", add_modal_list:"ZUR LISTE HINZUFÜGEN", ob8_picks:"✨ Persönliche Tipps für dich", err_bad_login:"Falsche E-Mail oder Passwort.", signin_create_cta:"Neu hier? Konto erstellen", recs_empty_title:"Persönliche Tipps", recs_empty_sub:"Gib eine Idee ein oder lass es leer und tippe auf Vorschlagen", recs_thinking:"Denke nach…", recs_still_thinking:"Denke noch nach, einen Moment…", based_on_label:"Basierend auf gesehenen Filmen", recs_hint_empty:"Füge gesehene Filme für persönliche Tipps hinzu", picks_left_today:"persönliche Tipps heute übrig", picks_left_week:"persönliche Tipps diese Woche übrig", why_off_many:"Empfohlen auf Basis von {n} deiner Favoriten: {films}", why_off_one:"Weil dir {film} gefallen hat", why_season:"Für {season}abende", why_acclaimed:"Hoch bewertet, aus den {decade}ern", why_for_query:"Passend zu „{q}“", why_person:"Mit {name}", season_winter:"Winter", season_spring:"Frühlings", season_summer:"Sommer", season_autumn:"Herbst", email_did_you_mean:"Meintest du", toast_list_limit:"Du kannst {n} eigene Listen haben, plus deine persönliche Liste. Geteilte Listen zählen nicht.", lists_header:"Listen", mark_watched:"Als gesehen markieren", picks_exhausted:"Du hast die Tipps dieser Woche aufgebraucht. Nächste Woche gibt es neue.", toast_member_limit:"Eine Liste fasst {n} Personen, dich eingeschlossen.", toast_list_full:"Diese Liste ist voll: {n} Personen samt Besitzer.", picks_random:"Zufällige Tipps", picks_tonight:"Tipps für heute Abend", picks_for_you:"Tipps für dich", where_to_watch:"Wo zu sehen", watch_attrib:"Streaming-Daten von JustWatch",
     loading_lbl:"Lädt…", err_no_results_title:"Keine Ergebnisse", err_no_results_sub:"Versuch nur den Titel, ohne Jahr", err_connection:"Verbindungsfehler", err_generic:"Fehler", report:"Melden", report_prefill:"Meldung zu einer Nachricht von {name}. Was ist passiert:", err_not_found_title:"Nicht gefunden", err_no_results_for:"Keine Ergebnisse für", err_took_long_title:"Hat zu lange gedauert", err_took_long_sub:"Versuch es gleich nochmal", recs_none_title:"Keine Tipps gefunden", recs_none_sub:"Versuch eine andere Idee", recs_unavail_title:"Tipps nicht verfügbar", recs_unavail_sub:"Bitte versuch es später", inbox_empty_title:"Noch keine Chats", inbox_empty_sub:"Teile einen Film aus der Suche oder deiner Liste, um ein Gespräch zu starten",
     continue_as_guest:"Ohne Konto starten", guest_label:"Gast", guest_banner:"Nur auf diesem Gerät gespeichert", guest_join_btn:"Cinemail beitreten", guest_save_sub:"Sichere deine Filme auf allen Geräten und teile sie mit Freunden - für immer kostenlos.", guest_join_free:"Kostenlos beitreten", guest_maybe_later:"Vielleicht später", guest_already_acct:"Hast du schon ein Konto?",
     del_acct_guest:"Du bist als Gast angemeldet - es gibt keine E-Mail, um dich wieder anzumelden. Nichts lässt sich wiederherstellen.", ob_mock_mylist:"Meine Liste", ob_mock_name:"Dein Name", block:"Blockieren", block_q:"{name} blockieren?", block_warn:"Diese Person kann dir keine Filme, Nachrichten oder Freundschaftsanfragen mehr senden. In deinem Konto rückgängig zu machen.", block_done:"Blockiert", block_failed:"Blockieren fehlgeschlagen", unblock:"Entsperren", err_not_allowed:"Das hat nicht funktioniert.", unblock_note:"Die Entsperrung hebt die Blockierung auf, stellt die Freundschaft aber nicht wieder her. Die Person müsste eine neue Anfrage senden.", unblock_done:"Entsperrt", blocked_header:"Blockierte Personen", block_someone:"Jemand", del_acct_q:"Konto löschen?", del_acct_warn:"Damit werden dein Filmverlauf, alle Listen, Freunde und Kontodaten endgültig gelöscht. Das lässt sich nicht rückgängig machen.", del_acct_confirm:"Mein Konto löschen", del_acct_working:"Wird gelöscht…", del_acct_done:"Konto gelöscht.", del_acct_failed:"Konto konnte nicht gelöscht werden",
@@ -4412,7 +4412,7 @@ const _I18N_EXTRA = {
     select_friend_invite:"Scegli un amico da invitare:", add_friends_first:"Aggiungi prima degli amici per invitarli",
     invite_valid_48:"Valido per 48 ore", invite_connect_hint:"Quando lo aprono, diventerete amici con un tocco.",
     join_list_q:"Unisciti alla lista", join_invited_sub:"Sei stato invitato a una lista di film condivisa",
-    list_picker_title:"Alla lista", filter_friends:"Filtra amici…", searching:"Ricerca…", not_found:"Non trovato", friends_empty:"Ancora nessun amico. Usa il link d'invito qui sotto per aggiungere le persone con cui guardi i film.", friend_remove_suffix:"— rimuovere dagli amici?", friends_no_match:"Nessun amico corrisponde", edit_modal_title:"MODIFICA RECENSIONE", share_modal_title:"CONSIGLIA UN FILM", send_btn:"Invia", note_ph:"Cosa ne pensi?", share_msg_ph:"Perché ti piacerà…", add_modal_seen:"SEGNA COME VISTO", add_modal_list:"AGGIUNGI ALLA LISTA", ob8_picks:"✨ Consigli personali per te", err_bad_login:"Email o password errati.", signin_create_cta:"Nuovo qui? Crea un account", recs_empty_title:"Consigli personali", recs_empty_sub:"Inserisci un'idea o lascia vuoto e tocca Consiglia", recs_thinking:"Sto pensando…", recs_still_thinking:"Sto ancora pensando, un attimo…", based_on_label:"In base ai film visti", recs_hint_empty:"Aggiungi film visti per consigli personali", picks_left_today:"consigli personali rimasti oggi", picks_left_week:"consigli personali rimasti questa settimana", why_off_many:"Consigliato a partire da {n} dei tuoi preferiti: {films}", why_off_one:"Perché ti è piaciuto {film}", why_season:"Per le sere d'{season}", why_acclaimed:"Molto apprezzato, dagli anni {decade}", season_winter:"inverno", season_spring:"primavera", season_summer:"estate", season_autumn:"autunno", email_did_you_mean:"Intendevi", picks_random:"Consigli casuali", picks_tonight:"Per stasera", picks_for_you:"Per te", where_to_watch:"Dove vederlo", watch_attrib:"Dati streaming da JustWatch",
+    list_picker_title:"Alla lista", filter_friends:"Filtra amici…", searching:"Ricerca…", not_found:"Non trovato", friends_empty:"Ancora nessun amico. Usa il link d'invito qui sotto per aggiungere le persone con cui guardi i film.", friend_remove_suffix:"— rimuovere dagli amici?", friends_no_match:"Nessun amico corrisponde", edit_modal_title:"MODIFICA RECENSIONE", share_modal_title:"CONSIGLIA UN FILM", send_btn:"Invia", note_ph:"Cosa ne pensi?", share_msg_ph:"Perché ti piacerà…", add_modal_seen:"SEGNA COME VISTO", add_modal_list:"AGGIUNGI ALLA LISTA", ob8_picks:"✨ Consigli personali per te", err_bad_login:"Email o password errati.", signin_create_cta:"Nuovo qui? Crea un account", recs_empty_title:"Consigli personali", recs_empty_sub:"Inserisci un'idea o lascia vuoto e tocca Consiglia", recs_thinking:"Sto pensando…", recs_still_thinking:"Sto ancora pensando, un attimo…", based_on_label:"In base ai film visti", recs_hint_empty:"Aggiungi film visti per consigli personali", picks_left_today:"consigli personali rimasti oggi", picks_left_week:"consigli personali rimasti questa settimana", why_off_many:"Consigliato a partire da {n} dei tuoi preferiti: {films}", why_off_one:"Perché ti è piaciuto {film}", why_season:"Per le sere d'{season}", why_acclaimed:"Molto apprezzato, dagli anni {decade}", why_for_query:"Per la ricerca «{q}»", why_person:"Con {name}", season_winter:"inverno", season_spring:"primavera", season_summer:"estate", season_autumn:"autunno", email_did_you_mean:"Intendevi", toast_list_limit:"Puoi avere {n} liste tue, più la lista personale. Le liste condivise con te non contano.", lists_header:"Liste", mark_watched:"Segna come visto", picks_exhausted:"Hai usato i consigli di questa settimana. Tornano la prossima.", toast_member_limit:"Una lista può avere {n} persone, incluso te.", toast_list_full:"Questa lista è piena: {n} persone col proprietario.", picks_random:"Consigli casuali", picks_tonight:"Per stasera", picks_for_you:"Per te", where_to_watch:"Dove vederlo", watch_attrib:"Dati streaming da JustWatch",
     loading_lbl:"Caricamento…", err_no_results_title:"Nessun risultato", err_no_results_sub:"Prova solo il titolo, senza l'anno", err_connection:"Errore di connessione", err_generic:"Errore", report:"Segnala", report_prefill:"Segnalazione di un messaggio di {name}. Che cosa è successo:", err_not_found_title:"Non trovato", err_no_results_for:"Nessun risultato per", err_took_long_title:"Ha impiegato troppo", err_took_long_sub:"Riprova tra un attimo", recs_none_title:"Nessun consiglio trovato", recs_none_sub:"Prova un'altra idea", recs_unavail_title:"Consigli non disponibili", recs_unavail_sub:"Riprova più tardi", inbox_empty_title:"Ancora nessuna chat", inbox_empty_sub:"Condividi un film dalla ricerca o dalla tua lista per iniziare una conversazione",
     continue_as_guest:"Inizia senza account", guest_label:"Ospite", guest_banner:"Salvato solo su questo dispositivo", guest_join_btn:"Unisciti a Cinemail", guest_save_sub:"Conserva i tuoi film su tutti i dispositivi e condividili con gli amici - gratis per sempre.", guest_join_free:"Unisciti gratis", guest_maybe_later:"Forse più tardi", guest_already_acct:"Hai già un account?",
     del_acct_guest:"Sei entrato come ospite, quindi non c\u2019è un\u2019email per rientrare. Non si potrà recuperare nulla.", ob_mock_mylist:"La mia lista", ob_mock_name:"Il tuo nome", block:"Blocca", block_q:"Bloccare {name}?", block_warn:"Non potrà più inviarti film, messaggi o richieste di amicizia. Puoi annullare dal tuo account.", block_done:"Bloccato", block_failed:"Impossibile bloccare", unblock:"Sblocca", err_not_allowed:"Non è stato possibile.", unblock_note:"Sbloccare rimuove il blocco ma non ripristina l'amicizia. La persona dovrebbe inviare una nuova richiesta.", unblock_done:"Sbloccato", blocked_header:"Persone bloccate", block_someone:"Qualcuno", del_acct_q:"Eliminare l'account?", del_acct_warn:"Verranno eliminati per sempre la cronologia dei film, tutte le liste, gli amici e i dati dell'account. L'operazione è irreversibile.", del_acct_confirm:"Elimina il mio account", del_acct_working:"Eliminazione…", del_acct_done:"Account eliminato.", del_acct_failed:"Impossibile eliminare l'account",
@@ -4531,14 +4531,14 @@ const _I18N_BACKUP_BTN = {
 Object.keys(_I18N_BACKUP_BTN).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_BACKUP_BTN[l]); });
 // "Read me" sheet content for the Excel backup (first tab the user sees on open)
 const _I18N_README = {
-  en:{ rm_title:"Cinemail - backup of your films & lists", rm_site:"Website", rm_what_q:"What is this file?", rm_what_a:"A backup of your films, ratings, comments and lists. The tabs Films, Lists and Members hold your data.", rm_how_q:"How to restore it", rm_how_a:"Open Cinemail - Profile - tap Restore (↑) - choose this file. Your lists and films come back.", rm_edit_q:"Editing this file", rm_edit_a:"You can edit it in Excel, Numbers or Google Sheets. When saving, keep the Excel (.xlsx) format." },
-  ru:{ rm_title:"Cinemail - резервная копия твоих фильмов и списков", rm_site:"Сайт", rm_what_q:"Что это за файл?", rm_what_a:"Резервная копия твоих фильмов, оценок, комментариев и списков. Вкладки Films, Lists и Members хранят данные.", rm_how_q:"Как восстановить", rm_how_a:"Открой Cinemail - Профиль - нажми Восстановить (↑) - выбери этот файл. Списки и фильмы вернутся.", rm_edit_q:"Если редактируешь файл", rm_edit_a:"Можно править в Excel, Numbers или Google Таблицах. При сохранении оставляй формат Excel (.xlsx)." },
-  uk:{ rm_title:"Cinemail - резервна копія твоїх фільмів і списків", rm_site:"Сайт", rm_what_q:"Що це за файл?", rm_what_a:"Резервна копія твоїх фільмів, оцінок, коментарів і списків. Вкладки Films, Lists і Members зберігають дані.", rm_how_q:"Як відновити", rm_how_a:"Відкрий Cinemail - Профіль - натисни Відновити (↑) - обери цей файл. Списки і фільми повернуться.", rm_edit_q:"Якщо редагуєш файл", rm_edit_a:"Можна правити в Excel, Numbers чи Google Таблицях. При збереженні залишай формат Excel (.xlsx)." },
-  ka:{ rm_title:"Cinemail - შენი ფილმებისა და სიების სარეზერვო ასლი", rm_site:"საიტი", rm_what_q:"რა ფაილია ეს?", rm_what_a:"შენი ფილმების, შეფასებების, კომენტარებისა და სიების სარეზერვო ასლი. ჩანართები Films, Lists და Members ინახავს მონაცემებს.", rm_how_q:"როგორ აღვადგინო", rm_how_a:"გახსენი Cinemail - პროფილი - დააჭირე აღდგენა (↑) - აირჩიე ეს ფაილი. სიები და ფილმები დაბრუნდება.", rm_edit_q:"თუ არედაქტირებ ფაილს", rm_edit_a:"შეგიძლია დაარედაქტირო Excel-ში, Numbers-ში ან Google Sheets-ში. შენახვისას დატოვე Excel (.xlsx) ფორმატი." },
-  es:{ rm_title:"Cinemail - copia de seguridad de tus películas y listas", rm_site:"Sitio web", rm_what_q:"¿Qué es este archivo?", rm_what_a:"Una copia de tus películas, valoraciones, comentarios y listas. Las pestañas Films, Lists y Members guardan tus datos.", rm_how_q:"Cómo restaurarlo", rm_how_a:"Abre Cinemail - Perfil - pulsa Restaurar (↑) - elige este archivo. Tus listas y películas vuelven.", rm_edit_q:"Si editas el archivo", rm_edit_a:"Puedes editarlo en Excel, Numbers o Google Sheets. Al guardar, mantén el formato Excel (.xlsx)." },
-  fr:{ rm_title:"Cinemail - sauvegarde de tes films et listes", rm_site:"Site web", rm_what_q:"Qu'est-ce que ce fichier ?", rm_what_a:"Une sauvegarde de tes films, notes, commentaires et listes. Les onglets Films, Lists et Members contiennent tes données.", rm_how_q:"Comment le restaurer", rm_how_a:"Ouvre Cinemail - Profil - appuie sur Restaurer (↑) - choisis ce fichier. Tes listes et films reviennent.", rm_edit_q:"Si tu modifies le fichier", rm_edit_a:"Tu peux l'éditer dans Excel, Numbers ou Google Sheets. À l'enregistrement, garde le format Excel (.xlsx)." },
-  de:{ rm_title:"Cinemail - Sicherung deiner Filme und Listen", rm_site:"Website", rm_what_q:"Was ist diese Datei?", rm_what_a:"Eine Sicherung deiner Filme, Bewertungen, Kommentare und Listen. Die Tabs Films, Lists und Members enthalten deine Daten.", rm_how_q:"Wiederherstellen", rm_how_a:"Öffne Cinemail - Profil - tippe auf Wiederherstellen (↑) - wähle diese Datei. Deine Listen und Filme kommen zurück.", rm_edit_q:"Datei bearbeiten", rm_edit_a:"Du kannst sie in Excel, Numbers oder Google Sheets bearbeiten. Beim Speichern das Excel-Format (.xlsx) behalten." },
-  it:{ rm_title:"Cinemail - backup dei tuoi film e liste", rm_site:"Sito web", rm_what_q:"Cos'è questo file?", rm_what_a:"Un backup dei tuoi film, voti, commenti e liste. Le schede Films, Lists e Members contengono i tuoi dati.", rm_how_q:"Come ripristinarlo", rm_how_a:"Apri Cinemail - Profilo - tocca Ripristina (↑) - scegli questo file. Le tue liste e i film tornano.", rm_edit_q:"Se modifichi il file", rm_edit_a:"Puoi modificarlo in Excel, Numbers o Google Sheets. Quando salvi, mantieni il formato Excel (.xlsx)." },
+  en:{ rm_title:"Cinemail - backup of your films & lists", rm_subtitle:"Your films, ratings and lists in one file", rm_site:"Website", rm_what_q:"What is this file?", rm_what_a:"A backup of your films, ratings, comments and lists. The tabs Films, Lists and Members hold your data.", rm_how_q:"How to restore it", rm_how_a:"Open Cinemail - Profile - tap Restore (↑) - choose this file. Your lists and films come back.", rm_edit_q:"Editing this file", rm_edit_a:"You can edit it in Excel, Numbers or Google Sheets. When saving, keep the Excel (.xlsx) format." },
+  ru:{ rm_title:"Cinemail - резервная копия твоих фильмов и списков", rm_subtitle:"Твои фильмы, оценки и списки в одном файле", rm_site:"Сайт", rm_what_q:"Что это за файл?", rm_what_a:"Резервная копия твоих фильмов, оценок, комментариев и списков. Вкладки Films, Lists и Members хранят данные.", rm_how_q:"Как восстановить", rm_how_a:"Открой Cinemail - Профиль - нажми Восстановить (↑) - выбери этот файл. Списки и фильмы вернутся.", rm_edit_q:"Если редактируешь файл", rm_edit_a:"Можно править в Excel, Numbers или Google Таблицах. При сохранении оставляй формат Excel (.xlsx)." },
+  uk:{ rm_title:"Cinemail - резервна копія твоїх фільмів і списків", rm_subtitle:"Твої фільми, оцінки і списки в одному файлі", rm_site:"Сайт", rm_what_q:"Що це за файл?", rm_what_a:"Резервна копія твоїх фільмів, оцінок, коментарів і списків. Вкладки Films, Lists і Members зберігають дані.", rm_how_q:"Як відновити", rm_how_a:"Відкрий Cinemail - Профіль - натисни Відновити (↑) - обери цей файл. Списки і фільми повернуться.", rm_edit_q:"Якщо редагуєш файл", rm_edit_a:"Можна правити в Excel, Numbers чи Google Таблицях. При збереженні залишай формат Excel (.xlsx)." },
+  ka:{ rm_title:"Cinemail - შენი ფილმებისა და სიების სარეზერვო ასლი", rm_subtitle:"შენი ფილმები, შეფასებები და სიები ერთ ფაილში", rm_site:"საიტი", rm_what_q:"რა ფაილია ეს?", rm_what_a:"შენი ფილმების, შეფასებების, კომენტარებისა და სიების სარეზერვო ასლი. ჩანართები Films, Lists და Members ინახავს მონაცემებს.", rm_how_q:"როგორ აღვადგინო", rm_how_a:"გახსენი Cinemail - პროფილი - დააჭირე აღდგენა (↑) - აირჩიე ეს ფაილი. სიები და ფილმები დაბრუნდება.", rm_edit_q:"თუ არედაქტირებ ფაილს", rm_edit_a:"შეგიძლია დაარედაქტირო Excel-ში, Numbers-ში ან Google Sheets-ში. შენახვისას დატოვე Excel (.xlsx) ფორმატი." },
+  es:{ rm_title:"Cinemail - copia de seguridad de tus películas y listas", rm_subtitle:"Tus películas, valoraciones y listas en un archivo", rm_site:"Sitio web", rm_what_q:"¿Qué es este archivo?", rm_what_a:"Una copia de tus películas, valoraciones, comentarios y listas. Las pestañas Films, Lists y Members guardan tus datos.", rm_how_q:"Cómo restaurarlo", rm_how_a:"Abre Cinemail - Perfil - pulsa Restaurar (↑) - elige este archivo. Tus listas y películas vuelven.", rm_edit_q:"Si editas el archivo", rm_edit_a:"Puedes editarlo en Excel, Numbers o Google Sheets. Al guardar, mantén el formato Excel (.xlsx)." },
+  fr:{ rm_title:"Cinemail - sauvegarde de tes films et listes", rm_subtitle:"Tes films, notes et listes dans un seul fichier", rm_site:"Site web", rm_what_q:"Qu'est-ce que ce fichier ?", rm_what_a:"Une sauvegarde de tes films, notes, commentaires et listes. Les onglets Films, Lists et Members contiennent tes données.", rm_how_q:"Comment le restaurer", rm_how_a:"Ouvre Cinemail - Profil - appuie sur Restaurer (↑) - choisis ce fichier. Tes listes et films reviennent.", rm_edit_q:"Si tu modifies le fichier", rm_edit_a:"Tu peux l'éditer dans Excel, Numbers ou Google Sheets. À l'enregistrement, garde le format Excel (.xlsx)." },
+  de:{ rm_title:"Cinemail - Sicherung deiner Filme und Listen", rm_subtitle:"Deine Filme, Bewertungen und Listen in einer Datei", rm_site:"Website", rm_what_q:"Was ist diese Datei?", rm_what_a:"Eine Sicherung deiner Filme, Bewertungen, Kommentare und Listen. Die Tabs Films, Lists und Members enthalten deine Daten.", rm_how_q:"Wiederherstellen", rm_how_a:"Öffne Cinemail - Profil - tippe auf Wiederherstellen (↑) - wähle diese Datei. Deine Listen und Filme kommen zurück.", rm_edit_q:"Datei bearbeiten", rm_edit_a:"Du kannst sie in Excel, Numbers oder Google Sheets bearbeiten. Beim Speichern das Excel-Format (.xlsx) behalten." },
+  it:{ rm_title:"Cinemail - backup dei tuoi film e liste", rm_subtitle:"I tuoi film, voti e liste in un unico file", rm_site:"Sito web", rm_what_q:"Cos'è questo file?", rm_what_a:"Un backup dei tuoi film, voti, commenti e liste. Le schede Films, Lists e Members contengono i tuoi dati.", rm_how_q:"Come ripristinarlo", rm_how_a:"Apri Cinemail - Profilo - tocca Ripristina (↑) - scegli questo file. Le tue liste e i film tornano.", rm_edit_q:"Se modifichi il file", rm_edit_a:"Puoi modificarlo in Excel, Numbers o Google Sheets. Quando salvi, mantieni il formato Excel (.xlsx)." },
 };
 Object.keys(_I18N_README).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_README[l]); });
 const _I18N_README_SUB = {
@@ -5793,6 +5793,7 @@ function _cacheLoadLists() {
 }
 
 async function loadHistoryFromDB() {
+  _clearTasteCache();   // библиотека меняется - модель вкуса вместе с ней
   const uid = currentUser?.id;
   const sharedIds = (_listsCache || []).map(l => l.id).filter(Boolean);
   let query = "watchlist?order=sort_order.asc.nullslast,created_at.desc";
@@ -5928,11 +5929,29 @@ function hasCyrillic(str) { return /[а-яёА-ЯЁ]/.test(str); }
 // search and took whatever ranked first - which is how a pick for Tarkovsky's Nostalghia
 // came back as an unrelated 2012 film, and "2012" came back as a documentary about
 // Roland Emmerich, with the model's reasoning still attached underneath.
+// A title reduced to a comparison key, for matching and de-duplication.
+//
+// This used to be written inline in three places as [^a-z0-9], which is correct for English
+// and silently destroys everything else: "Сталкер", "Зеркало" and "Солярис" all reduced to
+// the EMPTY STRING. _libraryKeys then put that empty string in its title set - its guard
+// tests the raw title, not the key - so every candidate with a non-Latin title matched it
+// and was thrown away as "already in your library". Three of our eight interface languages
+// are non-Latin, and TMDB returns titles in the interface language, so the picks engine
+// returned almost nothing for a Russian, Ukrainian or Georgian user. Measured, not guessed:
+// nine distinct titles collapsed to four distinct keys, five of them to "".
+//
+// \p{L}\p{N} keeps letters and digits of any script. NFD plus dropping \p{M} folds accents,
+// so "Amélie" and "Amelie" still meet, which the old version also got right by accident.
+function _normTitle(x) {
+  return String(x || "").toLowerCase().normalize("NFD")
+    .replace(/\p{M}/gu, "").replace(/[^\p{L}\p{N}]/gu, "");
+}
+
 async function tmdbResolveTitle(title, year, type) {
   const isTv = type === "tv";
   const path = isTv ? "/search/tv" : "/search/movie";
   const yearKey = isTv ? "first_air_date_year" : "primary_release_year";
-  const norm = x => String(x || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const norm = _normTitle;
   let results = [];
   if (year) {
     const r = await tmdbFetch(`${path}?query=${encodeURIComponent(title)}&${yearKey}=${encodeURIComponent(year)}&include_adult=false`);
@@ -7752,7 +7771,7 @@ async function _tallyFromSeeds(seeds, pages = 2) {
 // can sit in the table under a different id for the same film.
 function _libraryKeys() {
   const ids = new Set(), titles = new Set();
-  const norm = x => String(x || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const norm = _normTitle;
   watchHistory.forEach(h => { if (h.tmdbID) ids.add(String(h.tmdbID)); if (h.title) titles.add(norm(h.title)); });
   return { ids, titles, norm };
 }
@@ -7790,8 +7809,14 @@ async function _discoverPicks(mode) {
     'vote_count.gte': '600',
     include_adult: 'false',
     language: _tmdbLang(),
-    page: String(1 + Math.floor(Math.random() * 12)),
+    // Pages 1-3, not 1-12. The list is sorted best-first, so page 12 is roughly the 230th
+    // best film matching the filter - which is how "на вечер" came back with three films
+    // rated 5.5 on 21 Sep 2026. Variety was already handled twice over by the caller, which
+    // drops the last 30 shown and then picks 3 of the top 8 at random, so buying more of it
+    // by walking down the quality list was paying for something we already had.
+    page: String(1 + Math.floor(Math.random() * 3)),
   });
+  p.set('with_runtime.gte', '60');   // same reason as in _searchByQuery: no shorts
   if (mode === 'seasonal') p.set('with_genres', _SEASON_DISCOVER[season].with_genres);
   else {
     // Random: pin a decade at random so repeated presses roam the century rather than
@@ -7815,6 +7840,44 @@ async function _discoverPicks(mode) {
   }));
 }
 
+// ── The picks meter ──────────────────────────────────────────────────────────
+// Ten presses a week. Not a new restriction: the worker live in Cloudflare has been enforcing
+// exactly ten all along - the repo lowered it to 5 on 13 Sep and that was never pasted in - so
+// this preserves what people already have rather than changing it. Nobody gains and nobody
+// loses on the day it deploys, which is the only safe version of this change.
+//
+// Spent BEFORE the press, because the press costs about sixteen TMDB requests on the taste
+// path and refunding is not a thing. If the worker has not been updated yet it answers 404,
+// and an old worker must never block a press - so anything other than an explicit refusal is
+// treated as permission.
+let _picksRemaining = null;
+async function _spendPick() {
+  try {
+    const { data: { session } } = await sbClient.auth.getSession();
+    if (!session) return { ok: true };
+    const res = await fetch(PROXY_URL.replace(/\/$/, "") + "/picks/spend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + session.access_token },
+    });
+    if (res.status === 404) return { ok: true };          // worker not updated yet
+    const data = await res.json().catch(() => ({}));
+    if (res.status === 429) return { ok: false, data };
+    if (!res.ok) return { ok: true };                      // never block on an unclear answer
+    if (typeof data.remaining === "number") { _picksRemaining = data.remaining; _renderPicksMeter(); }
+    return { ok: true, data };
+  } catch (e) { return { ok: true }; }                     // offline or blocked: let them press
+}
+
+// The counter sits in the slot the model's counter used to occupy. It says what is left and
+// nothing else - there is no paid tier to point at, and hinting at one that does not exist
+// would be a promise nobody decided to make.
+function _renderPicksMeter() {
+  const el = document.getElementById("ai-counter");
+  if (!el) return;
+  if (_picksRemaining === null) { el.textContent = ""; return; }
+  el.textContent = `${_picksRemaining} ${t('picks_left_week')}`;
+}
+
 async function surpriseMe() {
   const el = document.getElementById("rec-results");
   const seen = watchHistory.filter(h => h.status === "watched").length;
@@ -7825,6 +7888,12 @@ async function surpriseMe() {
       <p>${escapeHtml(t('surprise_need_sub').replace('{n}', seen).replace('{need}', SURPRISE_MIN_WATCHED))}</p>
       <button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${escapeHtml(t('empty_list_btn'))}</button>
     </div>`;
+    return;
+  }
+  const spent = await _spendPick();
+  if (!spent.ok) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-state-title">${t('recs_unavail_title')}</div><p>${escapeHtml(t('picks_exhausted'))}</p></div>`;
+    _picksRemaining = 0; _renderPicksMeter();
     return;
   }
   el.innerHTML = loadingHTML(randQuote(), true, true);
@@ -7948,6 +8017,48 @@ const _GENRE_WORDS = [
 // `k` is sent to /search/keyword verbatim. Stems are matched whole-word, so "котиков" hits
 // "коти" and "который" does not, provided the stems stay specific - see the STOP list for the
 // two collisions that needed help anyway.
+// CURATED FILMS BY SUBJECT. Pairs of [tmdb id, year].
+//
+// TMDB's keyword index answers "films about cats" with whatever carries the cat tag, which on
+// 21 Sep 2026 put Satantango next to Flow. The tag is metadata. What the person wanted was
+// knowledge, so these lists carry it: written by hand, resolved against TMDB once, shipped as
+// numbers. No model runs in the app and none ever did - the lists were never generated from
+// TMDB content, which is what keeps this clear of the 1.C clause we left in the first place.
+//
+// EACH LIST RUNS CANON FIRST, DEEP CUT LAST, and that order is the whole design. The app
+// subtracts what the person has already seen, so a newcomer gets the film everybody means and
+// somebody who has seen the obvious ones gets the next layer down. A short list would hand
+// that second person nothing but leftovers.
+//
+// The year is here rather than fetched because taste ranking needs a decade and a decade is
+// the same in every language. Titles and posters are NOT stored: they have to come from TMDB
+// in the reader's own language, and storing the English ones would have quietly made the app
+// monolingual in the one place it shows off being eight-lingual.
+//
+// VERIFIED, not assumed. Resolving reported 200 of 200 found, which means only that TMDB
+// answered - and a second pass that fetched every id back and compared it to the title asked
+// for caught three films that had silently become something else: Kedi turned into Bad Cat
+// (Turkish, same year, also a cat), Planet of Storms into a 1986 Asimov documentary, and
+// Romero's Martin into J.A. Martin Photographer. That is the failure mode worth remembering:
+// a wrong film that exists passes every filter looking for films that do not.
+//
+// Source of truth for edits: docs/subject-lists.json, then docs/resolve-subject-lists.js to
+// turn titles into ids, then docs/verify-subject-ids.js to prove they are the right ids.
+const _SUBJECT_FILMS = {
+  "cat": [[10112,1970],[392011,2017],[15370,2002],[404378,2016],[823219,2024],[315162,2022],[25508,1942],[42448,1974],[19378,1978],[20723,1965],[12233,1988],[29254,1951],[32328,1962],[620249,2019],[6217,1982],[8983,1994],[52264,2010],[39853,1947]],
+  "dog": [[28178,2009],[22660,1957],[267999,2014],[399174,2018],[833,1952],[8816,1985],[13785,2000],[14306,2008],[37969,1963],[2202,1943],[23069,1974],[8942,2008],[43680,1988],[21032,1995],[606856,2019],[40096,2000],[483184,2018],[66125,2011]],
+  "wolf": [[110420,2012],[14280,1983],[128,1997],[75174,2011],[581,1990],[814,1981],[11905,1984],[441130,2020],[499537,2018],[12227,1991],[6312,2001],[10395,1994],[652004,2020],[9871,2000]],
+  "shark": [[578,1975],[332567,2016],[83,2003],[8914,1999],[13894,2006],[403119,2017],[49787,2010],[1001311,2024],[43959,2011],[17401,1971],[345940,2018]],
+  "dinosaur": [[329,1993],[12144,1988],[10567,2000],[2981,1925],[244,1933],[77951,2013],[105864,2015],[3591,1966],[42329,1969],[100246,1914],[18890,1993],[35073,1953]],
+  "space": [[62,1968],[593,1972],[157336,2014],[49047,2013],[568,1995],[9549,1983],[369972,2018],[17431,2009],[419704,2019],[811,1972],[286217,2015],[686,1997],[1272,2007],[376865,2018],[496743,2018],[20423,1989],[438740,2017],[49164,1962],[775,1902],[3007,1929]],
+  "alien": [[348,1979],[601,1982],[840,1977],[329865,2016],[1091,1982],[17654,2009],[11549,1956],[828,1951],[698232,2013],[563,1997],[2675,2002],[59678,2011],[300668,2018],[762504,2022],[991,1976],[1398,1979],[2103,2002],[11773,1960],[19483,1953]],
+  "robot": [[78,1982],[19,1927],[264660,2014],[10681,2008],[218,1984],[9323,1995],[644,2001],[2048,2004],[84329,2012],[2605,1986],[10386,1999],[198184,2015],[335984,2017],[1184918,2024],[16577,2009],[811,1972],[830,1956],[5548,1987]],
+  "time travel": [[105,1985],[63,1995],[14337,2004],[662,1962],[137,1993],[59967,2012],[137113,2014],[218,1984],[141,2001],[122906,2013],[206487,2014],[14139,2007],[14069,2006],[440021,2017],[587792,2020],[157336,2014],[2134,1960],[45612,2011]],
+  "vampire": [[653,1922],[13310,2008],[138,1931],[152603,2013],[628,1994],[246741,2014],[11879,1987],[11654,1983],[22536,2009],[252171,2014],[6114,1992],[779,1932],[10873,2000],[11655,1992],[3053,1967],[36647,1998],[26517,1978],[46175,1971]],
+  "zombie": [[10331,1968],[923,1978],[747,2004],[170,2002],[396535,2016],[513434,2017],[19908,2009],[1694,1985],[10925,1985],[23963,2008],[27130,1943],[26860,1932],[763,1992],[375366,2016],[425972,2017],[8408,1985]],
+  "ghost": [[745,1999],[30959,1964],[1933,2001],[428449,2017],[14696,1953],[16372,1961],[251,1990],[340676,2016],[1433,2001],[609,1982],[11772,1963],[18317,1990],[38368,2010],[3763,1964],[6537,2007],[4011,1988],[16093,1962],[27374,2008]],
+};
+
 const _SUBJECTS = [
   { k:'cat',          terms:'кошк коти котик кот коты кіт кішк katze chat gato gatt კატ' },
   { k:'dog',          terms:'собак пес псы собач hund chien perro cane ძაღლ' },
@@ -8097,6 +8208,38 @@ const _qNorm = s => String(s||"").toLowerCase().replace(/[ё]/g,'е').replace(/[
 // afterwards let "который" match the stem "кот" and turn "тот который живет" into a search for
 // cat films - the stop list was right and was simply consulted too late. Matched as prefixes,
 // so one entry covers "настроение", "настроением" and "настроения".
+// PLAIN NATIONALITY WORDS. Movements already pin a country, but only when the person names
+// a movement - "французская комедия про жандарма" got nothing from "французская" and came back
+// with the best comedies on Earth. A nationality is a hard, cheap constraint and people reach
+// for it constantly, so it gets its own table rather than waiting for someone to say
+// "nouvelle vague".
+const _COUNTRIES = [
+  { c:'FR', terms:'французск францз french francais française francese franzosisch französisch frances' },
+  { c:'IT', terms:'итальянск italian italiano italien italienisch' },
+  { c:'JP', terms:'японск japanese japonais giapponese japanisch japones' },
+  { c:'KR', terms:'корейск korean coreen coreano koreanisch' },
+  { c:'CN,HK,TW', terms:'китайск гонконгск chinese hongkong cinese chinois chinesisch' },
+  { c:'DE', terms:'немецк германск german deutsch allemand tedesco aleman' },
+  { c:'ES', terms:'испанск spanish espanol español espagnol spagnolo spanisch' },
+  { c:'GB', terms:'британск английск british english britannique britannico britisch' },
+  { c:'US', terms:'американск american americain americano amerikanisch' },
+  { c:'SU,RU', terms:'советск русск российск soviet russian russe russo russisch sowjetisch' },
+  { c:'IN', terms:'индийск болливуд indian bollywood indien indiano indisch' },
+  { c:'IR', terms:'иранск персидск iranian persian iranien iraniano iranisch' },
+  { c:'SE', terms:'шведск swedish suedois svedese schwedisch sueco' },
+  { c:'DK', terms:'датск danish danois danese danisch dänisch danes' },
+  { c:'PL', terms:'польск polish polonais polacco polnisch polaco' },
+  { c:'CZ,SK', terms:'чешск чехословацк czech tcheque ceco tschechisch checo' },
+  { c:'MX', terms:'мексиканск mexican mexicain messicano mexikanisch mexicano' },
+  { c:'BR', terms:'бразильск brazilian bresilien brasiliano brasilianisch brasileno' },
+  { c:'AR', terms:'аргентинск argentine argentinian argentino argentinisch' },
+  { c:'TR', terms:'турецк turkish turc turco turkisch türkisch' },
+  { c:'GE', terms:'грузинск georgian georgien georgiano georgisch' },
+  { c:'UA', terms:'украинск ukrainian ukrainien ucraino ukrainisch ucraniano' },
+  { c:'AR,CL,CO,PE', terms:'латиноамериканск latinamerican latino' },
+  { c:'FI,NO,SE,DK,IS', terms:'скандинавск nordic scandinavian scandinave scandinavo skandinavisch' },
+];
+
 const _QSTOP = ('про про about with films film movie movies кино фильм кинo о об на и с а но ' +
   'который котор которые которая которое которых что чтобы как это тот та те такой ' +
   'настроен настроени mood mit und der die das ein eine ' +
@@ -8147,9 +8290,10 @@ function _splitQuery(q) {
   const moods = hit(_MOODS);
   const genres = hit(_GENRE_WORDS);
   const subjects = hit(_SUBJECTS);
+  const countries = hit(_COUNTRIES);
   let rest = words.filter(w => !matchedWords.has(w)).join(' ');
   rest = rest.split(' ').filter(w => w.length > 2).join(' ').trim();
-  return { movements, moods, genres, subjects, subject: rest };
+  return { movements, moods, genres, subjects, countries, subject: rest };
 }
 
 async function _keywordIds(subject) {
@@ -8169,9 +8313,136 @@ async function _personId(subject) {
   return hit && hit.popularity > 1 ? { id: hit.id, name: hit.name } : null;
 }
 
+// ONE MODEL OF THE PERSON'S TASTE, built once a session and used by every path.
+//
+// Until now the text field ignored who was asking. "романтическая комедия" returned the same
+// seven films to everybody, ordered by TMDB's average rating - which is how a 2024 film with
+// 150 enthusiastic voters outranked every romantic comedy ever made. The words someone types
+// are a FILTER on their taste, not a replacement for it: taste decides the order, the words
+// decide what is eligible.
+//
+// Three signals, all already in the library, none of them requiring a model:
+//   1. the TMDB tally off their highly-rated films - what people who loved those also loved
+//   2. crew who recur across their favourites - the director or composer they keep choosing
+//   3. the decades they actually watch
+//
+// Cached because (1) costs about sixteen requests. Cleared when the library changes.
+let _tasteCache = null;
+function _clearTasteCache() { _tasteCache = null; }
+
+async function _tasteIndex() {
+  if (_tasteCache) return _tasteCache;
+  const watched = watchHistory.filter(h => h.status === 'watched' && h.tmdbID);
+  const loved = watched.filter(e => Number(e.stars) >= _SEED_MIN_STARS);
+  // Below three loved films there is nothing to read, and guessing from two would be worse
+  // than admitting we do not know. The caller falls back to plain quality order.
+  if (loved.length < 3) return (_tasteCache = { thin: true, tally: new Map(), crew: new Set(), decades: {} });
+
+  let tally = new Map();
+  try { tally = await _tallyFromSeeds(_pickSeeds(loved), 2); } catch (e) { /* taste is optional */ }
+
+  const crewCount = {};
+  loved.forEach(e => ['director', 'composer', 'cinematographer'].forEach(f =>
+    String(e[f] || '').split(',').forEach(n => {
+      n = n.trim(); if (n) crewCount[n] = (crewCount[n] || 0) + 1;
+    })));
+  // Twice is a pattern, once is a coincidence.
+  const crew = new Set(Object.keys(crewCount).filter(n => crewCount[n] >= 2));
+
+  const decades = {};
+  loved.forEach(e => { const d = Math.floor(Number(e.year) / 10) * 10; if (d > 1880) decades[d] = (decades[d] || 0) + 1; });
+
+  return (_tasteCache = { thin: false, tally, crew, decades });
+}
+
+// Orders a candidate set that the query has already narrowed. Returns the films with a `why`
+// that says something true about THEM rather than repeating the question.
+function _rankByTaste(cands, taste, fallbackWhy) {
+  if (taste.thin) return cands.map(c => ({ ...c, why: fallbackWhy }));
+  return cands.map(c => {
+    const hit = taste.tally.get(c.id) || taste.tally.get(Number(c.id)) || taste.tally.get(String(c.id));
+    const dec = Math.floor(Number(c.Year) / 10) * 10;
+    const score = (hit ? 10 * hit.votes : 0)
+                + Math.min(4, taste.decades[dec] || 0)
+                + Number(c.Rating || 0) / 10;          // tiebreak only, never the driver
+    const why = hit ? _tallyWhy(hit) : fallbackWhy;
+    return { ...c, _score: score, why };
+  }).sort((a, b) => b._score - a._score);
+}
+
+// A curated subject, ordered by this person's taste and filled in from TMDB in their language.
+//
+// Only the films that will actually be shown are fetched - seven, in parallel, so it costs one
+// round trip rather than one per film. Ranking happens on id and year alone, which is why the
+// table stores the year: it is the one fact about a film that reads the same in every language.
+async function _curatedSubject(key, taste, wantGenres) {
+  const rows = _SUBJECT_FILMS[key];
+  if (!rows) return null;                       // no list for this subject: caller falls back
+  const lib = _libraryKeys();
+  const fresh = rows.filter(([id]) => !lib.ids.has(String(id)));
+  if (!fresh.length) return [];                 // they have seen the lot; say so by returning nothing
+
+  const scored = fresh.map(([id, year], i) => {
+    const hit = taste.tally.get(id) || taste.tally.get(String(id));
+    const dec = Math.floor(year / 10) * 10;
+    return {
+      id, hit,
+      // The list's own order is the curation and it is not thrown away: it survives as a small
+      // descending term, so taste reorders the shelf rather than emptying it onto the floor.
+      score: (hit ? 10 * hit.votes : 0)
+           + Math.min(4, (taste.decades || {})[dec] || 0)
+           + (rows.length - i) / rows.length,
+    };
+  }).sort((a, b) => b.score - a.score);
+
+  // WHATEVER ELSE THE PERSON SAID STILL COUNTS. "доброе кино про вампиров" used to return
+  // Nosferatu and Dracula: the subject matched, the curated list fired, and the word "доброе"
+  // was thrown away with the rest of the query. A list that ignores half the question is worse
+  // than a tag search that reads all of it.
+  //
+  // So when a genre or mood came with the subject, twelve are fetched instead of seven and the
+  // ones carrying a wanted genre go first. Five extra requests, and only on a query that
+  // actually asked for something more.
+  const wide = (wantGenres && wantGenres.length) ? 12 : 7;
+  const got0 = await Promise.all(scored.slice(0, wide).map(async r => {
+    try {
+      const m = await tmdbFetch(`/movie/${r.id}?language=${_tmdbLang()}`);
+      if (!m || m.error || !m.title) return null;
+      return { id: m.id, tmdbID: String(m.id), type: 'movie', Title: m.title,
+               Year: (m.release_date || '').slice(0, 4),
+               Poster: m.poster_path ? TMDB_IMG + m.poster_path : '',
+               Rating: m.vote_average ? m.vote_average.toFixed(1) : null, Genre: '',
+               _genres: (m.genres || []).map(x => String(x.id)),
+               why: r.hit ? _tallyWhy(r.hit) : null };
+    } catch (e) { return null; }
+  }));
+  const got = got0.filter(Boolean);
+  if (!wantGenres || !wantGenres.length) return got.slice(0, 7);
+  const want = new Set(wantGenres.map(String));
+  const fits = got.filter(m => m._genres.some(g => want.has(g)));
+  // Only trust the narrowing when something survives it. Below three the filter has said more
+  // about the sparseness of TMDB's tags than about the films, and the unfiltered list is the
+  // better answer to a question we half understood.
+  return (fits.length >= 3 ? fits : got).slice(0, 7);
+}
+
 async function _searchByQuery(q) {
-  const { movements, moods, genres, subjects, subject } = _splitQuery(q);
-  const p = new URLSearchParams({ include_adult:'false', language:_tmdbLang(), sort_by:'vote_average.desc', 'vote_count.gte':'120' });
+  const { movements, moods, genres, subjects, countries, subject } = _splitQuery(q);
+  // HOW MANY VOTES A FILM NEEDS TO BE RANKED AT ALL.
+  //
+  // This is the single most important number here and it was wrong. TMDB's vote_average is a
+  // plain mean, so a 2025 film watched by 150 enthusiasts scores 9.9 and outranks every
+  // romantic comedy ever made. Measured on the live site 21 Sep 2026: "романтическая комедия"
+  // returned The Way to the Heart (2024) at 9.9, Accidental Partners (2026) at 8.8, and a
+  // stand-up special that qualified on the comedy genre id. Not one film anybody has heard of.
+  //
+  // The threshold has to move with how hard the OTHER constraints are. A movement pins country
+  // and decade, so it can afford almost no threshold - and that query was the one that worked,
+  // returning Le Trou, The 400 Blows and La Jetée. Genre alone pins nothing, so the vote count
+  // is the only thing standing between the person and an unknown film with a flattering mean.
+  const VOTES = { movement: 30, person: 20, keyword: 300, genre_only: 1000 };
+  const p = new URLSearchParams({ include_adult:'false', language:_tmdbLang(), sort_by:'vote_average.desc' });
+  p.set('vote_count.gte', String(VOTES.genre_only));      // loosened below by whatever pins harder
   let why = t('why_for_query').replace('{q}', q);
   let matched = false;
 
@@ -8182,33 +8453,75 @@ async function _searchByQuery(q) {
     if (m.c) p.set('with_origin_country', m.c);
     p.set('primary_release_date.gte', `${m.y[0]}-01-01`);
     p.set('primary_release_date.lte', `${m.y[1]}-12-31`);
-    p.set('vote_count.gte', '30');           // a 1920s movement has few voters by now
+    p.set('vote_count.gte', String(VOTES.movement));   // a 1920s movement has few voters by now
     matched = true;
   }
   const person = movements.length ? null : await _personId(subject);
   if (person) {
     p.set('with_people', String(person.id));
-    p.delete('vote_count.gte'); p.set('vote_count.gte','20');   // a director's early work is thin
+    p.set('vote_count.gte', String(VOTES.person));     // a director's early work is thin
     why = t('why_person').replace('{name}', person.name);
     matched = true;
-  } else if (subjects.length || subject) {
-    // Recognised subjects first: those are English terms TMDB actually indexes. The raw
-    // leftover is tried only when nothing was recognised, and it will find something just
-    // when the person typed English in the first place.
-    const terms = subjects.length ? subjects.map(x => x.k) : [subject];
-    const found = [];
-    for (const term of terms.slice(0, 2)) found.push(...await _keywordIds(term));
-    if (found.length) { p.set('with_keywords', found.slice(0, 4).join('|')); matched = true; }
   }
-  // A named genre is a harder constraint than a mood, so it wins the genre slot outright:
-  // "романтический" must return romance, not romance-OR-whatever-the-mood-table-guessed.
-  // Moods only fill the slot when no genre was named.
+
+  // Computed here rather than after the subject branch, because the curated list needs to know
+  // what else was asked for and the subject branch returns before reaching the old position.
   const genreIds = (genres.length ? genres.map(g => g.g) : moods.map(m => m.g))
     .join(',').split(',').map(x => x.trim()).filter(Boolean)
     .filter((v,i,a) => a.indexOf(v) === i).slice(0, 3);
+
+  if (!movements.length && countries.length) {
+    // A nationality is a hard constraint and costs nothing, but a movement already set one and
+    // knows better - "французская новая волна" must not be widened back out to all of France.
+    p.set('with_origin_country', countries[0].c);
+    matched = true;
+  }
+
+  if (subjects.length || subject) {
+    // Recognised subjects first: those are English terms TMDB actually indexes. The raw
+    // leftover is tried only when nothing was recognised, and it will find something just
+    // when the person typed English in the first place.
+    // A hand-made list beats a tag search wherever one exists, so it is tried first. Under
+    // three surviving films it is not worth showing on its own - either the subject has no
+    // list or the person has seen almost all of it - and the keyword search runs instead.
+    for (const sj of subjects) {
+      const curated = await _curatedSubject(sj.k, await _tasteIndex(), genreIds);
+      if (curated && curated.length >= 3) {
+        const w = t('why_for_query').replace('{q}', sj.k);
+        return curated.map(c => ({ ...c, why: c.why || w }));
+      }
+    }
+    const terms = subjects.length ? subjects.map(x => x.k) : [subject];
+    const found = [];
+    for (const term of terms.slice(0, 2)) found.push(...await _keywordIds(term));
+    if (found.length) {
+      p.set('with_keywords', found.slice(0, 4).join('|'));
+      // A keyword is a real constraint, so it earns a looser threshold than a bare genre -
+      // but not the movement's, because "cat" spans the whole century and every country.
+      if (!movements.length && !person) p.set('vote_count.gte', String(VOTES.keyword));
+      // Naming what was understood beats echoing the question back. "по теме: cat" tells the
+      // person how they were read, and when the reading is wrong they can see why at a glance.
+      if (subjects.length) why = t('why_for_query').replace('{q}', subjects.map(x => x.k).join(', '));
+      matched = true;
+    }
+  }
+  // A named genre is a harder constraint than a mood, so it wins the genre slot outright:
+  // "романтический" must return romance, not romance-OR-whatever-the-mood-table-guessed.
+  // Moods only fill the slot when no genre was named. (genreIds is computed above.)
   if (genreIds.length) {
-    // OR between them: AND across three genres returns almost nothing on TMDB.
-    p.set('with_genres', genreIds.join('|'));
+    // TWO NAMED GENRES MEAN THE INTERSECTION, NOT THE UNION. "романтическая комедия" is one
+    // thing, not a choice between two, and OR turned it into "anything tagged romance OR
+    // comedy sorted by rating" - which is just the best-films-ever list. Measured on the live
+    // site 21 Sep 2026: Parasite, Forrest Gump and The Intouchables came back, because
+    // Parasite carries the comedy tag. Not one of the seven was a romantic comedy.
+    //
+    // Moods stay OR. A mood is our guess at which genres fit a feeling, and ANDing three
+    // guesses returns nothing - that is what the old comment was right about.
+    const andThem = genres.length >= 2;
+    p.set('with_genres', genreIds.join(andThem ? ',' : '|'));
+    // An intersection is a far harder constraint than a union, so by the same rule as
+    // everywhere else here the vote threshold comes down with it.
+    if (andThem && !movements.length && !person) p.set('vote_count.gte', '500');
     matched = true;
   }
   if (!matched) {
@@ -8217,14 +8530,28 @@ async function _searchByQuery(q) {
     const r = await tmdbSearch(q);
     return (r || []).slice(0, 12).map(m => ({ ...m, why }));
   }
+    // NOT A SHORT. Measured on the live site 21 Sep 2026: "романтическая комедия" returned
+    // Paperman (six minutes) and In a Heartbeat (four minutes) in the top three. Both carry
+    // the romance and comedy tags honestly and both are rated highly, so every filter we had
+    // waved them through - and neither is an answer to "what do I watch tonight". Sixty
+    // minutes is the usual feature floor and it is below the shortest features that matter.
+    p.set('with_runtime.gte', '60');
   const res = await tmdbFetch(`/discover/movie?${p.toString()}`);
   if (res && res.error) { const e = new Error(res.error); e.tmdb = res; throw e; }
-  return ((res && res.results) || []).map(c => ({
+  // Drop what they already have. Note this is NOT done for the title branch above: somebody
+  // who types "Oppenheimer" is looking for that film, and hiding it because they own it would
+  // be the app refusing to answer the question it was asked.
+  const _lib = _libraryKeys();
+  const _cands = ((res && res.results) || [])
+    .filter(c => !_lib.ids.has(String(c.id)) && !_lib.titles.has(_lib.norm(c.title || c.name)))
+    .map(c => ({
     id:c.id, tmdbID:String(c.id), type:'movie',
     Title:c.title || c.name, Year:(c.release_date||"").slice(0,4),
     Poster:c.poster_path ? TMDB_IMG + c.poster_path : "",
     Rating:c.vote_average ? c.vote_average.toFixed(1) : null, Genre:"", why,
   }));
+  // The words narrowed the field; taste decides the order within it.
+  return _rankByTaste(_cands, await _tasteIndex(), why);
 }
 
 async function loadRecs() {
@@ -8238,6 +8565,12 @@ async function loadRecs() {
     // An empty field is not an error and should not be one: it means "anything good for me",
     // which is exactly what the taste tally answers. Hand it over rather than scolding.
     if (!q) { btn.disabled=false; btn.textContent=t('find_btn'); _setSurpriseMode('taste'); return surpriseMe(); }
+    const spent = await _spendPick();
+    if (!spent.ok) {
+      el.innerHTML = `<div class="empty-state"><div class="empty-state-title">${t('recs_unavail_title')}</div><p>${escapeHtml(t('picks_exhausted'))}</p></div>`;
+      _picksRemaining = 0; _renderPicksMeter();
+      btn.disabled=false; btn.textContent=t('find_btn'); return;
+    }
     const details = await _searchByQuery(q);
     // Drop anything already in the library. The prompt does say "none may appear in the
     // watched or watchlist lists above", and the model obeys it - but it is only ever
@@ -8249,7 +8582,7 @@ async function loadRecs() {
     //
     // Matched on the resolved TMDB id, which is exact where a title match is not. Seven
     // are requested so that five survive the filter.
-    const _norm = t => String(t||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+    const _norm = _normTitle;
     const knownIds = new Set(watchHistory.map(h=>String(h.tmdbID)).filter(Boolean));
     const knownTitles = new Set(watchHistory.map(h=>_norm(h.title)).filter(Boolean));
     const fresh = details.filter(m =>
@@ -9160,10 +9493,43 @@ function renderListsSection() {
   el.innerHTML = html;
 }
 
+// THE FREE LIST CAP. Personal list plus two named ones.
+//
+// Two things make this legitimate rather than the move that cost Trakt its goodwill. It is set
+// BEFORE anyone has more, not after: measured on the live database 16 Sep 2026, the most any
+// real user owns is two, so nobody loses anything today. And it counts only lists this person
+// OWNS - a list someone else shared with you does not count against your three, because a cap
+// that punishes you for accepting an invitation punishes the wrong person.
+//
+// What is deliberately NOT capped: the number of people in a shared list. That cap would fall on
+// whoever opened the link last, who chose nothing and did nothing wrong. Trakt's error was
+// retrenching on existing users; capping a guest's arrival would be a worse version of it.
+const FREE_LIST_LIMIT = 2;
+
+// How many people may share one list, the owner included. Three means you and two others,
+// which covers a couple, a friend, a pair of flatmates - and leaves a film club outside,
+// because the club is who would pay if a paid tier ever existed.
+//
+// Dafa's reasoning for keeping it tight, 17 Sep 2026: a limit people push against is the
+// first demand signal this project has ever had. A cap can always be RAISED later and never
+// lowered, so when unsure the smaller number is the safe one.
+//
+// This constant is the message and the early warning. It is NOT the enforcement: a list can
+// also be joined through the join_list_by_token RPC, which never runs this file. The lock is
+// a trigger on list_members - see docs/list-member-cap.sql.
+const FREE_MEMBER_LIMIT = 3;
+function _ownedListCount() {
+  return (_listsCache || []).filter(l => l.owner_id === currentUser?.id).length;
+}
+function _listCapReached() {
+  return _ownedListCount() >= FREE_LIST_LIMIT;
+}
+
 async function createList() {
   const input = document.getElementById('list-name-input');
   const name = (input?.value || '').trim();
   if (!name) { showToast(t('toast_enter_list_name'), true); return; }
+  if (_listCapReached()) { showToast(t('toast_list_limit').replace('{n}', FREE_LIST_LIMIT), true); return; }
   try {
     const { data, error } = await sbClient.from('lists').insert({ name, owner_id: currentUser.id }).select().single();
     if (error) throw new Error(error.message);
@@ -9758,6 +10124,15 @@ async function _doInviteToList(listId, btn) {
 
 async function inviteToList(listId, userId, userName, listName) {
   try {
+    // Told to the owner before the invite goes out, rather than to the guest when they try
+    // to accept. memberCount counts rows in list_members and the owner is one of them.
+    // Pending invites are deliberately not counted here: three outstanding invites to a
+    // list of one is a race the database settles, and settling it here would need another
+    // round trip on every invite to prevent something nobody does.
+    const _l = _listsCache.find(l => l.id === listId);
+    if (_l && (_l.memberCount || (_l.members || []).length) >= FREE_MEMBER_LIMIT) {
+      showToast(t('toast_member_limit').replace('{n}', FREE_MEMBER_LIMIT), true); return;
+    }
     const fromName = currentUser.displayName || currentUser.email?.split('@')[0] || 'Someone';
     const { error } = await sbClient.from('invites').insert({
       from_user_id: currentUser.id,
@@ -9882,6 +10257,7 @@ async function _createListFromPicker() {
   const inp = document.getElementById('list-picker-new-input');
   const name = (inp?.value || '').trim();
   if (!name) { showToast(t('toast_enter_a_name'), true); return; }
+  if (_listCapReached()) { showToast(t('toast_list_limit').replace('{n}', FREE_LIST_LIMIT), true); return; }
   try {
     const { data, error } = await sbClient.from('lists').insert({ name, owner_id: currentUser.id }).select().single();
     if (error) throw new Error(error.message);
@@ -10561,7 +10937,10 @@ async function respondInvite(id, status, inv) {
     if (status === "accepted" && inv) {
       if (inv.type === 'list_invite') {
         const { error: me } = await sbClient.from('list_members').insert({ list_id: inv.list_id, user_id: currentUser.id, role: 'member' });
-        if (me) throw new Error(me.message);
+        // The cap lives in a database trigger, so the guest can meet it here even though the
+        // owner was warned. Raw Postgres text would be meaningless to them, so name it.
+        if (me) throw new Error(/list_full/.test(me.message)
+          ? t('toast_list_full').replace('{n}', FREE_MEMBER_LIMIT) : me.message);
         await loadListsCache();
         watchHistory = await loadHistoryFromDB();
         renderHistory();

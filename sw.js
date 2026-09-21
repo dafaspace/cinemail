@@ -7,7 +7,7 @@
 //
 // Keep this in step with the app version in index.html, so the two can be compared at a
 // glance and a missed bump is visible rather than silent.
-const CACHE_VERSION = "v272-0.57.56";
+const CACHE_VERSION = "v281-0.57.65";
 const CACHE_NAME = "cinemail-" + CACHE_VERSION;
 
 // Files to cache for offline use
@@ -16,7 +16,6 @@ const PRECACHE = [
   "./index.html",
   "./manifest.json",
   "./logo.png",
-  "./logo-ink.png",
   "./icon.png",
   "./favicon-16.png", "./favicon-32.png", "./favicon-48.png",          // shown on the splash and all four auth screens, not just as the home-screen icon
   "./exceljs.min.js",
