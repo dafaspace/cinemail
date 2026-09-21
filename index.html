@@ -2866,7 +2866,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.78</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.79</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8396,7 +8396,7 @@ function _decadeFrom(flatQ, rawQ) {
 
 const _QSTOP = ('про про about with films film movie movies кино фильм кинo о об на и с а но ' +
   'который котор которые которая которое которых что чтобы как это тот та те такой ' +
-  'место места месте местом настроен настроени года году годов year years jahr annee anno mood mit und der die das ein eine ' +
+  'вроде нибудь типа наподобие похожее похожий similar like something anything место места месте местом настроен настроени года году годов year years jahr annee anno mood mit und der die das ein eine ' +
   'the of from de la le les des du un une et avec sur pour ' +
   'el los las con y e por sobre para pelicula peliculas ' +
   'di il lo gli un una su per film sul ' +
@@ -8611,10 +8611,22 @@ async function _personId(subject) {
   }
   if (words.length === 1) windows.push(words[0]);
 
+  // НЕ БОЛЬШЕ ТРЁХ ПОПЫТОК, И ТОЛЬКО ПО ОКНАМ, ПОХОЖИМ НА ИМЯ.
+  //
+  // Трассировка 21 сентября: "что-нибудь вроде Before Sunrise" стоило ДЕСЯТЬ обращений к
+  // TMDB, девять из них - перебор окон вида "нибудь вроде before" и их транслитераций. То
+  // есть запрос, который движок не понимает, обходится дороже всех, которые он понимает.
+  // Окно из мусорных слов именем быть не может, а попытки стоят квоты и времени.
   const seen = new Set();
+  let tries = 0;
   for (const w of windows) {
+    if (tries >= 3) break;
     if (seen.has(w) || w.length < 4) continue;
+    // Слово короче четырёх букв внутри окна - почти наверняка не часть имени, а остаток
+    // служебной речи, который не попал в стоп-лист.
+    if (w.split(' ').some(x => x.length < 4)) continue;
     seen.add(w);
+    tries++;
     const hit = await _personLookup(w);
     if (hit) return hit;
   }
