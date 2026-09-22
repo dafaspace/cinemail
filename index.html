@@ -2866,7 +2866,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.79</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.80</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8089,8 +8089,8 @@ const _SUBJECTS = [
   { k:'mountain',     terms:'гора горы горный горах альпин berg montagne montana montagna მთა mountain' },
   { k:'forest',       terms:'лес леса лесу лесн ліс лісов wald foret forêt bosque foresta ტყე forest' },
   { k:'sea',          terms:'море морск meer mer mare океан mare ზღვა sea seas' },
-  { k:'road trip',    terms:'дорог путешеств road reise voyage viaje viaggio trip' },
-  { k:'courtroom',    terms:'судебн залсуда суда присяжн адвокатск courtroom trial gericht tribunal juicio processo' },
+  { k:'road trip',    terms:'дорог роудтрип поездк road reise voyage viaje viaggio trip' },
+  { k:'courtroom',    terms:'судебн залсуда зале зал суда присяжн адвокатск courtroom trial gericht tribunal juicio processo' },
   { k:'single location', terms:'камерн однойкомнат однакомнат singlelocation onelocation huisclos' },
   { k:'radio',        terms:'радиостанц радиоэфир радиовед radio funk' },
   { k:'cyberpunk',    terms:'киберпанк cyberpunk' },
@@ -8336,7 +8336,7 @@ const _COUNTRIES = [
   { c:'FR', terms:'марсел marseille канн cannes франци france paris париж французск францз french francais française francese franzosisch französisch frances' },
   { c:'IT', terms:'венеци venice неапол naples италия итальянц italy rome рим итальянск italian italiano italien italienisch' },
   { c:'JP', terms:'киото kyoto осак osaka япони japan tokyo токийск токио японск japanese japonais giapponese japanisch japones' },
-  { c:'KR', terms:'корея корейц korea seoul сеул корейск korean coreen coreano koreanisch' },
+  { c:'KR', terms:'корея кореи корее южнокорейск южная корея корейц korea seoul сеул корейск korean coreen coreano koreanisch' },
   { c:'CN,HK,TW', terms:'китай китайц china hongkong гонконг китайск гонконгск chinese hongkong cinese chinois chinesisch' },
   { c:'DE', terms:'мюнхен munich германи germany berlin берлин немецк германск german deutsch allemand tedesco aleman' },
   { c:'ES', terms:'барселон barcelona испани spain madrid мадрид испанск spanish espanol español espagnol spagnolo spanisch' },
@@ -8397,7 +8397,7 @@ function _decadeFrom(flatQ, rawQ) {
 const _QSTOP = ('про про about with films film movie movies кино фильм кинo о об на и с а но ' +
   'который котор которые которая которое которых что чтобы как это тот та те такой ' +
   'вроде нибудь типа наподобие похожее похожий similar like something anything место места месте местом настроен настроени года году годов year years jahr annee anno mood mit und der die das ein eine ' +
-  'the of from de la le les des du un une et avec sur pour ' +
+  'cinema kino anni cine filme peliculas the of from de la le les des du un une et avec sur pour ' +
   'el los las con y e por sobre para pelicula peliculas ' +
   'di il lo gli un una su per film sul ' +
   'та і з на що який яка які').split(' ').filter(Boolean);
@@ -8625,6 +8625,12 @@ async function _personId(subject) {
     // Слово короче четырёх букв внутри окна - почти наверняка не часть имени, а остаток
     // служебной речи, который не попал в стоп-лист.
     if (w.split(' ').some(x => x.length < 4)) continue;
+    // ОКНО ИЗ НЕСКОЛЬКИХ СЛОВ ИЩЕМ ЖИВЬЁМ, ТОЛЬКО ЕСЛИ ЕСТЬ ПРИЗНАК ИМЕНИ.
+    // Правило из ревью: чем хуже мы понимаем запрос, тем МЕНЬШЕ спекулятивных обращений.
+    // "Абракадабра квмпрлджэ" тратила два поиска персоны просто потому, что осталась в
+    // остатке. Одно слово ищем всегда - это может быть фамилия; два и больше только когда
+    // карта имён или таблица алиасов подтверждает, что там вообще есть имя.
+    if (w.includes(' ') && !_idFromNameMap(w) && !_aliasFor(w)) continue;
     seen.add(w);
     tries++;
     const hit = await _personLookup(w);
@@ -8791,153 +8797,135 @@ async function _curatedSubject(key, taste, wantGenres) {
   return (fits.length >= 3 ? fits : got).slice(0, 7);
 }
 
-async function _searchByQuery(q) {
-  const { movements, moods, genres, subjects, countries, decade, subject } = _splitQuery(q);
-  // HOW MANY VOTES A FILM NEEDS TO BE RANKED AT ALL.
-  //
-  // This is the single most important number here and it was wrong. TMDB's vote_average is a
-  // plain mean, so a 2025 film watched by 150 enthusiasts scores 9.9 and outranks every
-  // romantic comedy ever made. Measured on the live site 21 Sep 2026: "романтическая комедия"
-  // returned The Way to the Heart (2024) at 9.9, Accidental Partners (2026) at 8.8, and a
-  // stand-up special that qualified on the comedy genre id. Not one film anybody has heard of.
-  //
-  // The threshold has to move with how hard the OTHER constraints are. A movement pins country
-  // and decade, so it can afford almost no threshold - and that query was the one that worked,
-  // returning Le Trou, The 400 Blows and La Jetée. Genre alone pins nothing, so the vote count
-  // is the only thing standing between the person and an unknown film with a flattering mean.
-  const VOTES = { movement: 30, person: 20, keyword: 300, genre_only: 1000 };
-  const p = new URLSearchParams({ include_adult:'false', language:_tmdbLang(), sort_by:'vote_average.desc' });
-  p.set('vote_count.gte', String(VOTES.genre_only));      // loosened below by whatever pins harder
-  let why = t('why_for_query').replace('{q}', q);
-  let matched = false;
+// ── ПОРОГ ГОЛОСОВ: ОДНА ПОЛИТИКА, А НЕ ПОРЯДОК ВЕТОК ────────────────────────
+//
+// Раньше каждая ветка ставила vote_count.gte сама, и последняя сработавшая перетирала
+// предыдущие. Измерено 21 сентября: "триллер" с ОДНИМ ограничением получал порог 1000,
+// "корейский триллер 90-х" с ТРЕМЯ получал 200, а "романтическая комедия 90-х франция"
+// с тремя - 500. Разница бралась не из политики, а из того, какой if отработал последним.
+//
+// Теперь ветки только собирают ограничения, а порог считается здесь, один раз, и зависит
+// ТОЛЬКО от набора - не от порядка. Правило одно и его видно целиком: чем больше и чем
+// жёстче ограничения, тем ниже порог, потому что тем меньше шансов, что наверх всплывёт
+// безвестный фильм с красивым средним от полутора сотен зрителей.
+function _voteFloor(c) {
+  if (c.person)   return 20;    // ранние работы режиссёра тонки по определению
+  if (c.movement) return 30;    // страна и десятилетие уже прижаты
+  const hard = (c.decade ? 1 : 0) + (c.country ? 1 : 0) + (c.keyword ? 1 : 0);
+  if (hard >= 2) return 150;
+  if (c.keyword)  return 300;   // ключевое слово - настоящее ограничение
+  if (c.decade)   return 200;
+  if (c.country)  return 400;
+  if (c.genreAnd) return 500;   // два названных жанра пересекаются - это уже узко
+  return 1000;                  // голый жанр или настроение не прижимают ничего
+}
 
-  // A movement pins country and years, which is the hardest constraint available and the one
-  // the person most clearly asked for, so it is applied before anything else.
-  if (movements.length) {
-    const m = movements[0];
-    if (m.c) p.set('with_origin_country', m.c);
-    p.set('primary_release_date.gte', `${m.y[0]}-01-01`);
-    p.set('primary_release_date.lte', `${m.y[1]}-12-31`);
-    p.set('vote_count.gte', String(VOTES.movement));   // a 1920s movement has few voters by now
-    matched = true;
+// План запроса отдельно от его выполнения: так его можно проверить тестом, не трогая сеть.
+// Возвращает то же, что уходит в TMDB, плюс потолок на число обращений.
+function _planQuery(c) {
+  const p = new URLSearchParams({
+    include_adult: 'false', language: _tmdbLang(), sort_by: 'vote_average.desc',
+  });
+  if (c.movement) {
+    if (c.movement.c) p.set('with_origin_country', c.movement.c);
+    p.set('primary_release_date.gte', c.movement.y[0] + '-01-01');
+    p.set('primary_release_date.lte', c.movement.y[1] + '-12-31');
   }
+  if (c.person) p.set('with_people', String(c.person));
+  if (c.decade && !c.movement) {
+    p.set('primary_release_date.gte', c.decade + '-01-01');
+    p.set('primary_release_date.lte', (c.decade + 9) + '-12-31');
+  }
+  if (c.country && !c.movement) p.set('with_origin_country', c.country);
+  if (c.keywords && c.keywords.length) p.set('with_keywords', c.keywords.slice(0, 4).join('|'));
+  if (c.genreIds && c.genreIds.length) p.set('with_genres', c.genreIds.join(c.genreAnd ? ',' : '|'));
+  p.set('with_runtime.gte', '60');
+  p.set('vote_count.gte', String(_voteFloor(c)));
+  return p;
+}
+
+// Разбор и сбор ограничений, отдельно от построения запроса и от его выполнения.
+// Три слоя вместо одного: понять -> спланировать -> выполнить. Так план можно проверить
+// тестом, не трогая сеть, и порядок веток перестаёт влиять на результат.
+async function _constraintsFor(q) {
+  const { movements, moods, genres, subjects, countries, decade, subject } = _splitQuery(q);
+  const c = {
+    why: t('why_for_query').replace('{q}', q),
+    matched: false, movement: null, person: null, decade: null, country: null,
+    keywords: [], genreIds: [], genreAnd: false, curated: null, pins: 0,
+  };
+
+  if (movements.length) { c.movement = movements[0]; c.matched = true; }
+
   const person = movements.length ? null : await _personId(subject);
   if (person) {
-    p.set('with_people', String(person.id));
-    p.set('vote_count.gte', String(VOTES.person));     // a director's early work is thin
-    why = t('why_person').replace('{name}', person.name);
-    matched = true;
+    c.person = person.id;
+    c.why = t('why_person').replace('{name}', person.name);
+    c.matched = true;
   }
 
-  // Computed here rather than after the subject branch, because the curated list needs to know
-  // what else was asked for and the subject branch returns before reaching the old position.
-  const genreIds = (genres.length ? genres.map(g => g.g) : moods.map(m => m.g))
+  // Названный жанр жёстче настроения и забирает жанровый слот целиком: "романтический"
+  // должен вернуть мелодраму, а не мелодраму-ИЛИ-что-там-угадало-настроение.
+  c.genreIds = (genres.length ? genres.map(g => g.g) : moods.map(m => m.g))
     .join(',').split(',').map(x => x.trim()).filter(Boolean)
-    .filter((v,i,a) => a.indexOf(v) === i).slice(0, 3);
+    .filter((v, i, a) => a.indexOf(v) === i).slice(0, 3);
+  // Два НАЗВАННЫХ жанра - это пересечение, а не выбор из двух. Настроения остаются
+  // объединением: настроение и так догадка о жанрах, а пересекать три догадки - пусто.
+  c.genreAnd = genres.length >= 2;
 
-  if (!movements.length && decade) {
-    // A movement already pins its own years and knows them better than a decade word would.
-    p.set('primary_release_date.gte', decade + '-01-01');
-    p.set('primary_release_date.lte', (decade + 9) + '-12-31');
-    // A decade is a hard constraint, so the vote threshold comes down with it - by the same
-    // rule as everywhere else in this function. Without it the 1930s return almost nothing.
-    p.set('vote_count.gte', '200');
-    matched = true;
-  }
-
-  if (!movements.length && countries.length) {
-    // A nationality is a hard constraint and costs nothing, but a movement already set one and
-    // knows better - "французская новая волна" must not be widened back out to all of France.
-    p.set('with_origin_country', countries[0].c);
-    matched = true;
-  }
+  if (!movements.length && decade) { c.decade = decade; c.matched = true; }
+  if (!movements.length && countries.length) { c.country = countries[0].c; c.matched = true; }
 
   if (subjects.length || subject) {
-    // Recognised subjects first: those are English terms TMDB actually indexes. The raw
-    // leftover is tried only when nothing was recognised, and it will find something just
-    // when the person typed English in the first place.
-    // A hand-made list beats a tag search wherever one exists, so it is tried first. Under
-    // three surviving films it is not worth showing on its own - either the subject has no
-    // list or the person has seen almost all of it - and the keyword search runs instead.
+    // Сделанный руками список бьёт поиск по тегам там, где он есть.
     for (const sj of subjects) {
-      const curated = await _curatedSubject(sj.k, await _tasteIndex(), genreIds);
+      const curated = await _curatedSubject(sj.k, await _tasteIndex(), c.genreIds);
       if (curated && curated.length >= 3) {
         const w = t('why_for_query').replace('{q}', sj.k);
-        return curated.map(c => ({ ...c, why: c.why || w }));
+        c.curated = curated.map(x => ({ ...x, why: x.why || w }));
+        return c;
       }
     }
     const terms = subjects.length ? subjects.map(x => x.k) : [subject];
     const found = [];
     for (const term of terms.slice(0, 2)) found.push(...await _keywordIds(term));
     if (found.length) {
-      p.set('with_keywords', found.slice(0, 4).join('|'));
-      // A keyword is a real constraint, so it earns a looser threshold than a bare genre -
-      // but not the movement's, because "cat" spans the whole century and every country.
-      if (!movements.length && !person) p.set('vote_count.gte', String(VOTES.keyword));
-      // Naming what was understood beats echoing the question back. "по теме: cat" tells the
-      // person how they were read, and when the reading is wrong they can see why at a glance.
-      if (subjects.length) why = t('why_for_query').replace('{q}', subjects.map(x => x.k).join(', '));
-      matched = true;
+      c.keywords = found;
+      if (subjects.length) c.why = t('why_for_query').replace('{q}', subjects.map(x => x.k).join(', '));
+      c.matched = true;
     }
   }
-  // A named genre is a harder constraint than a mood, so it wins the genre slot outright:
-  // "романтический" must return romance, not romance-OR-whatever-the-mood-table-guessed.
-  // Moods only fill the slot when no genre was named. (genreIds is computed above.)
-  if (genreIds.length) {
-    // TWO NAMED GENRES MEAN THE INTERSECTION, NOT THE UNION. "романтическая комедия" is one
-    // thing, not a choice between two, and OR turned it into "anything tagged romance OR
-    // comedy sorted by rating" - which is just the best-films-ever list. Measured on the live
-    // site 21 Sep 2026: Parasite, Forrest Gump and The Intouchables came back, because
-    // Parasite carries the comedy tag. Not one of the seven was a romantic comedy.
-    //
-    // Moods stay OR. A mood is our guess at which genres fit a feeling, and ANDing three
-    // guesses returns nothing - that is what the old comment was right about.
-    const andThem = genres.length >= 2;
-    p.set('with_genres', genreIds.join(andThem ? ',' : '|'));
-    // An intersection is a far harder constraint than a union, so by the same rule as
-    // everywhere else here the vote threshold comes down with it.
-    if (andThem && !movements.length && !person) p.set('vote_count.gte', '500');
-    matched = true;
-  }
-  if (!matched) {
-    // Nothing in the phrasebook and nothing TMDB indexes: treat it as a title. This is the
-    // branch that answers "Oppenheimer" typed into the picks field, which people do.
-    const r = await tmdbSearch(q);
-    return (r || []).slice(0, 12).map(m => ({ ...m, why }));
-  }
-    // NOT A SHORT. Measured on the live site 21 Sep 2026: "романтическая комедия" returned
-    // Paperman (six minutes) and In a Heartbeat (four minutes) in the top three. Both carry
-    // the romance and comedy tags honestly and both are rated highly, so every filter we had
-    // waved them through - and neither is an answer to "what do I watch tonight". Sixty
-    // minutes is the usual feature floor and it is below the shortest features that matter.
-    p.set('with_runtime.gte', '60');
-  // THE WEAKER THE CONSTRAINT, THE WIDER WE ROAM. Sorting by rating with a vote floor and
-  // nothing else pinned returns the same twenty films to everybody, every time: "меланхоличный
-  // роуд муви" came back with Parasite, Interstellar, Schindler's List and Forrest Gump, which
-  // is simply the all-time top list wearing a mood. A mood by itself is the weakest thing this
-  // engine can be told, so it earns the widest window; a movement or a decade has already done
-  // the narrowing and can stay near the top of its own list.
-  // Counted, not merely present. A decade ALONE is weak: "дождь токио 90х и киберпреступники"
-  // used one word of four and came back with Schindler's List, Forrest Gump and GoodFellas -
-  // the top of the nineties, which is what a rating sort over a whole decade always returns.
-  // Two constraints or more and the list is genuinely narrow; one and we should roam.
-  const _pins = (movements.length ? 1 : 0) + (decade ? 1 : 0) + (countries.length ? 1 : 0)
-              + (subjects.length ? 1 : 0) + (person ? 1 : 0);
-  p.set('page', String(1 + Math.floor(Math.random() * (_pins >= 2 ? 2 : 5))));
+  if (c.genreIds.length) c.matched = true;
 
-  // AN EMPTY ANSWER IS NOT AN ANSWER, AND WE WERE GIVING TWO OF THEM IN FOUR QUERIES.
-  // "тёмное фэнтези про средневековых уличных музыкантов и бродячий цирк" became fantasy AND
-  // three music keywords AND three hundred votes, and that intersection is empty on TMDB - so
-  // a query we understood well came back with nothing, which reads as "we have no idea" rather
-  // than "you asked for something nobody filmed".
-  //
-  // So when the first attempt is empty we loosen in order of how much each constraint was
-  // actually asked for. Keywords are the most specific thing the person said, so the genre
-  // goes first; the genre is often a mood's guess anyway. Then the keywords. The date range,
-  // the country and the vote floor are never dropped: those are what they typed, plainly.
+  c.keyword = c.keywords.length > 0;
+  c.pins = (c.movement ? 1 : 0) + (c.decade ? 1 : 0) + (c.country ? 1 : 0)
+         + (c.keyword ? 1 : 0) + (c.person ? 1 : 0);
+  return c;
+}
+
+async function _searchByQuery(q) {
+  const c = await _constraintsFor(q);
+  if (c.curated) return c.curated;                 // кураторский список ответил сам
+  if (!c.matched) {
+    // Ничего не распознано: считаем это названием. Сюда приходит "Оппенгеймер",
+    // набранный в поле подборок, и это делают часто.
+    const r = await tmdbSearch(q);
+    return (r || []).slice(0, 12).map(m => ({ ...m, why: c.why }));
+  }
+
+  const p = _planQuery(c);
+  // Чем слабее ограничение, тем шире окно. Сортировка по среднему с порогом голосов и
+  // ничем больше - это ФИКСИРОВАННЫЙ запрос: один вход, одни и те же двадцать фильмов
+  // всем и всегда. Движение, десятилетие, страна и предмет сужают выдачу до сортировки;
+  // настроение не сужает почти ничего.
+  p.set('page', String(1 + Math.floor(Math.random() * (c.pins >= 2 ? 2 : 5))));
+
   const _asAsked = new URLSearchParams(p.toString());   // до ослабления, для запроса по людям
   let res = await tmdbFetch(`/discover/movie?${p.toString()}`);
   if (res && res.error) { const e = new Error(res.error); e.tmdb = res; throw e; }
+  // Пустой ответ - не ответ. Ослабляем в порядке того, насколько о вещи просили:
+  // жанр часто догадка настроения, поэтому уходит первым; ключевые слова вторыми.
+  // Годы, страна и порог голосов не снимаются - это то, что человек написал прямо.
   for (const drop of ['with_genres', 'with_keywords']) {
     if (((res && res.results) || []).length) break;
     if (!p.has(drop)) continue;
@@ -8945,76 +8933,51 @@ async function _searchByQuery(q) {
     res = await tmdbFetch(`/discover/movie?${p.toString()}`);
     if (res && res.error) break;
   }
-  // Drop what they already have. Note this is NOT done for the title branch above: somebody
-  // who types "Oppenheimer" is looking for that film, and hiding it because they own it would
-  // be the app refusing to answer the question it was asked.
+
   const _lib = _libraryKeys();
   const _cands = ((res && res.results) || [])
-    .filter(c => !_lib.ids.has(String(c.id)) && !_lib.titles.has(_lib.norm(c.title || c.name)))
-    .map(c => ({
-    id:c.id, tmdbID:String(c.id), type:'movie',
-    Title:c.title || c.name, Year:(c.release_date||"").slice(0,4),
-    Poster:c.poster_path ? TMDB_IMG + c.poster_path : "",
-    Rating:c.vote_average ? c.vote_average.toFixed(1) : null, Genre:"", why,
-  }));
-  // THE SAME QUESTION, ASKED OF THE PEOPLE THEY ALREADY CHOOSE.
-  //
-  // Ranking the first answer by taste was not enough and the reason is arithmetic: the taste
-  // tally knows about three hundred films and a text query is asked of TMDB's entire database,
-  // so they almost never meet. Measured on forty live results 21 Sep 2026: not one carried a
-  // personal reason. The promise on the tab says personal picks, and sorting a stranger's list
-  // is not that.
-  //
-  // So the query is asked a second time with with_people set to the directors, composers and
-  // cinematographers who recur in what they rated highly. Those results are the same request,
-  // by people they have already chosen, and they go first - with a reason that names the person
-  // rather than repeating the question back.
-  const _taste = await _tasteIndex();
-  let ranked = _rankByTaste(_cands, _taste, why);
+    .filter(x => !_lib.ids.has(String(x.id)) && !_lib.titles.has(_lib.norm(x.title || x.name)))
+    .map(x => ({
+      id: x.id, tmdbID: String(x.id), type: 'movie',
+      Title: x.title || x.name, Year: (x.release_date || '').slice(0, 4),
+      Poster: x.poster_path ? TMDB_IMG + x.poster_path : '',
+      Rating: x.vote_average ? x.vote_average.toFixed(1) : null, Genre: '', why: c.why,
+    }));
 
-  // NOT WHEN THEY NAMED SOMEBODY THEMSELVES. "Уютный детектив мерил стрип" found Meryl
-  // Streep correctly and then had the taste layer push its own names in front of her - the
-  // composer of a series he rated highly, with a making-of documentary at the top. An explicit
-  // request beats our guess about him every time.
-  if (!person && _taste.crewIds && _taste.crewIds.length) {
+  const _taste = await _tasteIndex();
+  let ranked = _rankByTaste(_cands, _taste, c.why);
+
+  // Тот же вопрос, заданный людям, которых человек уже выбирает. Ранжировать первый ответ
+  // по вкусу оказалось мало: перекличка знает около трёхсот фильмов, а запрос идёт по всей
+  // базе TMDB, и они почти не встречаются. Не тогда, когда имя назвал он сам - явная
+  // просьба бьёт нашу догадку.
+  if (!c.person && _taste.crewIds && _taste.crewIds.length) {
     try {
       const pp = new URLSearchParams(_asAsked.toString());
-      pp.set('with_people', _taste.crewIds.map(c => c.id).join('|'));
+      pp.set('with_people', _taste.crewIds.map(x => x.id).join('|'));
       pp.delete('page');
-      // The person IS the specificity here, so the keywords come off: with_people AND three
-      // keywords AND a genre AND three hundred votes is empty almost every time, which is why
-      // this layer fired and returned nothing on every query it was tried on. The vote floor
-      // drops with it - the point of asking about somebody you already like is to reach the
-      // work of theirs you have not seen, and that is rarely the famous one.
       pp.delete('with_keywords');
       pp.set('vote_count.gte', '50');
-      // A low floor is the point - the unseen work of somebody they like is rarely the famous
-      // one - but it let in "No Half Measures: Creating the Final Season of Breaking Bad".
-      // Making-of documentaries are not an evening, so the genre is excluded unless asked for.
-      if (!genreIds.includes('99')) pp.set('without_genres', '99');
-      // AND NOT THEIR WEAK WORK. A composer with few credits had Term Life at 6.0 and
-      // Ultraviolet at 5.2 as his best in the genre, and we put both above everything the
-      // person had actually asked for. Reaching the unseen is the point; reaching the bad
-      // is not. Two films, not four: this is seasoning, not the dish.
+      if (!(c.genreIds || []).includes('99')) pp.set('without_genres', '99');
       pp.set('vote_average.gte', '6.5');
       const r2 = await tmdbFetch(`/discover/movie?${pp.toString()}`);
       const mine = ((r2 && !r2.error && r2.results) || [])
-        .filter(c => !_lib.ids.has(String(c.id)) && !_lib.titles.has(_lib.norm(c.title || c.name)))
+        .filter(x => !_lib.ids.has(String(x.id)) && !_lib.titles.has(_lib.norm(x.title || x.name)))
         .slice(0, 2)
-        .map(c => ({
-          id: c.id, tmdbID: String(c.id), type: 'movie',
-          Title: c.title || c.name, Year: (c.release_date || '').slice(0, 4),
-          Poster: c.poster_path ? TMDB_IMG + c.poster_path : '',
-          Rating: c.vote_average ? c.vote_average.toFixed(1) : null, Genre: '',
+        .map(x => ({
+          id: x.id, tmdbID: String(x.id), type: 'movie',
+          Title: x.title || x.name, Year: (x.release_date || '').slice(0, 4),
+          Poster: x.poster_path ? TMDB_IMG + x.poster_path : '',
+          Rating: x.vote_average ? x.vote_average.toFixed(1) : null, Genre: '',
           why: t('why_person').replace('{name}', _taste.crewIds[0].name),
         }));
-      // In front, and never duplicated further down.
       const seen = new Set(mine.map(m => String(m.id)));
       ranked = [...mine, ...ranked.filter(m => !seen.has(String(m.id)))];
-    } catch (e) { /* personal layer is a bonus, never a blocker */ }
+    } catch (e) { /* личный слой - добавка, а не условие */ }
   }
   return ranked;
 }
+
 
 async function loadRecs() {
   const q = document.getElementById("rec-input").value.trim();
