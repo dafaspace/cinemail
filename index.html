@@ -2866,7 +2866,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.80</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.81</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -13784,6 +13784,174 @@ if ("serviceWorker" in navigator) {
     document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") reg.update().catch(()=>{}); });
   }).catch(err=>console.warn("SW:",err));
 }
+
+// ── КНОПКА "НАЗАД": ОДИН СЛОЙ НА ВСЁ ПРИЛОЖЕНИЕ ─────────────────────────────
+//
+// Сообщено пользователем 23 сентября 2026: нашёл фильм в поиске, открыл карточку,
+// прочитал описание, нажал системную кнопку "назад" - и вышел из приложения
+// вместо возврата к списку найденного.
+//
+// Причина НЕ в карточке фильма. Измерено на живом сайте: pushState не вызывался
+// ни разу за всё приложение, только replaceState, который записей в историю не
+// создаёт. history.length до открытия карточки - 1, после открытия - 1.
+// Возвращаться было некуда, и ровно так же вели себя все оверлеи и переключение
+// вкладок. "Назад" не сломался на одном экране - он не работал нигде и никогда.
+//
+// Правило ставится в одном месте, а не одиннадцатью заплатами: таблица пар и
+// обёртка поверх них. Одиннадцать мест, исправленных по отдельности, разъезжаются -
+// двенадцатый оверлей просто забудут, как забыли эти.
+//
+// Google Play проверяет поведение системной "назад" явно: это блокер подачи.
+(function _navLayersInstalled() {
+  const stack = [];     // что открыто, снизу вверх
+  let ignore = 0;       // столько ближайших popstate - наши собственные откаты
+  let closing = false;  // закрываем ИЗ popstate: историю трогать нельзя, браузер уже ушёл
+
+  const shownEl = (id) => { const e = document.getElementById(id);
+                            return !!e && getComputedStyle(e).display !== 'none'; };
+  const push = (name, close) => { stack.push({ name, close });
+                                  history.pushState({ cm: name, d: stack.length }, ''); };
+  const drop = (name) => { const i = stack.map(x => x.name).lastIndexOf(name);
+                           if (i < 0) return false;
+                           stack.splice(i, 1); ignore++; history.back(); return true; };
+
+  // ── Простые оверлеи: открылся - записали, закрыли - откатили ───────────────
+  const SIMPLE = [
+    ['guest',    'showGuestConvertModal', 'closeGuestConvertModal', 'guest-convert-overlay'],
+    ['lightbox', 'openLightbox',          'closeLightbox',          'lightbox-overlay'],
+    ['add',      'openAdd',               'closeAdd',               'add-overlay'],
+    ['edit',     'openEdit',              'closeEdit',              'edit-overlay'],
+    ['picker',   'openListPicker',        'closeListPicker',        'list-picker-overlay'],
+    ['share',    'openShare',             'closeShare',             'share-overlay'],
+    ['account',  'openAccount',           'closeAccount',           'account-overlay'],
+    ['feedback', 'openFeedback',          'closeFeedback',          'feedback-overlay'],
+    // У чата нет своего оверлея: он живёт на флаге и перерисовывает список входящих.
+    ['chat',     'openChat',              'closeChat',              null],
+  ];
+
+  for (const [name, openName, closeName, elId] of SIMPLE) {
+    const rawOpen = window[openName], rawClose = window[closeName];
+    if (typeof rawOpen !== 'function' || typeof rawClose !== 'function') continue;
+    const shown = elId ? () => shownEl(elId)
+      : () => typeof _chatViewPartnerId !== 'undefined' && _chatViewPartnerId != null;
+
+    window[openName] = function () {
+      const r = rawOpen.apply(this, arguments);
+      // Уровень записывается, только если оверлей ДЕЙСТВИТЕЛЬНО открылся. Иначе
+      // вызов, ушедший в ошибку или в гостевую заглушку, оставил бы лишнюю запись,
+      // и одно нажатие "назад" съедалось бы впустую.
+      const arm = () => { if (shown() && !stack.some(x => x.name === name)) push(name, rawClose); };
+      if (r && typeof r.then === 'function') return r.then(v => { arm(); return v; });
+      arm();
+      return r;
+    };
+    window[closeName] = function () {
+      const r = rawClose.apply(this, arguments);
+      if (!closing) drop(name);   // закрыли крестиком, а не кнопкой "назад"
+      return r;
+    };
+  }
+
+  // ── Фильм и персона: особый случай, и он разобран до того, как писать код ──
+  //
+  // Эти двое ходят друг в друга своим стеком (_modalStack), и у них ТРИ разных
+  // смысла закрытия на двух экранах:
+  //   крестик      -> navModalBack: шаг назад по цепочке, с переоткрытием предыдущего
+  //   тап по фону  -> closeDetail:  закрыть ВСЮ цепочку разом
+  //   переход      -> _transitionToPerson прячет оверлей НАПРЯМУЮ, минуя close
+  // Поэтому обычная обёртка на пару не годится: она бы считала скрытый напрямую
+  // оверлей всё ещё открытым. Здесь у цепочки свой счётчик записей.
+  const rawNavBack = window.navModalBack;
+  let chain = 0;          // сколько записей истории занимает цепочка
+  let restoring = false;  // navModalBack переоткрывает предыдущий - записи не добавлять
+
+  if (typeof rawNavBack === 'function') {
+    const stepBack = () => { chain = Math.max(0, chain - 1);
+                             restoring = true;
+                             try { rawNavBack(); } finally { restoring = false; } };
+
+    for (const [openName, elId] of [['openDetail', 'detail-overlay'], ['openPerson', 'person-overlay']]) {
+      const rawOpen = window[openName];
+      if (typeof rawOpen !== 'function') continue;
+      window[openName] = function () {
+        const r = rawOpen.apply(this, arguments);
+        const arm = () => { if (!restoring && shownEl(elId)) { chain++; push('modal', stepBack); } };
+        if (r && typeof r.then === 'function') return r.then(v => { arm(); return v; });
+        arm();
+        return r;
+      };
+    }
+
+    // Крестик делает ровно то же, что системная кнопка, и через тот же путь -
+    // иначе два способа закрыть один экран разойдутся, и история переживёт окно.
+    window.navModalBack = function () {
+      if (closing || chain === 0) return rawNavBack.apply(this, arguments);
+      history.back();
+    };
+
+    // Тап по фону закрывает всю цепочку, значит и записи снимаются все сразу.
+    for (const closeName of ['closeDetail', 'closePerson']) {
+      const rawClose = window[closeName];
+      if (typeof rawClose !== 'function') continue;
+      window[closeName] = function () {
+        const r = rawClose.apply(this, arguments);
+        if (!closing && chain > 0) {
+          const n = chain; chain = 0;
+          for (let k = 0; k < n; k++) {
+            const i = stack.map(x => x.name).lastIndexOf('modal');
+            if (i >= 0) stack.splice(i, 1);
+          }
+          // history.go(-n) отдаёт ОДИН popstate на весь прыжок, а не n штук:
+          // измерено в браузере, а не взято из головы.
+          ignore++; history.go(-n);
+        }
+        return r;
+      };
+    }
+  }
+
+  // ── Вкладки ───────────────────────────────────────────────────────────────
+  // Соглашение Android: "назад" с любой вкладки возвращает на первую, и только
+  // с первой выходит. Без этого "назад" на списках выбрасывало так же, как с карточки.
+  const rawSwitch = window.switchTab;
+  if (typeof rawSwitch === 'function') {
+    let armed = false;
+    window.switchTab = function (n) {
+      const r = rawSwitch.apply(this, arguments);
+      if (n !== 'search' && !armed) {
+        armed = true;
+        stack.unshift({ name: 'tab', close: () => { armed = false; rawSwitch('search'); } });
+        history.pushState({ cm: 'tab' }, '');
+      } else if (n === 'search' && armed) {
+        armed = false;
+        const i = stack.map(x => x.name).lastIndexOf('tab');
+        if (i >= 0) { stack.splice(i, 1); ignore++; history.back(); }
+      }
+      return r;
+    };
+  }
+
+  window.addEventListener('popstate', () => {
+    if (ignore > 0) { ignore--; return; }
+    const top = stack.pop();
+    if (!top) return;               // уровней больше нет - пусть уходит, это и есть выход
+    closing = true;
+    try { top.close(); } catch (e) { /* закрытие не должно уносить навигацию с собой */ }
+    finally { closing = false; }
+  });
+
+  // В сборке Capacitor нативная кнопка без слушателя ведёт себя по умолчанию
+  // платформы, и проверить это можно только на устройстве. Со слушателем поведение
+  // одинаково в PWA и в сборке, и оно написано здесь, на виду.
+  const capApp = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
+  if (capApp && capApp.addListener) {
+    capApp.addListener('backButton', () => {
+      if (stack.length) history.back();
+      else if (capApp.exitApp) capApp.exitApp();
+    });
+  }
+})();
+
 </script>
 </body>
 </html>
