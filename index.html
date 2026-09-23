@@ -2866,7 +2866,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.81</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.82</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -7852,6 +7852,12 @@ async function _discoverPicks(mode) {
 // treated as permission.
 let _picksRemaining = null;
 async function _spendPick() {
+  // Проверочный режим не тратит подборку, и только для НАШЕГО движка. У него нет
+  // денежной цены: он ходит в TMDB, а TMDB ограничен отдельно и на стороне воркера
+  // (2000 в день), то есть настоящий потолок никуда не девается. Счётчик подборок -
+  // это метроном ощущения, а не касса, и на время сравнения плеч он мешает.
+  // У плеча ИИ расход остаётся всегда: там за каждое нажатие платят деньгами.
+  if (PICKS_ENGINE === 'engine' && PICKS_ENGINE_FORCED) return { ok: true };
   try {
     const { data: { session } } = await sbClient.auth.getSession();
     if (!session) return { ok: true };
@@ -7878,7 +7884,7 @@ function _renderPicksMeter() {
   el.textContent = `${_picksRemaining} ${t('picks_left_week')}`;
 }
 
-async function surpriseMe() {
+async function surpriseMeEngine() {
   const el = document.getElementById("rec-results");
   const seen = watchHistory.filter(h => h.status === "watched").length;
   if (seen < SURPRISE_MIN_WATCHED) {
@@ -8979,7 +8985,7 @@ async function _searchByQuery(q) {
 }
 
 
-async function loadRecs() {
+async function loadRecsEngine() {
   const q = document.getElementById("rec-input").value.trim();
   const btn = document.getElementById("rec-btn");
   const el = document.getElementById("rec-results");
@@ -8989,7 +8995,7 @@ async function loadRecs() {
   try {
     // An empty field is not an error and should not be one: it means "anything good for me",
     // which is exactly what the taste tally answers. Hand it over rather than scolding.
-    if (!q) { btn.disabled=false; btn.textContent=t('find_btn'); _setSurpriseMode('taste'); return surpriseMe(); }
+    if (!q) { btn.disabled=false; btn.textContent=t('find_btn'); _setSurpriseMode('taste'); return surpriseMeEngine(); }
     const spent = await _spendPick();
     if (!spent.ok) {
       el.innerHTML = `<div class="empty-state"><div class="empty-state-title">${t('recs_unavail_title')}</div><p>${escapeHtml(t('picks_exhausted'))}</p></div>`;
@@ -13784,6 +13790,296 @@ if ("serviceWorker" in navigator) {
     document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") reg.update().catch(()=>{}); });
   }).catch(err=>console.warn("SW:",err));
 }
+
+
+// ── ЧЕМ СЧИТАТЬ ПОДБОРКИ: ОДИН ПЕРЕКЛЮЧАТЕЛЬ ────────────────────────────────
+//
+// В приложении живут ОБА плеча сразу: модель через воркер и наш разбор запроса.
+// Выбор - одна строка ниже, то есть смена умолчания стоит один деплой и откат
+// стоит ровно столько же. Это и есть смысл: движок ещё строится, и возможность
+// вернуть людей на работающее за одну минуту дороже, чем экономия на мёртвом коде.
+//
+// Отдельный человек переключает себе сам, без деплоя:
+//     cinemail.app/?picks=engine   - наш движок
+//     cinemail.app/?picks=ai       - модель
+//     cinemail.app/?picks=default  - вернуться к умолчанию
+// Выбор запоминается на устройстве и переживает перезагрузку.
+//
+// ПОЧЕМУ УМОЛЧАНИЕ 'ai': ровно то, что у людей сейчас. Деплой не должен менять
+// подборки никому - он везёт починенную кнопку "назад" и восемнадцать коммитов
+// остальной работы. Умолчание меняется, когда слепой стенд скажет, что можно.
+//
+// §1.C TMDB: путь к модели остаётся в приложении, то есть положение то же, что
+// сегодня, - ни лучше, ни хуже. Оно обязано измениться ДО подачи в сторы, и это
+// записано как условие подачи, а не как "когда-нибудь".
+const PICKS_ENGINE_DEFAULT = 'ai';
+
+let PICKS_ENGINE_FORCED = false;
+const PICKS_ENGINE = (() => {
+  let q = null;
+  try { q = new URLSearchParams(location.search).get('picks'); } catch (e) {}
+  try {
+    if (q === 'default') localStorage.removeItem('picks_engine');
+    else if (q === 'ai' || q === 'engine') localStorage.setItem('picks_engine', q);
+    const saved = localStorage.getItem('picks_engine');
+    if (saved === 'ai' || saved === 'engine') { PICKS_ENGINE_FORCED = true; return saved; }
+  } catch (e) { /* приватное окно: остаёмся на умолчании */ }
+  if (q === 'ai' || q === 'engine') { PICKS_ENGINE_FORCED = true; return q; }
+  return PICKS_ENGINE_DEFAULT;
+})();
+
+async function loadRecs()   { return PICKS_ENGINE === 'ai' ? loadRecsAI()   : loadRecsEngine(); }
+async function surpriseMe() { return PICKS_ENGINE === 'ai' ? surpriseMeAI() : surpriseMeEngine(); }
+
+// Пометка на экране, и она не украшение: без неё легко час сравнивать плечо
+// с ним же самим и не заметить. Видна только тому, кто переключился руками.
+function _renderEngineBadge() {
+  const host = document.getElementById('rec-history-hint');
+  if (!host) return;
+  let el = document.getElementById('engine-badge');
+  if (!PICKS_ENGINE_FORCED) { if (el) el.remove(); return; }
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'engine-badge';
+    el.style.cssText = 'margin-top:6px;font-size:11px;letter-spacing:.06em;text-indent:.06em;'
+      + 'color:var(--muted);border:1px solid var(--border,#26264a);border-radius:6px;'
+      + 'padding:3px 7px;display:inline-block';
+    host.parentNode.insertBefore(el, host.nextSibling);
+  }
+  el.textContent = (PICKS_ENGINE === 'ai' ? 'AI' : 'ENGINE') + ' · ?picks=default';
+}
+document.addEventListener('DOMContentLoaded', _renderEngineBadge);
+
+// ── ПЛЕЧО ИИ, взято дословно из v0.57.33 ────────────────────────────────────
+// Не переписано по памяти и не восстановлено по описанию: вырезано из того самого
+// коммита, который сейчас работает у людей (edb3730), проверено на баланс скобок и
+// на то, что не зовёт ничего исчезнувшего. Однажды воспроизведённый по памяти
+// промпт разошёлся с настоящим в трёх местах сразу.
+const ANTHROPIC_KEY = "enabled";
+let _aiAbortController = null;
+function _crewRule() {
+  return `NEVER name the director, cinematographer, composer, or any crew member OF A FILM YOU ARE SUGGESTING - you do not have their credits and any name you produce will be wrong. Describe what the film does instead. You MAY name people from the person's own watched list, because those credits are given to you above.`;
+}
+function _recLangRule() {
+  const names = { en:'English', ru:'Russian', uk:'Ukrainian', ka:'Georgian', es:'Spanish', fr:'French', de:'German', it:'Italian' };
+  const lang = names[_lang] || 'English';
+  return `\n\nWrite every "why" value in ${lang}, speaking to the user directly, informally and warmly (use the informal "you" where the language distinguishes it). Do NOT use em dashes or any emoji in "why". Keep each "title" in its original language - do not translate titles.`;
+}
+function _tasteSample(entries, limit = 12) {
+  const rated = entries.filter(e => Number(e.stars) > 0)
+                       .sort((a, b) => Number(b.stars) - Number(a.stars));
+  const picked = rated.slice(0, Math.max(0, limit - 3));
+  const ids = new Set(picked.map(e => e.id ?? e.title));
+  for (const e of [...entries].reverse()) {            // newest first
+    if (picked.length >= limit) break;
+    const key = e.id ?? e.title;
+    if (!ids.has(key)) { picked.push(e); ids.add(key); }
+  }
+  return picked;
+}
+function cancelAIRequest() { if (_aiAbortController) { _aiAbortController.abort(); _aiAbortController = null; } }
+function extractJSON(text) {
+  const cleaned = text.replace(/```json|```/g, "").trim();
+  const match = cleaned.match(/\[[\s\S]*\]/);
+  if (!match) throw new Error("No JSON array in response");
+  return JSON.parse(match[0]);
+}
+function getTasteContext(watchedEntries) {
+  if (!watchedEntries||!watchedEntries.length) return "";
+  function topNames(field, min, max) {
+    const map = {};
+    watchedEntries.forEach(h => { if (!h[field]) return; h[field].split(", ").forEach(name => { name=name.trim(); if(name) map[name]=(map[name]||0)+1; }); });
+    return Object.entries(map).filter(([,c])=>c>=min).sort((a,b)=>b[1]-a[1]).slice(0,max).map(([name,c])=>`${name} (${c})`).join(", ");
+  }
+  const composers        = topNames("composer",2,3);
+  const directors        = topNames("director",2,3);
+  const cinematographers = topNames("cinematographer",2,3);
+  const actors           = topNames("actors",2,4);
+  const lines = [];
+  if (composers)        lines.push(`Favourite composers by films watched: ${composers}`);
+  if (directors)        lines.push(`Favourite directors by films watched: ${directors}`);
+  if (cinematographers) lines.push(`Favourite cinematographers by films watched: ${cinematographers}`);
+  if (actors)           lines.push(`Favourite actors by films watched: ${actors}`);
+  return lines.join("\n");
+}
+function handleRateLimitHit(data) {
+  const resetStr = formatReset(data.reset_at);
+  // An IP refusal is not this person's budget running out - it is everyone behind one
+  // address sharing a wall. The old code showed them the IP's numbers, so someone with
+  // 50 a week was told they had "used all 200" while the counter beside it still read
+  // 47 left: two parts of one screen disagreeing, and the louder one untrue.
+  if (data.scope === "ip") {
+    showToast(t('limit_ip_shared').replace('{reset}', resetStr));
+    return;
+  }
+  const seen = localStorage.getItem("seenLimitExplainer") === "1";
+  if (!seen) { showLimitExplainer(data, resetStr); localStorage.setItem("seenLimitExplainer", "1"); }
+  else showToast(t('limit_picks_reached').replace('{n}', data.limit || 5).replace('{reset}', resetStr));
+}
+async function proxyFetch(body) {
+  const { data: { session } } = await sbClient.auth.getSession();
+  if (!session) throw new Error("Not signed in");
+  _aiAbortController = new AbortController();
+  const timeoutId = setTimeout(() => _aiAbortController?.abort(), 15000);
+  let res;
+  try {
+    res = await fetch(PROXY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + session.access_token },
+      body: JSON.stringify(body),
+      signal: _aiAbortController.signal,
+    });
+  } catch(e) {
+    clearTimeout(timeoutId);
+    if (e.name === "AbortError") throw new Error("timeout_or_cancelled");
+    throw e;
+  } finally { clearTimeout(timeoutId); }
+  const remaining = res.headers.get("X-RateLimit-Remaining");
+  const limit = res.headers.get("X-RateLimit-Limit");
+  const period = res.headers.get("X-RateLimit-Period");
+  if (remaining !== null && limit !== null) updateAICounter(+remaining, +limit, period);
+  if (res.status === 429) { const data = await res.json().catch(() => ({})); handleRateLimitHit(data); throw new Error("rate_limited"); }
+  if (res.status === 401) { showToast(t('toast_session_expired')); throw new Error("unauthorized"); }
+  if (!res.ok) throw new Error("Proxy error " + res.status);
+  return res.json();
+}
+async function proxyFetchWithRetry(body) {
+  let data = await proxyFetch(body);
+  let text = (data.content||[]).map(b=>b.text||"").join("");
+  try { return extractJSON(text); } catch(e) {
+    const retryMessages = [...body.messages,
+      { role: "assistant", content: text },
+      { role: "user", content: "Your response was not valid JSON. Reply ONLY with a valid JSON array, no prose, no markdown." }
+    ];
+    data = await proxyFetch({ ...body, messages: retryMessages });
+    text = (data.content||[]).map(b=>b.text||"").join("");
+    return extractJSON(text);
+  }
+}
+async function translateQuery(q) {
+  if (!ANTHROPIC_KEY) return q;
+  try {
+    const d = await proxyFetch({ model: "claude-haiku-4-5-20251001", max_tokens: 100,
+      messages: [{ role: "user", content: `Translate this movie/show title to English for searching. Reply with ONLY the English title, nothing else: "${q}"` }]
+    });
+    return d.content?.[0]?.text?.trim() || q;
+  } catch { return q; }
+}
+function updateAICounter(remaining, limit, period) {
+  _aiQuota = { remaining, limit, period };
+  const el = document.getElementById("ai-counter");
+  if (!el) return;
+  if (remaining === null || limit === null) { el.textContent = ""; return; }
+  // Labelled from the server's own answer, so an app deployed before the worker still
+  // says "today" and is right, instead of saying "this week" and being wrong.
+  el.textContent = `${remaining}/${limit} ${t(period === "week" ? 'picks_left_week' : 'picks_left_today')}`;
+  el.style.color = remaining <= 3 ? "#f87171" : "var(--muted)";
+}
+async function loadRecsAI() {
+  const q = document.getElementById("rec-input").value.trim();
+  const btn = document.getElementById("rec-btn");
+  const el = document.getElementById("rec-results");
+  btn.disabled=true; // label stays "Find" — loading is shown in the results area below
+  el.innerHTML=loadingHTML(randQuote(),true,true);
+  const slowTimer = startSlowLoadingIndicator();
+  try {
+    let suggestions = [];
+    if (ANTHROPIC_KEY) {
+      const watchedEntries = watchHistory.filter(h=>h.status==="watched");
+      const watched = _tasteSample(watchedEntries).map(m=>`${m.title} (${m.year})${m.stars?" "+m.stars+"★":""}${m.comment?` — "${m.comment}"`:""}"`).join("\n");
+      const planned = watchHistory.filter(h=>h.status==="plan").slice(-6).map(m=>m.title).join(", ");
+      const tasteCtx = getTasteContext(watchedEntries);
+      const hasQ = !!q;
+      const requestBlock = hasQ
+        ? `THE REQUEST (this is the PRIMARY filter): "${q}"\n\nEvery suggestion MUST clearly satisfy this request. If the request names a specific person, title, franchise, place, year, or era, stay precise and literal — do NOT drift to only loosely-related films. Broaden interpretation only when the request is a vague mood or theme.`
+        : `No specific request — surprise them with excellent films matched to their taste below.`;
+      const whyRule = hasQ
+        ? `Each "why" MUST first state how the film satisfies the request "${q}" (name the explicit connection), then it may add how it fits their taste.`
+        : `Each "why" explains in one sentence why it fits their taste.`;
+      const prompt = `You are a film expert helping someone find what to watch.\n\n${requestBlock}\n\n${watched?`The person has watched these (use ONLY as a secondary tie-breaker for tone/quality — and DO NOT suggest any of them):\n${watched}`:"No watch history yet."}${planned?`\nOn their watchlist — DO NOT suggest: ${planned}`:""}${tasteCtx?`\n${tasteCtx}`:""}\n\nSuggest exactly 7 films or TV shows.\nRules:\n- CRITICAL: none may appear in the watched or watchlist lists above.\n- ${whyRule}\n- ${_crewRule()}\n- Vary genres/eras only when the request does not imply a specific style.${_recLangRule()}\n\nReply ONLY with a JSON array, no other text:\n[{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
+      try { suggestions = await proxyFetchWithRetry({ model:"claude-haiku-4-5-20251001", max_tokens:1200, messages:[{role:"user",content:prompt}] }); }
+      catch(e) { if (e.message==="rate_limited") { el.innerHTML=""; btn.disabled=false; btn.textContent=t('find_btn'); return; } throw e; }
+    } else {
+      el.innerHTML=`<div class="empty-state"><div class="empty-state-icon">🔑</div><div class="empty-state-title">${t('recs_unavail_title')}</div><p>${t('recs_unavail_sub')}</p></div>`;
+      btn.disabled=false; btn.textContent=t('find_btn'); return;
+    }
+    const details = await Promise.all(suggestions.map(async s => {
+      const pick = await tmdbResolveTitle(s.title, s.year, s.type);
+      return pick ? {...pick,why:s.why} : {Title:s.title,Year:s.year||"",Poster:"",tmdbID:null,type:s.type||"movie",why:s.why};
+    }));
+    // Drop anything already in the library. The prompt does say "none may appear in the
+    // watched or watchlist lists above", and the model obeys it - but it is only ever
+    // SHOWN a sample: _tasteSample sends 12 of the watched films and the watchlist is
+    // trimmed to the last 6. A film it never saw can therefore come back as a
+    // recommendation, which is how Felicity's picks returned The Power of the Dog, a film
+    // she had watched and rated 4 stars. Nothing in the prompt can fix that; the check has
+    // to happen here, against the whole library.
+    //
+    // Matched on the resolved TMDB id, which is exact where a title match is not. Seven
+    // are requested so that five survive the filter.
+    const _norm = t => String(t||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+    const knownIds = new Set(watchHistory.map(h=>String(h.tmdbID)).filter(Boolean));
+    const knownTitles = new Set(watchHistory.map(h=>_norm(h.title)).filter(Boolean));
+    const fresh = details.filter(m =>
+      !(m.tmdbID && knownIds.has(String(m.tmdbID))) && !knownTitles.has(_norm(m.Title))
+    ).slice(0, 5);
+    el.innerHTML = fresh.length
+      ? `<div class="card-list">${fresh.map(m=>movieCardHTML(m,m.why)).join("")}</div>`
+      : `<div class="empty-state"><div class="empty-state-icon">🤷</div><div class="empty-state-title">${t('recs_none_title')}</div><p>${t('recs_none_sub')}</p></div>`;
+  } catch(e) {
+    if (e.message==="timeout_or_cancelled") el.innerHTML=`<div class="empty-state"><div class="empty-state-icon">⏱</div><div class="empty-state-title">${t('err_took_long_title')}</div><p>${t('err_took_long_sub')}</p></div>`;
+    else el.innerHTML=`<div class="empty-state"><div class="empty-state-title">${t('err_generic')}</div><p>${e.message}</p></div>`;
+  } finally { clearTimeout(slowTimer); _aiAbortController=null; }
+  btn.disabled=false; btn.textContent=t('find_btn');
+}
+async function surpriseMeAI() {
+  const el = document.getElementById("rec-results");
+  const seen = watchHistory.filter(h => h.status === "watched").length;
+  if (seen < SURPRISE_MIN_WATCHED) {
+    el.innerHTML = `<div class="empty-state">
+      <div class="empty-state-icon">✨</div>
+      <div class="empty-state-title">${escapeHtml(t('surprise_need_title'))}</div>
+      <p>${escapeHtml(t('surprise_need_sub').replace('{n}', seen).replace('{need}', SURPRISE_MIN_WATCHED))}</p>
+      <button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${escapeHtml(t('empty_list_btn'))}</button>
+    </div>`;
+    return;
+  }
+  el.innerHTML = loadingHTML(randQuote(), true, true);
+  const slowTimer = startSlowLoadingIndicator();
+  try {
+    const mode = getSurpriseMode();
+    const recentlyShown = _shownSurprises.slice(-9).join(", ");
+    const watchedEntries = watchHistory.filter(h=>h.status==="watched");
+    const watched = _tasteSample(watchedEntries).map(m=>`${m.title} (${m.year})${m.stars?" "+m.stars+"\u2605":""}`).join(", ");
+    const planned = watchHistory.filter(h=>h.status==="plan").slice(-6).map(m=>m.title).join(", ");
+    const tasteCtx = getTasteContext(watchedEntries);
+    const angles = ["Focus on films from non-English speaking countries.","Focus on films from the 1970s or 1980s.","Focus on documentary or animated films.","Focus on recent films from the last 3 years.","Focus on cult classics or underrated gems.","Focus on films from Asia or Latin America.","Include at least one silent era or black-and-white film.","Focus on films with female directors.","Mix decades: one classic, one from 90s-2000s, one recent."];
+    const angle = angles[Math.floor(Math.random()*angles.length)];
+    let prompt = "";
+    if (mode==="random") prompt = `Pick 3 great films or shows completely at random — pure instinct, no context. ${angle} Make them wildly different in genre, era, country.${recentlyShown?"\nDO NOT repeat: "+recentlyShown:""}${tasteCtx?"\n"+tasteCtx:""}\n${_crewRule()}${_recLangRule()}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why it's a must-watch"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
+    else if (mode==="seasonal") { const ctx=getSeasonalContext(); prompt = `Suggest 3 films perfectly suited for right now: ${ctx}. Match the mood of the moment. ${angle}${recentlyShown?"\nDO NOT repeat: "+recentlyShown:""}${watched?"\nAlready watched — skip: "+watched:""}${tasteCtx?"\n"+tasteCtx:""}\n${_crewRule()}${_recLangRule()}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why it fits tonight"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`; }
+    else prompt = `Suggest 3 films based on taste. ${angle} Vary genre, era, country.${watched?"\nWatch history: "+watched:" No history — use acclaimed films."}${planned?"\nDO NOT suggest from watchlist: "+planned:""}${recentlyShown?"\nDO NOT repeat recently shown: "+recentlyShown:""}${watched?"\nDO NOT suggest already watched: "+watched:""}${tasteCtx?"\n"+tasteCtx:""}\n${_crewRule()}${_recLangRule()}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why they'd love it"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
+    let suggestions;
+    try { suggestions = await proxyFetchWithRetry({ model:"claude-haiku-4-5-20251001", max_tokens:700, messages:[{role:"user",content:prompt}] }); }
+    catch(e) { if (e.message==="rate_limited") { el.innerHTML=""; return; } throw e; }
+    if (!Array.isArray(suggestions)) suggestions = [suggestions];
+    const details = await Promise.all(suggestions.map(async s => {
+      const pick = await tmdbResolveTitle(s.title, s.year, s.type);
+      return pick ? {...pick,why:s.why} : {Title:s.title,Year:s.year||"",Poster:"",tmdbID:null,type:s.type||"movie",why:s.why};
+    }));
+    details.forEach(m=>{if(m.Title)_shownSurprises.push(m.Title);});
+    sessionStorage.setItem("shownSurprises", JSON.stringify(_shownSurprises.slice(-30)));
+    const modeLabel = "✨ " + (mode==="random"?t('picks_random'):mode==="seasonal"?t('picks_tonight'):t('picks_for_you'));
+    el.innerHTML = `
+      <div class="picks-banner"><div class="picks-banner-label">${modeLabel}</div></div>
+      <div class="card-list">${details.map(m=>movieCardHTML(m,m.why)).join("")}</div>
+      ${_pickQualityHint(watchedEntries.length)}`;
+  } catch(e) {
+    if (e.message==="timeout_or_cancelled") el.innerHTML=`<div class="empty-state"><div class="empty-state-icon">⏱</div><div class="empty-state-title">${t('err_took_long_title')}</div><p>${t('err_took_long_sub')}</p></div>`;
+    else el.innerHTML=`<div class="empty-state"><div class="empty-state-title">${t('err_generic')}</div><p>${e.message}</p></div>`;
+  } finally { clearTimeout(slowTimer); _aiAbortController=null; }
+}
+// ── конец плеча ИИ ──────────────────────────────────────────────────────────
 
 // ── КНОПКА "НАЗАД": ОДИН СЛОЙ НА ВСЁ ПРИЛОЖЕНИЕ ─────────────────────────────
 //
