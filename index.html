@@ -2866,7 +2866,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.82</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.83</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8732,19 +8732,82 @@ async function _tasteIndex() {
   return (_tasteCache = { thin: false, tally, crew, crewIds, decades });
 }
 
+// ── ЧТО СКОЛЬКО ВЕСИТ ВО ВКУСЕ, И ПОЧЕМУ В БАЛЛАХ РЕЙТИНГА ──────────────────
+//
+// Измерено 22 сентября на двадцати кандидатах, отданных TMDB по убыванию оценки,
+// против библиотеки, любящей 2000-е: средняя оценка топ-5 падала с 8.36 до 7.80,
+// из топ-5 TMDB уцелело два фильма из пяти, а фильм 6.8 обходил фильм 8.6.
+//
+// Причина была арифметическая, а не смысловая. Прежняя формула:
+//     10 * перекличка       перекличка знает около трёхсот фильмов, а discover
+//                           берёт из всей базы TMDB - пересечения почти нет,
+//                           поэтому слагаемое почти всегда НОЛЬ
+//     min(4, десятилетие)   0..4
+//     рейтинг / 10          0..1, и рядом стоял комментарий "только для ничьих,
+//                           никогда не драйвер"
+// Намерение было верным, числа его перевернули: драйвером стало десятилетие,
+// вчетверо тяжелее оценки. Это "назови значение так, как оно себя ведёт".
+//
+// Теперь все сигналы в ОДНОЙ единице - баллах рейтинга TMDB. В них есть интуиция:
+// 0.3 между двумя фильмами - шум, 1.5 - разные фильмы.
+const TASTE_W = {
+  // Перекличка: сколько из восьми твоих любимых рекомендуют этот фильм (см.
+  // _pickSeeds). Один голос слабо, три - сильно и редко. Потолок в 1.5 балла
+  // значит: фильм, который рекомендуют трое твоих любимых, встаёт выше чужого
+  // среднего на полтора балла. Это и есть обещание персональной подборки, и оно
+  // ОБЯЗАНО уметь побеждать рейтинг - иначе персонализации нет, а есть топ-250.
+  tallyPerVote: 0.6, tallyMax: 1.5,
+  // Десятилетие говорит не про ЭТОТ фильм, а про корзину, в которую он попал.
+  // Разнимает равных, не переставляет неравных: потолок 0.3 меньше, чем разброс
+  // шума между двумя оценками TMDB, и так и задумано.
+  decadePerFilm: 0.1, decadeMax: 0.3,
+  // Сколько мест из пяти перекличка получает БЕЗ соревнования - см. _rankByTaste.
+  reservedSlots: 2,
+  // У кураторского списка основа не рейтинг, а его собственный порядок: он и есть
+  // курирование. Два балла от первого места до последнего - перекличка (до 1.5)
+  // может поднять фильм высоко, но не перевернуть список.
+  curationSpan: 2.0,
+};
+
+function _tasteBonus(hit, year, taste) {
+  const dec = Math.floor(Number(year) / 10) * 10;
+  const t = hit ? Math.min(TASTE_W.tallyMax, TASTE_W.tallyPerVote * hit.votes) : 0;
+  const d = Math.min(TASTE_W.decadeMax,
+                     TASTE_W.decadePerFilm * (((taste && taste.decades) || {})[dec] || 0));
+  return t + d;
+}
+
 // Orders a candidate set that the query has already narrowed. Returns the films with a `why`
 // that says something true about THEM rather than repeating the question.
 function _rankByTaste(cands, taste, fallbackWhy) {
   if (taste.thin) return cands.map(c => ({ ...c, why: fallbackWhy }));
-  return cands.map(c => {
+  const scored = cands.map(c => {
     const hit = taste.tally.get(c.id) || taste.tally.get(Number(c.id)) || taste.tally.get(String(c.id));
-    const dec = Math.floor(Number(c.Year) / 10) * 10;
-    const score = (hit ? 10 * hit.votes : 0)
-                + Math.min(4, taste.decades[dec] || 0)
-                + Number(c.Rating || 0) / 10;          // tiebreak only, never the driver
-    const why = hit ? _tallyWhy(hit) : fallbackWhy;
-    return { ...c, _score: score, why };
+    // Рейтинг - основа, вкус её сдвигает. Обратный порядок был измеримо хуже: см. TASTE_W.
+    return { ...c, _hit: hit, why: hit ? _tallyWhy(hit) : fallbackWhy,
+             _score: Number(c.Rating || 0) + _tasteBonus(hit, c.Year, taste) };
   }).sort((a, b) => b._score - a._score);
+
+  // МЕСТО ДЛЯ ПЕРЕКЛИЧКИ РЕЗЕРВИРУЕТСЯ, А НЕ ВЫИГРЫВАЕТСЯ.
+  // Перекличка - это не "чуть другая оценка", а другой РОД доказательства: её
+  // рекомендуют фильмы, которые человек сам поставил высоко. Заставлять её
+  // соревноваться в баллах рейтинга - категориальная ошибка, и она измерима:
+  // на 3000 прогонов по двадцать кандидатов перекличка доходила до топ-5 лишь в
+  // 78% случаев, потому что фильму с восемнадцатого места не хватало полутора
+  // баллов до первого. Терялся ровно тот сигнал, ради которого всё это есть.
+  //
+  // Поднимать потолок бонуса было бы возвратом к прежнему дефекту в меньшем
+  // масштабе. Вместо этого ограничение снимается: до двух мест из пяти отдаются
+  // перекличке без соревнования, внутри пятёрки порядок остаётся по счёту.
+  // Остальные три места - качество, и их вкус не трогает.
+  const hits = scored.filter(x => x._hit).slice(0, TASTE_W.reservedSlots);
+  if (!hits.length) return scored;
+  const head = scored.slice(0, 5);
+  const missing = hits.filter(h => !head.some(x => x.id === h.id));
+  if (!missing.length) return scored;
+  const front = [...head.slice(0, 5 - missing.length), ...missing].sort((a, b) => b._score - a._score);
+  const seen = new Set(front.map(x => String(x.id)));
+  return [...front, ...scored.filter(x => !seen.has(String(x.id)))];
 }
 
 // A curated subject, ordered by this person's taste and filled in from TMDB in their language.
@@ -8761,14 +8824,12 @@ async function _curatedSubject(key, taste, wantGenres) {
 
   const scored = fresh.map(([id, year], i) => {
     const hit = taste.tally.get(id) || taste.tally.get(String(id));
-    const dec = Math.floor(year / 10) * 10;
     return {
       id, hit,
       // The list's own order is the curation and it is not thrown away: it survives as a small
       // descending term, so taste reorders the shelf rather than emptying it onto the floor.
-      score: (hit ? 10 * hit.votes : 0)
-           + Math.min(4, (taste.decades || {})[dec] || 0)
-           + (rows.length - i) / rows.length,
+      score: TASTE_W.curationSpan * (rows.length - i) / rows.length
+           + _tasteBonus(hit, year, taste),
     };
   }).sort((a, b) => b.score - a.score);
 
@@ -8781,7 +8842,18 @@ async function _curatedSubject(key, taste, wantGenres) {
   // ones carrying a wanted genre go first. Five extra requests, and only on a query that
   // actually asked for something more.
   const wide = (wantGenres && wantGenres.length) ? 12 : 7;
-  const got0 = await Promise.all(scored.slice(0, wide).map(async r => {
+  // То же резервирование, что и в _rankByTaste, и по той же причине. Измерено:
+  // фильм с САМОГО НИЗА списка из двадцати, который рекомендуют двое твоих
+  // любимых, поднимается с двадцатого места на девятое - и всё равно не попадает
+  // в показываемые семь. Правило, применённое в одном месте из двух, хуже, чем
+  // не применённое нигде: одна половина продукта обещает то, чего другая не делает.
+  const _hits = scored.filter(r => r.hit).slice(0, TASTE_W.reservedSlots);
+  const _head = scored.slice(0, wide);
+  const _miss = _hits.filter(h => !_head.includes(h));
+  const _window = _miss.length
+    ? [..._head.slice(0, wide - _miss.length), ..._miss].sort((a, b) => b.score - a.score)
+    : _head;
+  const got0 = await Promise.all(_window.map(async r => {
     try {
       const m = await tmdbFetch(`/movie/${r.id}?language=${_tmdbLang()}`);
       if (!m || m.error || !m.title) return null;
