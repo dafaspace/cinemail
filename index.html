@@ -2866,7 +2866,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.83</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.84</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8373,16 +8373,16 @@ const _COUNTRIES = [
 // Read off the FLATTENED query, like movements, because "70 х" and "1970 е" fall apart into
 // separate words the moment _qNorm touches the hyphen.
 const _DECADES = [
-  { y:1920, t:'двадцатых двадцатые 1920 20х twenties zwanziger annees20 anni20' },
-  { y:1930, t:'тридцатых тридцатые 1930 30х thirties dreissiger annees30 anni30' },
-  { y:1940, t:'сороковых сороковые 1940 40х forties vierziger annees40 anni40' },
-  { y:1950, t:'пятидесятых пятидесятые 1950 50х fifties funfziger annees50 anni50' },
-  { y:1960, t:'шестидесятых шестидесятые 1960 60х sixties sechziger annees60 anni60' },
-  { y:1970, t:'семидесятых семидесятые 1970 70х seventies siebziger annees70 anni70' },
-  { y:1980, t:'восьмидесятых восьмидесятые 1980 80х eighties achtziger annees80 anni80' },
-  { y:1990, t:'девяностых девяностые 1990 90х nineties neunziger annees90 anni90' },
-  { y:2000, t:'нулевых нулевые двухтысячных 2000 00х noughties zweitausender' },
-  { y:2010, t:'десятых 2010 10х' },
+  { y:1920, t:'двадцатых двадцатые 1920 20х 20е 20ые 20ых 1920х 1920е twenties zwanziger annees20 anni20' },
+  { y:1930, t:'тридцатых тридцатые 1930 30х 30е 30ые 30ых 1930х 1930е thirties dreissiger annees30 anni30' },
+  { y:1940, t:'сороковых сороковые 1940 40х 40е 40ые 40ых 1940х 1940е forties vierziger annees40 anni40' },
+  { y:1950, t:'пятидесятых пятидесятые 1950 50х 50е 50ые 50ых 1950х 1950е fifties funfziger annees50 anni50' },
+  { y:1960, t:'шестидесятых шестидесятые 1960 60х 60е 60ые 60ых 1960х 1960е sixties sechziger annees60 anni60' },
+  { y:1970, t:'семидесятых семидесятые 1970 70х 70е 70ые 70ых 1970х 1970е seventies siebziger annees70 anni70' },
+  { y:1980, t:'восьмидесятых восьмидесятые 1980 80х 80е 80ые 80ых 1980х 1980е eighties achtziger annees80 anni80' },
+  { y:1990, t:'девяностых девяностые 1990 90х 90е 90ые 90ых 1990х 1990е nineties neunziger annees90 anni90' },
+  { y:2000, t:'нулевых нулевые двухтысячных 2000 00х 00е 00ые 00ых 2000х 2000е noughties zweitausender' },
+  { y:2010, t:'десятых 2010 10х 10е 10ые 10ых 2010х 2010е' },
 ];
 
 // The plain forms with a Latin s - 70s, 1990s - and the bare four-digit year. Kept apart from
@@ -8488,11 +8488,36 @@ function _splitQuery(q) {
   return { movements, moods, genres, subjects, countries, decade, subject: rest };
 }
 
-async function _keywordIds(subject) {
+// ВТОРОЙ АРГУМЕНТ РЕШАЕТ ВСЁ, И ЕГО НЕ БЫЛО.
+//
+// Индекс ключевых слов у TMDB английский и нечёткий: он отвечает почти на любую
+// строку. Сюда приходили ДВА разных вида текста, и оба принимались одинаково:
+//   - ключ из нашей таблицы ('serial killer') - английский и точный, верить можно
+//   - остаток запроса как его набрал человек - на его языке, и тогда ответ TMDB
+//     это шум, к которому наш текст отношения не имеет
+// Непустой ответ ставил c.matched = true, и отсюда три жалобы разом, сообщённые
+// 25 сентября: "take my muffin" не находился НИКОГДА, потому что остаток "take
+// muffin" давал какое-то ключевое слово, запрос уходил в discover и до поиска по
+// названию дело не доходило; "романтическое убийство" брало жанр мелодрамы и
+// случайный тег из слова "убийство"; "90е" становилось тегом вместо годов.
+//
+// Семь из восьми языков интерфейса - не английский, то есть для большинства людей
+// этот путь работал как генератор случайного фильтра.
+async function _keywordIds(subject, trusted) {
   if (!subject) return [];
   const res = await tmdbFetch(`/search/keyword?query=${encodeURIComponent(subject)}`);
   if (res && res.error) { const e = new Error(res.error); e.tmdb = res; throw e; }
-  return ((res && res.results) || []).slice(0, 3).map(k => k.id);
+  const got = ((res && res.results) || []).slice(0, 3);
+  if (trusted) return got.map(k => k.id);
+  // Чужой текст: берём только то, что действительно похоже на набранное. Кириллица
+  // не совпадёт с английским тегом никогда - и это правильный ответ, потому что
+  // тогда запрос честно уходит в поиск по названию.
+  const want = _normTitle(subject);
+  if (!want) return [];
+  return got.filter(k => {
+    const n = _normTitle(k.name);
+    return n && (n === want || n.includes(want) || want.includes(n));
+  }).map(k => k.id);
 }
 
 // "Tarkovsky" is a very common shape for this field and is not a keyword. Ask TMDB whether the
@@ -8966,7 +8991,7 @@ async function _constraintsFor(q) {
     }
     const terms = subjects.length ? subjects.map(x => x.k) : [subject];
     const found = [];
-    for (const term of terms.slice(0, 2)) found.push(...await _keywordIds(term));
+    for (const term of terms.slice(0, 2)) found.push(...await _keywordIds(term, subjects.length > 0));
     if (found.length) {
       c.keywords = found;
       if (subjects.length) c.why = t('why_for_query').replace('{q}', subjects.map(x => x.k).join(', '));
