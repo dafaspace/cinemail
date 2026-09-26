@@ -2867,7 +2867,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.93</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.96</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8627,22 +8627,62 @@ function _aliasFor(q) {
 
 // Карта отвечает СРАЗУ идентификатором - искать по имени уже не нужно, и это лучше алиаса:
 // алиас даёт строку, которую TMDB ещё предстоит понять, а здесь понимать нечего.
+// ИМЕНА В РУССКОМ СКЛОНЯЮТСЯ, А КЛЮЧИ В КАРТЕ - НЕТ.
+//
+// В карте лежит "кристофернолан", а человек пишет "фильмы кристофера нолана",
+// "музыка циммера", "с тильдой суинтон". Измерено 26 сентября: "кристофер нолан
+// научно фантастический" находился, "фильмы кристофера нолана" - нет, и разница
+// была только в падеже.
+//
+// Полный морфологический разбор здесь не нужен и вреден: имена склоняются
+// беднее нарицательных, а лишние догадки дают чужих людей. Достаточно отрезать
+// обычные окончания и спросить карту ещё раз - это несколько обращений к объекту
+// в памяти, без единого запроса в сеть.
+// Падеж не только ОТРЕЗАЕТ, но и ЗАМЕНЯЕТ: Софии - это София, а Тарковского -
+// Тарковский, который после нормализации становится "тарковскии". Одним усечением
+// ни то ни другое не получить.
+const _CASE_SUBS = [
+  ['ого', 'ии'], ['ому', 'ии'], ['ым', 'ии'], ['ом', 'ии'],   // -ский: Тарковского
+  ['ого', ''], ['его', ''], ['ому', ''], ['ему', ''],
+  ['ии', 'ия'], ['я', 'и'], ['ю', 'и'],                        // Софии -> София, Карвая -> Карвай
+  ['ы', 'а'], ['ои', 'а'], ['еи', 'а'], ['у', 'а'], ['е', 'а'],// Копполы -> Коппола
+  ['а', ''], ['я', ''], ['и', ''], ['ы', ''], ['у', ''], ['ю', ''], ['е', ''],
+  ['ои', ''], ['еи', ''], ['ым', ''], ['им', ''], ['ом', ''], ['ем', ''], ['ах', ''], ['ям', ''],
+];
+// minStem РАЗНЫЙ ДЛЯ ПАРЫ И ДЛЯ ОДИНОЧНОГО СЛОВА, и это не вкусовщина.
+// "софии копполы" усеклось до "софи" - а "софи" оказался отдельным ключом другого
+// человека, и выдача стала его. Пара слов сама по себе точна, одиночная догадка
+// нет, поэтому ей нужен запас длины.
+function _caseForms(k, minStem) {
+  const out = [k], seen = new Set([k]);
+  for (const [t, r] of _CASE_SUBS) {
+    if (!k.endsWith(t) || k.length - t.length < minStem) continue;
+    const f = k.slice(0, -t.length) + r;
+    if (f && !seen.has(f)) { seen.add(f); out.push(f); }
+  }
+  return out;
+}
+
 function _idFromNameMap(q) {
   if (!_nameMap) return 0;
   const norm = x => String(x || '').toLowerCase().normalize('NFD')
     .replace(/\p{M}/gu, '').replace(/[^\p{L}\p{N}]/gu, '');
+  const hit = k => { for (const f of _caseForms(k, 6)) if (_nameMap[f]) return _nameMap[f]; return 0; };
   const whole = norm(q);
   if (_nameMap[whole]) return _nameMap[whole];
   const words = String(q || '').split(/\s+/).filter(Boolean);
-  // Фамилия отдельным словом: "фильмы Тарковского", "музыка Зиммера".
+  // Пары соседних слов идут ПЕРВЫМИ: "кристофера нолана" точнее, чем "нолана"
+  // в одиночку, а однофамильцы - главный источник чужих людей в выдаче.
+  for (let i = 0; i + 1 < words.length; i++) {
+    const a = norm(words[i]), b = norm(words[i + 1]);
+    for (const fa of _caseForms(a, 3)) for (const fb of _caseForms(b, 4)) {
+      const v = _nameMap[fa + fb]; if (v) return v;
+    }
+  }
+  // Фамилия отдельным словом: "фильмы Тарковского", "музыка Циммера".
   for (const w of words) {
     const k = norm(w);
-    if (k.length > 3 && _nameMap[k]) return _nameMap[k];
-  }
-  // И пары соседних слов: "вуди аллен" внутри длинной фразы.
-  for (let i = 0; i + 1 < words.length; i++) {
-    const k = norm(words[i] + words[i + 1]);
-    if (_nameMap[k]) return _nameMap[k];
+    if (k.length > 3) { const v = hit(k); if (v) return v; }
   }
   return 0;
 }
@@ -8654,6 +8694,14 @@ function _idFromNameMap(q) {
 async function _personId(subject) {
   const words = String(subject || '').split(' ').filter(Boolean);
   if (!words.length) return null;
+  // КАРТА ГРУЗИТСЯ ДО ПЕРЕБОРА ОКОН, А НЕ ВНУТРИ НЕГО.
+  // Она загружалась в _personLookup, то есть уже ПОСЛЕ охранника, и при первом
+  // обращении за сессию _idFromNameMap отвечал пустотой на любое окно. Дальше
+  // срабатывало ограничение "одно многословное окно на запрос", и оно тратилось на
+  // первое попавшееся. Измерено 26 сентября: "роджер дикинс неонуар" дал окна
+  // ["роджер дикинс неонуар", "роджер дикинс", ...], первое израсходовало
+  // попытку, второе - верное - не пробовалось вовсе. Дикинс в карте есть, номер 151.
+  await _loadNameMap();
   const windows = [];
   if (words.length <= 3) windows.push(words.join(' '));
   for (const size of [3, 2]) {
@@ -9356,6 +9404,72 @@ async function _enrichWhy(list, c, weak) {
   return out;
 }
 
+
+// ── КОГДА ЧЕЛОВЕК НАЗВАН, СПРАШИВАЕМ ЕГО ФИЛЬМОГРАФИЮ, А НЕ БАЗУ ────────────
+//
+// discover умеет только with_people, и тот ловит ВСЕХ: актёров, продюсеров,
+// монтажёров и «в роли самого себя». Фильтра по должности у discover нет вовсе.
+// Отсюда шум, сообщённый 26 сентября: "кристофер нолан научно фантастический"
+// вернул Insomnia (его), а дальше документалку про звук в кино, документалку про
+// «Тёмного рыцаря», Man of Steel и Transcendence - две картины О НЁМ и две, где он
+// лишь значится продюсером.
+//
+// У /person/{id}/movie_credits должность ЕСТЬ. Один запрос вместо одного, зато мы
+// знаем, снял человек фильм, написал, озвучил или просто попал в титры. Отбор по
+// жанру и годам делается здесь же: фильмография это десятки строк, а не база.
+const _JOB_RANK = (job) => {
+  if (job === 'Director') return 4;                                    // его решение
+  if (/^(Writer|Screenplay|Story)$/.test(job)) return 3;
+  if (/Original Music Composer|^Music$/.test(job)) return 3;
+  if (job === 'Director of Photography') return 3;
+  return 0;   // продюсер, монтаж, «камео» - формально участие, а не авторство
+};
+
+async function _personFilms(c) {
+  let r;
+  try { r = await tmdbFetch(`/person/${c.person}/movie_credits?language=${_tmdbLang()}`); }
+  catch (e) { return null; }
+  if (!r || r.error) return null;
+
+  const best = new Map();                       // фильм -> лучшая должность на нём
+  for (const x of (r.crew || [])) {
+    const k = _JOB_RANK(x.job);
+    if (!k) continue;
+    if (!best.has(x.id) || best.get(x.id).rank < k) best.set(x.id, { film: x, rank: k });
+  }
+  // Актёрская работа - это работа, в отличие от строчки продюсера: ниже авторства,
+  // но выше нуля, иначе "что-нибудь с Тильдой Суинтон" не вернёт ничего.
+  for (const x of (r.cast || [])) if (!best.has(x.id)) best.set(x.id, { film: x, rank: 2 });
+  if (!best.size) return null;
+
+  const want = new Set((c.genreIds || []).map(String));
+  const docAsked = want.has('99');
+  const out = [...best.values()].filter(({ film }) => {
+    const g = (film.genre_ids || []).map(String);
+    // Документалка О ЧЕЛОВЕКЕ - не его фильм. Если документалку просили, оставляем.
+    if (!docAsked && g.includes('99')) return false;
+    if ((film.vote_count || 0) < 20) return false;
+    if (want.size) {
+      const hit = [...want].filter(x => g.includes(x));
+      if (c.genreAnd ? hit.length < want.size : !hit.length) return false;
+    }
+    const y = Number((film.release_date || '').slice(0, 4));
+    if (c.decade && (!y || y < c.decade || y > c.decade + 9)) return false;
+    return true;
+  });
+  if (!out.length) return null;                 // вызывающий отступит к простому списку
+
+  // Авторство важнее оценки: фильм, который он СНЯЛ, идёт выше того, где он в кадре.
+  out.sort((a, b) => b.rank - a.rank
+                  || (b.film.vote_average || 0) - (a.film.vote_average || 0));
+  return out.map(({ film }) => ({
+    id: film.id, tmdbID: String(film.id), type: 'movie',
+    Title: film.title || film.name, Year: (film.release_date || '').slice(0, 4),
+    Poster: film.poster_path ? TMDB_IMG + film.poster_path : '',
+    Rating: film.vote_average ? film.vote_average.toFixed(1) : null, Genre: '', why: null,
+  }));
+}
+
 async function _searchByQuery(q) {
   const c = await _constraintsFor(q);
   if (c.curated) return _enrichWhy(c.curated, c);  // кураторский список ответил сам
@@ -9364,6 +9478,18 @@ async function _searchByQuery(q) {
     // набранный в поле подборок, и это делают часто.
     const r = await tmdbSearch(q);
     return _enrichWhy((r || []).slice(0, 12).map(m => ({ ...m, why: c.why })), c);
+  }
+
+  // Назван человек - идём в его фильмографию, там указана должность. К discover
+  // отступаем только если TMDB не ответил или после отбора ничего не осталось.
+  if (c.person) {
+    const own = await _personFilms(c);
+    if (own && own.length) {
+      const lib = _libraryKeys();
+      const fresh = own.filter(m => !lib.ids.has(String(m.id))
+                                 && !lib.titles.has(lib.norm(m.Title)));
+      if (fresh.length) return _enrichWhy(fresh.slice(0, 12), c);
+    }
   }
 
   const p = _planQuery(c);
