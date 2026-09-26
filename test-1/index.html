@@ -2881,7 +2881,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.0-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.1-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8098,9 +8098,20 @@ const _SUBJECT_FILMS = {
   "bittersweet": [[153,2003],[152601,2013],[38,2004],[666277,2023],[475303,2019]],
   "epic": [[238,1972],[28,1979],[346,1954]],
   "dreamlike": [[426,1958],[1018,2001],[27040,1943]],
-  "beautiful": [[426,1958],[843,2000],[62,1968],[631,1927],[3114,1956]],
-  "haunting": [[426,1958],[1018,2001],[28,1979]],
-  "moving": [[18148,1953],[631,1927],[346,1954]],
+  "beautiful": [[426,1958],[843,2000],[62,1968],[631,1927],[3114,1956],[3112,1955],[531428,2019]],
+  "haunting": [[426,1958],[1018,2001],[28,1979],[3112,1955]],
+  "moving": [[18148,1953],[631,1927],[346,1954],[20530,1949],[20108,1966]],
+  "austere": [[44012,1975],[14626,1998],[780,1928],[20108,1966]],
+  "playful": [[872,1952],[499,1962],[10227,1967],[46919,1966]],
+  "restrained": [[18148,1953],[843,2000],[20530,1949],[531428,2019]],
+  "delicate": [[18148,1953],[20530,1949],[531428,2019]],
+  "eerie": [[426,1958],[1018,2001],[3112,1955]],
+  "erotic": [[843,2000],[1018,2001],[531428,2019]],
+  "experimental": [[26317,1929],[797,1966],[46919,1966]],
+  "exquisite": [[843,2000],[20530,1949],[531428,2019]],
+  "intimate": [[18148,1953],[843,2000],[531428,2019]],
+  "powerful": [[20530,1949],[42044,1985],[103,1976]],
+  "sensual": [[843,2000],[14626,1998],[531428,2019]],
 };
 
 const _SUBJECTS = [
@@ -8231,6 +8242,17 @@ const _SUBJECTS = [
   { k:"beautiful", terms:"beautiful gorgeous ravishing visually stunning красив прекрасн визуально роскошн любоват изумительн красив прекрасн розкішн hermoso precioso deslumbrante magnifique splendide sublime wunderschon prachtig bellissimo splendido ლამაზი მშვენიერი" },
   { k:"haunting", terms:"haunting lingering unshakeable stays with you щемящ неотвязн преследующ засевш западающ неотпускающ щемк невідступн переслідує inolvidable persistente obsesionante obsedant lancinant nachhallend eindringlich ossessionante persistente დაუვიწყარი" },
   { k:"moving", terms:"moving touching heartbreaking poignant tearjerker трогательн пронзительн до слез душеразд берущ за душу растрогат зворушлив пронизлив до сліз conmovedor emotivo desgarrador emouvant bouleversant poignant ruhrend ergreifend herzzerreissend commovente toccante struggente ამაღელვებელი" },
+  { k:"austere", terms:"austere ascetic spare severe аскетичн суров скупо строгая форма аскетичне суворе austero adusto austere depouille streng karg austero spoglio ასკეტური" },
+  { k:"playful", terms:"playful impish mischievous игрив озорн шаловлив пустотлив грайлив jugueton travieso espiegle verspielt giocoso მოთამაშე" },
+  { k:"restrained", terms:"restrained reserved understated spare emotion сдержанн скуп негромк приглушенн стриман негучне contenido sobrio retenu pudique zuruckhaltend sobrio ᲗᲐᲕᲨᲔᲙᲐᲕᲔᲑᲣᲚᲘ" },
+  { k:"delicate", terms:"delicate fragile deft хрупк деликатн невесом ажурн крихк делікатн delicado fragil delicat zart delicato ნაზი" },
+  { k:"eerie", terms:"eerie uncanny otherworldly жутков потусторонн зловещ мороз по коже моторошн inquietante sobrenatural etrange inquietant unheimlich inquietante საშიში" },
+  { k:"erotic", terms:"erotic desire эротичн желание влечен эротичне eroticо erotique erotisch erotico ეროტიული" },
+  { k:"experimental", terms:"experimental avantgarde экспериментальн авангардн формальн эксперимент експериментальн experimental experimentale experimentell sperimentale ექსპერიმენტული" },
+  { k:"exquisite", terms:"exquisite refined изысканн утончённ утонченн вишукан exquisito refinado exquis raffine erlesen squisito რაფინირებული" },
+  { k:"intimate", terms:"intimate чутк камерн близост вдвоем камерне інтимне intimo intime intim intimo ინტიმური" },
+  { k:"powerful", terms:"powerful forceful overwhelming мощн сокрушительн оглушительн пробирает потужн poderoso arrollador puissant bouleversant wuchtig uberwaltigend potente ძლიერი" },
+  { k:"sensual", terms:"sensual tactile чувственн телесн осязаем чуттєв sensual sensuel sinnlich sensuale სენსუალური" },
 ];
 // MOVEMENTS, SCHOOLS AND ERAS. Each is a country, a stretch of years, and sometimes a handful
 // of people - which is to say each is an exact query, not an approximation. "Французская новая
@@ -14597,6 +14619,17 @@ if ("serviceWorker" in navigator) {
 //     и это отдельная работа, а не строка в словаре.
 const _SHOW = {
   subject: {
+    "austere":{en:"austere",ru:"аскетичное",uk:"аскетичне",ka:"ასკეტური",es:"austero",fr:"austère",de:"karg",it:"austero"},
+    "playful":{en:"playful",ru:"игривое",uk:"грайливе",ka:"მოთამაშე",es:"juguetón",fr:"espiègle",de:"verspielt",it:"giocoso"},
+    "restrained":{en:"restrained",ru:"сдержанное",uk:"стримане",ka:"თავშეკავებული",es:"contenido",fr:"retenu",de:"zurückhaltend",it:"sobrio"},
+    "delicate":{en:"delicate",ru:"хрупкое",uk:"крихке",ka:"ნაზი",es:"delicado",fr:"délicat",de:"zart",it:"delicato"},
+    "eerie":{en:"eerie",ru:"жутковатое",uk:"моторошне",ka:"საშიში",es:"inquietante",fr:"étrange",de:"unheimlich",it:"inquietante"},
+    "erotic":{en:"erotic",ru:"эротичное",uk:"еротичне",ka:"ეროტიული",es:"erótico",fr:"érotique",de:"erotisch",it:"erotico"},
+    "experimental":{en:"experimental",ru:"экспериментальное",uk:"експериментальне",ka:"ექსპერიმენტული",es:"experimental",fr:"expérimental",de:"experimentell",it:"sperimentale"},
+    "exquisite":{en:"exquisite",ru:"изысканное",uk:"вишукане",ka:"რაფინირებული",es:"exquisito",fr:"exquis",de:"erlesen",it:"squisito"},
+    "intimate":{en:"intimate",ru:"камерное",uk:"камерне",ka:"ინტიმური",es:"íntimo",fr:"intime",de:"intim",it:"intimo"},
+    "powerful":{en:"powerful",ru:"мощное",uk:"потужне",ka:"ძლიერი",es:"poderoso",fr:"puissant",de:"wuchtig",it:"potente"},
+    "sensual":{en:"sensual",ru:"чувственное",uk:"чуттєве",ka:"სენსუალური",es:"sensual",fr:"sensuel",de:"sinnlich",it:"sensuale"},
     "beautiful":{en:"beautiful",ru:"визуально красивое",uk:"візуально красиве",ka:"ლამაზი",es:"hermoso",fr:"magnifique",de:"wunderschön",it:"bellissimo"},
     "haunting":{en:"haunting",ru:"неотвязное",uk:"невідступне",ka:"დაუვიწყარი",es:"obsesionante",fr:"obsédant",de:"nachhallend",it:"ossessionante"},
     "moving":{en:"moving",ru:"трогательное",uk:"зворушливе",ka:"ამაღელვებელი",es:"conmovedor",fr:"émouvant",de:"rührend",it:"commovente"},
