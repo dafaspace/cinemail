@@ -2583,7 +2583,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   <!-- ── TAB: Picks ───────────────────────────────────────────────────── -->
   <div id="tab-recs" class="tab-panel" style="display:none">
     <div class="search-row">
-      <input id="rec-input" type="text" data-i18n-ph="recs_ph" placeholder="Genre, country, era, subject">
+      <input id="rec-input" type="text" dir="auto" data-i18n-ph="recs_ph" placeholder="Genre, country, era, subject">
       <button class="btn btn-primary btn-sm" style="width:auto;min-width:104px" id="rec-btn" onclick="loadRecs()" data-i18n="find_btn">Find</button>
     </div>
     <div id="rec-suggest" style="display:none"></div>
@@ -2877,7 +2877,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.58.1</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.58.2</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -9703,7 +9703,7 @@ async function loadRecsEngine() {
     // один раз над списком и делает границу разбора видимой: сразу ясно, какое из
     // набранных слов мы не прочитали.
     const readLine = details._read
-      ? `<div class="picks-read">${escapeHtml(details._read)}</div>` : "";
+      ? `<div class="picks-read" dir="auto">${escapeHtml(details._read)}</div>` : "";
     el.innerHTML = fresh.length
       ? `${readLine}<div class="card-list">${fresh.map(m=>movieCardHTML(m,m.why)).join("")}</div>`
       : `<div class="empty-state"><div class="empty-state-icon">🤷</div><div class="empty-state-title">${t('recs_none_title')}</div><p>${t('recs_none_sub')}</p></div>`;
@@ -14802,7 +14802,13 @@ function _renderSuggest() {
   const items = _suggestFor(_lastToken(inp.value));
   if (!items.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
   box.innerHTML = items.map(w =>
-    `<button type="button" class="sug" data-w="${escapeHtml(w)}">${escapeHtml(w)}</button>`).join('');
+    // dir="auto" ЧИНИТ СЛОВО, А НЕ ВЁРСТКУ, И это стоит различать.
+    // Браузер берёт направление у первой сильной буквы, поэтому "מְתַח" встанет
+    // справа налево внутри чипа, а "триллер" слева направо - в одном и том же
+    // списке. Само зеркалирование интерфейса под иврит и арабский это отдельная
+    // работа: приложение сейчас целиком слева направо, и делать вид, что одна
+    // строка это исправила, не надо.
+    `<button type="button" class="sug" dir="auto" data-w="${escapeHtml(w)}">${escapeHtml(w)}</button>`).join('');
   box.style.display = 'flex';
 }
 
