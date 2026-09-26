@@ -2881,7 +2881,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.58.4-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.58.5-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -9540,7 +9540,11 @@ async function _searchByQuery(q) {
   // ничем больше - это ФИКСИРОВАННЫЙ запрос: один вход, одни и те же двадцать фильмов
   // всем и всегда. Движение, десятилетие, страна и предмет сужают выдачу до сортировки;
   // настроение не сужает почти ничего.
-  p.set('page', String(1 + Math.floor(Math.random() * (c.pins >= 2 ? 2 : 5))));
+  // ЧЕМ ТОЧНЕЕ СПРОСИЛИ, ТЕМ МЕНЬШЕ МЫ ВПРАВЕ БРОДИТЬ.
+  // Страница выбиралась случайно из пяти даже для узкого запроса, а узкий запрос
+  // и так отдаёт немного фильмов - третья страница у него это уже хвост. Человек,
+  // назвавший режиссёра, жанр и десятилетие, просит ответ, а не лотерею.
+  p.set('page', String(1 + Math.floor(Math.random() * (c.pins >= 2 ? 1 : c.pins === 1 ? 2 : 4))));
 
   const _asAsked = new URLSearchParams(p.toString());   // до ослабления, для запроса по людям
   let res = await tmdbFetch(`/discover/movie?${p.toString()}`);
@@ -9694,14 +9698,20 @@ async function loadRecsEngine() {
     //
     // Подгонять порог под каждый жанр - это таблица исключений, которая устареет.
     // Помнить показанное - одно правило, работающее на любом запросе.
-    const recent = new Set(_shownSurprises.slice(-30));
+    // ПАМЯТЬ О ПОКАЗАННОМ - ДЛЯ "УДИВИ МЕНЯ", А НЕ ДЛЯ ЯВНОГО ЗАПРОСА.
+    //
+    // Вчера я добавил её и сюда, чтобы "documentary" не повторял один короткий
+    // список. Сегодняшние скриншоты показали цену: "denis villeneuve cyberpunk
+    // 2010s" первым нажатием отдавал Blade Runner 2049, а вторым и третьим -
+    // Steven Universe, Mommy, Hacksaw Ridge. Лучшие совпадения вычёркивались
+    // именно потому, что их уже показали.
+    //
+    // Это разные обещания. "Удиви меня" обещает НОВОЕ, и там повтор - провал.
+    // Явный запрос обещает ОТВЕТ НА НЕГО, и там разнообразие - провал: человек
+    // жмёт второй раз, чтобы проверить, не показалось ли, и получает чужую выдачу.
     const usable = details.filter(m =>
       !(m.tmdbID && knownIds.has(String(m.tmdbID))) && !knownTitles.has(_norm(m.Title)));
-    const unseen = usable.filter(m => !recent.has(m.Title));
-    // Если всё показано, лучше повторить, чем отдать пустой экран.
-    const fresh = (unseen.length >= 3 ? unseen : usable).slice(0, 5);
-    fresh.forEach(m => { if (m.Title) _shownSurprises.push(m.Title); });
-    try { sessionStorage.setItem("shownSurprises", JSON.stringify(_shownSurprises.slice(-30))); } catch (e) {}
+    const fresh = usable.slice(0, 5);
     // "Понято: комедия · франция" - это ответ на ЗАПРОС, а не на "почему этот фильм",
     // и повторённое под каждой карточкой оно превращалось в шум. Здесь оно стоит
     // один раз над списком и делает границу разбора видимой: сразу ясно, какое из
