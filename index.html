@@ -2022,6 +2022,15 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   width: 100%; height: 100%; min-width: 44px; min-height: 44px;
 }
 .picks-read{font-size:12px;color:var(--muted);margin:0 0 10px;letter-spacing:.02em}
+#rec-suggest{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 10px}
+#rec-suggest .sug{display:inline-flex;align-items:center;justify-content:center;
+  font:inherit;font-size:13px;line-height:1;padding:.5em .9em;box-sizing:border-box;
+  -webkit-appearance:none;appearance:none;text-box:trim-both cap alphabetic;
+  min-height:34px;border-radius:999px;cursor:pointer;
+  background:color-mix(in srgb, var(--accent) 10%, transparent);
+  border:1px solid color-mix(in srgb, var(--accent) 34%, transparent);
+  color:var(--text);transition:background .15s}
+#rec-suggest .sug:hover{background:color-mix(in srgb, var(--accent) 22%, transparent)}
 </style>
 </head>
 <body>
@@ -2577,6 +2586,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <input id="rec-input" type="text" data-i18n-ph="recs_ph" placeholder="Genre, country, era, subject">
       <button class="btn btn-primary btn-sm" style="width:auto;min-width:104px" id="rec-btn" onclick="loadRecs()" data-i18n="find_btn">Find</button>
     </div>
+    <div id="rec-suggest" style="display:none"></div>
     <button onclick="surpriseMe()" data-i18n="surprise" style="width:100%;margin-top:0;margin-bottom:12px;padding:11px;border-radius:11px;background:color-mix(in srgb, var(--accent) 12%, transparent);border:1px solid color-mix(in srgb, var(--accent) 50%, transparent);color:var(--accent-text);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:1.5px;cursor:pointer;transition:all .18s;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)" onmouseover="this.style.background='color-mix(in srgb, var(--accent) 22%, transparent)';this.style.borderColor='color-mix(in srgb, var(--accent) 85%, transparent)';this.style.boxShadow='0 4px 18px color-mix(in srgb, var(--accent) 28%, transparent)';this.style.color='var(--text)'" onmouseout="this.style.background='color-mix(in srgb, var(--accent) 12%, transparent)';this.style.borderColor='color-mix(in srgb, var(--accent) 50%, transparent)';this.style.boxShadow='none';this.style.color='var(--accent-text)'">✨ Surprise Me</button>
     <div id="picks-hint" style="display:none;margin-bottom:12px;padding:11px 13px;background:rgba(245,197,24,0.07);border:1px solid rgba(245,197,24,0.22);border-radius:10px;font-size:12px;line-height:1.5;color:var(--text)">
       <div data-i18n="picks_random_hint" style="margin-bottom:9px;color:#cfcfcf">Without watched films, picks are random. Mark 5-10 films as Watched and they become personal to your taste.</div>
@@ -2867,7 +2877,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.99</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.58.0</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -14466,6 +14476,152 @@ if ("serviceWorker" in navigator) {
   }).catch(err=>console.warn("SW:",err));
 }
 
+
+
+// ── ПОДСКАЗКИ ПРИ ВВОДЕ: СПИСОК И ЕСТЬ СВОД ПРАВИЛ ─────────────────────────
+//
+// Движок понимает закрытый словарь: 204 записи и 1476 слов-триггеров. Всё, что в
+// него не попало, тихо отбрасывается, и человек узнаёт об этом только по пустому
+// экрану - "claustrophobic and unhinged" не находит ничего и не объясняет почему.
+//
+// Можно было написать правила ввода. Их не читают. Подсказка решает ту же задачу
+// иначе: человек видит, ЧТО МЫ ЗНАЕМ, пока печатает, а не после неудачи. Список
+// подсказок - это и есть грамматика, которую не надо заучивать.
+//
+// Стоит это ноль: словарь уже в памяти, обращений в сеть нет, фильтр по полутора
+// тысячам строк укладывается в доли миллисекунды.
+//
+// ИМЁНА СЮДА НЕ ПОПАДАЮТ, И ЭТО НЕ ЗАБЫВЧИВОСТЬ. В карте лежат ключи вида
+// "кристофернолан" - без пробелов и без исходного написания, показать такое нельзя.
+// Имена и так находятся по вводу целиком.
+// ПОДСКАЗЫВАЕМ ТО, У ЧЕГО ЕСТЬ ФОРМА ДЛЯ ПОКАЗА. ЭТО НЕ ВЕСЬ СЛОВАРЬ.
+//
+// Первая попытка брала слова прямо из таблиц движка - и упёрлась в то, что таблицы
+// хранят ОСНОВЫ, а не слова: сопоставление идёт подстрокой, поэтому там лежат
+// "кошк", "романт", "марсел", "немецкийэкспрессионизм". Измерено 26 сентября: из
+// 1476 триггеров отличить основу от слова автоматически нельзя - "кошк" не является
+// префиксом ни одного другого термина и при этом словом не является тоже.
+//
+// Значит у словаря просто НЕТ слоя отображения, и построить его - работа на 204
+// записи в восьми языках. Она осмысленна, но это не вечер.
+//
+// Поэтому подсказываем из трёх источников, у которых форма есть по природе:
+//   1. ЛЮДИ ИЗ ТВОЕЙ БИБЛИОТЕКИ - имена уже хранятся как написаны, и человек это
+//      то, что движок ищет лучше всего. Подсказывать своё сильное место честнее,
+//      чем подсказывать слабое.
+//   2. ЖАНРЫ - у TMDB есть их список на твоём языке, один запрос за сессию.
+//   3. ДЕСЯТИЛЕТИЯ - собираются из числа, переводить нечего.
+let _sugIndex = null;
+let _sugGenres = null;
+
+async function _loadGenreNames() {
+  if (_sugGenres) return _sugGenres;
+  try {
+    const r = await tmdbFetch(`/genre/movie/list?language=${_tmdbLang()}`);
+    _sugGenres = ((r && r.genres) || []).map(g => g.name).filter(Boolean);
+  } catch (e) { _sugGenres = []; }
+  return _sugGenres;
+}
+
+function _suggestIndex() {
+  if (_sugIndex) return _sugIndex;
+  const seen = new Set(), out = [];
+  const add = (w) => {
+    w = String(w || '').trim();
+    const k = _qNorm(w);
+    if (w.length < 3 || seen.has(k)) return;
+    seen.add(k); out.push(w);
+  };
+  // Люди из библиотеки: режиссёры, композиторы, операторы, актёры - как написаны.
+  try {
+    (watchHistory || []).forEach(e =>
+      ['director', 'composer', 'cinematographer', 'actors'].forEach(f =>
+        String(e[f] || '').split(',').forEach(n => {
+          n = n.trim();
+          if (n && n.split(/\s+/).length <= 3) add(n);
+        })));
+  } catch (e) { /* пустая библиотека - просто меньше подсказок */ }
+  (_sugGenres || []).forEach(add);
+  // Десятилетия на языке интерфейса, без словаря: 1990-е / 1990s / 1990er.
+  const suffix = { ru: '-е', uk: '-і', en: 's', de: 'er', es: '', fr: '', it: '', ka: '' };
+  const sfx = suffix[(_lang || 'en').slice(0, 2)] !== undefined
+            ? suffix[(_lang || 'en').slice(0, 2)] : 's';
+  for (let y = 1920; y <= 2020; y += 10) add(String(y) + sfx);
+  return (_sugIndex = out);
+}
+function _clearSuggestIndex() { _sugIndex = null; }
+
+// Последнее слово - то, которое человек ДОПЕЧАТЫВАЕТ. Запятая разделяет наравне с
+// пробелом: "корейский триллер, убий|" подсказывает по "убий", а не по всей фразе.
+function _lastToken(v) {
+  const m = String(v || '').split(/[,]/);
+  return String(m[m.length - 1] || '').trim();
+}
+
+function _suggestFor(token) {
+  const t = _qNorm(token);
+  if (!t || t.length < 2) return [];
+  const idx = _suggestIndex();
+  // Имя человека пишут с любого конца: "финчер" должно находить "Дэвид Финчер".
+  // ТЫ ПЕЧАТАЕШЬ КИРИЛЛИЦЕЙ, А В БИБЛИОТЕКЕ ИМЕНА ЛАТИНИЦЕЙ.
+  // Измерено 26 сентября: "fin" находило David Fincher, а "финч" - ничего, хотя
+  // это то же самое имя. Транслитерация у нас уже есть, и здесь она дешёвая:
+  // сравниваются два десятка строк, а не сто двадцать тысяч.
+  // Ц по-русски ts, а в фамилиях из немецкого z: Циммер - Zimmer. Та же поправка,
+  // что и в поиске имён, и здесь она стоит одно сравнение строк.
+  const tl0 = _toLatin(t);
+  const tl = tl0;
+  const tlz = tl0 && tl0.includes('ts') ? tl0.replace(/ts/g, 'z') : null;
+  const hit = (n) => n !== t && (n.startsWith(t) || n.split(' ').some(x => x.startsWith(t)));
+  const hitL = (n) => tl && tl !== t
+                   && (n.startsWith(tl) || n.split(' ').some(x => x.startsWith(tl)));
+  const hitZ = (n) => tlz && (n.startsWith(tlz) || n.split(' ').some(x => x.startsWith(tlz)));
+  const starts = idx.filter(w => { const n = _qNorm(w); return hit(n) || hitL(n) || hitZ(n); });
+  let near = [];
+  if (starts.length < 3 && t.length >= 4) {
+    // Опечатка - не повод молчать. _lev уже есть в приложении.
+    near = idx.filter(w => {
+      const n = _qNorm(w);
+      return !n.startsWith(t) && Math.abs(n.length - t.length) <= 2 && _lev(n, t) <= 1;
+    });
+  }
+  return [...starts, ...near].slice(0, 6);
+}
+
+function _renderSuggest() {
+  const inp = document.getElementById('rec-input');
+  const box = document.getElementById('rec-suggest');
+  if (!inp || !box) return;
+  const items = _suggestFor(_lastToken(inp.value));
+  if (!items.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
+  box.innerHTML = items.map(w =>
+    `<button type="button" class="sug" data-w="${escapeHtml(w)}">${escapeHtml(w)}</button>`).join('');
+  box.style.display = 'flex';
+}
+
+function _applySuggest(word) {
+  const inp = document.getElementById('rec-input');
+  if (!inp) return;
+  // Заменяем только допечатываемую часть; набранное до запятой остаётся как есть.
+  const v = inp.value, cut = v.lastIndexOf(',');
+  inp.value = (cut < 0 ? '' : v.slice(0, cut + 1) + ' ') + word + ', ';
+  inp.focus();
+  _renderSuggest();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('rec-input');
+  const box = document.getElementById('rec-suggest');
+  if (!inp || !box) return;
+  inp.addEventListener('input', _renderSuggest);
+  inp.addEventListener('blur', () => setTimeout(() => { box.style.display = 'none'; }, 150));
+  inp.addEventListener('focus', () => { _loadGenreNames().then(() => { _clearSuggestIndex(); _renderSuggest(); }); });
+  // mousedown, а не click: blur поля успел бы спрятать список раньше клика.
+  box.addEventListener('mousedown', e => {
+    const b = e.target.closest('.sug'); if (!b) return;
+    e.preventDefault(); _applySuggest(b.dataset.w);
+  });
+});
 
 // ── ЧЕМ СЧИТАТЬ ПОДБОРКИ: ОДИН ПЕРЕКЛЮЧАТЕЛЬ ────────────────────────────────
 //
