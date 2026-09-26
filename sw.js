@@ -7,7 +7,7 @@
 //
 // Keep this in step with the app version in index.html, so the two can be compared at a
 // glance and a missed bump is visible rather than silent.
-const CACHE_VERSION = "v306-0.57.96";
+const CACHE_VERSION = "v307-0.57.97";
 const CACHE_NAME = "cinemail-" + CACHE_VERSION;
 
 // НЕИЗМЕНЯЕМОЕ ЖИВЁТ ОТДЕЛЬНО И ПЕРЕЖИВАЕТ РЕЛИЗЫ.
