@@ -2867,7 +2867,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.97</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.99</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -9020,6 +9020,13 @@ function _rankByTaste(cands, taste, fallbackWhy) {
     const hit = taste.tally.get(c.id) || taste.tally.get(Number(c.id)) || taste.tally.get(String(c.id));
     // Рейтинг - основа, вкус её сдвигает. Обратный порядок был измеримо хуже: см. TASTE_W.
     return { ...c, _hit: hit, why: hit ? _tallyWhy(hit) : fallbackWhy,
+             // Один голос переклички - это "кому понравился твой фильм, тем
+             // понравилось и это", и связь за этим НЕ НАЗВАНА: /recommendations у
+             // TMDB причину не сообщает. Если у того же фильма найдётся названная
+             // связь - тот же композитор, тот же оператор - она полезнее, поэтому
+             // одноголосая помечается заменяемой. Два и больше голосов остаются:
+             // "советуют к пяти твоим любимым" сильнее любой одной фамилии.
+             _weakWhy: !!hit && (hit.votes || 0) < 2,
              _score: Number(c.Rating || 0) + _tasteBonus(hit, c.Year, taste) };
   }).sort((a, b) => b._score - a._score);
 
@@ -9394,16 +9401,17 @@ async function _enrichWhy(list, c, weak) {
                keywords: ((r.keywords || {}).keywords) || [] };
     } catch (e) { return null; }       // состав - украшение, а не условие выдачи
   }));
-  const replaceable = w => !w || w === (c && c.why) || (weak && w === weak);
+  const replaceable = (w, m) => !w || w === (c && c.why) || (weak && w === weak)
+                            || (m && m._weakWhy);
   const used = new Set();
   head.forEach((m, i) => {
-    if (!replaceable(m.why)) { used.add(m.why); return; }   // перекличка сильнее, не трогаем
+    if (!replaceable(m.why, m)) { used.add(m.why); return; }  // сильная перекличка остаётся
     const opts = _personalWhy(credits[i], taste);
     const pick = opts.find(x => !used.has(x)) || opts[0];
     m.why = pick || null;
     if (m.why) used.add(m.why);
   });
-  out.forEach(m => { if (replaceable(m.why)) m.why = null; });
+  out.forEach(m => { if (replaceable(m.why, m)) m.why = null; });
   // "Понято: комедия · франция" относится к ЗАПРОСУ, а не к фильму, и на живом
   // экране 26 сентября стояло одной и той же строкой под четырьмя карточками из
   // пяти. Подпись под карточкой отвечает "почему ИМЕННО ЭТОТ", и если ответа нет,
@@ -9610,13 +9618,18 @@ async function _searchByQuery(q) {
       const r2 = await tmdbFetch(`/discover/movie?${pp.toString()}`);
       const mine = ((r2 && !r2.error && r2.results) || [])
         .filter(x => !_lib.ids.has(String(x.id)) && !_lib.titles.has(_lib.norm(x.title || x.name)))
-        .slice(0, 2)
-        .map(x => ({
+        .slice(0, 6)
+        .sort(() => Math.random() - 0.5).slice(0, 2)   // из шести любые две, иначе
+        .map(x => ({                                   // "With Dave Porter" навсегда
           id: x.id, tmdbID: String(x.id), type: 'movie',
           Title: x.title || x.name, Year: (x.release_date || '').slice(0, 4),
           Poster: x.poster_path ? TMDB_IMG + x.poster_path : '',
           Rating: x.vote_average ? x.vote_average.toFixed(1) : null, Genre: '',
-          why: t('why_person').replace('{name}', _taste.crewIds[0].name),
+          // Имя без должности - половина ответа. Сообщено 26 сентября: "With Dave
+          // Porter" не говорит, играл он или написал музыку, а он композитор.
+          // Состав кандидата всё равно загружается для подписи, так что роль
+          // назовём точно; эта строка остаётся лишь если состав не пришёл.
+          why: t('why_person').replace('{name}', _taste.crewIds[0].name), _weakWhy: true,
         }));
       const seen = new Set(mine.map(m => String(m.id)));
       ranked = [...mine, ...ranked.filter(m => !seen.has(String(m.id)))];
@@ -9657,9 +9670,24 @@ async function loadRecsEngine() {
     const _norm = _normTitle;
     const knownIds = new Set(watchHistory.map(h=>String(h.tmdbID)).filter(Boolean));
     const knownTitles = new Set(watchHistory.map(h=>_norm(h.title)).filter(Boolean));
-    const fresh = details.filter(m =>
-      !(m.tmdbID && knownIds.has(String(m.tmdbID))) && !knownTitles.has(_norm(m.Title))
-    ).slice(0, 5);
+    // ПОМНИМ ПОКАЗАННОЕ, КАК ЭТО ДАВНО ДЕЛАЕТ "УДИВИ МЕНЯ".
+    //
+    // Порог в 1000 голосов на голом жанре оставляет от "action" тысячи фильмов, а
+    // от "documentary" или "вестерн" пару десятков - жанры на TMDB очень разного
+    // размера. Сортировка по средней оценке из маленького набора всегда отдаёт одну
+    // и ту же верхушку, и подборка перестаёт быть подборкой. Сообщено 26 сентября:
+    // "documentary" повторял один и тот же короткий список.
+    //
+    // Подгонять порог под каждый жанр - это таблица исключений, которая устареет.
+    // Помнить показанное - одно правило, работающее на любом запросе.
+    const recent = new Set(_shownSurprises.slice(-30));
+    const usable = details.filter(m =>
+      !(m.tmdbID && knownIds.has(String(m.tmdbID))) && !knownTitles.has(_norm(m.Title)));
+    const unseen = usable.filter(m => !recent.has(m.Title));
+    // Если всё показано, лучше повторить, чем отдать пустой экран.
+    const fresh = (unseen.length >= 3 ? unseen : usable).slice(0, 5);
+    fresh.forEach(m => { if (m.Title) _shownSurprises.push(m.Title); });
+    try { sessionStorage.setItem("shownSurprises", JSON.stringify(_shownSurprises.slice(-30))); } catch (e) {}
     // "Понято: комедия · франция" - это ответ на ЗАПРОС, а не на "почему этот фильм",
     // и повторённое под каждой карточкой оно превращалось в шум. Здесь оно стоит
     // один раз над списком и делает границу разбора видимой: сразу ясно, какое из
