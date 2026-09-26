@@ -2867,7 +2867,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.89</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.90</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -9092,14 +9092,22 @@ function _planQuery(c) {
   // сказал достаточно и наши темы только помешали бы. На голом "анимация" мы иначе
   // отдаём глобальный топ жанра - то есть один и тот же список всем и всегда, и
   // именно так "анимация" превращалась в одно анимэ. Здесь профиль и нужен.
-  // НАСТРОЕНИЕ БЬЁТ ПРОФИЛЬ. Измерено на живом запросе 26 сентября: "старый уютный
-  // книжный магазин" вернул Паразитов и Бесславных ублюдков с подписью "твоя тема:
-  // чёрная комедия". Человек сказал, чего хочет СЕЙЧАС, а мы подмешали то, что ему
-  // нравится ВООБЩЕ - и получили прямую противоположность просьбе. Профиль отвечает
-  // на "что тебе обычно", настроение на "что тебе сегодня", и сегодня важнее.
-  if (tg.pos.length && !p.has('with_keywords') && c.pins <= 1 && !c.mood) {
-    p.set('with_keywords', tg.pos.slice(0, 5).map(x => x.id).join('|'));
-  }
+  // ЛЮБИМЫЕ ТЕМЫ БОЛЬШЕ НЕ ФИЛЬТР, И ЭТО ОТКАТ ВЧЕРАШНЕГО РЕШЕНИЯ.
+  //
+  // Подмешивание tg.pos в with_keywords выглядело бесплатным: профиль влияет на
+  // сам запрос, лишних обращений ноль. Измерено на живых запросах 26 сентября -
+  // оно роняет качество в пол. "романтическое убийство" вернуло Sex Drive 6.4,
+  // Two Weeks Notice 6.4, Something Borrowed 6.2 с подписями "твоя тема: road trip"
+  // и "твоя тема: lawyer". "софия коппола драма о взрослении" - The Rainmaker,
+  // опять "lawyer".
+  //
+  // Причина в разнице между фильтром и предпочтением. Фильтр ТРЕБУЕТ, чтобы тема
+  // присутствовала, и пересечение "мелодрама И road trip" - это хвост жанра, а не
+  // его вершина. Предпочтение всего лишь поднимает. Вчерашний выбор был за дешевизну,
+  // и дешевизна оказалась оплачена тем единственным, что здесь нельзя терять.
+  //
+  // Отрицательные темы остаются: они УБИРАЮТ, а не требуют, и хуже от этого не
+  // становится никогда.
   // Отрицательные темы отсекаются ВСЕГДА. Если ты дважды поставил двойку фильмам
   // с найденной плёнкой, ты не хочешь их и в ответе на точный запрос тоже.
   if (tg.neg.length) p.set('without_keywords', tg.neg.slice(0, 4).map(x => x.id).join(','));
@@ -9174,7 +9182,11 @@ async function _constraintsFor(q) {
   // его фильмы и подписывало снизу "Не учтено: тарантино". Строка брала сырой
   // остаток и не знала, что его уже употребили. Подпись, которая врёт про свою же
   // работу, хуже отсутствующей: она учит не верить и остальным.
-  c.subjectLeft = (c.person || (c.keywords && c.keywords.length)) ? '' : (subject || '');
+  // Молчим, только если непрочитанное УШЛО В ДЕЛО: человеком или собственной темой.
+  // Тема, найденная по НАШЕМУ словарю, остаток не оправдывает - на "лондон, 19 век"
+  // строки не было вовсе, хотя не понято было всё.
+  const _leftUsed = c.person || (subjects.length === 0 && c.keywords && c.keywords.length);
+  c.subjectLeft = _leftUsed ? '' : (subject || '');
   c.mood = moods.length > 0;
   c.keyword = c.keywords.length > 0;
   c.pins = (c.movement ? 1 : 0) + (c.decade ? 1 : 0) + (c.country ? 1 : 0)
@@ -9359,10 +9371,20 @@ async function _searchByQuery(q) {
   const _lib = _libraryKeys();
   const _fresh = r => ((r && r.results) || []).filter(x =>
     !_lib.ids.has(String(x.id)) && !_lib.titles.has(_lib.norm(x.title || x.name))).length;
-  for (const drop of ['with_keywords', 'with_genres']) {
+  for (const drop of ['with_keywords', '&genres', 'with_genres']) {
     if (_fresh(res) >= 3) break;
-    if (!p.has(drop)) continue;
-    p.delete(drop);
+    if (drop === '&genres') {
+      // "анимация, триллер" - два названных жанра, значит пересечение. Пересечение
+      // часто почти пусто, и раньше следующим шагом жанр выбрасывался ЦЕЛИКОМ: так
+      // запрос про анимацию вернул American History X и Dead Poets Society.
+      // Ослабить "И" до "ИЛИ" - шаг меньше, и он сохраняет то, что человек назвал.
+      const g = p.get('with_genres');
+      if (!g || !g.includes(',')) continue;
+      p.set('with_genres', g.split(',').join('|'));
+    } else {
+      if (!p.has(drop)) continue;
+      p.delete(drop);
+    }
     res = await tmdbFetch(`/discover/movie?${p.toString()}`);
     if (res && res.error) break;
   }
