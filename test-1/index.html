@@ -2881,7 +2881,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.58.5-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.58.6-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8088,6 +8088,14 @@ const _SUBJECT_FILMS = {
   "vampire": [[653,1922],[13310,2008],[138,1931],[152603,2013],[628,1994],[246741,2014],[11879,1987],[11654,1983],[22536,2009],[252171,2014],[6114,1992],[779,1932],[10873,2000],[11655,1992],[3053,1967],[36647,1998],[26517,1978],[46175,1971]],
   "zombie": [[10331,1968],[923,1978],[747,2004],[170,2002],[396535,2016],[513434,2017],[19908,2009],[1694,1985],[10925,1985],[23963,2008],[27130,1943],[26860,1932],[763,1992],[375366,2016],[425972,2017],[8408,1985]],
   "ghost": [[745,1999],[30959,1964],[1933,2001],[428449,2017],[14696,1953],[16372,1961],[251,1990],[340676,2016],[1433,2001],[609,1982],[11772,1963],[18317,1990],[38368,2010],[3763,1964],[6537,2007],[4011,1988],[16093,1962],[27374,2008]],
+  "kinetic": [[76341,2015],[473033,2019],[244786,2014],[104,1998],[94329,2011]],
+  "slow burn": [[1398,1979],[438631,2021],[758866,2021],[370755,2016],[361292,2018]],
+  "whimsical": [[120467,2014],[194,2001],[83666,2012],[587,2003]],
+  "neon noir": [[64690,2011],[335984,2017],[843,2000],[34647,2009],[103,1976]],
+  "claustrophobic": [[694,1980],[503919,2019],[1091,1982],[493922,2018],[473,1998]],
+  "folk horror": [[310131,2015],[530385,2019],[16307,1973],[433808,2017]],
+  "mind bending": [[27205,2010],[1018,2001],[577922,2020],[797,1966],[11324,2010]],
+  "bittersweet": [[153,2003],[152601,2013],[38,2004],[666277,2023],[475303,2019]],
 };
 
 const _SUBJECTS = [
@@ -8183,6 +8191,20 @@ const _SUBJECTS = [
   { k:'wedding',      terms:'свадьб весілл hochzeit mariage boda matrimonio ქორწ wedding' },
   { k:'winter',       terms:'зим зимн winter hiver invierno inverno ზამთარ' },
   { k:'snow',         terms:'снег снег schnee neige nieve neve თოვლ snow' },
+  // ── АТМОСФЕРА, А НЕ ПРЕДМЕТ ──────────────────────────────────────────────
+  // Восемь групп от Dafa, 26 сентября. Это НЕ предметы: "клаустрофобное" нельзя
+  // найти фильтром, потому что у discover нет оси атмосферы и в TMDB нет такого
+  // тега. Зато есть кураторский список - человек знает, какие фильмы такие, и
+  // отдаёт их списком. Мы перестаём делать вид, что понимаем настроение, и
+  // берём ответ у того, кто действительно понимает.
+  { k:"kinetic", terms:"kinetic visceral relentless pulsepounding adrenaline breathless frantic кинетичн висцеральн неистов безостановочн адреналин на разрыв бешеный ритм кінетичн шалений адреналін visceral frenetico adrenalina trepidante viscéral haletant effréné adrénaline rasant atemlos adrenalin viscerale frenetico adrenalina კინეტიკური ადრენალინი" },
+  { k:"slow burn", terms:"slowburn slow burn meditative hypnotic deliberate contemplative immersive медленное горение медитативн гипнотическ созерцательн неторопл томительн тягуч медитативн гіпнотичн споглядальн pausado meditativo hipnotico contemplativo contemplatif hypnotique lent meditativ hypnotisch bedachtig meditativo ipnotico contemplativo მედიტაციური ჰიპნოტური" },
+  { k:"whimsical", terms:"whimsical quirky symmetrical pastel storybook twee playful причудлив чудаковат симметричн пастельн сказочн игрушечн затейлив вигадлив дивакуват симетричн caprichoso excentrico simetrico pastel fantasque excentrique symetrique pastel skurril verspielt symmetrisch pastell bizzarro stravagante simmetrico pastello უცნაური სიმეტრიული" },
+  { k:"neon noir", terms:"neon neondrenched moody sleek stylish nightcity synthwave неон неонов ночной город томн стильн меланхоличн синтвейв неон нічне місто стильн neon nocturno elegante melancolico neon nocturne elegant melancolique neon nachtlich stilvoll melancholisch neon notturno elegante malinconico ნეონი ღამის ქალაქი" },
+  { k:"claustrophobic", terms:"claustrophobic claustrophobia dread unhinged unsettling paranoid oppressive клаустрофоб замкнут тесн безумие паранойя гнетущ тревожн давящ клаустрофоб замкнут божевілля паранойя claustrofobico opresivo paranoia angustioso claustrophobe oppressant paranoia angoissant klaustrophob beklemmend paranoid claustrofobico opprimente paranoia angosciante კლაუსტროფობიური შემზარავი" },
+  { k:"folk horror", terms:"folkhorror folk horror eerie ritual pagan daylight horror haunting фольклорн языческ ритуальн обряд жутк деревенск хоррор при свете дня фольклорн язичницьк ритуальн моторошн folclorico pagano ritual inquietante folklorique paien rituel inquietant folk heidnisch ritual unheimlich folkloristico pagano rituale inquietante ფოლკლორული რიტუალური" },
+  { k:"mind bending", terms:"mindbending mind bending cerebral surreal puzzle convoluted unreliable labyrinth взрыв мозга головолом сюрреалист лабиринт запутанн ненадежн рассказчик замороченн головолом сюрреаліст лабіринт заплутан rompecabezas cerebral surrealista laberinto casse tete cerebral surrealiste labyrinthe kopfzerbrechen zerebral surreal labyrinth rompicapo cerebrale surreale labirinto თავსატეხი სიურრეალისტური" },
+  { k:"bittersweet", terms:"bittersweet wistful intimate understated tender quiet longing горьковат светлая грусть камерн сдержанн нежн тих тоск недосказанн гіркувато світлий сум камерн стриман agridulce intimo sobrio tierno nostalgico doux amer intime sobre tendre nostalgique bittersuss intim zuruckhaltend zart wehmutig agrodolce intimo sobrio tenero nostalgico მწარე ტკბილი ნაზი" },
 ];
 // MOVEMENTS, SCHOOLS AND ERAS. Each is a country, a stretch of years, and sometimes a handful
 // of people - which is to say each is an exact query, not an approximation. "Французская новая
@@ -14538,6 +14560,14 @@ if ("serviceWorker" in navigator) {
 //     и это отдельная работа, а не строка в словаре.
 const _SHOW = {
   subject: {
+    "kinetic":{en:"kinetic",ru:"на разрыв",uk:"шалений темп",ka:"კინეტიკური",es:"frenético",fr:"haletant",de:"atemlos",it:"frenetico"},
+    "slow burn":{en:"slow burn",ru:"медленное и затягивающее",uk:"повільне і затягуюче",ka:"მედიტაციური",es:"pausado",fr:"contemplatif",de:"meditativ",it:"meditativo"},
+    "whimsical":{en:"whimsical",ru:"причудливое и симметричное",uk:"вигадливе",ka:"უცნაური",es:"caprichoso",fr:"fantasque",de:"skurril",it:"bizzarro"},
+    "neon noir":{en:"neon noir",ru:"неоновая ночь",uk:"неонова ніч",ka:"ნეონის ღამე",es:"neón nocturno",fr:"néon nocturne",de:"Neon-Noir",it:"neon notturno"},
+    "claustrophobic":{en:"claustrophobic",ru:"клаустрофобное и тревожное",uk:"клаустрофобне",ka:"კლაუსტროფობიური",es:"claustrofóbico",fr:"claustrophobe",de:"klaustrophobisch",it:"claustrofobico"},
+    "folk horror":{en:"folk horror",ru:"фольклорный хоррор",uk:"фольклорний горор",ka:"ფოლკლორული საშინელება",es:"terror folclórico",fr:"folk horror",de:"Folk-Horror",it:"folk horror"},
+    "mind bending":{en:"mind bending",ru:"головоломное",uk:"головоломне",ka:"თავსატეხი",es:"rompecabezas",fr:"casse-tête",de:"verwirrend",it:"rompicapo"},
+    "bittersweet":{en:"bittersweet",ru:"светлая грусть",uk:"світлий сум",ka:"მწარე-ტკბილი",es:"agridulce",fr:"doux-amer",de:"bittersüß",it:"agrodolce"},
     "cat":{en:"cats",ru:"кошки",uk:"коти",ka:"კატები",es:"gatos",fr:"chats",de:"Katzen",it:"gatti"},
     "dog":{en:"dogs",ru:"собаки",uk:"собаки",ka:"ძაღლები",es:"perros",fr:"chiens",de:"Hunde",it:"cani"},
     "horse":{en:"horses",ru:"лошади",uk:"коні",ka:"ცხენები",es:"caballos",fr:"chevaux",de:"Pferde",it:"cavalli"},
