@@ -2867,7 +2867,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.92</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.93</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -9394,7 +9394,18 @@ async function _searchByQuery(q) {
   // ПОРЯДОК ОСЛАБЛЕНИЯ: СНАЧАЛА НАШИ ЧИСЛА, ПОТОМ ЕГО СЛОВА.
   // Порог голосов придумали мы, жанр и тему назвал человек. Опустить свой порог и
   // сохранить "про шахматы" - лучше, чем оставить порог и выбросить шахматы.
-  for (const drop of ['&votes', 'with_keywords', '&genres', 'with_genres']) {
+  // НАЗВАННОГО ЧЕЛОВЕКА НЕ БРОСАЕМ, ВСЁ ОСТАЛЬНОЕ УСТУПАЕТ ЕМУ ДОРОГУ.
+  //
+  // Сообщено 26 сентября: "роберт эггерс исторический хоррор", "макото синкай
+  // романтическая аниме", "чарли кауфман абсурдистская драма" - пусто, притом что
+  // карта имён всех троих нашла. Два названных жанра склеиваются через И, у Эггерса
+  // нет фильма, помеченного разом хоррором И историей, и дальше ослаблять было
+  // нечего: without_keywords от профиля оставался, а до простого "фильмы Эггерса"
+  // дело не доходило вовсе.
+  //
+  // Сказать "ничего не нашлось" про человека, которого мы УЗНАЛИ, - худший из
+  // возможных ответов: мы знаем его фильмы и молчим о них.
+  for (const drop of ['&votes', 'without_keywords', 'with_keywords', '&genres', 'with_genres']) {
     if (_fresh(res) >= 3) break;
     if (drop === '&votes') {
       const v = Number(p.get('vote_count.gte') || 0);
@@ -9414,6 +9425,15 @@ async function _searchByQuery(q) {
     }
     res = await tmdbFetch(`/discover/movie?${p.toString()}`);
     if (res && res.error) break;
+  }
+  // Последнее слово за человеком: если после всего пусто, отдаём просто его фильмы.
+  if (c.person && _fresh(res) < 1) {
+    const only = new URLSearchParams({
+      include_adult: 'false', language: _tmdbLang(), sort_by: 'vote_average.desc',
+      with_people: String(c.person), 'with_runtime.gte': '60', 'vote_count.gte': '20',
+    });
+    const r2 = await tmdbFetch(`/discover/movie?${only.toString()}`);
+    if (r2 && !r2.error && _fresh(r2) > 0) res = r2;
   }
   const _cands = ((res && res.results) || [])
     .filter(x => !_lib.ids.has(String(x.id)) && !_lib.titles.has(_lib.norm(x.title || x.name)))
