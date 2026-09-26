@@ -2877,7 +2877,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.58.0</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.58.1</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -14494,6 +14494,199 @@ if ("serviceWorker" in navigator) {
 // ИМЁНА СЮДА НЕ ПОПАДАЮТ, И ЭТО НЕ ЗАБЫВЧИВОСТЬ. В карте лежат ключи вида
 // "кристофернолан" - без пробелов и без исходного написания, показать такое нельзя.
 // Имена и так находятся по вводу целиком.
+// ── ФОРМЫ ДЛЯ ПОКАЗА: ТО, ЧЕГО У СЛОВАРЯ НЕ БЫЛО ───────────────────────────
+//
+// Таблицы движка сопоставляются ПОДСТРОКОЙ, поэтому хранят основы: "кошк",
+// "романт", "марсел", "немецкийэкспрессионизм". Для поиска это правильно и менять
+// это незачем. Но показать такое человеку нельзя, а отличить основу от слова
+// автоматически невозможно - измерено 26 сентября: "кошк" не является префиксом
+// ни одного другого термина и словом при этом не является тоже.
+//
+// Здесь лежит недостающий слой: ключ записи -> как её назвать вслух.
+//
+// КЛЮЧИ ЯЗЫКОВ, А НЕ ПОЗИЦИИ В МАССИВЕ. Сначала это были массивы [en,ru,uk,...],
+// и добавить иврит значило бы править все 153 строки руками. Dafa назвал шесть
+// языков, которые хочет добавить - иврит, арабский, хинди, китайский, японский,
+// корейский, - и при такой форме каждый из них это отдельный ключ там, где он
+// написан, а где не написан, берётся английский. Ровно то, что дёшево сейчас и
+// дорого потом.
+//
+// ДВА ПРЕДУПРЕЖДЕНИЯ НА БУДУЩЕЕ, из тех, что дешевле знать заранее:
+//   - иврит и арабский пишутся справа налево, и это забота вёрстки, а не этой
+//     таблицы: чипу понадобится dir="auto";
+//   - китайский, японский и корейский НЕ РАЗДЕЛЯЮТ СЛОВА ПРОБЕЛАМИ, а весь разбор
+//     запроса построен на split по пробелу. Подсказки заработают, разбор - нет,
+//     и это отдельная работа, а не строка в словаре.
+const _SHOW = {
+  subject: {
+    "cat":{en:"cats",ru:"кошки",uk:"коти",ka:"კატები",es:"gatos",fr:"chats",de:"Katzen",it:"gatti"},
+    "dog":{en:"dogs",ru:"собаки",uk:"собаки",ka:"ძაღლები",es:"perros",fr:"chiens",de:"Hunde",it:"cani"},
+    "horse":{en:"horses",ru:"лошади",uk:"коні",ka:"ცხენები",es:"caballos",fr:"chevaux",de:"Pferde",it:"cavalli"},
+    "wolf":{en:"wolves",ru:"волки",uk:"вовки",ka:"მგლები",es:"lobos",fr:"loups",de:"Wölfe",it:"lupi"},
+    "bear":{en:"bears",ru:"медведи",uk:"ведмеді",ka:"დათვები",es:"osos",fr:"ours",de:"Bären",it:"orsi"},
+    "shark":{en:"sharks",ru:"акулы",uk:"акули",ka:"ზვიგენები",es:"tiburones",fr:"requins",de:"Haie",it:"squali"},
+    "dinosaur":{en:"dinosaurs",ru:"динозавры",uk:"динозаври",ka:"დინოზავრები",es:"dinosaurios",fr:"dinosaures",de:"Dinosaurier",it:"dinosauri"},
+    "bird":{en:"birds",ru:"птицы",uk:"птахи",ka:"ფრინველები",es:"pájaros",fr:"oiseaux",de:"Vögel",it:"uccelli"},
+    "space":{en:"space",ru:"космос",uk:"космос",ka:"კოსმოსი",es:"espacio",fr:"espace",de:"Weltraum",it:"spazio"},
+    "alien":{en:"aliens",ru:"пришельцы",uk:"прибульці",ka:"უცხოპლანეტელები",es:"alienígenas",fr:"extraterrestres",de:"Aliens",it:"alieni"},
+    "robot":{en:"robots",ru:"роботы",uk:"роботи",ka:"რობოტები",es:"robots",fr:"robots",de:"Roboter",it:"robot"},
+    "time travel":{en:"time travel",ru:"путешествия во времени",uk:"подорожі в часі",ka:"დროში მოგზაურობა",es:"viajes en el tiempo",fr:"voyage dans le temps",de:"Zeitreisen",it:"viaggi nel tempo"},
+    "vampire":{en:"vampires",ru:"вампиры",uk:"вампіри",ka:"ვამპირები",es:"vampiros",fr:"vampires",de:"Vampire",it:"vampiri"},
+    "zombie":{en:"zombies",ru:"зомби",uk:"зомбі",ka:"ზომბები",es:"zombis",fr:"zombies",de:"Zombies",it:"zombie"},
+    "ghost":{en:"ghosts",ru:"призраки",uk:"привиди",ka:"მოჩვენებები",es:"fantasmas",fr:"fantômes",de:"Geister",it:"fantasmi"},
+    "witch":{en:"witches",ru:"ведьмы",uk:"відьми",ka:"ჯადოქრები",es:"brujas",fr:"sorcières",de:"Hexen",it:"streghe"},
+    "dragon":{en:"dragons",ru:"драконы",uk:"дракони",ka:"დრაკონები",es:"dragones",fr:"dragons",de:"Drachen",it:"draghi"},
+    "monster":{en:"monsters",ru:"монстры",uk:"монстри",ka:"მონსტრები",es:"monstruos",fr:"monstres",de:"Monster",it:"mostri"},
+    "superhero":{en:"superheroes",ru:"супергерои",uk:"супергерої",ka:"სუპერგმირები",es:"superhéroes",fr:"super-héros",de:"Superhelden",it:"supereroi"},
+    "school":{en:"school",ru:"школа",uk:"школа",ka:"სკოლა",es:"escuela",fr:"école",de:"Schule",it:"scuola"},
+    "prison":{en:"prison",ru:"тюрьма",uk:"в’язниця",ka:"ციხე",es:"prisión",fr:"prison",de:"Gefängnis",it:"prigione"},
+    "hospital":{en:"hospital",ru:"больница",uk:"лікарня",ka:"საავადმყოფო",es:"hospital",fr:"hôpital",de:"Krankenhaus",it:"ospedale"},
+    "train":{en:"trains",ru:"поезда",uk:"потяги",ka:"მატარებლები",es:"trenes",fr:"trains",de:"Züge",it:"treni"},
+    "ship":{en:"ships",ru:"корабли",uk:"кораблі",ka:"გემები",es:"barcos",fr:"navires",de:"Schiffe",it:"navi"},
+    "island":{en:"island",ru:"остров",uk:"острів",ka:"კუნძული",es:"isla",fr:"île",de:"Insel",it:"isola"},
+    "desert":{en:"desert",ru:"пустыня",uk:"пустеля",ka:"უდაბნო",es:"desierto",fr:"désert",de:"Wüste",it:"deserto"},
+    "mountain":{en:"mountains",ru:"горы",uk:"гори",ka:"მთები",es:"montañas",fr:"montagnes",de:"Berge",it:"montagne"},
+    "forest":{en:"forest",ru:"лес",uk:"ліс",ka:"ტყე",es:"bosque",fr:"forêt",de:"Wald",it:"bosco"},
+    "sea":{en:"sea",ru:"море",uk:"море",ka:"ზღვა",es:"mar",fr:"mer",de:"Meer",it:"mare"},
+    "road trip":{en:"road trip",ru:"путешествие по дороге",uk:"подорож дорогою",ka:"მოგზაურობა გზაზე",es:"viaje por carretera",fr:"road trip",de:"Roadtrip",it:"viaggio on the road"},
+    "courtroom":{en:"courtroom",ru:"суд",uk:"суд",ka:"სასამართლო",es:"juicio",fr:"procès",de:"Gerichtssaal",it:"aula di tribunale"},
+    "single location":{en:"single location",ru:"одно место",uk:"одне місце",ka:"ერთი ადგილი",es:"un solo lugar",fr:"huis clos",de:"ein Schauplatz",it:"unico luogo"},
+    "radio":{en:"radio",ru:"радио",uk:"радіо",ka:"რადიო",es:"radio",fr:"radio",de:"Radio",it:"radio"},
+    "cyberpunk":{en:"cyberpunk",ru:"киберпанк",uk:"кіберпанк",ka:"კიბერპანკი",es:"ciberpunk",fr:"cyberpunk",de:"Cyberpunk",it:"cyberpunk"},
+    "hacker":{en:"hackers",ru:"хакеры",uk:"хакери",ka:"ჰაკერები",es:"hackers",fr:"hackers",de:"Hacker",it:"hacker"},
+    "rain":{en:"rain",ru:"дождь",uk:"дощ",ka:"წვიმა",es:"lluvia",fr:"pluie",de:"Regen",it:"pioggia"},
+    "circus":{en:"circus",ru:"цирк",uk:"цирк",ka:"ცირკი",es:"circo",fr:"cirque",de:"Zirkus",it:"circo"},
+    "mansion":{en:"mansion",ru:"особняк",uk:"особняк",ka:"სასახლე",es:"mansión",fr:"manoir",de:"Herrenhaus",it:"villa"},
+    "night":{en:"night",ru:"ночь",uk:"ніч",ka:"ღამე",es:"noche",fr:"nuit",de:"Nacht",it:"notte"},
+    "subway":{en:"subway",ru:"метро",uk:"метро",ka:"მეტრო",es:"metro",fr:"métro",de:"U-Bahn",it:"metropolitana"},
+    "stranger":{en:"stranger",ru:"незнакомец",uk:"незнайомець",ka:"უცნობი",es:"desconocido",fr:"inconnu",de:"Fremder",it:"sconosciuto"},
+    "city":{en:"city",ru:"город",uk:"місто",ka:"ქალაქი",es:"ciudad",fr:"ville",de:"Stadt",it:"città"},
+    "village":{en:"village",ru:"деревня",uk:"село",ka:"სოფელი",es:"pueblo",fr:"village",de:"Dorf",it:"villaggio"},
+    "war":{en:"war",ru:"война",uk:"війна",ka:"ომი",es:"guerra",fr:"guerre",de:"Krieg",it:"guerra"},
+    "love":{en:"love",ru:"любовь",uk:"кохання",ka:"სიყვარული",es:"amor",fr:"amour",de:"Liebe",it:"amore"},
+    "friendship":{en:"friendship",ru:"дружба",uk:"дружба",ka:"მეგობრობა",es:"amistad",fr:"amitié",de:"Freundschaft",it:"amicizia"},
+    "family":{en:"family",ru:"семья",uk:"сім’я",ka:"ოჯახი",es:"familia",fr:"famille",de:"Familie",it:"famiglia"},
+    "revenge":{en:"revenge",ru:"месть",uk:"помста",ka:"შურისძიება",es:"venganza",fr:"vengeance",de:"Rache",it:"vendetta"},
+    "survival":{en:"survival",ru:"выживание",uk:"виживання",ka:"გადარჩენა",es:"supervivencia",fr:"survie",de:"Überleben",it:"sopravvivenza"},
+    "heist":{en:"heist",ru:"ограбление",uk:"пограбування",ka:"ძარცვა",es:"atraco",fr:"casse",de:"Raubzug",it:"rapina"},
+    "spy":{en:"spies",ru:"шпионы",uk:"шпигуни",ka:"ჯაშუშები",es:"espías",fr:"espions",de:"Spione",it:"spie"},
+    "mafia":{en:"mafia",ru:"мафия",uk:"мафія",ka:"მაფია",es:"mafia",fr:"mafia",de:"Mafia",it:"mafia"},
+    "serial killer":{en:"serial killer",ru:"серийный убийца",uk:"серійний вбивця",ka:"სერიული მკვლელი",es:"asesino en serie",fr:"tueur en série",de:"Serienmörder",it:"serial killer"},
+    "boxing":{en:"boxing",ru:"бокс",uk:"бокс",ka:"კრივი",es:"boxeo",fr:"boxe",de:"Boxen",it:"pugilato"},
+    "football":{en:"football",ru:"футбол",uk:"футбол",ka:"ფეხბურთი",es:"fútbol",fr:"football",de:"Fußball",it:"calcio"},
+    "chess":{en:"chess",ru:"шахматы",uk:"шахи",ka:"ჭადრაკი",es:"ajedrez",fr:"échecs",de:"Schach",it:"scacchi"},
+    "music":{en:"music",ru:"музыка",uk:"музика",ka:"მუსიკა",es:"música",fr:"musique",de:"Musik",it:"musica"},
+    "rock band":{en:"rock band",ru:"рок-группа",uk:"рок-гурт",ka:"როკ-ჯგუფი",es:"banda de rock",fr:"groupe de rock",de:"Rockband",it:"band rock"},
+    "painter":{en:"painters",ru:"художники",uk:"художники",ka:"მხატვრები",es:"pintores",fr:"peintres",de:"Maler",it:"pittori"},
+    "writer":{en:"writers",ru:"писатели",uk:"письменники",ka:"მწერლები",es:"escritores",fr:"écrivains",de:"Schriftsteller",it:"scrittori"},
+    "dance":{en:"dance",ru:"танец",uk:"танець",ka:"ცეკვა",es:"danza",fr:"danse",de:"Tanz",it:"danza"},
+    "theatre":{en:"theatre",ru:"театр",uk:"театр",ka:"თეატრი",es:"teatro",fr:"théâtre",de:"Theater",it:"teatro"},
+    "doctor":{en:"doctors",ru:"врачи",uk:"лікарі",ka:"ექიმები",es:"médicos",fr:"médecins",de:"Ärzte",it:"medici"},
+    "teacher":{en:"teachers",ru:"учителя",uk:"вчителі",ka:"მასწავლებლები",es:"profesores",fr:"enseignants",de:"Lehrer",it:"insegnanti"},
+    "journalist":{en:"journalists",ru:"журналисты",uk:"журналісти",ka:"ჟურნალისტები",es:"periodistas",fr:"journalistes",de:"Journalisten",it:"giornalisti"},
+    "lawyer":{en:"lawyers",ru:"юристы",uk:"юристи",ka:"იურისტები",es:"abogados",fr:"avocats",de:"Anwälte",it:"avvocati"},
+    "police":{en:"police",ru:"полиция",uk:"поліція",ka:"პოლიცია",es:"policía",fr:"police",de:"Polizei",it:"polizia"},
+    "soldier":{en:"soldiers",ru:"солдаты",uk:"солдати",ka:"ჯარისკაცები",es:"soldados",fr:"soldats",de:"Soldaten",it:"soldati"},
+    "chef":{en:"chefs",ru:"повара",uk:"кухарі",ka:"მზარეულები",es:"cocineros",fr:"chefs",de:"Köche",it:"cuochi"},
+    "pilot":{en:"pilots",ru:"лётчики",uk:"льотчики",ka:"პილოტები",es:"pilotos",fr:"pilotes",de:"Piloten",it:"piloti"},
+    "childhood":{en:"childhood",ru:"детство",uk:"дитинство",ka:"ბავშვობა",es:"infancia",fr:"enfance",de:"Kindheit",it:"infanzia"},
+    "old age":{en:"old age",ru:"старость",uk:"старість",ka:"სიბერე",es:"vejez",fr:"vieillesse",de:"Alter",it:"vecchiaia"},
+    "death":{en:"death",ru:"смерть",uk:"смерть",ka:"სიკვდილი",es:"muerte",fr:"mort",de:"Tod",it:"morte"},
+    "illness":{en:"illness",ru:"болезнь",uk:"хвороба",ka:"ავადმყოფობა",es:"enfermedad",fr:"maladie",de:"Krankheit",it:"malattia"},
+    "addiction":{en:"addiction",ru:"зависимость",uk:"залежність",ka:"დამოკიდებულება",es:"adicción",fr:"addiction",de:"Sucht",it:"dipendenza"},
+    "immigration":{en:"immigration",ru:"эмиграция",uk:"еміграція",ka:"ემიგრაცია",es:"inmigración",fr:"immigration",de:"Einwanderung",it:"immigrazione"},
+    "cooking":{en:"cooking",ru:"кулинария",uk:"кулінарія",ka:"კულინარია",es:"cocina",fr:"cuisine",de:"Kochen",it:"cucina"},
+    "teenager":{en:"teenagers",ru:"подростки",uk:"підлітки",ka:"მოზარდები",es:"adolescentes",fr:"adolescents",de:"Jugendliche",it:"adolescenti"},
+    "lighthouse":{en:"lighthouse",ru:"маяк",uk:"маяк",ka:"შუქურა",es:"faro",fr:"phare",de:"Leuchtturm",it:"faro"},
+    "scientist":{en:"scientists",ru:"учёные",uk:"науковці",ka:"მეცნიერები",es:"científicos",fr:"scientifiques",de:"Wissenschaftler",it:"scienziati"},
+    "bureaucracy":{en:"bureaucracy",ru:"бюрократия",uk:"бюрократія",ka:"ბიუროკრატია",es:"burocracia",fr:"bureaucratie",de:"Bürokratie",it:"burocrazia"},
+    "jazz":{en:"jazz",ru:"джаз",uk:"джаз",ka:"ჯაზი",es:"jazz",fr:"jazz",de:"Jazz",it:"jazz"},
+    "loneliness":{en:"loneliness",ru:"одиночество",uk:"самотність",ka:"მარტოობა",es:"soledad",fr:"solitude",de:"Einsamkeit",it:"solitudine"},
+    "dream":{en:"dreams",ru:"сны",uk:"сни",ka:"სიზმრები",es:"sueños",fr:"rêves",de:"Träume",it:"sogni"},
+    "skateboarding":{en:"skateboarding",ru:"скейтбординг",uk:"скейтбординг",ka:"სკეიტბორდინგი",es:"skate",fr:"skateboard",de:"Skateboarding",it:"skateboard"},
+    "artist":{en:"artists",ru:"художники",uk:"митці",ka:"ხელოვანები",es:"artistas",fr:"artistes",de:"Künstler",it:"artisti"},
+    "silent film":{en:"silent film",ru:"немое кино",uk:"німе кіно",ka:"მუნჯი კინო",es:"cine mudo",fr:"cinéma muet",de:"Stummfilm",it:"cinema muto"},
+    "road movie":{en:"road movie",ru:"роуд-муви",uk:"роуд-муві",ka:"როუდ-მუვი",es:"road movie",fr:"road movie",de:"Roadmovie",it:"road movie"},
+    "christmas":{en:"christmas",ru:"рождество",uk:"різдво",ka:"შობა",es:"navidad",fr:"Noël",de:"Weihnachten",it:"Natale"},
+    "wedding":{en:"wedding",ru:"свадьба",uk:"весілля",ka:"ქორწილი",es:"boda",fr:"mariage",de:"Hochzeit",it:"matrimonio"},
+    "winter":{en:"winter",ru:"зима",uk:"зима",ka:"ზამთარი",es:"invierno",fr:"hiver",de:"Winter",it:"inverno"},
+    "snow":{en:"snow",ru:"снег",uk:"сніг",ka:"თოვლი",es:"nieve",fr:"neige",de:"Schnee",it:"neve"},
+  },
+  mood: {
+    "cosy":{en:"cosy",ru:"уютное",uk:"затишне",ka:"მყუდრო",es:"acogedor",fr:"cosy",de:"gemütlich",it:"intimo"},
+    "autumn":{en:"autumnal",ru:"осеннее",uk:"осіннє",ka:"შემოდგომური",es:"otoñal",fr:"automnal",de:"herbstlich",it:"autunnale"},
+    "heavy":{en:"heavy",ru:"тяжёлое",uk:"важке",ka:"მძიმე",es:"duro",fr:"lourd",de:"schwer",it:"pesante"},
+    "light":{en:"light",ru:"лёгкое",uk:"легке",ka:"მსუბუქი",es:"ligero",fr:"léger",de:"leicht",it:"leggero"},
+    "slow":{en:"slow",ru:"медленное",uk:"повільне",ka:"ნელი",es:"lento",fr:"lent",de:"langsam",it:"lento"},
+    "think":{en:"thoughtful",ru:"подумать",uk:"поміркувати",ka:"დასაფიქრებელი",es:"para pensar",fr:"pour réfléchir",de:"zum Nachdenken",it:"da pensare"},
+    "cry":{en:"to cry",ru:"поплакать",uk:"поплакати",ka:"ასატირებელი",es:"para llorar",fr:"pour pleurer",de:"zum Weinen",it:"da piangere"},
+    "scary":{en:"scary",ru:"страшное",uk:"страшне",ka:"საშინელი",es:"de miedo",fr:"effrayant",de:"gruselig",it:"spaventoso"},
+    "funny":{en:"funny",ru:"смешное",uk:"смішне",ka:"სასაცილო",es:"divertido",fr:"drôle",de:"lustig",it:"divertente"},
+    "real":{en:"true story",ru:"по реальным событиям",uk:"за реальними подіями",ka:"რეალური ამბავი",es:"hechos reales",fr:"faits réels",de:"wahre Begebenheit",it:"storia vera"},
+  },
+  movement: {
+    "немецкийэкспрессионизм":{en:"German expressionism",ru:"немецкий экспрессионизм",uk:"німецький експресіонізм",ka:"გერმანული ექსპრესიონიზმი",es:"expresionismo alemán",fr:"expressionnisme allemand",de:"Deutscher Expressionismus",it:"espressionismo tedesco"},
+    "советскиймонтаж":{en:"Soviet montage",ru:"советский монтаж",uk:"радянський монтаж",ka:"საბჭოთა მონტაჟი",es:"montaje soviético",fr:"montage soviétique",de:"Sowjetische Montage",it:"montaggio sovietico"},
+    "французскийавангард":{en:"French avant-garde",ru:"французский авангард",uk:"французький авангард",ka:"ფრანგული ავანგარდი",es:"vanguardia francesa",fr:"avant-garde française",de:"Französische Avantgarde",it:"avanguardia francese"},
+    "сюрреализм":{en:"Surrealism",ru:"сюрреализм",uk:"сюрреалізм",ka:"სიურრეალიზმი",es:"surrealismo",fr:"surréalisme",de:"Surrealismus",it:"surrealismo"},
+    "каммершпиль":{en:"Kammerspiel",ru:"каммершпиль",uk:"каммершпіль",ka:"კამერშპილი",es:"Kammerspiel",fr:"Kammerspiel",de:"Kammerspiel",it:"Kammerspiel"},
+    "немоекино":{en:"Silent cinema",ru:"немое кино",uk:"німе кіно",ka:"მუნჯი კინო",es:"cine mudo",fr:"cinéma muet",de:"Stummfilm",it:"cinema muto"},
+    "прекод":{en:"Pre-Code Hollywood",ru:"предкодексный Голливуд",uk:"докодексний Голлівуд",ka:"პრე-კოდის ჰოლივუდი",es:"Hollywood pre-Code",fr:"Hollywood pré-Code",de:"Pre-Code-Hollywood",it:"Hollywood pre-Code"},
+    "киноглаз":{en:"Kino-Eye",ru:"киноглаз",uk:"кінооко",ka:"კინო-თვალი",es:"Kino-Glaz",fr:"Kino-Œil",de:"Kinoglaz",it:"Kino-Occhio"},
+    "поэтическийреализм":{en:"Poetic realism",ru:"поэтический реализм",uk:"поетичний реалізм",ka:"პოეტური რეალიზმი",es:"realismo poético",fr:"réalisme poétique",de:"Poetischer Realismus",it:"realismo poetico"},
+    "золотойвекголливуда":{en:"Golden Age of Hollywood",ru:"золотой век Голливуда",uk:"золота доба Голлівуду",ka:"ჰოლივუდის ოქროს ხანა",es:"edad de oro de Hollywood",fr:"âge d’or de Hollywood",de:"Goldenes Zeitalter Hollywoods",it:"età d’oro di Hollywood"},
+    "скрюболл":{en:"Screwball comedy",ru:"скрюболл-комедия",uk:"скрюбол-комедія",ka:"სქრუბოლ-კომედია",es:"comedia screwball",fr:"comédie loufoque",de:"Screwball-Komödie",it:"commedia screwball"},
+    "нуар":{en:"Film noir",ru:"нуар",uk:"нуар",ka:"ფილმ ნუარი",es:"cine negro",fr:"film noir",de:"Film noir",it:"film noir"},
+    "неонуар":{en:"Neo-noir",ru:"неонуар",uk:"неонуар",ka:"ნეო-ნუარი",es:"neo-noir",fr:"néo-noir",de:"Neo-Noir",it:"neo-noir"},
+    "неореализм":{en:"Italian neorealism",ru:"итальянский неореализм",uk:"італійський неореалізм",ka:"იტალიური ნეორეალიზმი",es:"neorrealismo italiano",fr:"néoréalisme italien",de:"Italienischer Neorealismus",it:"neorealismo italiano"},
+    "фрисинема":{en:"Free Cinema",ru:"фри синема",uk:"фрі сінема",ka:"თავისუფალი კინო",es:"Free Cinema",fr:"Free Cinema",de:"Free Cinema",it:"Free Cinema"},
+    "британскаяноваяволна":{en:"British New Wave",ru:"британская новая волна",uk:"британська нова хвиля",ka:"ბრიტანული ახალი ტალღა",es:"nueva ola británica",fr:"nouvelle vague britannique",de:"Britische Neue Welle",it:"nuova onda britannica"},
+    "французскаяноваяволна":{en:"Nouvelle Vague",ru:"французская новая волна",uk:"французька нова хвиля",ka:"ფრანგული ახალი ტალღა",es:"nouvelle vague",fr:"Nouvelle Vague",de:"Nouvelle Vague",it:"Nouvelle Vague"},
+    "группалевогоберега":{en:"Left Bank Group",ru:"группа Левого берега",uk:"група Лівого берега",ka:"მარცხენა ნაპირის ჯგუფი",es:"grupo de la Rive Gauche",fr:"Rive Gauche",de:"Rive-Gauche-Gruppe",it:"gruppo della Rive Gauche"},
+    "синемаверите":{en:"Cinéma vérité",ru:"синема верите",uk:"сінема веріте",ka:"სინემა ვერიტე",es:"cinéma vérité",fr:"cinéma vérité",de:"Cinéma vérité",it:"cinéma vérité"},
+    "прямоекино":{en:"Direct cinema",ru:"прямое кино",uk:"пряме кіно",ka:"პირდაპირი კინო",es:"cine directo",fr:"cinéma direct",de:"Direct Cinema",it:"cinema diretto"},
+    "оттепель":{en:"Soviet Thaw cinema",ru:"оттепель",uk:"відлига",ka:"დათბობის კინო",es:"cine del Deshielo",fr:"cinéma du Dégel",de:"Tauwetter-Kino",it:"cinema del disgelo"},
+    "новыйголливуд":{en:"New Hollywood",ru:"новый Голливуд",uk:"новий Голлівуд",ka:"ახალი ჰოლივუდი",es:"nuevo Hollywood",fr:"Nouvel Hollywood",de:"New Hollywood",it:"nuova Hollywood"},
+    "чехословацкаяноваяволна":{en:"Czechoslovak New Wave",ru:"чехословацкая новая волна",uk:"чехословацька нова хвиля",ka:"ჩეხოსლოვაკიური ახალი ტალღა",es:"nueva ola checoslovaca",fr:"nouvelle vague tchécoslovaque",de:"Tschechoslowakische Neue Welle",it:"nuova onda cecoslovacca"},
+    "польскаякиношкола":{en:"Polish Film School",ru:"польская киношкола",uk:"польська кіношкола",ka:"პოლონური კინოსკოლა",es:"escuela polaca de cine",fr:"école polonaise",de:"Polnische Filmschule",it:"scuola polacca"},
+    "югославскаячернаяволна":{en:"Yugoslav Black Wave",ru:"югославская чёрная волна",uk:"югославська чорна хвиля",ka:"იუგოსლავიური შავი ტალღა",es:"ola negra yugoslava",fr:"vague noire yougoslave",de:"Jugoslawische Schwarze Welle",it:"onda nera jugoslava"},
+    "новоенемецкоекино":{en:"New German Cinema",ru:"новое немецкое кино",uk:"нове німецьке кіно",ka:"ახალი გერმანული კინო",es:"nuevo cine alemán",fr:"nouveau cinéma allemand",de:"Neuer Deutscher Film",it:"nuovo cinema tedesco"},
+    "синеманово":{en:"Cinema Novo",ru:"синема ново",uk:"сінема ново",ka:"სინემა ნოვო",es:"Cinema Novo",fr:"Cinema Novo",de:"Cinema Novo",it:"Cinema Novo"},
+    "третьекино":{en:"Third Cinema",ru:"третье кино",uk:"третє кіно",ka:"მესამე კინო",es:"tercer cine",fr:"troisième cinéma",de:"Drittes Kino",it:"terzo cinema"},
+    "японскаяноваяволна":{en:"Japanese New Wave",ru:"японская новая волна",uk:"японська нова хвиля",ka:"იაპონური ახალი ტალღა",es:"nueva ola japonesa",fr:"nouvelle vague japonaise",de:"Japanische Neue Welle",it:"nuova onda giapponese"},
+    "иранскаяноваяволна":{en:"Iranian New Wave",ru:"иранская новая волна",uk:"іранська нова хвиля",ka:"ირანული ახალი ტალღა",es:"nueva ola iraní",fr:"nouvelle vague iranienne",de:"Iranische Neue Welle",it:"nuova onda iraniana"},
+    "параллельноекино":{en:"Parallel Cinema",ru:"параллельное кино",uk:"паралельне кіно",ka:"პარალელური კინო",es:"cine paralelo",fr:"cinéma parallèle",de:"Parallel Cinema",it:"cinema parallelo"},
+    "венгерскаяноваяволна":{en:"Hungarian New Wave",ru:"венгерская новая волна",uk:"угорська нова хвиля",ka:"უნგრული ახალი ტალღა",es:"nueva ola húngara",fr:"nouvelle vague hongroise",de:"Ungarische Neue Welle",it:"nuova onda ungherese"},
+    "новыйгреческийкинематограф":{en:"New Greek Cinema",ru:"новый греческий кинематограф",uk:"нове грецьке кіно",ka:"ახალი ბერძნული კინო",es:"nuevo cine griego",fr:"nouveau cinéma grec",de:"Neuer Griechischer Film",it:"nuovo cinema greco"},
+    "гонконгскаяноваяволна":{en:"Hong Kong New Wave",ru:"гонконгская новая волна",uk:"гонконгська нова хвиля",ka:"ჰონგ-კონგის ახალი ტალღა",es:"nueva ola de Hong Kong",fr:"nouvelle vague hongkongaise",de:"Hongkonger Neue Welle",it:"nuova onda di Hong Kong"},
+    "пятоепоколение":{en:"Fifth Generation",ru:"пятое поколение",uk:"п’яте покоління",ka:"მეხუთე თაობა",es:"quinta generación",fr:"cinquième génération",de:"Fünfte Generation",it:"quinta generazione"},
+    "новоетайваньскоекино":{en:"Taiwanese New Cinema",ru:"новое тайваньское кино",uk:"нове тайванське кіно",ka:"ახალი ტაივანური კინო",es:"nuevo cine taiwanés",fr:"nouveau cinéma taïwanais",de:"Neues Taiwanesisches Kino",it:"nuovo cinema taiwanese"},
+    "синемадюлук":{en:"Cinéma du look",ru:"синема дю лук",uk:"сінема дю лук",ka:"სინემა დიუ ლუკი",es:"cinéma du look",fr:"Cinéma du look",de:"Cinéma du look",it:"cinéma du look"},
+    "догма":{en:"Dogme 95",ru:"догма 95",uk:"догма 95",ka:"დოგმა 95",es:"Dogma 95",fr:"Dogme 95",de:"Dogma 95",it:"Dogma 95"},
+    "новоеквиркино":{en:"New Queer Cinema",ru:"новое квир-кино",uk:"нове квір-кіно",ka:"ახალი ქვიარ კინო",es:"nuevo cine queer",fr:"nouveau cinéma queer",de:"New Queer Cinema",it:"nuovo cinema queer"},
+    "американскоенезависимое":{en:"American independent",ru:"американское независимое",uk:"американське незалежне",ka:"ამერიკული დამოუკიდებელი",es:"cine independiente americano",fr:"cinéma indépendant américain",de:"US-Independentfilm",it:"cinema indipendente americano"},
+    "иранскоекино":{en:"Iranian cinema",ru:"иранское кино",uk:"іранське кіно",ka:"ირანული კინო",es:"cine iraní",fr:"cinéma iranien",de:"Iranisches Kino",it:"cinema iraniano"},
+    "румынскаяноваяволна":{en:"Romanian New Wave",ru:"румынская новая волна",uk:"румунська нова хвиля",ka:"რუმინული ახალი ტალღა",es:"nueva ola rumana",fr:"nouvelle vague roumaine",de:"Rumänische Neue Welle",it:"nuova onda rumena"},
+    "шестоепоколение":{en:"Sixth Generation",ru:"шестое поколение",uk:"шосте покоління",ka:"მეექვსე თაობა",es:"sexta generación",fr:"sixième génération",de:"Sechste Generation",it:"sesta generazione"},
+    "новаяфранцузскаяжестокость":{en:"New French Extremity",ru:"новая французская жестокость",uk:"нова французька жорстокість",ka:"ახალი ფრანგული ექსტრემალობა",es:"nueva extremidad francesa",fr:"nouvelle extrémité française",de:"New French Extremity",it:"new French extremity"},
+    "мамблкор":{en:"Mumblecore",ru:"мамблкор",uk:"мамблкор",ka:"მამბლკორი",es:"mumblecore",fr:"mumblecore",de:"Mumblecore",it:"mumblecore"},
+    "греческаястраннаяволна":{en:"Greek Weird Wave",ru:"греческая странная волна",uk:"грецька дивна хвиля",ka:"ბერძნული უცნაური ტალღა",es:"ola rara griega",fr:"vague étrange grecque",de:"Greek Weird Wave",it:"strana onda greca"},
+    "берлинскаяшкола":{en:"Berlin School",ru:"берлинская школа",uk:"берлінська школа",ka:"ბერლინის სკოლა",es:"escuela de Berlín",fr:"école de Berlin",de:"Berliner Schule",it:"scuola di Berlino"},
+    "новоеаргентинскоекино":{en:"New Argentine Cinema",ru:"новое аргентинское кино",uk:"нове аргентинське кіно",ka:"ახალი არგენტინული კინო",es:"nuevo cine argentino",fr:"nouveau cinéma argentin",de:"Neues Argentinisches Kino",it:"nuovo cinema argentino"},
+    "новоемексиканскоекино":{en:"New Mexican Cinema",ru:"новое мексиканское кино",uk:"нове мексиканське кіно",ka:"ახალი მექსიკური კინო",es:"nuevo cine mexicano",fr:"nouveau cinéma mexicain",de:"Neues Mexikanisches Kino",it:"nuovo cinema messicano"},
+    "корейскаяноваяволна":{en:"Korean New Wave",ru:"корейская новая волна",uk:"корейська нова хвиля",ka:"კორეული ახალი ტალღა",es:"nueva ola coreana",fr:"nouvelle vague coréenne",de:"Koreanische Neue Welle",it:"nuova onda coreana"},
+    "медленноекино":{en:"Slow cinema",ru:"медленное кино",uk:"повільне кіно",ka:"ნელი კინო",es:"cine lento",fr:"cinéma lent",de:"Slow Cinema",it:"cinema lento"},
+  },
+};
+
+// Как назвать вслух. Нет формы на твоём языке - берём английскую: показать
+// понятное чужими словами лучше, чем не показать ничего.
+function _showWord(kind, key) {
+  const r = (_SHOW[kind] || {})[key];
+  if (!r) return null;
+  return r[(_lang || 'en').slice(0, 2)] || r.en || null;
+}
+
 // ПОДСКАЗЫВАЕМ ТО, У ЧЕГО ЕСТЬ ФОРМА ДЛЯ ПОКАЗА. ЭТО НЕ ВЕСЬ СЛОВАРЬ.
 //
 // Первая попытка брала слова прямо из таблиц движка - и упёрлась в то, что таблицы
@@ -14542,6 +14735,14 @@ function _suggestIndex() {
         })));
   } catch (e) { /* пустая библиотека - просто меньше подсказок */ }
   (_sugGenres || []).forEach(add);
+  // Теперь и словарь: предметы, настроения и движения - через формы для показа.
+  // У движений своего ключа в таблице нет, поэтому ключ - первый термин, как он
+  // там записан; это устойчиво, потому что термины дописывают в конец строки.
+  try {
+    (_SUBJECTS || []).forEach(x => add(_showWord('subject', x.k)));
+    (_MOODS || []).forEach(x => add(_showWord('mood', x.id)));
+    (_MOVEMENTS || []).forEach(x => add(_showWord('movement', String(x.t || '').split(' ')[0])));
+  } catch (e) { /* формы не собрались - остаются люди, жанры и десятилетия */ }
   // Десятилетия на языке интерфейса, без словаря: 1990-е / 1990s / 1990er.
   const suffix = { ru: '-е', uk: '-і', en: 's', de: 'er', es: '', fr: '', it: '', ka: '' };
   const sfx = suffix[(_lang || 'en').slice(0, 2)] !== undefined
@@ -14576,9 +14777,15 @@ function _suggestFor(token) {
   const hitL = (n) => tl && tl !== t
                    && (n.startsWith(tl) || n.split(' ').some(x => x.startsWith(tl)));
   const hitZ = (n) => tlz && (n.startsWith(tlz) || n.split(' ').some(x => x.startsWith(tlz)));
+  // Набрано слово, которое мы знаем целиком - подсказывать нечего, и уж точно
+  // нельзя уходить в нечёткий поиск: "chess" находил "chefs" и выглядел так,
+  // будто мы шахмат не знаем и предлагаем поваров.
+  if (idx.some(w => _qNorm(w) === t)) return [];
   const starts = idx.filter(w => { const n = _qNorm(w); return hit(n) || hitL(n) || hitZ(n); });
   let near = [];
-  if (starts.length < 3 && t.length >= 4) {
+  // Опечатку ищем, ТОЛЬКО если по началу слова не нашлось ничего. Иначе к верной
+  // подсказке подмешивается соседняя по букве: "slow" тянуло за собой "snow".
+  if (!starts.length && t.length >= 4) {
     // Опечатка - не повод молчать. _lev уже есть в приложении.
     near = idx.filter(w => {
       const n = _qNorm(w);
