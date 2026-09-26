@@ -2867,7 +2867,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.90</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.91</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -9061,8 +9061,20 @@ function _voteFloor(c) {
   if (c.person)   return 20;    // ранние работы режиссёра тонки по определению
   if (c.movement) return 30;    // страна и десятилетие уже прижаты
   const hard = (c.decade ? 1 : 0) + (c.country ? 1 : 0) + (c.keyword ? 1 : 0);
-  if (hard >= 2) return 150;
-  if (c.keyword)  return 300;   // ключевое слово - настоящее ограничение
+  // ПОРОГ БЫЛ НИЗКИМ КАК СТРАХОВКА ОТ ПУСТОТЫ, А СТРАХОВКА ТЕПЕРЬ ДРУГАЯ.
+  //
+  // 150 и 300 стояли не потому, что при ста пятидесяти голосах средняя оценка
+  // что-то значит - она не значит, - а потому, что узкая тема с высоким порогом
+  // рисковала вернуть пусто. Измерено на живом запросе 26 сентября: "триллер,
+  // акула" отдал The Shallows 6.4, Open Water 5.5, 47 Meters Down 5.8, The Reef
+  // 5.6. Это весь хвост темы, впущенный ради страховки.
+  //
+  // Страховка теперь в цикле ослабления, и она лучше: он считает фильмы, которые
+  // реально покажут, и СНАЧАЛА опускает наши собственные числа, а уже потом
+  // выбрасывает то, что человек назвал вслух. Значит порог можно держать там, где
+  // средняя оценка перестаёт быть шумом.
+  if (hard >= 2) return 300;
+  if (c.keyword)  return 700;   // тема сужает, но не оправдывает хвост
   if (c.decade)   return 200;
   if (c.country)  return 400;
   if (c.genreAnd) return 500;   // два названных жанра пересекаются - это уже узко
@@ -9371,9 +9383,16 @@ async function _searchByQuery(q) {
   const _lib = _libraryKeys();
   const _fresh = r => ((r && r.results) || []).filter(x =>
     !_lib.ids.has(String(x.id)) && !_lib.titles.has(_lib.norm(x.title || x.name))).length;
-  for (const drop of ['with_keywords', '&genres', 'with_genres']) {
+  // ПОРЯДОК ОСЛАБЛЕНИЯ: СНАЧАЛА НАШИ ЧИСЛА, ПОТОМ ЕГО СЛОВА.
+  // Порог голосов придумали мы, жанр и тему назвал человек. Опустить свой порог и
+  // сохранить "про шахматы" - лучше, чем оставить порог и выбросить шахматы.
+  for (const drop of ['&votes', 'with_keywords', '&genres', 'with_genres']) {
     if (_fresh(res) >= 3) break;
-    if (drop === '&genres') {
+    if (drop === '&votes') {
+      const v = Number(p.get('vote_count.gte') || 0);
+      if (v <= 150) continue;
+      p.set('vote_count.gte', String(Math.max(150, Math.floor(v / 3))));
+    } else if (drop === '&genres') {
       // "анимация, триллер" - два названных жанра, значит пересечение. Пересечение
       // часто почти пусто, и раньше следующим шагом жанр выбрасывался ЦЕЛИКОМ: так
       // запрос про анимацию вернул American History X и Dead Poets Society.
