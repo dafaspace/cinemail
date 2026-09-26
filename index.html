@@ -2877,7 +2877,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.58.2</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.58.3</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -14624,6 +14624,35 @@ const _SHOW = {
     "funny":{en:"funny",ru:"смешное",uk:"смішне",ka:"სასაცილო",es:"divertido",fr:"drôle",de:"lustig",it:"divertente"},
     "real":{en:"true story",ru:"по реальным событиям",uk:"за реальними подіями",ka:"რეალური ამბავი",es:"hechos reales",fr:"faits réels",de:"wahre Begebenheit",it:"storia vera"},
   },
+  // Страны и группы стран. Ключ - код из таблицы, включая составные ("CZ,SK"):
+  // человек пишет "чехословацкая новая волна", а не два кода, и группа для него
+  // одна вещь.
+  country: {
+    "FR":{en:"France",ru:"Франция",uk:"Франція",ka:"საფრანგეთი",es:"Francia",fr:"France",de:"Frankreich",it:"Francia"},
+    "IT":{en:"Italy",ru:"Италия",uk:"Італія",ka:"იტალია",es:"Italia",fr:"Italie",de:"Italien",it:"Italia"},
+    "JP":{en:"Japan",ru:"Япония",uk:"Японія",ka:"იაპონია",es:"Japón",fr:"Japon",de:"Japan",it:"Giappone"},
+    "KR":{en:"South Korea",ru:"Корея",uk:"Корея",ka:"კორეა",es:"Corea del Sur",fr:"Corée du Sud",de:"Südkorea",it:"Corea del Sud"},
+    "CN,HK,TW":{en:"China, Hong Kong, Taiwan",ru:"Китай, Гонконг, Тайвань",uk:"Китай, Гонконг, Тайвань",ka:"ჩინეთი, ჰონგ-კონგი, ტაივანი",es:"China, Hong Kong, Taiwán",fr:"Chine, Hong Kong, Taïwan",de:"China, Hongkong, Taiwan",it:"Cina, Hong Kong, Taiwan"},
+    "DE":{en:"Germany",ru:"Германия",uk:"Німеччина",ka:"გერმანია",es:"Alemania",fr:"Allemagne",de:"Deutschland",it:"Germania"},
+    "ES":{en:"Spain",ru:"Испания",uk:"Іспанія",ka:"ესპანეთი",es:"España",fr:"Espagne",de:"Spanien",it:"Spagna"},
+    "GB":{en:"United Kingdom",ru:"Великобритания",uk:"Велика Британія",ka:"დიდი ბრიტანეთი",es:"Reino Unido",fr:"Royaume-Uni",de:"Großbritannien",it:"Regno Unito"},
+    "US":{en:"USA",ru:"США",uk:"США",ka:"აშშ",es:"EE. UU.",fr:"États-Unis",de:"USA",it:"USA"},
+    "SU,RU":{en:"Russia and USSR",ru:"Россия и СССР",uk:"Росія і СРСР",ka:"რუსეთი და სსრკ",es:"Rusia y URSS",fr:"Russie et URSS",de:"Russland und UdSSR",it:"Russia e URSS"},
+    "IN":{en:"India",ru:"Индия",uk:"Індія",ka:"ინდოეთი",es:"India",fr:"Inde",de:"Indien",it:"India"},
+    "IR":{en:"Iran",ru:"Иран",uk:"Іран",ka:"ირანი",es:"Irán",fr:"Iran",de:"Iran",it:"Iran"},
+    "SE":{en:"Sweden",ru:"Швеция",uk:"Швеція",ka:"შვედეთი",es:"Suecia",fr:"Suède",de:"Schweden",it:"Svezia"},
+    "DK":{en:"Denmark",ru:"Дания",uk:"Данія",ka:"დანია",es:"Dinamarca",fr:"Danemark",de:"Dänemark",it:"Danimarca"},
+    "PL":{en:"Poland",ru:"Польша",uk:"Польща",ka:"პოლონეთი",es:"Polonia",fr:"Pologne",de:"Polen",it:"Polonia"},
+    "CZ,SK":{en:"Czechia and Slovakia",ru:"Чехия и Словакия",uk:"Чехія і Словаччина",ka:"ჩეხეთი და სლოვაკეთი",es:"Chequia y Eslovaquia",fr:"Tchéquie et Slovaquie",de:"Tschechien und Slowakei",it:"Cechia e Slovacchia"},
+    "MX":{en:"Mexico",ru:"Мексика",uk:"Мексика",ka:"მექსიკა",es:"México",fr:"Mexique",de:"Mexiko",it:"Messico"},
+    "BR":{en:"Brazil",ru:"Бразилия",uk:"Бразилія",ka:"ბრაზილია",es:"Brasil",fr:"Brésil",de:"Brasilien",it:"Brasile"},
+    "AR":{en:"Argentina",ru:"Аргентина",uk:"Аргентина",ka:"არგენტინა",es:"Argentina",fr:"Argentine",de:"Argentinien",it:"Argentina"},
+    "TR":{en:"Turkey",ru:"Турция",uk:"Туреччина",ka:"თურქეთი",es:"Turquía",fr:"Turquie",de:"Türkei",it:"Turchia"},
+    "GE":{en:"Georgia",ru:"Грузия",uk:"Грузія",ka:"საქართველო",es:"Georgia",fr:"Géorgie",de:"Georgien",it:"Georgia"},
+    "UA":{en:"Ukraine",ru:"Украина",uk:"Україна",ka:"უკრაინა",es:"Ucrania",fr:"Ukraine",de:"Ukraine",it:"Ucraina"},
+    "AR,CL,CO,PE":{en:"Latin America",ru:"Латинская Америка",uk:"Латинська Америка",ka:"ლათინური ამერიკა",es:"América Latina",fr:"Amérique latine",de:"Lateinamerika",it:"America Latina"},
+    "FI,NO,SE,DK,IS":{en:"Scandinavia",ru:"Скандинавия",uk:"Скандинавія",ka:"სკანდინავია",es:"Escandinavia",fr:"Scandinavie",de:"Skandinavien",it:"Scandinavia"},
+  },
   movement: {
     "немецкийэкспрессионизм":{en:"German expressionism",ru:"немецкий экспрессионизм",uk:"німецький експресіонізм",ka:"გერმანული ექსპრესიონიზმი",es:"expresionismo alemán",fr:"expressionnisme allemand",de:"Deutscher Expressionismus",it:"espressionismo tedesco"},
     "советскиймонтаж":{en:"Soviet montage",ru:"советский монтаж",uk:"радянський монтаж",ka:"საბჭოთა მონტაჟი",es:"montaje soviético",fr:"montage soviétique",de:"Sowjetische Montage",it:"montaggio sovietico"},
@@ -14742,6 +14771,7 @@ function _suggestIndex() {
     (_SUBJECTS || []).forEach(x => add(_showWord('subject', x.k)));
     (_MOODS || []).forEach(x => add(_showWord('mood', x.id)));
     (_MOVEMENTS || []).forEach(x => add(_showWord('movement', String(x.t || '').split(' ')[0])));
+    (_COUNTRIES || []).forEach(x => add(_showWord('country', x.c)));
   } catch (e) { /* формы не собрались - остаются люди, жанры и десятилетия */ }
   // Десятилетия на языке интерфейса, без словаря: 1990-е / 1990s / 1990er.
   const suffix = { ru: '-е', uk: '-і', en: 's', de: 'er', es: '', fr: '', it: '', ka: '' };
