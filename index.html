@@ -2867,7 +2867,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.87</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.89</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8663,19 +8663,29 @@ async function _personId(subject) {
   // есть запрос, который движок не понимает, обходится дороже всех, которые он понимает.
   // Окно из мусорных слов именем быть не может, а попытки стоят квоты и времени.
   const seen = new Set();
-  let tries = 0;
+  let tries = 0, multiTried = false;
   for (const w of windows) {
     if (tries >= 3) break;
     if (seen.has(w) || w.length < 4) continue;
     // Слово короче четырёх букв внутри окна - почти наверняка не часть имени, а остаток
     // служебной речи, который не попал в стоп-лист.
     if (w.split(' ').some(x => x.length < 4)) continue;
-    // ОКНО ИЗ НЕСКОЛЬКИХ СЛОВ ИЩЕМ ЖИВЬЁМ, ТОЛЬКО ЕСЛИ ЕСТЬ ПРИЗНАК ИМЕНИ.
-    // Правило из ревью: чем хуже мы понимаем запрос, тем МЕНЬШЕ спекулятивных обращений.
-    // "Абракадабра квмпрлджэ" тратила два поиска персоны просто потому, что осталась в
-    // остатке. Одно слово ищем всегда - это может быть фамилия; два и больше только когда
-    // карта имён или таблица алиасов подтверждает, что там вообще есть имя.
-    if (w.includes(' ') && !_idFromNameMap(w) && !_aliasFor(w)) continue;
+    // ОКНО ИЗ НЕСКОЛЬКИХ СЛОВ: РАНЬШЕ ТРЕБОВАЛАСЬ КАРТА ИМЁН, КОТОРОЙ НЕТ.
+    //
+    // Правило "два слова ищем, только если карта имён или алиас подтверждает имя"
+    // было верным ровно до тех пор, пока карта существовала. Она не собрана, файла
+    // нет, и значит ЛЮБОЕ имя из двух слов на кириллице не доходило до TMDB вообще.
+    // Измерено 26 сентября на живых запросах: "ханс циммер", "хоакин феникс",
+    // "роберт эггерс", "чарли кауфман" - ноль обращений, ноль находок.
+    //
+    // Экономия сохраняется иначе: многословное окно пробуется ОДИН раз за запрос, и
+    // только если каждое слово в нём длиной от четырёх букв. "нибудь вроде before"
+    // такую проверку не проходит, "ханс циммер" проходит.
+    if (w.includes(' ')) {
+      if (_idFromNameMap(w) || _aliasFor(w)) { /* точное знание - всегда */ }
+      else if (multiTried) continue;
+      else multiTried = true;
+    }
     seen.add(w);
     tries++;
     const hit = await _personLookup(w);
@@ -8704,6 +8714,11 @@ async function _personLookup(q) {
   if (alias) tries.push([alias, 1]);
   const lat = _toLatin(q);
   if (lat && lat !== q.toLowerCase()) tries.push([lat, 5]);
+  // Ц по-русски это ts, а в фамилиях, пришедших из немецкого, это z: Циммер - Zimmer,
+  // Цвейг - Zweig. Одна таблица обе передать не может, поэтому второй вариант идёт
+  // следом и стоит одно обращение только тогда, когда первое ничего не нашло.
+  const latZ = lat && lat.includes('ts') ? lat.replace(/ts/g, 'z') : null;
+  if (latZ && latZ !== lat) tries.push([latZ, 5]);
   for (const [term, floor] of tries) {
     let res;
     try { res = await tmdbFetch(`/search/person?query=${encodeURIComponent(term)}&include_adult=false`); }
@@ -9077,7 +9092,12 @@ function _planQuery(c) {
   // сказал достаточно и наши темы только помешали бы. На голом "анимация" мы иначе
   // отдаём глобальный топ жанра - то есть один и тот же список всем и всегда, и
   // именно так "анимация" превращалась в одно анимэ. Здесь профиль и нужен.
-  if (tg.pos.length && !p.has('with_keywords') && c.pins <= 1) {
+  // НАСТРОЕНИЕ БЬЁТ ПРОФИЛЬ. Измерено на живом запросе 26 сентября: "старый уютный
+  // книжный магазин" вернул Паразитов и Бесславных ублюдков с подписью "твоя тема:
+  // чёрная комедия". Человек сказал, чего хочет СЕЙЧАС, а мы подмешали то, что ему
+  // нравится ВООБЩЕ - и получили прямую противоположность просьбе. Профиль отвечает
+  // на "что тебе обычно", настроение на "что тебе сегодня", и сегодня важнее.
+  if (tg.pos.length && !p.has('with_keywords') && c.pins <= 1 && !c.mood) {
     p.set('with_keywords', tg.pos.slice(0, 5).map(x => x.id).join('|'));
   }
   // Отрицательные темы отсекаются ВСЕГДА. Если ты дважды поставил двойку фильмам
@@ -9126,8 +9146,11 @@ async function _constraintsFor(q) {
     for (const sj of subjects) {
       const curated = await _curatedSubject(sj.k, await _tasteIndex(), c.genreIds);
       if (curated && curated.length >= 3) {
-        const w = t('why_for_query').replace('{q}', sj.k);
-        c.curated = curated.map(x => ({ ...x, why: x.why || w }));
+        // Своя строка "По запросу «space»" стояла под ВСЕМИ пятью карточками, потому
+        // что отличалась от c.why и поэтому не считалась заменяемой. Кураторский
+        // список отвечает на вопрос один раз, а не пять: здесь остаётся только то,
+        // что сказала перекличка, остальное достаётся слою подписи.
+        c.curated = curated.map(x => ({ ...x, why: x.why || null }));
         return c;
       }
     }
@@ -9146,7 +9169,13 @@ async function _constraintsFor(q) {
   try { c.tags = (await _tasteIndex()).tags || { pos: [], neg: [] }; }
   catch (e) { c.tags = { pos: [], neg: [] }; }
 
-  c.subjectLeft = subject || '';   // что осталось непрочитанным
+  // ЧТО ОСТАЛОСЬ НЕПРОЧИТАННЫМ - именно непрочитанным.
+  // На живом экране 26 сентября "тарантино вестерн" находило Тарантино, отдавало
+  // его фильмы и подписывало снизу "Не учтено: тарантино". Строка брала сырой
+  // остаток и не знала, что его уже употребили. Подпись, которая врёт про свою же
+  // работу, хуже отсутствующей: она учит не верить и остальным.
+  c.subjectLeft = (c.person || (c.keywords && c.keywords.length)) ? '' : (subject || '');
+  c.mood = moods.length > 0;
   c.keyword = c.keywords.length > 0;
   c.pins = (c.movement ? 1 : 0) + (c.decade ? 1 : 0) + (c.country ? 1 : 0)
          + (c.keyword ? 1 : 0) + (c.person ? 1 : 0);
