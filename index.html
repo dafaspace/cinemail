@@ -2867,7 +2867,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.91</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.57.92</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8567,15 +8567,21 @@ const _NAME_MAP_KEY = 'cm_namemap_v1';
 async function _loadNameMap() {
   if (_nameMap || _nameMapTried) return _nameMap;
   _nameMapTried = true;
-  try {
-    const cached = localStorage.getItem(_NAME_MAP_KEY);
-    if (cached) { _nameMap = JSON.parse(cached); return _nameMap; }
-  } catch (e) { /* приватное окно или очищенное хранилище - просто тянем заново */ }
+  // ХРАНИЛИЩЕ БРАУЗЕРА ЭТО НЕ ВЫДЕРЖИТ, И МОЛЧА.
+  //
+  // Карта собрана 26 сентября: 121 635 имён, 3820 КБ сырых, 1331 КБ в gzip. В
+  // localStorage типичный предел на источник - около пяти мегабайт НА ВСЁ, и туда
+  // же пишутся кэш тем, показанные подборки и настройки. Запись такого размера
+  // почти наверняка упрётся в квоту, а catch её проглотит - и карта будет тянуться
+  // заново КАЖДУЮ сессию, по мегабайту с лишним. Молча и на мобильной связи.
+  //
+  // Правильное хранилище здесь - HTTP-кэш и сервис-воркер: файл неизменяемый,
+  // force-cache отдаёт его с диска, а localStorage остаётся для мелочей, для
+  // которых он и есть.
   try {
     const r = await fetch('./name-map.json', { cache: 'force-cache' });
     if (!r.ok) return null;
     _nameMap = await r.json();
-    try { localStorage.setItem(_NAME_MAP_KEY, JSON.stringify(_nameMap)); } catch (e) {}
     return _nameMap;
   } catch (e) { return null; }
 }
@@ -8699,7 +8705,9 @@ async function _personId(subject) {
 // popularity > 1 is a floor almost anybody clears. A transliteration is a guess to begin with,
 // so it has to clear a higher bar than a name that matched as typed.
 async function _personLookup(q) {
-  // Карта первой: она отвечает идентификатором, а не строкой для поиска.
+  // Карта первой: она отвечает идентификатором, а не строкой для поиска. Мегабайт
+  // тянется один раз за сессию и только когда в запросе вообще похоже на имя -
+  // _personId зовёт сюда лишь после того, как отсеял мусорные окна.
   await _loadNameMap();
   const mapped = _idFromNameMap(q);
   if (mapped) {

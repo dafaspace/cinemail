@@ -7,8 +7,17 @@
 //
 // Keep this in step with the app version in index.html, so the two can be compared at a
 // glance and a missed bump is visible rather than silent.
-const CACHE_VERSION = "v303-0.57.91";
+const CACHE_VERSION = "v304-0.57.92";
 const CACHE_NAME = "cinemail-" + CACHE_VERSION;
+
+// НЕИЗМЕНЯЕМОЕ ЖИВЁТ ОТДЕЛЬНО И ПЕРЕЖИВАЕТ РЕЛИЗЫ.
+// name-map.json - 121 635 имён, 1331 КБ в gzip, и он не меняется от версии к версии.
+// В версионном кэше он перекачивался бы при КАЖДОМ обновлении приложения, потому что
+// activate стирает всё, кроме текущего CACHE_NAME. На мобильной связи это мегабайт за
+// правку одной строки, и заметить это было бы нечем.
+const STATIC_CACHE = "cinemail-static-v1";
+const STATIC_PATHS = ["name-map.json"];
+const isStatic = (url) => STATIC_PATHS.some(x => url.pathname.endsWith("/" + x) || url.pathname.endsWith(x));
 
 // Files to cache for offline use
 const PRECACHE = [
@@ -62,7 +71,7 @@ self.addEventListener("activate", event => {
     caches.keys().then(keys =>
       Promise.all(
         keys
-          .filter(key => key !== CACHE_NAME)
+          .filter(key => key !== CACHE_NAME && key !== STATIC_CACHE)
           .map(key => {
             console.log("[SW] Deleting old cache:", key);
             return caches.delete(key);
@@ -117,6 +126,15 @@ self.addEventListener("fetch", event => {
   // Serving from cache first is safe here because CACHE_NAME carries the version and
   // `activate` deletes every older cache, so a release always lands on fresh assets.
   // The background fetch keeps the cache current within a release too.
+  // Неизменяемое: из своего кэша, и если оно там есть - в сеть не ходим вовсе.
+  if (isStatic(new URL(event.request.url))) {
+    event.respondWith(caches.open(STATIC_CACHE).then(cache =>
+      cache.match(event.request).then(hit => hit || fetch(event.request).then(res => {
+        if (res && res.ok) cache.put(event.request, res.clone());
+        return res;
+      }))));
+    return;
+  }
   event.respondWith(
     caches.match(event.request).then(cached => {
       const network = fetch(event.request)
