@@ -2881,7 +2881,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.58.9-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.0-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8089,7 +8089,7 @@ const _SUBJECT_FILMS = {
   "zombie": [[10331,1968],[923,1978],[747,2004],[170,2002],[396535,2016],[513434,2017],[19908,2009],[1694,1985],[10925,1985],[23963,2008],[27130,1943],[26860,1932],[763,1992],[375366,2016],[425972,2017],[8408,1985]],
   "ghost": [[745,1999],[30959,1964],[1933,2001],[428449,2017],[14696,1953],[16372,1961],[251,1990],[340676,2016],[1433,2001],[609,1982],[11772,1963],[18317,1990],[38368,2010],[3763,1964],[6537,2007],[4011,1988],[16093,1962],[27374,2008]],
   "kinetic": [[76341,2015],[473033,2019],[244786,2014],[104,1998],[94329,2011]],
-  "slow burn": [[1398,1979],[438631,2021],[758866,2021],[370755,2016],[361292,2018],[44012,1975],[426,1958],[62,1968],[14626,1998]],
+  "slow burn": [[1398,1979],[438631,2021],[758866,2021],[370755,2016],[361292,2018],[44012,1975],[426,1958],[62,1968],[14626,1998],[1018,2001]],
   "whimsical": [[120467,2014],[194,2001],[83666,2012],[587,2003]],
   "neon noir": [[64690,2011],[335984,2017],[843,2000],[34647,2009],[103,1976]],
   "claustrophobic": [[694,1980],[503919,2019],[1091,1982],[493922,2018],[473,1998]],
@@ -8098,6 +8098,9 @@ const _SUBJECT_FILMS = {
   "bittersweet": [[153,2003],[152601,2013],[38,2004],[666277,2023],[475303,2019]],
   "epic": [[238,1972],[28,1979],[346,1954]],
   "dreamlike": [[426,1958],[1018,2001],[27040,1943]],
+  "beautiful": [[426,1958],[843,2000],[62,1968],[631,1927],[3114,1956]],
+  "haunting": [[426,1958],[1018,2001],[28,1979]],
+  "moving": [[18148,1953],[631,1927],[346,1954]],
 };
 
 const _SUBJECTS = [
@@ -8209,6 +8212,25 @@ const _SUBJECTS = [
   { k:"bittersweet", terms:"bittersweet wistful understated горьковат светлая грусть недосказанн гіркувато світлий сум agridulce doux amer bittersuss agrodolce მწარე ტკბილი" },
   { k:"epic", terms:"epic epics sweeping grand scale monumental saga эпическ эпос масштабн грандиозн полотно сага размах монументальн епічн масштабн грандіозн сага epico epopeya grandioso gran escala epique fresque grandiose ampleur episch monumental grossangelegt saga epico kolossale grandioso saga ეპიკური მასშტაბური" },
   { k:"dreamlike", terms:"dreamlike dream logic oneiric reverie sleepwalking trance сновидческ как во сне сон наяву грез бред марев транс дремотн сновидн як уві сні марення транс onirico como un sueno ensonacion onirique comme un reve reverie traumhaft traumartig traumlogik onirico come un sogno სიზმრისეული ონირიული" },
+  // ЭТИ ГРУППЫ СЛЕПЫ К СЛОЮ, И ЭТО ВРЕМЕННО, А НЕ ПРАВИЛЬНО.
+  //
+  // Dafa сформулировал правило дважды за один час, и вторая формулировка отменяет
+  // первую. Сначала: "попадание в группу решает подтверждённая характеристика,
+  // независимо от aspect". Через час: нет, aspect нужен и для ОГРАНИЧЕНИЯ области
+  // совпадения, и пример решает спор - фильм про зомби с beautiful score не должен
+  // всплывать по запросу "beautiful actor" из-за одной музыки.
+  //
+  // Он прав. Но выполнить это сегодня нельзя: в docs/film-epithets.json поля aspect
+  // ещё нет, у всех ста одной характеристики слой неизвестен. Значит эти списки
+  // слепы к слою ВЫНУЖДЕННО, и когда aspect появится, их надо пересобрать с весами:
+  // overall сильнее всего, cinematography и production design тянут визуальные
+  // запросы, score и sound - музыкальные, performance НЕ переносится на внешность.
+  //
+  // Оставлено здесь, а не в заметках, потому что иначе через месяц это прочтут как
+  // решённое. Источник списков - docs/film-epithets.json.
+  { k:"beautiful", terms:"beautiful gorgeous ravishing visually stunning красив прекрасн визуально роскошн любоват изумительн красив прекрасн розкішн hermoso precioso deslumbrante magnifique splendide sublime wunderschon prachtig bellissimo splendido ლამაზი მშვენიერი" },
+  { k:"haunting", terms:"haunting lingering unshakeable stays with you щемящ неотвязн преследующ засевш западающ неотпускающ щемк невідступн переслідує inolvidable persistente obsesionante obsedant lancinant nachhallend eindringlich ossessionante persistente დაუვიწყარი" },
+  { k:"moving", terms:"moving touching heartbreaking poignant tearjerker трогательн пронзительн до слез душеразд берущ за душу растрогат зворушлив пронизлив до сліз conmovedor emotivo desgarrador emouvant bouleversant poignant ruhrend ergreifend herzzerreissend commovente toccante struggente ამაღელვებელი" },
 ];
 // MOVEMENTS, SCHOOLS AND ERAS. Each is a country, a stretch of years, and sometimes a handful
 // of people - which is to say each is an exact query, not an approximation. "Французская новая
@@ -14575,6 +14597,9 @@ if ("serviceWorker" in navigator) {
 //     и это отдельная работа, а не строка в словаре.
 const _SHOW = {
   subject: {
+    "beautiful":{en:"beautiful",ru:"визуально красивое",uk:"візуально красиве",ka:"ლამაზი",es:"hermoso",fr:"magnifique",de:"wunderschön",it:"bellissimo"},
+    "haunting":{en:"haunting",ru:"неотвязное",uk:"невідступне",ka:"დაუვიწყარი",es:"obsesionante",fr:"obsédant",de:"nachhallend",it:"ossessionante"},
+    "moving":{en:"moving",ru:"трогательное",uk:"зворушливе",ka:"ამაღელვებელი",es:"conmovedor",fr:"émouvant",de:"rührend",it:"commovente"},
     "epic":{en:"epic",ru:"эпическое полотно",uk:"епічне полотно",ka:"ეპიკური",es:"épico",fr:"épique",de:"episch",it:"epico"},
     "dreamlike":{en:"dreamlike",ru:"как во сне",uk:"як уві сні",ka:"სიზმრისეული",es:"onírico",fr:"onirique",de:"traumhaft",it:"onirico"},
     "kinetic":{en:"kinetic",ru:"на разрыв",uk:"шалений темп",ka:"კინეტიკური",es:"frenético",fr:"haletant",de:"atemlos",it:"frenetico"},
