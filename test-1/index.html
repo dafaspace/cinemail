@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Cinemail</title>
-<link rel="manifest" href="./manifest.json">
+<link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Cinemail">
 <meta name="theme-color" content="#0d0d1a">
-<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
-  <link rel="icon" type="image/png" sizes="48x48" href="./favicon-48.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
   <!-- Each favicon carries the #0d0d1a field rather than being a transparent mark, which
        is why a light browser tab never reaches the artwork. Without any icon declared at
        all - the state until 3 Sep 2026 - the tab showed a blank page glyph. -->
-  <link rel="apple-touch-icon" href="./icon.png">
+  <link rel="apple-touch-icon" href="/icon.png">
 <!-- Local, not a CDN. Loading this from jsdelivr meant the app could not START without a
      network: createClient is called during init, so an unreachable CDN threw before any
      screen was shown. Measured with the CDN blocked - blank body, no screens, no offline
@@ -24,13 +24,13 @@
      is also what a reviewer would see in airplane mode, and one jsdelivr outage would take
      every user down at once. Pinned to 2.112.4 rather than the @2 range: the range meant the
      app could change under us without a deploy. -->
-<script src="./supabase.js?v=2.112.4"></script>
+<script src="/supabase.js?v=2.112.4"></script>
 <!-- Versioned on purpose. index.html is served network-first while assets are
      cache-first, so without the query a fresh page could load a cached older
      emoji.js - which is exactly what emptied the avatar picker after v0.50.0.
      Bump this with the release; sw.js precaches the same URL. -->
-<script src="./emoji.js?v=0.53.3"></script>
-<script src="./qr.js?v=0.52.0"></script>
+<script src="/emoji.js?v=0.53.3"></script>
+<script src="/qr.js?v=0.52.0"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -2034,6 +2034,10 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 </style>
 </head>
 <body>
+<div id="test-banner" dir="auto" style="position:fixed;left:0;right:0;top:0;z-index:2147483646;
+  background:#5A93FF;color:#08081a;font:600 11px/1 system-ui,sans-serif;letter-spacing:.06em;
+  text-align:center;padding:5px 8px">TEST BUILD - not the live app</div>
+<div style="height:21px"></div>
 <script>
 // ── Capacitor native bridge ────────────────────────────────────────────────────
 // Harmless in browser (window.Capacitor stays undefined); active in native app.
@@ -2074,7 +2078,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <!-- logo.png, not icon.png: the icon is opaque, so drop-shadow traced its square
            and the glow read as a rectangle behind the mark rather than light coming off
            it. The logo carries an alpha channel, so the glow follows the envelope. -->
-      <img src="./logo.png" alt="Cinemail" style="width:108px;height:108px;margin-bottom:16px;filter:drop-shadow(0 0 26px rgba(245,197,24,0.28))">
+      <img src="/logo.png" alt="Cinemail" style="width:108px;height:108px;margin-bottom:16px;filter:drop-shadow(0 0 26px rgba(245,197,24,0.28))">
       <div class="ob-title" style="font-size:40px;letter-spacing:3px;margin-bottom:8px"><span>CINE</span>MAIL</div>
       <div class="ob-body" data-i18n="ob0_body" style="margin-bottom:28px">Films. Music. Friends.</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:240px">
@@ -2362,7 +2366,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 <!-- Sign In -->
 <div id="screen-signin" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;overflow-y:auto">
   <div class="auth-wrap">
-    <img src="./icon.png" alt="Cinemail" style="width:80px;height:80px;border-radius:19px;margin:0 auto 14px;display:block;filter:drop-shadow(0 0 24px rgba(245,197,24,0.18))">
+    <img src="/icon.png" alt="Cinemail" style="width:80px;height:80px;border-radius:19px;margin:0 auto 14px;display:block;filter:drop-shadow(0 0 24px rgba(245,197,24,0.18))">
     <div class="auth-logo"><span>CINE</span>MAIL</div>
     <div class="auth-card">
       <h2 data-i18n="sign_in_title">Welcome Back</h2>
@@ -2396,7 +2400,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 <!-- Sign Up -->
 <div id="screen-signup" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;overflow-y:auto">
   <div class="auth-wrap">
-    <img src="./icon.png" alt="Cinemail" style="width:80px;height:80px;border-radius:19px;margin:0 auto 14px;display:block;filter:drop-shadow(0 0 24px rgba(245,197,24,0.18))">
+    <img src="/icon.png" alt="Cinemail" style="width:80px;height:80px;border-radius:19px;margin:0 auto 14px;display:block;filter:drop-shadow(0 0 24px rgba(245,197,24,0.18))">
     <div class="auth-logo"><span>CINE</span>MAIL</div>
     <div class="auth-tagline" data-i18n="auth_tagline" data-i18n-html="1">Track films.<br>Get personal picks.<br>Share with friends.</div>
     <div class="auth-card">
@@ -2450,7 +2454,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 <!-- Forgot Password -->
 <div id="screen-forgot" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;overflow-y:auto">
   <div class="auth-wrap">
-    <img src="./icon.png" alt="Cinemail" style="width:80px;height:80px;border-radius:19px;margin:0 auto 14px;display:block;filter:drop-shadow(0 0 24px rgba(245,197,24,0.18))">
+    <img src="/icon.png" alt="Cinemail" style="width:80px;height:80px;border-radius:19px;margin:0 auto 14px;display:block;filter:drop-shadow(0 0 24px rgba(245,197,24,0.18))">
     <div class="auth-logo"><span>CINE</span>MAIL</div>
     <div class="auth-card">
       <button onclick="showScreen('signin')" data-i18n="back" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:16px;padding:0;display:flex;align-items:center;gap:5px;font-family:'DM Sans','Noto Sans Georgian',sans-serif">← Back</button>
@@ -2473,7 +2477,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 <!-- Set New Password (after clicking the reset link) -->
 <div id="screen-reset" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;overflow-y:auto">
   <div class="auth-wrap">
-    <img src="./icon.png" alt="Cinemail" style="width:80px;height:80px;border-radius:19px;margin:0 auto 14px;display:block;filter:drop-shadow(0 0 24px rgba(245,197,24,0.18))">
+    <img src="/icon.png" alt="Cinemail" style="width:80px;height:80px;border-radius:19px;margin:0 auto 14px;display:block;filter:drop-shadow(0 0 24px rgba(245,197,24,0.18))">
     <div class="auth-logo"><span>CINE</span>MAIL</div>
     <div class="auth-card">
       <h2 data-i18n="reset_title">Set New Password</h2>
@@ -2573,7 +2577,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     </div>
     <div id="search-results">
       <div class="empty-state">
-        <img src="./logo.png" class="search-logo pop" alt="Cinemail" draggable="false" onclick="_bounceLogo(this)">
+        <img src="/logo.png" class="search-logo pop" alt="Cinemail" draggable="false" onclick="_bounceLogo(this)">
         <div class="empty-state-title" data-i18n="empty_search_title">Find Your Next Film</div>
         <p data-i18n="empty_search_sub">Type a title and press Search</p>
       </div>
@@ -2865,7 +2869,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
              unmodified, linked to their site. -->
         <a href="https://www.themoviedb.org" target="_blank" rel="noopener"
            class="tmdb-credit" aria-label="The Movie Database">
-          <img src="./tmdb-logo.svg" alt="TMDB" width="92" height="12"
+          <img src="/tmdb-logo.svg" alt="TMDB" width="92" height="12"
                style="display:block;height:12px;width:auto">
         </a>
         <div data-i18n="about_tmdb" data-i18n-html="1">
@@ -2877,7 +2881,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.58.3</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.58.4-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8589,7 +8593,7 @@ async function _loadNameMap() {
   // force-cache отдаёт его с диска, а localStorage остаётся для мелочей, для
   // которых он и есть.
   try {
-    const r = await fetch('./name-map.json', { cache: 'force-cache' });
+    const r = await fetch('/name-map.json', { cache: 'force-cache' });
     if (!r.ok) return null;
     _nameMap = await r.json();
     return _nameMap;
@@ -10705,7 +10709,7 @@ function _qrHTML(url, size) {
   const logo = Math.round(size * 0.17);   // 2.9% of the area; decoding tolerates up to 30% of the side
   return `<div style="position:relative;width:${size}px;height:${size}px;margin:0 auto 10px">
     <img src="${_qrURL(url, size)}" width="${size}" height="${size}" style="border-radius:10px;display:block" alt="">
-    <img src="./icon.png" alt="" width="${logo}" height="${logo}"
+    <img src="/icon.png" alt="" width="${logo}" height="${logo}"
       style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:7px;background:#ffffff;padding:2px;box-sizing:border-box">
   </div>`;
 }
@@ -13585,7 +13589,7 @@ async function _loadExcelJS() {
     // Reset on failure so a later call can retry.
     _exceljsLoading = (async () => {
       try {
-        await _loadScript('./exceljs.min.js');
+        await _loadScript('/exceljs.min.js');
       } catch {
         await _loadScript('https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js');
       }
@@ -13652,7 +13656,7 @@ async function _renderBannerPNG(subtitle) {
     try { await document.fonts.load('700 46px "Bebas Neue"'); await document.fonts.ready; } catch(e) {}
     let logoImg = null, lbox = null;
     try {
-      const resp = await fetch('./logo.png');
+      const resp = await fetch('/logo.png');
       if (resp.ok) {
         logoImg = await createImageBitmap(await resp.blob());
         // The PNG has transparent padding around the artwork, which made the
@@ -14467,7 +14471,12 @@ document.addEventListener("visibilitychange", async () => {
 });
 
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" }).then(reg => {
+  // ТЕСТОВАЯ СТРАНИЦА СВОЙ ВОРКЕР НЕ СТАВИТ.
+  // Область продакшенового воркера - корень, значит он и так накрывает /test-1/,
+  // а навигации у него идут сначала в сеть: тестер всегда получает свежую сборку
+  // без "обнови страницу трижды". Свой воркер здесь только добавил бы второй кэш,
+  // который надо помнить и чистить.
+  Promise.reject(new Error("service worker disabled on the test build")).then(reg => {
     let reloading=false;
     navigator.serviceWorker.addEventListener("controllerchange",()=>{if(reloading)return;reloading=true;window.location.reload();});
     reg.update();
@@ -14745,41 +14754,55 @@ async function _loadGenreNames() {
   return _sugGenres;
 }
 
+// ИЩЕМ ПО ТРИГГЕРАМ, ПОКАЗЫВАЕМ КАНОНИЧЕСКОЕ. Это разные вещи, и первая версия
+// их спутала: индекс и искал, и показывал одно и то же слово, поэтому "романт"
+// не находил ничего - в показе стоит "Мелодрама", а "романт" лежит среди
+// триггеров, куда никто не смотрел. Сообщено 26 сентября вместе с "джонни депп".
+//
+// Теперь у записи два поля: по чему совпадать и что написать на чипе.
 function _suggestIndex() {
   if (_sugIndex) return _sugIndex;
-  const seen = new Set(), out = [];
-  const add = (w) => {
-    w = String(w || '').trim();
-    const k = _qNorm(w);
-    if (w.length < 3 || seen.has(k)) return;
-    seen.add(k); out.push(w);
+  const out = [], seen = new Set();
+  const add = (show, blob) => {
+    show = String(show || '').trim();
+    if (!show || seen.has(show)) return;
+    seen.add(show);
+    const m = new Set([_qNorm(show)]);
+    String(blob || '').split(/\s+/).forEach(w => { const k = _qNorm(w); if (k.length >= 3) m.add(k); });
+    out.push({ show, match: [...m] });
   };
-  // Люди из библиотеки: режиссёры, композиторы, операторы, актёры - как написаны.
+  try {
+    (_SUBJECTS || []).forEach(x => add(_showWord('subject', x.k), x.terms + ' ' + x.k));
+    (_MOODS || []).forEach(x => add(_showWord('mood', x.id), x.terms));
+    (_COUNTRIES || []).forEach(x => add(_showWord('country', x.c), x.t || x.terms));
+    (_MOVEMENTS || []).forEach(x => add(_showWord('movement', String(x.t || '').split(' ')[0]), x.t));
+    // Жанры: название с языка TMDB, а совпадать должно и по нашим триггерам -
+    // "романт" это мелодрама, и человек пишет именно так.
+    (_GENRE_WORDS || []).forEach(g => {
+      const name = (_sugGenres || []).find(x => (g.terms || '').split(/\s+/)
+        .some(w => _qNorm(x).startsWith(_qNorm(w).slice(0, 5))));
+      add(name || (g.terms || '').split(' ')[0], g.terms);
+    });
+    (_DECADES || []).forEach(d => add(_decadeShow(d.y), d.t));
+  } catch (e) { /* словарь не собрался - остаются люди */ }
+  // Люди из библиотеки: имя как написано, совпадение и по нему, и по частям.
   try {
     (watchHistory || []).forEach(e =>
       ['director', 'composer', 'cinematographer', 'actors'].forEach(f =>
         String(e[f] || '').split(',').forEach(n => {
           n = n.trim();
-          if (n && n.split(/\s+/).length <= 3) add(n);
+          if (n && n.split(/\s+/).length <= 3) add(n, n);
         })));
   } catch (e) { /* пустая библиотека - просто меньше подсказок */ }
-  (_sugGenres || []).forEach(add);
-  // Теперь и словарь: предметы, настроения и движения - через формы для показа.
-  // У движений своего ключа в таблице нет, поэтому ключ - первый термин, как он
-  // там записан; это устойчиво, потому что термины дописывают в конец строки.
-  try {
-    (_SUBJECTS || []).forEach(x => add(_showWord('subject', x.k)));
-    (_MOODS || []).forEach(x => add(_showWord('mood', x.id)));
-    (_MOVEMENTS || []).forEach(x => add(_showWord('movement', String(x.t || '').split(' ')[0])));
-    (_COUNTRIES || []).forEach(x => add(_showWord('country', x.c)));
-  } catch (e) { /* формы не собрались - остаются люди, жанры и десятилетия */ }
-  // Десятилетия на языке интерфейса, без словаря: 1990-е / 1990s / 1990er.
-  const suffix = { ru: '-е', uk: '-і', en: 's', de: 'er', es: '', fr: '', it: '', ka: '' };
-  const sfx = suffix[(_lang || 'en').slice(0, 2)] !== undefined
-            ? suffix[(_lang || 'en').slice(0, 2)] : 's';
-  for (let y = 1920; y <= 2020; y += 10) add(String(y) + sfx);
   return (_sugIndex = out);
 }
+
+// Десятилетие на языке интерфейса, без словаря.
+function _decadeShow(y) {
+  const sfx = { ru: '-е', uk: '-і', en: 's', de: 'er' }[(_lang || 'en').slice(0, 2)];
+  return String(y) + (sfx === undefined ? 's' : sfx);
+}
+
 function _clearSuggestIndex() { _sugIndex = null; }
 
 // Последнее слово - то, которое человек ДОПЕЧАТЫВАЕТ. Запятая разделяет наравне с
@@ -14793,36 +14816,59 @@ function _suggestFor(token) {
   const t = _qNorm(token);
   if (!t || t.length < 2) return [];
   const idx = _suggestIndex();
-  // Имя человека пишут с любого конца: "финчер" должно находить "Дэвид Финчер".
-  // ТЫ ПЕЧАТАЕШЬ КИРИЛЛИЦЕЙ, А В БИБЛИОТЕКЕ ИМЕНА ЛАТИНИЦЕЙ.
-  // Измерено 26 сентября: "fin" находило David Fincher, а "финч" - ничего, хотя
-  // это то же самое имя. Транслитерация у нас уже есть, и здесь она дешёвая:
-  // сравниваются два десятка строк, а не сто двадцать тысяч.
-  // Ц по-русски ts, а в фамилиях из немецкого z: Циммер - Zimmer. Та же поправка,
-  // что и в поиске имён, и здесь она стоит одно сравнение строк.
+  // Транслитерация даёт несколько правдоподобных написаний одного имени, и все
+  // они дешёвые: сравниваются две сотни строк. Дж по-русски это dzh, а в именах,
+  // пришедших из английского, это j: Джонни - Johnny, Джек - Jack. Ц так же даёт
+  // и ts, и z: Циммер - Zimmer.
   const tl0 = _toLatin(t);
-  const tl = tl0;
-  const tlz = tl0 && tl0.includes('ts') ? tl0.replace(/ts/g, 'z') : null;
-  const hit = (n) => n !== t && (n.startsWith(t) || n.split(' ').some(x => x.startsWith(t)));
-  const hitL = (n) => tl && tl !== t
-                   && (n.startsWith(tl) || n.split(' ').some(x => x.startsWith(tl)));
-  const hitZ = (n) => tlz && (n.startsWith(tlz) || n.split(' ').some(x => x.startsWith(tlz)));
-  // Набрано слово, которое мы знаем целиком - подсказывать нечего, и уж точно
-  // нельзя уходить в нечёткий поиск: "chess" находил "chefs" и выглядел так,
-  // будто мы шахмат не знаем и предлагаем поваров.
-  if (idx.some(w => _qNorm(w) === t)) return [];
-  const starts = idx.filter(w => { const n = _qNorm(w); return hit(n) || hitL(n) || hitZ(n); });
+  const forms = [t, tl0,
+                 tl0 && tl0.includes('ts') ? tl0.replace(/ts/g, 'z') : null,
+                 tl0 && tl0.includes('dzh') ? tl0.replace(/dzh/g, 'j') : null,
+                ].filter(Boolean);
+  // МОЛЧИМ, ТОЛЬКО ЕСЛИ НАБРАНО КАНОНИЧЕСКОЕ СЛОВО, А НЕ ЛЮБОЙ ТРИГГЕР.
+  // Триггеры - ОСНОВЫ: "романт", "уютн", "мелодрам". Совпасть с основой точно не
+  // значит дописать слово, и сравнение с ними глушило ровно те подсказки, которых
+  // не хватало: "романт" должно предлагать "Мелодрама", а не молчать.
+  if (idx.some(e => _qNorm(e.show) === t)) return [];
+  const starts = idx.filter(e => e.match.some(m =>
+    forms.some(f => m.startsWith(f) || m.split(' ').some(x => x.startsWith(f)))));
   let near = [];
-  // Опечатку ищем, ТОЛЬКО если по началу слова не нашлось ничего. Иначе к верной
-  // подсказке подмешивается соседняя по букве: "slow" тянуло за собой "snow".
   if (!starts.length && t.length >= 4) {
-    // Опечатка - не повод молчать. _lev уже есть в приложении.
-    near = idx.filter(w => {
-      const n = _qNorm(w);
-      return !n.startsWith(t) && Math.abs(n.length - t.length) <= 2 && _lev(n, t) <= 1;
-    });
+    near = idx.filter(e => e.match.some(m =>
+      Math.abs(m.length - t.length) <= 2 && _lev(m, t) <= 1));
   }
-  return [...starts, ...near].slice(0, 6);
+  const res = [...starts, ...near].map(e => e.show).filter(Boolean);
+  // ЗАПИСЫВАЕМ ТО, ЧЕГО У НАС НЕТ. Слово длиной от четырёх букв, на которое мы не
+  // нашли ничего, - это материал для пополнения словаря, и он приходит от живых
+  // запросов, а не от моих догадок. Копится локально; выгрузить: _missingWords().
+  if (!res.length && t.length >= 4) _noteMissing(t);
+  return res.slice(0, 6);
+}
+
+// ── ЧЕГО НЕ ХВАТАЕТ СЛОВАРЮ, ПО ЖИВЫМ ЗАПРОСАМ ─────────────────────────────
+// Dafa 26 сентября: "нет довольно базовых вещей - нет романтический, джонни депп".
+// Собирать это руками значит помнить, а помнить не надо: пусть приложение само
+// ведёт список того, на что промолчало, со счётчиком. Потом раз в месяц глазами.
+const _MISS_KEY = 'cinemail_missing_v1';
+function _noteMissing(w) {
+  try {
+    const m = JSON.parse(localStorage.getItem(_MISS_KEY) || '{}');
+    m[w] = (m[w] || 0) + 1;
+    // Двести слов хватит на месяц наблюдений, а хранилище нам ещё нужно под другое.
+    const keys = Object.keys(m);
+    if (keys.length > 200) { keys.sort((a, b) => m[a] - m[b]).slice(0, 50).forEach(k => delete m[k]); }
+    localStorage.setItem(_MISS_KEY, JSON.stringify(m));
+  } catch (e) { /* приватное окно - просто не копим */ }
+}
+function _missingWords() {
+  try {
+    const m = JSON.parse(localStorage.getItem(_MISS_KEY) || '{}');
+    const rows = Object.entries(m).sort((a, b) => b[1] - a[1]);
+    const text = rows.map(([w, n]) => `${n}\t${w}`).join('\n');
+    console.log(text || '(пока ничего)');
+    try { navigator.clipboard.writeText(text); } catch (e) {}
+    return rows.length + ' слов, скопировано в буфер';
+  } catch (e) { return 'нет доступа к хранилищу'; }
 }
 
 function _renderSuggest() {
