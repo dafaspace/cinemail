@@ -2881,7 +2881,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.1-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.2-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8097,21 +8097,25 @@ const _SUBJECT_FILMS = {
   "mind bending": [[27205,2010],[1018,2001],[577922,2020],[797,1966],[11324,2010]],
   "bittersweet": [[153,2003],[152601,2013],[38,2004],[666277,2023],[475303,2019]],
   "epic": [[238,1972],[28,1979],[346,1954]],
-  "dreamlike": [[426,1958],[1018,2001],[27040,1943]],
-  "beautiful": [[426,1958],[843,2000],[62,1968],[631,1927],[3114,1956],[3112,1955],[531428,2019]],
-  "haunting": [[426,1958],[1018,2001],[28,1979],[3112,1955]],
-  "moving": [[18148,1953],[631,1927],[346,1954],[20530,1949],[20108,1966]],
+  "dreamlike": [[426,1958],[1018,2001],[27040,1943],[422,1963],[1396,1975]],
+  "beautiful": [[426,1958],[843,2000],[62,1968],[631,1927],[3114,1956],[3112,1955],[531428,2019],[43904,1934],[901,1931]],
+  "haunting": [[426,1958],[1018,2001],[28,1979],[3112,1955],[832,1931]],
+  "moving": [[18148,1953],[631,1927],[346,1954],[20530,1949],[20108,1966],[5801,1955],[901,1931]],
   "austere": [[44012,1975],[14626,1998],[780,1928],[20108,1966]],
-  "playful": [[872,1952],[499,1962],[10227,1967],[46919,1966]],
+  "playful": [[872,1952],[499,1962],[10227,1967],[46919,1966],[43904,1934],[239,1959]],
   "restrained": [[18148,1953],[843,2000],[20530,1949],[531428,2019]],
   "delicate": [[18148,1953],[20530,1949],[531428,2019]],
   "eerie": [[426,1958],[1018,2001],[3112,1955]],
-  "erotic": [[843,2000],[1018,2001],[531428,2019]],
+  "erotic": [[843,2000],[1018,2001],[531428,2019],[43904,1934]],
   "experimental": [[26317,1929],[797,1966],[46919,1966]],
   "exquisite": [[843,2000],[20530,1949],[531428,2019]],
   "intimate": [[18148,1953],[843,2000],[531428,2019]],
   "powerful": [[20530,1949],[42044,1985],[103,1976]],
   "sensual": [[843,2000],[14626,1998],[531428,2019]],
+  "poetic": [[62,1968],[631,1927],[1396,1975],[43904,1934],[5801,1955]],
+  "chilling": [[1018,2001],[832,1931],[567,1954]],
+  "dark": [[238,1972],[103,1976],[539,1960]],
+  "disturbing": [[44012,1975],[103,1976],[539,1960]],
 };
 
 const _SUBJECTS = [
@@ -8253,6 +8257,10 @@ const _SUBJECTS = [
   { k:"intimate", terms:"intimate чутк камерн близост вдвоем камерне інтимне intimo intime intim intimo ინტიმური" },
   { k:"powerful", terms:"powerful forceful overwhelming мощн сокрушительн оглушительн пробирает потужн poderoso arrollador puissant bouleversant wuchtig uberwaltigend potente ძლიერი" },
   { k:"sensual", terms:"sensual tactile чувственн телесн осязаем чуттєв sensual sensuel sinnlich sensuale სენსუალური" },
+  { k:"poetic", terms:"poetic lyrical поэтичн лиричн поэзия кинопоэзия поетичн ліричн poetico lirico poetique lyrique poetisch lyrisch poetico lirico პოეტური" },
+  { k:"chilling", terms:"chilling bloodcurdling леденящ холодок по спине озноб морозн страх крижан escalofriante glacant eiskalt agghiacciante შემზარავი" },
+  { k:"dark", terms:"darkness pitchblack мрачн беспросветн темнота черная сторона похмур sombrio tenebroso sombre tenebreux dustere finster cupo tenebroso ბნელი" },
+  { k:"disturbing", terms:"disturbing troubling выбива из колеи беспокоящ смущающ травмирующ тривожн perturbador inquietante derangeant verstorend perturbante შემაშფოთებელი" },
 ];
 // MOVEMENTS, SCHOOLS AND ERAS. Each is a country, a stretch of years, and sometimes a handful
 // of people - which is to say each is an exact query, not an approximation. "Французская новая
@@ -14619,6 +14627,10 @@ if ("serviceWorker" in navigator) {
 //     и это отдельная работа, а не строка в словаре.
 const _SHOW = {
   subject: {
+    "poetic":{en:"poetic",ru:"поэтичное",uk:"поетичне",ka:"პოეტური",es:"poético",fr:"poétique",de:"poetisch",it:"poetico"},
+    "chilling":{en:"chilling",ru:"леденящее",uk:"крижане",ka:"შემზარავი",es:"escalofriante",fr:"glaçant",de:"eiskalt",it:"agghiacciante"},
+    "dark":{en:"dark",ru:"мрачное",uk:"похмуре",ka:"ბნელი",es:"sombrío",fr:"sombre",de:"düster",it:"cupo"},
+    "disturbing":{en:"disturbing",ru:"выбивающее из колеи",uk:"тривожне",ka:"შემაშფოთებელი",es:"perturbador",fr:"dérangeant",de:"verstörend",it:"perturbante"},
     "austere":{en:"austere",ru:"аскетичное",uk:"аскетичне",ka:"ასკეტური",es:"austero",fr:"austère",de:"karg",it:"austero"},
     "playful":{en:"playful",ru:"игривое",uk:"грайливе",ka:"მოთამაშე",es:"juguetón",fr:"espiègle",de:"verspielt",it:"giocoso"},
     "restrained":{en:"restrained",ru:"сдержанное",uk:"стримане",ka:"თავშეკავებული",es:"contenido",fr:"retenu",de:"zurückhaltend",it:"sobrio"},
