@@ -2881,7 +2881,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.58.7-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.58.9-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8096,6 +8096,8 @@ const _SUBJECT_FILMS = {
   "folk horror": [[310131,2015],[530385,2019],[16307,1973],[433808,2017]],
   "mind bending": [[27205,2010],[1018,2001],[577922,2020],[797,1966],[11324,2010]],
   "bittersweet": [[153,2003],[152601,2013],[38,2004],[666277,2023],[475303,2019]],
+  "epic": [[238,1972],[28,1979],[346,1954]],
+  "dreamlike": [[426,1958],[1018,2001],[27040,1943]],
 };
 
 const _SUBJECTS = [
@@ -8198,13 +8200,15 @@ const _SUBJECTS = [
   // отдаёт их списком. Мы перестаём делать вид, что понимаем настроение, и
   // берём ответ у того, кто действительно понимает.
   { k:"kinetic", terms:"kinetic visceral relentless pulsepounding adrenaline breathless frantic кинетичн висцеральн неистов безостановочн адреналин на разрыв бешеный ритм кінетичн шалений адреналін visceral frenetico adrenalina trepidante viscéral haletant effréné adrénaline rasant atemlos adrenalin viscerale frenetico adrenalina კინეტიკური ადრენალინი" },
-  { k:"slow burn", terms:"slowburn slow burn meditative hypnotic deliberate contemplative immersive rigorous dreamlike медленное горение медитативн гипнотическ созерцательн неторопл томительн тягуч медитативн гіпнотичн споглядальн pausado meditativo hipnotico contemplativo contemplatif hypnotique lent meditativ hypnotisch bedachtig meditativo ipnotico contemplativo მედიტაციური ჰიპნოტური" },
+  { k:"slow burn", terms:"slowburn slow burn meditative hypnotic deliberate contemplative immersive rigorous медленное горение медитативн гипнотическ созерцательн неторопл томительн тягуч медитативн гіпнотичн споглядальн pausado meditativo hipnotico contemplativo contemplatif hypnotique lent meditativ hypnotisch bedachtig meditativo ipnotico contemplativo მედიტაციური ჰიპნოტური" },
   { k:"whimsical", terms:"whimsical quirky symmetrical pastel storybook twee playful причудлив чудаковат симметричн пастельн сказочн игрушечн затейлив вигадлив дивакуват симетричн caprichoso excentrico simetrico pastel fantasque excentrique symetrique pastel skurril verspielt symmetrisch pastell bizzarro stravagante simmetrico pastello უცნაური სიმეტრიული" },
-  { k:"neon noir", terms:"neon neondrenched moody sleek stylish nightcity synthwave неон неонов ночной город томн стильн меланхоличн синтвейв неон нічне місто стильн neon nocturno elegante melancolico neon nocturne elegant melancolique neon nachtlich stilvoll melancholisch neon notturno elegante malinconico ნეონი ღამის ქალაქი" },
+  { k:"neon noir", terms:"neon neondrenched neonlit synthwave неон неонов неоновый синтвейв неон неонові синтвейв neon neon neon neon ნეონი" },
   { k:"claustrophobic", terms:"claustrophobic claustrophobia dread unhinged unsettling paranoid oppressive клаустрофоб замкнут тесн безумие паранойя гнетущ тревожн давящ клаустрофоб замкнут божевілля паранойя claustrofobico opresivo paranoia angustioso claustrophobe oppressant paranoia angoissant klaustrophob beklemmend paranoid claustrofobico opprimente paranoia angosciante კლაუსტროფობიური შემზარავი" },
   { k:"folk horror", terms:"folkhorror folk horror eerie ritual pagan daylight horror haunting фольклорн языческ ритуальн обряд жутк деревенск хоррор при свете дня фольклорн язичницьк ритуальн моторошн folclorico pagano ritual inquietante folklorique paien rituel inquietant folk heidnisch ritual unheimlich folkloristico pagano rituale inquietante ფოლკლორული რიტუალური" },
   { k:"mind bending", terms:"mindbending mind bending cerebral surreal puzzle convoluted unreliable labyrinth взрыв мозга головолом сюрреалист лабиринт запутанн ненадежн рассказчик замороченн головолом сюрреаліст лабіринт заплутан rompecabezas cerebral surrealista laberinto casse tete cerebral surrealiste labyrinthe kopfzerbrechen zerebral surreal labyrinth rompicapo cerebrale surreale labirinto თავსატეხი სიურრეალისტური" },
-  { k:"bittersweet", terms:"bittersweet wistful intimate understated tender quiet longing горьковат светлая грусть камерн сдержанн нежн тих тоск недосказанн гіркувато світлий сум камерн стриман agridulce intimo sobrio tierno nostalgico doux amer intime sobre tendre nostalgique bittersuss intim zuruckhaltend zart wehmutig agrodolce intimo sobrio tenero nostalgico მწარე ტკბილი ნაზი" },
+  { k:"bittersweet", terms:"bittersweet wistful understated горьковат светлая грусть недосказанн гіркувато світлий сум agridulce doux amer bittersuss agrodolce მწარე ტკბილი" },
+  { k:"epic", terms:"epic epics sweeping grand scale monumental saga эпическ эпос масштабн грандиозн полотно сага размах монументальн епічн масштабн грандіозн сага epico epopeya grandioso gran escala epique fresque grandiose ampleur episch monumental grossangelegt saga epico kolossale grandioso saga ეპიკური მასშტაბური" },
+  { k:"dreamlike", terms:"dreamlike dream logic oneiric reverie sleepwalking trance сновидческ как во сне сон наяву грез бред марев транс дремотн сновидн як уві сні марення транс onirico como un sueno ensonacion onirique comme un reve reverie traumhaft traumartig traumlogik onirico come un sogno სიზმრისეული ონირიული" },
 ];
 // MOVEMENTS, SCHOOLS AND ERAS. Each is a country, a stretch of years, and sometimes a handful
 // of people - which is to say each is an exact query, not an approximation. "Французская новая
@@ -9270,6 +9274,17 @@ async function _constraintsFor(q) {
 
   if (subjects.length || subject) {
     // Сделанный руками список бьёт поиск по тегам там, где он есть.
+    // ДЛИННОЕ СОВПАДЕНИЕ ВАЖНЕЕ КОРОТКОГО.
+    //
+    // Предметы сопоставляются ПОДСТРОКОЙ, и поэтому "dreamlike" совпадает и с
+    // группой dreamlike, и со старым предметом dream - "сны". Первым срабатывал
+    // dream, потому что он в таблице раньше, и человек, спросивший сновидческое
+    // кино, получал фильмы ПРО СНЫ. Измерено 26 сентября при добавлении группы.
+    //
+    // Правило общее, а не заплата на эту пару: чем длиннее ключ, совпавший с
+    // запросом, тем он точнее. "serial killer" должен бить "killer" по той же
+    // причине, и когда такая пара появится, она уже будет решена.
+    subjects.sort((a, b) => String(b.k).length - String(a.k).length);
     for (const sj of subjects) {
       const curated = await _curatedSubject(sj.k, await _tasteIndex(), c.genreIds);
       if (curated && curated.length >= 3) {
@@ -14560,6 +14575,8 @@ if ("serviceWorker" in navigator) {
 //     и это отдельная работа, а не строка в словаре.
 const _SHOW = {
   subject: {
+    "epic":{en:"epic",ru:"эпическое полотно",uk:"епічне полотно",ka:"ეპიკური",es:"épico",fr:"épique",de:"episch",it:"epico"},
+    "dreamlike":{en:"dreamlike",ru:"как во сне",uk:"як уві сні",ka:"სიზმრისეული",es:"onírico",fr:"onirique",de:"traumhaft",it:"onirico"},
     "kinetic":{en:"kinetic",ru:"на разрыв",uk:"шалений темп",ka:"კინეტიკური",es:"frenético",fr:"haletant",de:"atemlos",it:"frenetico"},
     "slow burn":{en:"slow burn",ru:"медленное и затягивающее",uk:"повільне і затягуюче",ka:"მედიტაციური",es:"pausado",fr:"contemplatif",de:"meditativ",it:"meditativo"},
     "whimsical":{en:"whimsical",ru:"причудливое и симметричное",uk:"вигадливе",ka:"უცნაური",es:"caprichoso",fr:"fantasque",de:"skurril",it:"bizzarro"},
