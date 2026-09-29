@@ -2881,7 +2881,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.2-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.3-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -7994,15 +7994,15 @@ const _MOODS = [
   // terms are matched as substrings against the normalised query, so stems are enough and a
   // single entry covers inflections: "уютн" catches уютный / уютное / уютную.
   { id:'cosy',    g:'35,10751,10749', terms:'cosy cozy warm feelgood уютн тепл добр ностальг винтажн затишн gemutlich gemütlich accogliente douillet acogedor затишн' },
-  { id:'autumn',  g:'18,9648',        terms:'autumn fall melanchol осенн меланхол грусн сумрачн herbst autunno automne otoño otono შემოდგომ' },
+  { id:'autumn',  g:'18,9648',        terms:'autumn fall melanchol осенн меланхол грусн сумрачн herbst autunno automne otoño otono შემოდგომ herbstlich' },
   { id:'heavy',   g:'18,10752,36',    terms:'heavy hard bleak grim тяжел мрачн жестк готич депресс schwer pesante lourd duro' },
   { id:'light',   g:'35,10749,16',    terms:'light easy fun лёгк легк весел непринужд leicht leggero léger ligero' },
   { id:'slow',    g:'18',             terms:'slow quiet contemplative медленн тих тихи тихо созерцат медитат гипнотич langsam lento lent' },
   { id:'think',   g:'18,878,9648',    terms:'think clever mind подумать умн сложн интеллект nachdenk riflessiv réfléch pensar' },
   { id:'cry',     g:'18,10749',       terms:'cry sad tears поплакать груст слёз слез traurig triste piangere pleurer' },
-  { id:'scary',   g:'27,53',          terms:'scary horror tense страшн ужас напряж gruselig spavent effrayant miedo' },
+  { id:'scary',   g:'27,53',          terms:'scary horror tense страшн ужас напряж gruselig spavent effrayant miedo spaventoso' },
   { id:'funny',   g:'35',             terms:'funny laugh comedy смешн смеш комед lustig divertente drôle drole gracioso' },
-  { id:'real',    g:'99,36',          terms:'true real documentary реальн документ истинн wahr vero vrai real' },
+  { id:'real',    g:'99,36',          terms:'true real documentary реальн документ истинн wahr vero vrai real realism realismo realismus' },
 ];
 // GENRE WORDS, and this layer is the one that matters most in practice.
 //
@@ -8110,7 +8110,12 @@ const _SUBJECT_FILMS = {
   "experimental": [[26317,1929],[797,1966],[46919,1966]],
   "exquisite": [[843,2000],[20530,1949],[531428,2019]],
   "intimate": [[18148,1953],[843,2000],[531428,2019]],
-  "powerful": [[20530,1949],[42044,1985],[103,1976]],
+  // powerful СНЯТ со списка 27 сентября 2026, решением Dafa, и не по ошибке сбора.
+  // Слово часто встречается в кинокритике и ИМЕННО ПОЭТОМУ мало различает фильмы:
+  // powerful performance, powerful ending, powerful score - это почти универсальная
+  // похвала. Различительная сила low (docs/lexicon.json), а слово с низкой
+  // различительной силой не ведёт кураторский список само по себе. В корпусе оно
+  // остаётся, триггеры ниже тоже остаются: слово понимается, но не командует выдачей.
   "sensual": [[843,2000],[14626,1998],[531428,2019]],
   "poetic": [[62,1968],[631,1927],[1396,1975],[43904,1934],[5801,1955]],
   "chilling": [[1018,2001],[832,1931],[567,1954]],
@@ -8128,7 +8133,7 @@ const _SUBJECTS = [
   { k:'dinosaur',     terms:'динозавр dinosaur dinosaurier dinosaure dinosaurio' },
   { k:'bird',         terms:'птиц птах vogel oiseau pajaro uccell ფრინველ bird' },
   { k:'space',        terms:'космос космич weltraum espace espacio spazio კოსმ space' },
-  { k:'alien',        terms:'инопланет пришелец ausserirdisch außerirdisch extraterrestre alieno alien' },
+  { k:'alien',        terms:'инопланет пришелец ausserirdisch außerirdisch extraterrestre alieno alien alienigenas alienígenas' },
   { k:'robot',        terms:'робот roboter robot' },
   { k:'time travel',  terms:'путешествиевовремени времени машинавремени zeitreise voyagedanstemps time travel' },
   { k:'vampire',      terms:'вампир vampir vampire vampiro' },
@@ -8148,8 +8153,8 @@ const _SUBJECTS = [
   { k:'mountain',     terms:'гора горы горный горах альпин berg montagne montana montagna მთა mountain' },
   { k:'forest',       terms:'лес леса лесу лесн ліс лісов wald foret forêt bosque foresta ტყე forest' },
   { k:'sea',          terms:'море морск meer mer mare океан mare ზღვა sea seas' },
-  { k:'road trip',    terms:'дорог роудтрип поездк road reise voyage viaje viaggio trip' },
-  { k:'courtroom',    terms:'судебн залсуда зале зал суда присяжн адвокатск courtroom trial gericht tribunal juicio processo' },
+  { k:'road trip',    terms:'дорог роудтрип поездк road reise voyage viaje viaggio trip roadtrip roadmovie' },
+  { k:'courtroom',    terms:'судебн залсуда зале зал суда присяжн адвокатск courtroom trial gericht tribunal juicio processo gerichtssaal' },
   { k:'single location', terms:'камерн однойкомнат однакомнат singlelocation onelocation huisclos' },
   { k:'radio',        terms:'радиостанц радиоэфир радиовед radio funk' },
   { k:'cyberpunk',    terms:'киберпанк cyberpunk' },
@@ -8168,7 +8173,7 @@ const _SUBJECTS = [
   { k:'family',       terms:'семья семьи семейн сімʼя сімей familie famille familia famiglia ოჯახ family' },
   { k:'revenge',      terms:'месть мести мстит мстител помста помсти rache vengeance venganza vendetta revenge' },
   { k:'survival',     terms:'выживан виживан uberleben überleben survie supervivencia sopravvivenza survival' },
-  { k:'heist',        terms:'ограблен пограбуван raub braquage atraco rapina heist' },
+  { k:'heist',        terms:'ограблен пограбуван raub braquage atraco rapina heist raubzug' },
   { k:'spy',          terms:'шпион шпигун spion espion espia spia spy spies' },
   { k:'mafia',        terms:'мафи гангстер mafia gangster' },
   { k:'serial killer',terms:'маньяк серийн серийныйубийца serienmorder serienmörder tueur asesinoserie serial killer' },
@@ -8176,7 +8181,7 @@ const _SUBJECTS = [
   { k:'football',     terms:'футбол fussball fußball football futbol calcio' },
   { k:'chess',        terms:'шахмат шахів шахова schach echecs échecs ajedrez scacchi chess' },
   { k:'music',        terms:'музык музик musik musique musica მუსიკ music' },
-  { k:'rock band',    terms:'группа рокгруп band groupe banda rock' },
+  { k:'rock band',    terms:'группа рокгруп band groupe banda rock rockband' },
   { k:'painter',      terms:'художник маляр maler peintre pintor pittore მხატვ painter' },
   { k:'writer',       terms:'писател письмен schriftsteller ecrivain écrivain escritor scrittore მწერალ writer' },
   { k:'dance',        terms:'танц tanz danse baile danza ცეკვ dance' },
@@ -8194,7 +8199,7 @@ const _SUBJECTS = [
   { k:'death',        terms:'смерт tod mort muerte morte სიკვდილ death' },
   { k:'illness',      terms:'болезн хвороб krankheit maladie enfermedad malattia illness' },
   { k:'addiction',    terms:'наркот зависим sucht drogue droga addiction' },
-  { k:'immigration',  terms:'эмигра иммигра emigra einwander immigration inmigra immigra' },
+  { k:'immigration',  terms:'эмигра иммигра emigra einwander immigration inmigra immigra inmigracion inmigración einwanderung immigrazione' },
   { k:'cooking',      terms:'кулинар готовк приготовлен повар кухня кухни ресторан kochen cuisine cocina cucina food cooking' },
   { k:'teenager',     terms:'подрост тинейдж юност старшеклассник teenager jugendlich adolescent adolescente' },
   { k:'lighthouse',   terms:'маяк leuchtturm phare faro lighthouse' },
@@ -8202,11 +8207,11 @@ const _SUBJECTS = [
   { k:'bureaucracy',  terms:'бюрократ чиновник канцеляр burokratie bürokratie bureaucratie burocracia burocrazia bureaucracy bureaucracies' },
   { k:'jazz',         terms:'джаз jazz' },
   { k:'loneliness',   terms:'одиночеств одинок lonel einsamkeit solitude soledad solitudine loneliness' },
-  { k:'dream',        terms:'сновиден сюрреалист абсурдист traum reve rêve sueno sogno surreal dream' },
+  { k:'dream',        terms:'сновиден сюрреалист абсурдист traum reve rêve sueno sogno surreal dream surrealism surrealismo surrealismus' },
   { k:'skateboarding',terms:'скейт skateboard' },
   { k:'artist',       terms:'художествен искусств творчеств kunst artiste arte artist' },
   { k:'silent film',  terms:'безмолвн бездиалог безсловес silentfilm silent film' },
-  { k:'road movie',   terms:'роудмуви роуд-муви роуд roadmovie road movie' },
+  { k:'road movie',   terms:'роудмуви роуд-муви роуд roadmovie road movie roadtrip roadmovie' },
   { k:'christmas',    terms:'рождеств різдв weihnacht noel noël navidad natale christmas' },
   { k:'wedding',      terms:'свадьб весілл hochzeit mariage boda matrimonio ქორწ wedding' },
   { k:'winter',       terms:'зим зимн winter hiver invierno inverno ზამთარ' },
@@ -8223,7 +8228,7 @@ const _SUBJECTS = [
   { k:"neon noir", terms:"neon neondrenched neonlit synthwave неон неонов неоновый синтвейв неон неонові синтвейв neon neon neon neon ნეონი" },
   { k:"claustrophobic", terms:"claustrophobic claustrophobia dread unhinged unsettling paranoid oppressive клаустрофоб замкнут тесн безумие паранойя гнетущ тревожн давящ клаустрофоб замкнут божевілля паранойя claustrofobico opresivo paranoia angustioso claustrophobe oppressant paranoia angoissant klaustrophob beklemmend paranoid claustrofobico opprimente paranoia angosciante კლაუსტროფობიური შემზარავი" },
   { k:"folk horror", terms:"folkhorror folk horror eerie ritual pagan daylight horror haunting фольклорн языческ ритуальн обряд жутк деревенск хоррор при свете дня фольклорн язичницьк ритуальн моторошн folclorico pagano ritual inquietante folklorique paien rituel inquietant folk heidnisch ritual unheimlich folkloristico pagano rituale inquietante ფოლკლორული რიტუალური" },
-  { k:"mind bending", terms:"mindbending mind bending cerebral surreal puzzle convoluted unreliable labyrinth взрыв мозга головолом сюрреалист лабиринт запутанн ненадежн рассказчик замороченн головолом сюрреаліст лабіринт заплутан rompecabezas cerebral surrealista laberinto casse tete cerebral surrealiste labyrinthe kopfzerbrechen zerebral surreal labyrinth rompicapo cerebrale surreale labirinto თავსატეხი სიურრეალისტური" },
+  { k:"mind bending", terms:"mindbending mind bending cerebral surreal puzzle convoluted unreliable labyrinth взрыв мозга головолом сюрреалист лабиринт запутанн ненадежн рассказчик замороченн головолом сюрреаліст лабіринт заплутан rompecabezas cerebral surrealista laberinto casse tete cerebral surrealiste labyrinthe kopfzerbrechen zerebral surreal labyrinth rompicapo cerebrale surreale labirinto თავსატეხი სიურრეალისტური surrealism surrealismo surrealismus" },
   { k:"bittersweet", terms:"bittersweet wistful understated горьковат светлая грусть недосказанн гіркувато світлий сум agridulce doux amer bittersuss agrodolce მწარე ტკბილი" },
   { k:"epic", terms:"epic epics sweeping grand scale monumental saga эпическ эпос масштабн грандиозн полотно сага размах монументальн епічн масштабн грандіозн сага epico epopeya grandioso gran escala epique fresque grandiose ampleur episch monumental grossangelegt saga epico kolossale grandioso saga ეპიკური მასშტაბური" },
   { k:"dreamlike", terms:"dreamlike dream logic oneiric reverie sleepwalking trance сновидческ как во сне сон наяву грез бред марев транс дремотн сновидн як уві сні марення транс onirico como un sueno ensonacion onirique comme un reve reverie traumhaft traumartig traumlogik onirico come un sogno სიზმრისეული ონირიული" },
@@ -8446,22 +8451,22 @@ const _COUNTRIES = [
   { c:'IT', terms:'венеци venice неапол naples италия итальянц italy rome рим итальянск italian italiano italien italienisch' },
   { c:'JP', terms:'киото kyoto осак osaka япони japan tokyo токийск токио японск japanese japonais giapponese japanisch japones' },
   { c:'KR', terms:'корея кореи корее южнокорейск южная корея корейц korea seoul сеул корейск korean coreen coreano koreanisch' },
-  { c:'CN,HK,TW', terms:'китай китайц china hongkong гонконг китайск гонконгск chinese hongkong cinese chinois chinesisch' },
-  { c:'DE', terms:'мюнхен munich германи germany berlin берлин немецк германск german deutsch allemand tedesco aleman' },
+  { c:'CN,HK,TW', terms:'китай китайц china hongkong гонконг китайск гонконгск chinese hongkong cinese chinois chinesisch hongkongaise' },
+  { c:'DE', terms:'мюнхен munich германи germany berlin берлин немецк германск german deutsch allemand tedesco aleman deutschland' },
   { c:'ES', terms:'барселон barcelona испани spain madrid мадрид испанск spanish espanol español espagnol spagnolo spanisch' },
   { c:'GB', terms:'эдинбург edinburgh англи britain england london лондон британск английск british english britannique britannico britisch' },
   { c:'US', terms:'лосандж losangeles чикаго chicago америк usa hollywood голливуд newyork ньюйорк американск american americain americano amerikanisch' },
-  { c:'SU,RU', terms:'росси ссср russia moscow москв советск русск российск soviet russian russe russo russisch sowjetisch' },
+  { c:'SU,RU', terms:'росси ссср russia moscow москв советск русск российск soviet russian russe russo russisch sowjetisch sovietico' },
   { c:'IN', terms:'индия индийц india индийск болливуд indian bollywood indien indiano indisch' },
   { c:'IR', terms:'иране иранск iran tehran тегеран иранск персидск iranian persian iranien iraniano iranisch' },
   { c:'SE', terms:'швеци sweden шведск swedish suedois svedese schwedisch sueco' },
   { c:'DK', terms:'дания датчан denmark copenhagen датск danish danois danese danisch dänisch danes' },
   { c:'PL', terms:'польш poland warsaw польск polish polonais polacco polnisch polaco' },
-  { c:'CZ,SK', terms:'чехи czechia prague прага чешск чехословацк czech tcheque ceco tschechisch checo' },
+  { c:'CZ,SK', terms:'чехи czechia prague прага чешск чехословацк czech tcheque ceco tschechisch checo czechoslovak checoslovaca cecoslovacca' },
   { c:'MX', terms:'мексик mexico мексиканск mexican mexicain messicano mexikanisch mexicano' },
   { c:'BR', terms:'бразил brazil бразильск brazilian bresilien brasiliano brasilianisch brasileno' },
   { c:'AR', terms:'аргентин argentina аргентинск argentine argentinian argentino argentinisch' },
-  { c:'TR', terms:'турци turkey istanbul стамбул турецк turkish turc turco turkisch türkisch' },
+  { c:'TR', terms:'турци turkey istanbul стамбул турецк turkish turc turco turkisch türkisch turchia' },
   { c:'GE', terms:'грузи georgia tbilisi тбилиси грузинск georgian georgien georgiano georgisch' },
   { c:'UA', terms:'украин ukraine kyiv киеве украинск ukrainian ukrainien ucraino ukrainisch ucraniano' },
   { c:'AR,CL,CO,PE', terms:'латиноамериканск latinamerican latino' },
@@ -8475,32 +8480,115 @@ const _COUNTRIES = [
 //
 // Read off the FLATTENED query, like movements, because "70 х" and "1970 е" fall apart into
 // separate words the moment _qNorm touches the hyphen.
+// СВЕЖЕСТЬ. Двумя уровнями, и разделение вынужденное, а не изящное.
+//
+// "новый Вильнёв" человек произносит, ожидая последний его фильм. До 27 сентября в
+// парсере не было ни одного триггера на свежесть: слово молча уходило в "Не учтено",
+// а фильмография сортировалась по должности и ОЦЕНКЕ, без года вообще.
+//
+// ПОЧЕМУ ДВА УРОВНЯ. Совпадение с таблицей ставит c.matched, а c.matched перекрывает
+// поиск по названию (_searchByQuery: путь по названию только при !c.matched). Значит
+// слово, часто стоящее в НАЗВАНИЯХ, ломает поиск фильма: "последний император"
+// перестал бы находиться и стал бы "свежими фильмами про императора".
+//
+//   strong - слово, которого в названиях практически не бывает: новинки, latest,
+//            recent, novedades. Включает свежесть само по себе.
+//   weak   - новый, последний, new, last, dernier, ultimo. Это половина каталога
+//            названий, поэтому свежесть включается ТОЛЬКО если в запросе назван ещё и
+//            человек. "новый Вильнёв" - да, "новый мир" - нет.
+//
+// Формы перечислены явно, а не добраны приставкой: 27 сентября приставка на латинице
+// была ограничена двумя символами хвоста, потому что ville ловила villeneuve, а burn -
+// burnett. Списывать формы дешевле, чем потом искать, куда уехало совпадение.
+const _RECENT = {
+  strong: 'новинки новинка новинок новинках свеж недавн нещодавн свіж '
+        + 'latest newest recent '
+        + 'novedades nouveaut neuerscheinung neueste aktuell kurzlich novita უახლესი',
+  weak:   'новы новое новая последн нові новий остан '
+        + 'new last nuevo nueva ultimo ultima nouveau nouvelle dernier derniere '
+        + 'neu letzte letzter nuovo nuova ახალი ბოლო',
+};
+// Сколько лет считать свежим. Три года, а не один: "новый Вильнёв" в 2026 должен
+// находить и то, что вышло в 2024, а у авторского кино пауза между фильмами больше
+// года почти всегда.
+const _RECENT_YEARS = 3;
+
+// ГОЛЫХ ЧЕТЫРЁХЗНАЧНЫХ ФОРМ ЗДЕСЬ БОЛЬШЕ НЕТ, и это снятие особого случая, а не потеря.
+// Пока "1970" стояло синонимом семидесятых, "фильм 1970 года" давал десять лет вместо
+// одного - и так для десяти круглых лет из ста. Измерено 30 сентября: 1950, 1960, 1970,
+// 1980, 2000 отдавали десятилетие, а 2020 не отдавал вообще ничего.
+// Теперь просто: голое число - год, десятилетию нужен маркер (70х, 1970е, seventies).
 const _DECADES = [
-  { y:1920, t:'двадцатых двадцатые 1920 20х 20е 20ые 20ых 1920х 1920е twenties zwanziger annees20 anni20' },
-  { y:1930, t:'тридцатых тридцатые 1930 30х 30е 30ые 30ых 1930х 1930е thirties dreissiger annees30 anni30' },
-  { y:1940, t:'сороковых сороковые 1940 40х 40е 40ые 40ых 1940х 1940е forties vierziger annees40 anni40' },
-  { y:1950, t:'пятидесятых пятидесятые 1950 50х 50е 50ые 50ых 1950х 1950е fifties funfziger annees50 anni50' },
-  { y:1960, t:'шестидесятых шестидесятые 1960 60х 60е 60ые 60ых 1960х 1960е sixties sechziger annees60 anni60' },
-  { y:1970, t:'семидесятых семидесятые 1970 70х 70е 70ые 70ых 1970х 1970е seventies siebziger annees70 anni70' },
-  { y:1980, t:'восьмидесятых восьмидесятые 1980 80х 80е 80ые 80ых 1980х 1980е eighties achtziger annees80 anni80' },
-  { y:1990, t:'девяностых девяностые 1990 90х 90е 90ые 90ых 1990х 1990е nineties neunziger annees90 anni90' },
-  { y:2000, t:'нулевых нулевые двухтысячных 2000 00х 00е 00ые 00ых 2000х 2000е noughties zweitausender' },
-  { y:2010, t:'десятых 2010 10х 10е 10ые 10ых 2010х 2010е' },
+  { y:1920, t:'двадцатых двадцатые 20х 20е 20ые 20ых 1920х 1920е twenties zwanziger annees20 anni20' },
+  { y:1930, t:'тридцатых тридцатые 30х 30е 30ые 30ых 1930х 1930е thirties dreissiger annees30 anni30' },
+  { y:1940, t:'сороковых сороковые 40х 40е 40ые 40ых 1940х 1940е forties vierziger annees40 anni40' },
+  { y:1950, t:'пятидесятых пятидесятые 50х 50е 50ые 50ых 1950х 1950е fifties funfziger annees50 anni50' },
+  { y:1960, t:'шестидесятых шестидесятые 60х 60е 60ые 60ых 1960х 1960е sixties sechziger annees60 anni60' },
+  { y:1970, t:'семидесятых семидесятые 70х 70е 70ые 70ых 1970х 1970е seventies siebziger annees70 anni70' },
+  { y:1980, t:'восьмидесятых восьмидесятые 80х 80е 80ые 80ых 1980х 1980е eighties achtziger annees80 anni80' },
+  { y:1990, t:'девяностых девяностые 90х 90е 90ые 90ых 1990х 1990е nineties neunziger annees90 anni90' },
+  { y:2000, t:'нулевых нулевые двухтысячных 00х 00е 00ые 00ых 2000х 2000е noughties zweitausender' },
+  { y:2010, t:'десятых 10х 10е 10ые 10ых 2010х 2010е' },
+  // Строки на 2020-е не было вообще: "кино 2020х" отдавало 1920-е, потому что "20х" из
+  // строки 1920-х находится подстрокой внутри "2020х". Теперь выигрывает длинный ключ,
+  // но выигрывать было нечему - самой строки не существовало.
+  // «двадцатые» словом отданы 1920-м выше и там остаются: здесь только цифровые маркеры.
+  { y:2020, t:'2020х 2020е 2020ые 2020ых twenties2020' },
 ];
 
-// The plain forms with a Latin s - 70s, 1990s - and the bare four-digit year. Kept apart from
-// the table because they are a pattern rather than a list, and because "1975" should mean the
-// decade it sits in rather than nothing at all.
-function _decadeFrom(flatQ, rawQ) {
+// The plain forms with a Latin s - 70s, 1990s. Kept apart from the table because they are a
+// pattern rather than a list.
+// САМЫЙ ДЛИННЫЙ КЛЮЧ ВЫИГРЫВАЕТ. Строки сопоставляются ПОДСТРОКОЙ, поэтому "20х" из
+// строки 1920-х находится внутри "2020х", и порядок в массиве решал за смысл: "кино
+// 2020х" отдавало 1920-е. Измерено 30 сентября. То же правило уже стоит на предметах -
+// там оно появилось, когда "dreamlike" проигрывало "dream".
+// ФОРМА ЗДЕСЬ ВЫНУЖДЕННАЯ, не стилистическая. Это было объявление const с цепочкой
+// .flatMap().sort(), и экстрактор стенда обрезал её на закрывающей скобке внутри
+// [term, d.y]: в стенд уехал список БЕЗ сортировки, приложение сортировало, три проверки
+// экстрактора прошли, потому что обрезок остался валидным кодом. Обнаружено 30 сентября.
+// function он режет по фигурным скобкам и обрезать не может.
+let _decadeKeysCache = null;
+function _decadeKeys() {
+  if (_decadeKeysCache) return _decadeKeysCache;
+  const out = [];
   for (const d of _DECADES) {
-    if (d.t.split(' ').some(term => term && flatQ.includes(term))) return d.y;
+    for (const term of d.t.split(' ')) if (term) out.push([term, d.y]);
   }
-  const m = String(rawQ).match(/\b(19|20)?(\d0)\s*[-\u2011\u2013]?\s*(?:s|х|е|ых|ые|ies|ern|er)\b/i)
-         || String(rawQ).match(/\b(19|20)(\d\d)\b/);
+  out.sort((a, b) => b[0].length - a[0].length);
+  _decadeKeysCache = out;
+  return out;
+}
+
+function _decadeFrom(flatQ, rawQ) {
+  for (const [term, y] of _decadeKeys()) {
+    if (flatQ.includes(term)) return y;
+  }
+  const m = String(rawQ).match(/\b(19|20)?(\d0)\s*[-\u2011\u2013]?\s*(?:s|х|е|ых|ые|ies|ern|er)\b/i);
   if (!m) return null;
   let y = m[1] ? Number(m[1] + m[2]) : Number(m[2]);
   if (!m[1]) y = y >= 20 && y <= 99 ? 1900 + y : 2000 + y;   // "70-х" is the 1970s, "10-х" the 2010s
   return Math.floor(y / 10) * 10;
+}
+
+// ТОЧНЫЙ ГОД - НЕ ДЕСЯТИЛЕТИЕ, И ЭТО БЫЛ ОДИН Math.floor.
+//
+// Здесь разбирался и четырёхзначный год, после чего уезжал в Math.floor(y/10)*10. То есть
+// на названный год приходило окно в десять лет, отсортированное по рейтингу: "новинки 2026"
+// давали 2020-2029 по оценке, "фильмы 2025" - то же самое. Найдено 30 сентября вопросом
+// "новинки 2026 понимает?"; дефект старше свежести и жил тихо, потому что окно всё-таки
+// сужалось и выдача выглядела осмысленной.
+//
+// Круглое число ОСТАЁТСЯ десятилетием: оно перечислено в _DECADES как синоним ("1970 70х
+// 70е"), и кто набрал "1970", скорее имел в виду семидесятые. Некруглое - это год.
+function _yearFrom(flatQ, rawQ) {
+  if (_decadeFrom(flatQ, rawQ)) return null;          // "90х" уже разобрано как десятилетие
+  const m = String(rawQ).match(/\b(19|20)\d\d\b/);
+  if (!m) return null;
+  const y = Number(m[0]);
+  // СТОРОЖА НА КРУГЛЫЕ ЧИСЛА БОЛЬШЕ НЕТ. Он отбрасывал 1950, 1970, 2020 как «десятилетия»,
+  // хотя 2020 таблица не знала - и запрос не понимался вообще. Круглый год - такой же год.
+  // Год из будущего дальше следующего - это не год, а число из названия ("2046", "2001").
+  return y <= new Date().getFullYear() + 1 ? y : null;
 }
 
 const _QSTOP = ('про про about with films film movie movies кино фильм кинo о об на и с а но ' +
@@ -8551,6 +8639,28 @@ function _splitQuery(q) {
   // "пес" catches песня, English "war" catches warm, "fun" catches funeral, "sad" catches
   // saddle. Four letters is where a prefix starts meaning something; below that the word has
   // to be the word.
+  // ПРИСТАВКА РАБОТАЕТ ПО-РАЗНОМУ В РАЗНЫХ ПИСЬМЕННОСТЯХ, и это не придирка, а замер.
+  //
+  // Порог в четыре символа выше лечит КОРОТКИЙ термин ("кон" ловит "конца"). Он ничего не
+  // делает с длинной приставкой внутри фамилии, и 27 сентября это нашлось на сорока реальных
+  // именах, два ложных срабатывания:
+  //   denis villeneuve  -> предмет "city",      потому что ville - это город по-французски
+  //   charles burnett   -> предмет "slow burn", потому что burn стоит в триггерах
+  // Второй особенно неприятен: Чарльз Бёрнетт лежит в нашем же корпусе, и запрос по его имени
+  // подмешивал кураторский список из девяти чужих фильмов.
+  //
+  // Поднять порог нельзя: русская морфология приставкой и держится - "фантаст" обязан ловить
+  // "фантастические", а это семь лишних символов. Зато латиница гнётся КОРОТКИМИ окончаниями
+  // (-s, -es, -ed, -ing), и там хвост длиной в три символа означает уже другое слово.
+  //
+  // Поэтому разрез по письменности, а не по длине. Ровно это правило уже стоит на _QSTOP
+  // двадцатью строками выше - там оно появилось, когда итальянское "per" съедало "perros".
+  const _pfxHit = (w, st) => {
+    if (st.length < 4) return false;
+    if (!w.startsWith(st)) return false;
+    if (/[^\u0000-ɏ]/.test(st)) return true;     // кириллица, грузинский: хвост любой
+    return w.length - st.length <= 2;                  // латиница: только короткое окончание
+  };
   const hit = tbl => tbl.filter(row => {
     const stems = row.terms.split(' ').filter(s => s.length > 2);
     let found = false;
@@ -8564,7 +8674,7 @@ function _splitQuery(q) {
       // обрубками - "воен", "учён", "осен", - а обрубок, пропущенный через стеммер, даёт
       // мусор: "воен" превращается в "во" и ловит воду, воздух и вокзал. Четыре символа с
       // обеих сторон: и у слова из запроса, и у термина после нормализации.
-      if (stems.some(st => (st.length >= 4 && w.startsWith(st)) || (st.length < 4 && w === st)
+      if (stems.some(st => _pfxHit(w, st) || (st.length < 4 && w === st)
                         || (ws.length >= 4 && _stem(st).length >= 4 && ws === _stem(st))))
         { matchedWords.add(w); found = true; }
     });
@@ -8575,20 +8685,37 @@ function _splitQuery(q) {
   const subjects = hit(_SUBJECTS);
   const countries = hit(_COUNTRIES);
   const decade = _decadeFrom(flat, q);
+  const year = _yearFrom(flat, q);
   // A decade word has done its job and must not go on to the keyword search as if it were a
   // subject: "японский хоррор восьмидесятых" left "восьмидесятых" in the remainder, which then
   // went to TMDB's English-only keyword index and coloured the "why" with a word nobody asked
   // to see there.
-  if (decade) {
+  if (decade || year) {
     const dRow = _DECADES.find(d => d.y === decade);
     (dRow ? dRow.t.split(' ') : []).forEach(term => {
       words.forEach(w => { if (term && (w === term || w.startsWith(term))) matchedWords.add(w); });
     });
     words.forEach(w => { if (/^(19|20)?\d0(х|е|ых|ые|s|er|ern|ies)?$/i.test(w) || /^(19|20)\d\d$/.test(w)) matchedWords.add(w); });
   }
+  // Свежесть. Слово съедается в любом случае - иначе "новый" уедет в поиск по
+  // названию или в англоязычный индекс тегов и раскрасит подпись словом, которого
+  // никто не спрашивал. А ВКЛЮЧАЕТ свежесть только strong; weak ждёт человека и
+  // решается в _constraintsFor, когда уже известно, назван ли он.
+  const _recWords = tier => tier.split(' ').filter(Boolean);
+  const _recHit = tier => {
+    let got = false;
+    words.forEach(w => {
+      if (_recWords(tier).some(st => w === st || _pfxHit(w, st))) { matchedWords.add(w); got = true; }
+    });
+    return got;
+  };
+  const recent = _recHit(_RECENT.strong);
+  const recentIfPerson = _recHit(_RECENT.weak);
+
   let rest = words.filter(w => !matchedWords.has(w)).join(' ');
   rest = rest.split(' ').filter(w => w.length > 2).join(' ').trim();
-  return { movements, moods, genres, subjects, countries, decade, subject: rest,
+  return { movements, moods, genres, subjects, countries, decade, year, subject: rest,
+           recent, recentIfPerson,
            // Слова, которые мы ДЕЙСТВИТЕЛЬНО поняли. Считались давно и наружу не
            // отдавались, а именно они - честный ответ на вопрос "что ты прочитал".
            matchedWords: [...matchedWords].sort((a, b) => words.indexOf(a) - words.indexOf(b)) };
@@ -9260,6 +9387,24 @@ function _planQuery(c) {
     p.set('primary_release_date.gte', c.decade + '-01-01');
     p.set('primary_release_date.lte', (c.decade + 9) + '-12-31');
   }
+  // ОКНО И СОРТИРОВКА - РАЗНЫЕ РЕШЕНИЯ, и раньше они были одним.
+  // Названный год задаёт окно: "фильмы 2025" - это 2025-й, а не двадцатые по рейтингу.
+  // Свежесть задаёт сортировку по дате. Вместе они дают "новинки 2026": окно года,
+  // порядок от новых. Порознь - каждое своё.
+  if (c.year && !c.movement && !c.decade) {
+    p.set('primary_release_date.gte', c.year + '-01-01');
+    p.set('primary_release_date.lte', c.year + '-12-31');
+  }
+  if (c.recent && !c.movement && !c.decade) {
+    // Верхняя граница - сегодня: без неё в выдачу лезет анонсированное, у которого ни
+    // оценок, ни зрителей. Порог голосов ставится ниже, он общий.
+    if (!c.year) {
+      const d = new Date();
+      p.set('primary_release_date.gte', (d.getFullYear() - _RECENT_YEARS) + '-01-01');
+      p.set('primary_release_date.lte', d.toISOString().slice(0, 10));
+    }
+    p.set('sort_by', 'primary_release_date.desc');
+  }
   if (c.country && !c.movement) p.set('with_origin_country', c.country);
   if (c.keywords && c.keywords.length) p.set('with_keywords', c.keywords.slice(0, 4).join('|'));
   const tg = (c.tags || { pos: [], neg: [] });
@@ -9296,7 +9441,8 @@ function _planQuery(c) {
 // Три слоя вместо одного: понять -> спланировать -> выполнить. Так план можно проверить
 // тестом, не трогая сеть, и порядок веток перестаёт влиять на результат.
 async function _constraintsFor(q) {
-  const { movements, moods, genres, subjects, countries, decade, subject, matchedWords } = _splitQuery(q);
+  const { movements, moods, genres, subjects, countries, decade, year, subject, matchedWords,
+          recent, recentIfPerson } = _splitQuery(q);
   const c = {
     why: t('why_for_query').replace('{q}', q), matchedWords,
     matched: false, movement: null, person: null, decade: null, country: null,
@@ -9311,6 +9457,17 @@ async function _constraintsFor(q) {
     c.why = t('why_person').replace('{name}', person.name);
     c.matched = true;
   }
+
+  // Свежесть решается ЗДЕСЬ, потому что только здесь известно, назван ли человек.
+  // "новый Вильнёв" - свежесть; "новый мир" - нет, иначе слово из названия стало бы
+  // фильтром по дате. Десятилетие сильнее: кто сказал "фантастика 70-х", сказал точнее.
+  // decade и movements берутся ЛОКАЛЬНЫЕ: c.decade присваивается ниже по функции, и
+  // читать его здесь значило бы читать null всегда.
+  c.recent = !!(recent || (recentIfPerson && c.person)) && !decade && !movements.length;
+  // Точный год свежесть НЕ отключает: окно даёт год, сортировку - свежесть.
+  c.year = (!decade && !movements.length) ? (year || null) : null;
+  if (c.year) c.matched = true;
+  if (c.recent) c.matched = true;
 
   // Названный жанр жёстче настроения и забирает жанровый слот целиком: "романтический"
   // должен вернуть мелодраму, а не мелодраму-ИЛИ-что-там-угадало-настроение.
@@ -9592,7 +9749,14 @@ async function _personFilms(c) {
   if (!out.length) return null;                 // вызывающий отступит к простому списку
 
   // Авторство важнее оценки: фильм, который он СНЯЛ, идёт выше того, где он в кадре.
+  //
+  // ГОД ВХОДИТ В СОРТИРОВКУ ТОЛЬКО КОГДА О НЁМ СПРОСИЛИ. До 27 сентября года здесь не
+  // было вовсе, и "новый Вильнёв" отдавал его самый высокооценённый фильм - что иногда
+  // совпадало со свежим, но случайно. Ставить год постоянно тоже неверно: на голое
+  // "Вильнёв" человек ждёт главный фильм, а не последний.
+  const _year = f => Number((f.release_date || '').slice(0, 4)) || 0;
   out.sort((a, b) => b.rank - a.rank
+                  || (c.recent ? _year(b.film) - _year(a.film) : 0)
                   || (b.film.vote_average || 0) - (a.film.vote_average || 0));
   return out.map(({ film }) => ({
     id: film.id, tmdbID: String(film.id), type: 'movie',
