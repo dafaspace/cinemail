@@ -2,6 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<!-- ТЕСТОВАЯ СБОРКА ЖИВЁТ В ПОДПАПКЕ, А ЕЁ КАРТИНКИ - В КОРНЕ.
+     Рядом с этим файлом нет ничего: вся изоляция /test-1/ в том и состоит, что это
+     ОДИН файл. Пути в коде относительные (./av/fox-ink.webp), поэтому упирались в
+     /test-1/av/... и отдавали 404 - девять файлов, семь постеров тура и два слоя
+     аватара. Тур открывался без единой картинки.
+     Хуже пустых картинок был цикл: _paintMockAvatar дописывает cssText при каждом
+     показе карточки, и на 404 браузер просил файл заново - больше трёх тысяч
+     запросов за один визит. В продакшене картинка приходит с 200 и кэшируется,
+     поэтому цикла там нет и дефект не был виден.
+     Одна строка вместо переписывания путей: она чинит и постеры, и аватар, и всё,
+     что появится позже. Проверено перед вставкой - внутристраничных якорей href="#"
+     в файле ноль, своего <base> нет, ломать нечего. -->
+<base href="/">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Cinemail</title>
 <link rel="manifest" href="/manifest.json">
@@ -2881,7 +2894,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.3-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.4-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
