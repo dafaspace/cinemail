@@ -2894,7 +2894,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.5-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.6-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -9767,13 +9767,15 @@ async function _personFilms(c) {
   // было вовсе, и "новый Вильнёв" отдавал его самый высокооценённый фильм - что иногда
   // совпадало со свежим, но случайно. Ставить год постоянно тоже неверно: на голое
   // "Вильнёв" человек ждёт главный фильм, а не последний.
-  const _year = f => Number((f.release_date || '').slice(0, 4)) || 0;
+  // Полная дата, а не год: два фильма одного года иначе стояли бы по оценке.
+  const _year = f => Number((f.release_date || '').replace(/-/g, '')) || 0;
   out.sort((a, b) => b.rank - a.rank
                   || (c.recent ? _year(b.film) - _year(a.film) : 0)
                   || (b.film.vote_average || 0) - (a.film.vote_average || 0));
   return out.map(({ film }) => ({
     id: film.id, tmdbID: String(film.id), type: 'movie',
     Title: film.title || film.name, Year: (film.release_date || '').slice(0, 4),
+    Released: film.release_date || '',
     Poster: film.poster_path ? TMDB_IMG + film.poster_path : '',
     Rating: film.vote_average ? film.vote_average.toFixed(1) : null, Genre: '', why: null,
   }));
@@ -9879,6 +9881,7 @@ async function _searchByQuery(q) {
     .map(x => ({
       id: x.id, tmdbID: String(x.id), type: 'movie',
       Title: x.title || x.name, Year: (x.release_date || '').slice(0, 4),
+      Released: x.release_date || '',
       Poster: x.poster_path ? TMDB_IMG + x.poster_path : '',
       Rating: x.vote_average ? x.vote_average.toFixed(1) : null, Genre: '', why: c.why,
     }));
@@ -9907,6 +9910,7 @@ async function _searchByQuery(q) {
         .map(x => ({                                   // "With Dave Porter" навсегда
           id: x.id, tmdbID: String(x.id), type: 'movie',
           Title: x.title || x.name, Year: (x.release_date || '').slice(0, 4),
+          Released: x.release_date || '',
           Poster: x.poster_path ? TMDB_IMG + x.poster_path : '',
           Rating: x.vote_average ? x.vote_average.toFixed(1) : null, Genre: '',
           // Имя без должности - половина ответа. Сообщено 26 сентября: "With Dave
@@ -9919,6 +9923,15 @@ async function _searchByQuery(q) {
       ranked = [...mine, ...ranked.filter(m => !seen.has(String(m.id)))];
     } catch (e) { /* личный слой - добавка, а не условие */ }
   }
+  // СВЕЖЕСТЬ - ЭТО ПОРЯДОК, А НЕ ТОЛЬКО ОКНО. Решение Dafa, 1 октября.
+  // До этого sort_by=primary_release_date.desc в запросе к TMDB решал лишь, КАКИЕ
+  // двадцать фильмов придут, а _rankByTaste выше пересортировывал их по оценке плюс
+  // вкус. На живой выдаче "новинки 2026" это выглядело как 9.1, 8.9, 8.3, 8.2, 8.0 -
+  // лучшее из нового, а спрашивали новое. "Лучшие фильмы 2026" - другой запрос, и он
+  // по-прежнему сортируется по оценке.
+  // Сортировка устойчивая: внутри одной даты остаётся порядок вкуса.
+  if (c.recent) ranked = [...ranked].sort((a, b) =>
+    String(b.Released || '').localeCompare(String(a.Released || '')));
   return _enrichWhy(ranked, c);
 }
 
