@@ -2894,7 +2894,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.6-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.7-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -7690,7 +7690,12 @@ const _DRAW_SPIN_MS = 1900;
 // Shuffled within a wider band than we need, so pressing twice does not give the same three.
 let _lastSeeds = [];
 const _SEED_MIN_STARS = 3.5;
-function _pickSeeds(entries, n = 8) {
+// shuffle=false - для профиля вкуса. Вкус - это то, что о человеке известно, а не
+// источник разнообразия: если зёрна перемешиваются при каждой загрузке, тот же запрос
+// после перезагрузки ранжируется иначе и "Your kind of theme" меняется сам по себе.
+// Найдено 2 октября при разборе, где выдаче нужна случайность. "Удиви меня" зовёт
+// с перемешиванием - там оно и обещано.
+function _pickSeeds(entries, n = 8, shuffle = true) {
   const withId = entries.filter(e => e.tmdbID);
   // A LOW RATING IS A NEGATIVE SIGNAL AND MUST NOT SEED. Measured on a real 15-film library:
   // The Room, rated ONE star, was seeding the tally, and produced "Newness - recommended off
@@ -7702,6 +7707,7 @@ function _pickSeeds(entries, n = 8) {
   // Fall back only when there is genuinely nothing loved to work from.
   const pool = loved.length >= 3 ? loved : (rated.length >= 3 ? rated : withId);
   const band = pool.slice().sort((a, b) => Number(b.stars) - Number(a.stars)).slice(0, Math.max(n * 2, 14));
+  if (!shuffle) return band.slice(0, n);                // лучшие по оценке, порядок устойчив
   for (let i = band.length - 1; i > 0; i--) {           // Fisher-Yates
     const j = Math.floor(Math.random() * (i + 1));
     [band[i], band[j]] = [band[j], band[i]];
@@ -9054,7 +9060,7 @@ async function _tasteIndex() {
   if (loved.length < 3) return (_tasteCache = { thin: true, tally: new Map(), crew: new Set(), crewIds: [], decades: {}, byPerson: new Map(), tags: { pos: [], neg: [] } });
 
   let tally = new Map();
-  try { tally = await _tallyFromSeeds(_pickSeeds(loved), 2); } catch (e) { /* taste is optional */ }
+  try { tally = await _tallyFromSeeds(_pickSeeds(loved, 8, false), 2); } catch (e) { /* taste is optional */ }
 
   const crewCount = {};
   loved.forEach(e => ['director', 'composer', 'cinematographer'].forEach(f =>
@@ -9362,8 +9368,14 @@ async function _curatedSubject(key, taste, wantGenres) {
 // безвестный фильм с красивым средним от полутора сотен зрителей.
 function _voteFloor(c) {
   if (c.person)   return 20;    // ранние работы режиссёра тонки по определению
+  // СВЕЖЕСТЬ: 100, а не 1000. Голоса копятся со временем, и порог 1000 отрезал ровно
+  // то, о чём спросили: 1 октября самым новым в "новинках" был конец июля, ничего из
+  // августа и сентября. Шум низкого порога - ненадёжная ОЦЕНКА, а здесь порядок задаёт
+  // дата, так что ненадёжная оценка выдачу не поднимает. Порог лишь отсеивает пустое.
+  if (c.recent)   return 100;
   if (c.movement) return 30;    // страна и десятилетие уже прижаты
-  const hard = (c.decade ? 1 : 0) + (c.country ? 1 : 0) + (c.keyword ? 1 : 0);
+  // Год у́же десятилетия и сужает не меньше.
+  const hard = ((c.decade || c.year) ? 1 : 0) + (c.country ? 1 : 0) + (c.keyword ? 1 : 0);
   // ПОРОГ БЫЛ НИЗКИМ КАК СТРАХОВКА ОТ ПУСТОТЫ, А СТРАХОВКА ТЕПЕРЬ ДРУГАЯ.
   //
   // 150 и 300 стояли не потому, что при ста пятидесяти голосах средняя оценка
@@ -9378,7 +9390,7 @@ function _voteFloor(c) {
   // средняя оценка перестаёт быть шумом.
   if (hard >= 2) return 300;
   if (c.keyword)  return 700;   // тема сужает, но не оправдывает хвост
-  if (c.decade)   return 200;
+  if (c.decade || c.year) return 200;
   if (c.country)  return 400;
   if (c.genreAnd) return 500;   // два названных жанра пересекаются - это уже узко
   return 1000;                  // голый жанр или настроение не прижимают ничего
@@ -9406,7 +9418,11 @@ function _planQuery(c) {
   // порядок от новых. Порознь - каждое своё.
   if (c.year && !c.movement && !c.decade) {
     p.set('primary_release_date.gte', c.year + '-01-01');
-    p.set('primary_release_date.lte', c.year + '-12-31');
+    // "Новинки 2026" - вышедшее, а не анонсированное: при пороге свежести в 100 голосов
+    // иначе полезут фильмы с оценками ожидания. Без свежести год берётся целиком.
+    const today = new Date().toISOString().slice(0, 10);
+    const end = c.year + '-12-31';
+    p.set('primary_release_date.lte', c.recent && today < end ? today : end);
   }
   if (c.recent && !c.movement && !c.decade) {
     // Верхняя граница - сегодня: без неё в выдачу лезет анонсированное, у которого ни
@@ -9546,7 +9562,7 @@ async function _constraintsFor(q) {
   c.mood = moods.length > 0;
   c.keyword = c.keywords.length > 0;
   c.pins = (c.movement ? 1 : 0) + (c.decade ? 1 : 0) + (c.country ? 1 : 0)
-         + (c.keyword ? 1 : 0) + (c.person ? 1 : 0);
+         + (c.keyword ? 1 : 0) + (c.person ? 1 : 0) + (c.year ? 1 : 0);
   return c;
 }
 
@@ -9781,9 +9797,29 @@ async function _personFilms(c) {
   }));
 }
 
-async function _searchByQuery(q) {
+// ПЕРВОЕ НАЖАТИЕ - ВСЕГДА ОДНО И ТО ЖЕ, СЛЕДУЮЩЕЕ - СЛЕДУЮЩАЯ ПОРЦИЯ ПО ПОРЯДКУ.
+// Решение Dafa, 2 октября. До этого страница TMDB выбиралась наугад из 1-4, и десять
+// нажатий "новинки 2026" дали четыре набора вперемешку: лето, март, апрель, январь.
+// Явный запрос обещает ответ, а не лотерею. Но и всегда одни и те же пять - тоже провал,
+// на это была жалоба про документальное кино. Поэтому press: 0 - первая страница,
+// 1 - вторая и так далее; изменил запрос - снова с начала. Кончилась выдача - по кругу.
+// Случайность осталась там, где её обещают: в "Удиви меня".
+let _searchWrapped = false;
+async function _searchByQuery(q, press = 0) {
+  _searchWrapped = false;
+  // Порция из готового списка (кураторский, фильмография): пятёрка за нажатие, по кругу.
+  const _portion = list => {
+    const off = press * 5;
+    if (off && off >= list.length) { _searchWrapped = true; return list.slice(0, 12); }
+    return list.slice(off, off + 12);
+  };
   const c = await _constraintsFor(q);
-  if (c.curated) return _enrichWhy(c.curated, c);  // кураторский список ответил сам
+  if (c.curated) {                                  // кураторский список ответил сам
+    const lib0 = _libraryKeys();
+    const unseen = c.curated.filter(m => !lib0.ids.has(String(m.id))
+                                      && !lib0.titles.has(lib0.norm(m.Title)));
+    return _enrichWhy(_portion(unseen.length ? unseen : c.curated), c);
+  }
   if (!c.matched) {
     // Ничего не распознано: считаем это названием. Сюда приходит "Оппенгеймер",
     // набранный в поле подборок, и это делают часто.
@@ -9799,7 +9835,7 @@ async function _searchByQuery(q) {
       const lib = _libraryKeys();
       const fresh = own.filter(m => !lib.ids.has(String(m.id))
                                  && !lib.titles.has(lib.norm(m.Title)));
-      if (fresh.length) return _enrichWhy(fresh.slice(0, 12), c);
+      if (fresh.length) return _enrichWhy(_portion(fresh), c);
     }
   }
 
@@ -9812,7 +9848,7 @@ async function _searchByQuery(q) {
   // Страница выбиралась случайно из пяти даже для узкого запроса, а узкий запрос
   // и так отдаёт немного фильмов - третья страница у него это уже хвост. Человек,
   // назвавший режиссёра, жанр и десятилетие, просит ответ, а не лотерею.
-  p.set('page', String(1 + Math.floor(Math.random() * (c.pins >= 2 ? 1 : c.pins === 1 ? 2 : 4))));
+  p.set('page', String(1 + press));
 
   const _asAsked = new URLSearchParams(p.toString());   // до ослабления, для запроса по людям
   let res = await tmdbFetch(`/discover/movie?${p.toString()}`);
@@ -9846,8 +9882,17 @@ async function _searchByQuery(q) {
   //
   // Сказать "ничего не нашлось" про человека, которого мы УЗНАЛИ, - худший из
   // возможных ответов: мы знаем его фильмы и молчим о них.
+  // Глубже ответа нет - возвращаемся к началу, а не ослабляем запрос: ослабление на
+  // пятой странице дало бы пятую страницу ДРУГОГО, более широкого запроса.
+  if (press > 0 && _fresh(res) === 0) {
+    p.set('page', '1');
+    res = await tmdbFetch(`/discover/movie?${p.toString()}`);
+    if (res && res.error) { const e = new Error(res.error); e.tmdb = res; throw e; }
+    _searchWrapped = true;
+  }
+  const _deep = press > 0 && !_searchWrapped;   // на глубокой странице показываем, что есть
   for (const drop of ['&votes', 'without_keywords', 'with_keywords', '&genres', 'with_genres']) {
-    if (_fresh(res) >= 3) break;
+    if (_deep || _fresh(res) >= 3) break;
     if (drop === '&votes') {
       const v = Number(p.get('vote_count.gte') || 0);
       if (v <= 150) continue;
@@ -9906,8 +9951,10 @@ async function _searchByQuery(q) {
       const mine = ((r2 && !r2.error && r2.results) || [])
         .filter(x => !_lib.ids.has(String(x.id)) && !_lib.titles.has(_lib.norm(x.title || x.name)))
         .slice(0, 6)
-        .sort(() => Math.random() - 0.5).slice(0, 2)   // из шести любые две, иначе
-        .map(x => ({                                   // "With Dave Porter" навсегда
+        // Из шести - по две за нажатие, по кругу. Было "любые две наугад", чтобы
+        // "With Dave Porter" не стоял навсегда; порции по порядку решают то же без лотереи.
+        .filter((x, i, a) => a.length <= 2 || i === (2 * press) % a.length || i === (2 * press + 1) % a.length)
+        .map(x => ({
           id: x.id, tmdbID: String(x.id), type: 'movie',
           Title: x.title || x.name, Year: (x.release_date || '').slice(0, 4),
           Released: x.release_date || '',
@@ -9936,6 +9983,7 @@ async function _searchByQuery(q) {
 }
 
 
+let _pressState = { key: '', n: 0 };
 async function loadRecsEngine() {
   const q = document.getElementById("rec-input").value.trim();
   const btn = document.getElementById("rec-btn");
@@ -9953,7 +10001,12 @@ async function loadRecsEngine() {
       _picksRemaining = 0; _renderPicksMeter();
       btn.disabled=false; btn.textContent=t('find_btn'); return;
     }
-    const details = await _searchByQuery(q);
+    // Тот же запрос - следующая порция; другой запрос - с начала. Регистр и пробелы
+    // по краям не делают запрос другим.
+    const _key = q.toLowerCase().replace(/\s+/g, ' ');
+    if (_pressState.key === _key) _pressState.n++; else _pressState = { key: _key, n: 0 };
+    const details = await _searchByQuery(q, _pressState.n);
+    if (_searchWrapped) _pressState.n = 0;
     // Drop anything already in the library. The prompt does say "none may appear in the
     // watched or watchlist lists above", and the model obeys it - but it is only ever
     // SHOWN a sample of the library, and the watchlist was
