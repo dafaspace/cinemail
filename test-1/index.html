@@ -2894,7 +2894,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.14-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.15-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -5160,7 +5160,9 @@ function _maybeShowOnboarding() {
   return true;
 }
 
+let _currentScreen = null;   // какой экран входа открыт сейчас; см. слушатель SIGNED_IN
 function showScreen(name) {
+  _currentScreen = name;
   // By selector, for the same reason as onSignedIn: this list named five screens and there
   // are six. The missing one was the ONBOARDING TOUR, which is position:fixed and would sit
   // on top of whatever screen was just asked for - so "open the reset form" could leave the
@@ -5284,6 +5286,7 @@ async function doResetPassword() {
   // Past this line the password IS changed, and nothing below may say otherwise.
   showToast(t('reset_done'));
   btn.textContent = label; btn.disabled = false;
+  _currentScreen = null;                        // пароль сменён: экран сброса больше не держим
   try { await onSignedIn(data.user); }          // recovery session is active -> log them in
   catch (e) {
     console.warn("[reset] signed in but could not load:", e);
@@ -15048,6 +15051,13 @@ function initUI() {
         if (!session.user.is_anonymous) renderGuestBanner();
         return;
       }
+      // ЭКРАН НОВОГО ПАРОЛЯ НЕ ЗАКРЫВАЕТСЯ САМ. По ссылке сброса сессия уже есть, но мы её
+      // намеренно не открываем, пока человек не выбрал пароль. supabase-js при каждом возврате
+      // во вкладку присылает SIGNED_IN, currentUser тут ещё null - и onSignedIn открывал
+      // приложение поверх формы. Человек уходил в почту за паролем, возвращался и оказывался
+      // внутри со старым неизвестным паролем: ровно ошибка 11 сентября, закрытая тогда только
+      // при запуске. Найдено проверкой кода 9 октября.
+      if (_currentScreen === 'reset') return;
       // Другой человек без выхода между ними (вход поверх чужой сессии): сначала сброс,
       // иначе onSignedIn не заменяет непустую чужую библиотеку пустой своей.
       if (currentUser && currentUser.id !== session.user.id) _resetAccountState(currentUser.id);
