@@ -2894,7 +2894,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.9-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.10-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -5963,7 +5963,9 @@ function _whereToWatchInner(wp) {
     `<img src="https://image.tmdb.org/t/p/w92${p.logo_path}" alt="${(p.provider_name||'').replace(/"/g,'')}" title="${(p.provider_name||'').replace(/"/g,'')}" style="width:34px;height:34px;border-radius:8px;display:block" loading="lazy">`
   ).join('');
   const sel = `<select onchange="_setWatchRegion(this.value)" style="background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px;padding:2px 4px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer">${regions.map(c => `<option value="${c}" ${c===region?'selected':''}>${c}</option>`).join('')}</select>`;
-  const open = data.link ? `onclick='window.open(${JSON.stringify(data.link)},"_blank","noopener")'` : '';
+  // Ссылка - в data-атрибут через escapeHtml, а не JSON внутрь onclick: апостроф в адресе
+  // обрывал бы атрибут так же, как в кнопках «Поделиться».
+  const open = data.link ? `data-href="${escapeHtml(data.link)}" onclick="window.open(this.dataset.href,'_blank','noopener')"` : '';
   return `<div style="margin-bottom:14px">
     <div class="crew-label" style="display:flex;align-items:center;gap:8px">${t('where_to_watch')} ${sel}</div>
     <div ${open} style="display:flex;gap:8px;flex-wrap:wrap;margin-top:7px;cursor:${data.link?'pointer':'default'}">${logos}</div>
@@ -10863,7 +10865,13 @@ function switchListTab(listId) {
   renderHistory();
 }
 
+// ПРЕДЕЛ СВОИХ СПИСКОВ ПРОВЕРЯЕТСЯ НА ВСЕХ ПУТЯХ СОЗДАНИЯ. Решение Дафы от 17 сентября: два
+// своих плюс личный, общие с тобой не считаются. Проверка стояла в createList, который мёртв
+// (поля list-name-input в разметке нет), и в выборе списка; основной путь, кнопка «+ New list»
+// в ряду вкладок, и импорт общего списка её не делали. Найдено проверкой кода 9 октября.
+// Сервер этот предел пока не держит - это отдельная правка в базе.
 function _startNewListTab() {
+  if (_listCapReached()) { showToast(t('toast_list_limit').replace('{n}', FREE_LIST_LIMIT), true); return; }
   _listTabCreating = true;
   renderListTabs();
 }
@@ -10896,6 +10904,7 @@ async function _confirmNewListTab() {
   const name = (inp?.value || '').trim();
   _listTabCreating = false;
   if (!name) { renderListTabs(); return; }
+  if (_listCapReached()) { renderListTabs(); showToast(t('toast_list_limit').replace('{n}', FREE_LIST_LIMIT), true); return; }
   _listTabSaving = true;
   try {
     const { data, error } = await sbClient.from('lists').insert({ name, owner_id: currentUser.id }).select().single();
@@ -11208,12 +11217,28 @@ async function toggleAppInvite() {
     ${_qrHTML(url, 180)}
     <div style="font-size:11px;color:var(--muted);margin-bottom:10px">${t('invite_connect_hint')}</div>
     <div style="display:flex;gap:8px">
-      <button onclick='_shareOrCopy(${JSON.stringify(url)}, "Cinemail", ${JSON.stringify(msg)})'
+      <button data-act="share"
         style="flex:2;padding:9px;border-radius:8px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;font-weight:600">${t('share_invite')}</button>
-      <button onclick='navigator.clipboard.writeText(${JSON.stringify(url)}).then(()=>showToast(t('toast_link_copied')))'
+      <button data-act="copy"
         style="flex:1;padding:9px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${t('copy')}</button>
     </div>`;
+  _wireShareButtons(panel, url, msg);
   panel.style.display = 'block';
+}
+
+// КНОПКИ «ПОДЕЛИТЬСЯ» И «КОПИРОВАТЬ» БЕЗ КОДА В АТРИБУТЕ. Адрес и текст подставлялись прямо в
+// onclick='…', и первый апостроф обрывал атрибут: в «what's inside», в t('toast_link_copied'),
+// в имени человека или списка. Обработчик не компилировался, кнопка молчала, ссылку можно
+// было передать только через QR. Хуже того, имя списка, пришедшее от постороннего через
+// импорт, могло закрыть атрибут и дописать кнопке свой. Найдено проверкой кода 9 октября.
+// Теперь данные остаются в замыкании и в HTML не попадают вовсе.
+function _wireShareButtons(root, url, msg) {
+  const share = root.querySelector('[data-act="share"]');
+  const copy = root.querySelector('[data-act="copy"]');
+  if (share) share.onclick = () => _shareOrCopy(url, "Cinemail", msg);
+  if (copy) copy.onclick = () => navigator.clipboard.writeText(url)
+    .then(() => showToast(t('toast_link_copied')))
+    .catch(() => _shareOrCopy(url, "Cinemail", msg));
 }
 
 // Capture ?friend=<id> on load, before auth, then strip it from the URL
@@ -11438,6 +11463,10 @@ async function _sharedImport() {
   // Someone else's selection should arrive as someone else's selection, separable and
   // removable in one go, rather than mixed irreversibly into what they already keep.
   let listId = null;
+  if (_listCapReached()) {
+    if (btn) { btn.disabled = false; btn.textContent = t('shared_add'); }
+    showToast(t('toast_list_limit').replace('{n}', FREE_LIST_LIMIT), true); return;
+  }
   try {
     const name = String(window._sharedListName || 'Shared list').slice(0, 60);
     const { data, error } = await sbClient.from('lists')
@@ -11578,12 +11607,13 @@ async function _loadInviteLink(listId) {
       ${_qrHTML(url, 180)}
       <div style="font-size:10px;color:var(--muted);margin-bottom:10px">${t('invite_valid_48')}</div>
       <div style="display:flex;gap:8px">
-        <button onclick='_shareOrCopy(${JSON.stringify(url)}, "Cinemail", ${JSON.stringify(msg)})'
+        <button data-act="share"
           style="flex:2;padding:9px;border-radius:8px;background:var(--accent);border:none;color:var(--on-accent);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer">${t('share_invite')}</button>
-        <button onclick='navigator.clipboard.writeText(${JSON.stringify(url)}).then(()=>showToast(t('toast_link_copied')))'
+        <button data-act="copy"
           style="flex:1;padding:9px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${t('copy')}</button>
       </div>`;
-  } catch(e) { if (el) el.innerHTML = `<div style="font-size:12px;color:#f87171">${e.message}</div>`; }
+    _wireShareButtons(el, url, msg);
+  } catch(e) { if (el) el.innerHTML = `<div style="font-size:12px;color:#f87171">${escapeHtml(e.message)}</div>`; }
 }
 
 function _checkJoinToken() {
@@ -14874,6 +14904,12 @@ function initUI() {
   // until the next sign-in.
   _checkListLink();
   _checkFilmLink();
+  // ?join= и ?friend= - туда же и по той же причине. Они стояли после onSignedIn, а
+  // checkPendingJoinToken читается внутри него, поэтому у человека с живой сессией ссылка
+  // вступления в список не срабатывала никогда, только после ручной перезагрузки.
+  // Найдено проверкой кода 9 октября.
+  _checkJoinToken();
+  _checkFriendInvite();
   const {data:{session}}=await sbClient.auth.getSession();
   if(session && isRecoveryLink){
     // Signed in, deliberately not shown the app. The recovery session is what authorises
@@ -14901,8 +14937,6 @@ function initUI() {
   _applyI18n(); // apply stored language preference to static elements
   _paintIcons(); // swap data-ic placeholders for real vector glyphs
   _paintMockAvatar(); // the tour's mock account avatar, drawn from the real sprite
-  _checkJoinToken(); // capture ?join= before anything else
-  _checkFriendInvite(); // capture ?friend= referral before anything else
   sbClient.auth.onAuthStateChange(async(event,session)=>{
     if(event==="SIGNED_IN"&&session){
       // Distinguish a genuine sign-in (new user / first time) from a token-refresh re-fire.
