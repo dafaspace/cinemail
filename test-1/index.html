@@ -2894,7 +2894,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.13-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.14-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -13202,16 +13202,26 @@ async function saveDisplayName() {
 //
 // 1,000 at a time, until a page comes back short. The extra requests cost nothing next to the
 // spreadsheet being written, and the loop has no way to stop early and still look finished.
-async function getBackupData() {
+// ТОЛЬКО МОИ СТРОКИ. Без фильтра по user_id политика "list members can read" подмешивала
+// строки других участников общих списков, и резервная копия выдавала чужие фильмы и оценки
+// за мои - а при восстановлении они стали бы моими. Найдено проверкой кода 9 октября.
+function _myRowsQuery(select, order) {
+  const uid = currentUser && currentUser.id;
+  return `watchlist?${uid ? `user_id=eq.${uid}&` : ''}${select ? `select=${select}&` : ''}order=${order}`;
+}
+async function _fetchAllMyRows(select, order) {
   const PAGE = 1000, out = [];
   for (let from = 0; ; from += PAGE) {
-    const page = await sbFetch(`watchlist?order=created_at.asc&limit=${PAGE}&offset=${from}`);
+    const page = await sbFetch(`${_myRowsQuery(select, order)}&limit=${PAGE}&offset=${from}`);
     if (!Array.isArray(page) || !page.length) break;
     out.push(...page);
     if (page.length < PAGE) break;
     if (out.length > 100000) { console.warn("[backup] stopping at 100k rows"); break; }
   }
   return out;
+}
+async function getBackupData() {
+  return _fetchAllMyRows(null, 'created_at.asc,id.asc');
 }
 
 // Core: merge-import enriched rows into Supabase (skip existing by tmdb_id+status)
@@ -13247,7 +13257,11 @@ async function getBackupData() {
 async function applyBackupData(rows, onProgress, opts = {}) {
   const preserveLocal = opts.preserveLocal === true;
   if (!currentUser || !rows.length) return { added: 0, updated: 0, skipped: 0, failed: 0 };
-  const existing = await sbFetch("watchlist?select=id,imdb_id,status");
+  // Сверка с библиотекой - по МОИМ строкам и по ВСЕМ страницам. Раньше один запрос без
+  // фильтра: строки участников общих списков сопоставлялись с входящим фильмом, и импорт
+  // правил чужую строку (статус, оценку, дату) вместо того, чтобы завести свою; а после
+  // тысячной строки сверка слепла, и повторный импорт вставлял дубли.
+  const existing = await _fetchAllMyRows('id,imdb_id,status', 'created_at.asc,id.asc');
   // Map tmdb_id → existing row (prefer same-status match if multiple statuses exist for same film)
   const byKey = new Map();          // "imdb_id|status" → row
   const byImdb = new Map();         // "imdb_id" → row (fallback for status change)
@@ -13598,6 +13612,7 @@ async function backfillCrewData() {
 }
 
 async function backupImportCSV() {
+  ImportProgress.begin();
   const importBtn = document.querySelector('.btn-backup[onclick="backupImportCSV()"]');
   try {
     const rows = await BackupLocal.import();
@@ -13733,6 +13748,7 @@ async function _resolveViaTMDBSearch(rows, onProgress) {
 }
 
 async function backupImportLetterboxd() {
+  ImportProgress.begin();
   const statusEl = document.getElementById('backup-status');
   const setStatus = (main) => {
     if (!statusEl) return;
@@ -13773,7 +13789,13 @@ async function backupImportLetterboxd() {
     if (updated)   parts.push(`↻ ${updated} updated`);
     if (failed)    parts.push(`✕ ${failed} ${t("imp_failed_n")} - ${t("imp_retry")}`);
     if (unmatched) parts.push(`${t("imp_notfound")}: ${unmatched}`);
-    showToast(parts.length ? parts.join(" · ") : t("imp_nothing"));
+    // Резолвер останавливается на лимите TMDB или на обрыве сети и отдаёт только то, что
+    // успел. Путь IMDb это всегда сообщал, путь Letterboxd молчал: тост "✓ 900 new", а 600
+    // фильмов файла пропадали без упоминания. Найдено проверкой кода 9 октября.
+    const _stopped = resolved.limitReached || resolved.serverError;
+    if (resolved.limitReached) parts.push(t("imp_limit_day"));
+    else if (resolved.serverError) parts.push(t("imp_server_err"));
+    showToast(parts.length ? parts.join(" · ") : t("imp_nothing"), !!_stopped);
   } catch (e) {
     if (e.message !== "cancelled") showToast(t("imp_failed") + ": " + e.message, true);
   } finally {
@@ -13993,6 +14015,11 @@ const ImportProgress = {
   // leave a full-screen overlay with no exit but a page reload — which reads as a
   // frozen app. Films already saved before cancelling stay saved.
   cancel() { this._cancelled = true; this.close(); },
+  // ОТМЕНА ОТНОСИТСЯ К ОДНОМУ ИМПОРТУ. Флаг сбрасывался только в show(), а show() зовёт один
+  // импорт IMDb. После одной отмены каждое следующее восстановление и каждый импорт Letterboxd
+  // пропускали все вставки и всё равно сообщали «ничего не изменилось» - восстановить
+  // копию было нельзя до перезагрузки страницы. Каждый вход в импорт зовёт begin().
+  begin() { this._cancelled = false; },
   finish(msg) {
     if (!this._el) return;
     const m = this._el.querySelector('#ip-msg'); if (m) m.innerHTML = msg; // callers escape user content
@@ -14004,6 +14031,7 @@ const ImportProgress = {
 };
 
 async function backupImportIMDb() {
+  ImportProgress.begin();
   const statusEl = document.getElementById('backup-status');
   const setStatus = (main) => {
     if (!statusEl) return;
@@ -14421,6 +14449,7 @@ async function backupExportXLSX() {
 }
 
 async function backupImportXLSX() {
+  ImportProgress.begin();
   const importBtn = document.querySelector('.btn-backup[onclick="backupImportXLSX()"]');
   const exportBtn = document.querySelector('.btn-backup[onclick="backupExportXLSX()"]');
   const statusEl  = document.getElementById('backup-status');
