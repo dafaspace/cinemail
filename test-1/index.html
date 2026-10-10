@@ -599,18 +599,13 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   border: 1px solid var(--border);
   border-top: none;
   border-radius: 0 0 var(--radius) var(--radius);
-  color: #998;
+  color: #a3a3ad;
   font-size: 12px;
-  font-style: italic;
   line-height: 1.5;
 }
-.why-brand {
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, sans-serif;
-  font-style: normal;
-  color: var(--primary);
-  letter-spacing: 0.5px;
-  margin-right: 3px;
-}
+/* Подпись под карточкой: сначала что совпало с запросом (светлое), потом связь с твоими
+   фильмами. Слова CINEMAIL перед ней больше нет: подпись - факт, а не мнение. */
+.why-strip b { color: var(--text); font-weight: 500; }
 
 /* ── Filter pills ───────────────────────────────────────────────────── */
 .filter-row { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
@@ -2035,6 +2030,36 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   width: 100%; height: 100%; min-width: 44px; min-height: 44px;
 }
 .picks-read{font-size:12px;color:var(--muted);margin:0 0 10px;letter-spacing:.02em}
+/* ── Единый поиск ─────────────────────────────────────────────────────────── */
+#search-input { -webkit-appearance: none; appearance: none; }
+#search-input::-webkit-search-decoration { -webkit-appearance: none; }
+.srch-try { font-size: 12px; color: var(--muted); margin: 0 2px 8px; }
+.srch-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.srch-chip { min-height: 36px; padding: 0 13px; border-radius: 999px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); font: 13px 'DM Sans','Noto Sans Georgian',sans-serif; cursor: pointer; }
+.srch-surprise { width: 100%; gap: 8px; margin-top: 12px; padding: 13px; border-radius: 11px;
+  background: color-mix(in srgb, var(--primary) 8%, transparent); border: 1px solid color-mix(in srgb, var(--primary) 50%, transparent);
+  color: var(--primary); font: 16px 'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif; letter-spacing: 1.2px; text-indent: 1.2px; cursor: pointer; }
+.srch-surprise svg { width: 16px; height: 16px; }
+.srch-sect { font: 14px 'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif; letter-spacing: 1px; color: var(--muted); margin: 18px 2px 9px; }
+.srch-sect:first-child { margin-top: 2px; }
+/* «Понято»: что из запроса пошло в дело. Крестик снимает кусок и перезапускает поиск. */
+.srch-got { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 2px 0 6px; }
+.srch-got-l { font: 13px 'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif; letter-spacing: .8px; color: var(--muted); margin-right: 2px; }
+.srch-tok { gap: 4px; min-height: 30px; padding: 0 6px 0 11px; border-radius: 999px; background: var(--primary-soft, rgba(245,197,24,.1));
+  border: 1px solid var(--primary-border); color: var(--primary); font: 13px 'DM Sans','Noto Sans Georgian',sans-serif; cursor: pointer; }
+.srch-tok svg { width: 14px; height: 14px; opacity: .75; }
+.srch-skip { font-size: 12px; color: var(--muted); margin: 0 2px 8px; }
+.srch-note { font-size: 13px; line-height: 1.45; color: var(--text); margin: 4px 2px 10px; }
+.srch-note span { color: var(--muted); }
+.srch-line { width: 100%; justify-content: flex-start; gap: 10px; min-height: 46px; padding: 0 12px; margin-top: 9px;
+  border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text);
+  font: 14px 'DM Sans','Noto Sans Georgian',sans-serif; cursor: pointer; text-align: left; }
+.srch-line svg { width: 18px; height: 18px; color: var(--primary); flex: none; }
+.srch-line .srch-chev { margin-left: auto; color: var(--muted); }
+.srch-more { width: 100%; min-height: 44px; margin-top: 10px; border-radius: 12px; border: 1px solid var(--border); background: none;
+  color: var(--text); font: 15px 'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif; letter-spacing: 1px; text-indent: 1px; cursor: pointer; }
+.srch-end { font-size: 12px; color: var(--muted); text-align: center; padding: 12px 0 2px; }
 #rec-suggest{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 10px}
 #rec-suggest .sug{display:inline-flex;align-items:center;justify-content:center;
   font:inherit;font-size:13px;line-height:1;padding:.5em .9em;box-sizing:border-box;
@@ -2604,51 +2629,34 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   <!-- Tab bar -->
   <div class="tabbar">
     <button class="tab-btn active" id="tab-btn-search" onclick="switchTab('search')"><span data-ic="search"></span><span data-i18n="tab_search">Search</span></button>
-    <button class="tab-btn" id="tab-btn-recs" onclick="switchTab('recs')"><span data-ic="sparkles"></span><span data-i18n="tab_picks">Picks</span></button>
-    <button class="tab-btn" id="tab-btn-history" onclick="switchTab('history')"><span data-ic="list-checks"></span><span data-i18n="tab_lists">Lists</span></button>
+    <button class="tab-btn" id="tab-btn-history" onclick="switchTab('history')"><span data-ic="list-checks"></span><span data-i18n="tab_library">Library</span></button>
     <button class="tab-btn" id="tab-btn-maps" onclick="switchTab('maps')"><span data-ic="map-pin"></span><span data-i18n="tab_maps">Maps</span></button>
     <button class="tab-btn" id="tab-btn-inbox" onclick="switchTab('inbox')"><span style="position:relative;display:inline-block"><span data-ic="inbox"></span><span id="inbox-badge" class="inbox-badge">0</span></span><span data-i18n="tab_inbox_label">Inbox</span></button>
   </div>
 
-  <!-- ── TAB: Search ──────────────────────────────────────────────────── -->
+  <!-- ── TAB: Search ──────────────────────────────────────────────────
+       Один поиск вместо двух (решено 9 окт, собрано 10 окт; макет docs/mockups/one-search.html).
+       Набранное идёт двумя путями сразу: поиск по названию и разбор движка. Что сверху,
+       решает, насколько точно совпало название. -->
   <div id="tab-search" class="tab-panel active">
     <div class="search-row">
-      <input id="search-input" type="text" data-i18n-ph="search_ph" placeholder="Movie or series title…"
-        onkeydown="if(event.key==='Enter')doSearch()">
-      <button class="btn btn-primary btn-sm" style="width:auto;min-width:104px" onclick="doSearch()" data-i18n="search_btn">Search</button>
-    </div>
-    <div id="search-results">
-      <div class="empty-state">
-        <img src="/logo.png" class="search-logo pop" alt="Cinemail" draggable="false" onclick="_bounceLogo(this)">
-        <div class="empty-state-title" data-i18n="empty_search_title">Find Your Next Film</div>
-        <p data-i18n="empty_search_sub">Type a title and press Search</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── TAB: Picks ───────────────────────────────────────────────────── -->
-  <div id="tab-recs" class="tab-panel" style="display:none">
-    <div class="search-row">
-      <input id="rec-input" type="text" dir="auto" data-i18n-ph="recs_ph" placeholder="Genre, country, era, subject">
-      <button class="btn btn-primary btn-sm" style="width:auto;min-width:104px" id="rec-btn" onclick="loadRecs()" data-i18n="find_btn">Find</button>
+      <input id="search-input" type="search" dir="auto" enterkeyhint="search" autocomplete="off"
+        data-i18n-ph="search_ph" placeholder="A title, a person, a mood…"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();doSearch()}">
+      <button class="btn btn-primary btn-sm" style="width:auto;min-width:104px" id="search-btn" onclick="doSearch()" data-i18n="search_btn">Search</button>
     </div>
     <div id="rec-suggest" style="display:none"></div>
-    <button onclick="surpriseMe()" data-i18n="surprise" style="width:100%;margin-top:0;margin-bottom:12px;padding:11px;border-radius:11px;background:color-mix(in srgb, var(--accent) 12%, transparent);border:1px solid color-mix(in srgb, var(--accent) 50%, transparent);color:var(--accent-text);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:1.5px;cursor:pointer;transition:all .18s;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)" onmouseover="this.style.background='color-mix(in srgb, var(--accent) 22%, transparent)';this.style.borderColor='color-mix(in srgb, var(--accent) 85%, transparent)';this.style.boxShadow='0 4px 18px color-mix(in srgb, var(--accent) 28%, transparent)';this.style.color='var(--text)'" onmouseout="this.style.background='color-mix(in srgb, var(--accent) 12%, transparent)';this.style.borderColor='color-mix(in srgb, var(--accent) 50%, transparent)';this.style.boxShadow='none';this.style.color='var(--accent-text)'">✨ Surprise Me</button>
-    <div id="picks-hint" style="display:none;margin-bottom:12px;padding:11px 13px;background:rgba(245,197,24,0.07);border:1px solid rgba(245,197,24,0.22);border-radius:10px;font-size:12px;line-height:1.5;color:var(--text)">
-      <div data-i18n="picks_random_hint" style="margin-bottom:9px;color:#cfcfcf">Without watched films, picks are random. Mark 5-10 films as Watched and they become personal to your taste.</div>
-      <button onclick="dismissPicksHint()" data-i18n="picks_hint_got" style="padding:5px 14px;border-radius:8px;background:rgba(245,197,24,0.15);border:1px solid rgba(245,197,24,0.3);color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">Got it</button>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-      <div id="rec-history-hint" style="color:var(--muted);font-size:11px"></div>
-      <div id="ai-counter" style="color:var(--muted);font-size:11px"></div>
-    </div>
-    <div id="rec-results">
-      <div class="empty-state">
-        <div class="empty-state-icon">✨</div>
-        <div class="empty-state-title" data-i18n="recs_empty_title">Get Personal Picks</div>
-        <p data-i18n="recs_empty_sub">Enter a prompt, or leave it blank and tap Find</p>
+    <div id="search-home">
+      <div class="srch-try" data-i18n="search_try">Try</div>
+      <div class="srch-chips" id="search-examples"></div>
+      <button class="srch-surprise" onclick="surpriseMe()"><span data-ic="sparkles"></span><span data-i18n="surprise_btn">Surprise me</span></button>
+      <div id="picks-hint" style="display:none;margin-top:12px;padding:11px 13px;background:rgba(245,197,24,0.07);border:1px solid rgba(245,197,24,0.22);border-radius:10px;font-size:12px;line-height:1.5;color:var(--text)">
+        <div data-i18n="picks_random_hint" style="margin-bottom:9px;color:#cfcfcf">Without watched films, picks are random. Mark 5-10 films as Watched and they become personal to your taste.</div>
+        <button onclick="dismissPicksHint()" data-i18n="picks_hint_got" style="padding:5px 14px;border-radius:8px;background:rgba(245,197,24,0.15);border:1px solid rgba(245,197,24,0.3);color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">Got it</button>
       </div>
+      <div id="search-foryou"></div>
     </div>
+    <div id="search-results"></div>
   </div>
 
   <!-- ── TAB: My List ─────────────────────────────────────────────────── -->
@@ -2936,7 +2944,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.60.0-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.61.0-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -4559,6 +4567,20 @@ const _I18N_MAPS = {
   it:{"tab_maps": "Mappe", "maps_all": "Tutti i film", "maps_mine": "I miei film", "maps_stats": "{f} film e serie · {p} luoghi", "maps_mine_stats": "Film che hai visto con luoghi delle riprese noti: {n}", "maps_hint": "Tocca un punto per vedere cosa è stato girato lì.", "maps_mine_empty": "Segna i film come visti e qui compariranno i luoghi in cui sono stati girati.", "maps_per_wiki": "secondo Wikipedia", "maps_place_note": "Girato qui. Quale scena, non è noto.", "maps_film_note": "Girato in questi luoghi. Quale scena dove, non è noto.", "maps_more": "altri {n}", "maps_loading": "Caricamento della mappa…", "maps_failed": "Impossibile caricare la mappa. Controlla la connessione e riapri la scheda.", "maps_film_block": "Luoghi delle riprese", "maps_on_map": "Sulla mappa", "maps_also": "Girato anche in", "maps_credit": "Luoghi: Wikidata, tramite Movie Scene Map", "maps_cat_city": "Città", "maps_cat_landmark": "Monumento", "maps_cat_nature": "Natura", "maps_cat_castle": "Castello", "maps_cat_studio": "Studio", "maps_cat_street": "Via o piazza", "maps_cat_region": "Regione", "maps_cat_fiction": "Luogo immaginario"},
 };
 Object.keys(_I18N_MAPS).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_MAPS[l]); });
+// ── Единый поиск (10 окт 2026) ───────────────────────────────────────────────
+// Примеры в search_examples проверены разбором на каждом языке: их движок понимает целиком.
+// Прежние примеры из recs_empty_sub на украинском и грузинском он не понимал вовсе.
+const _I18N_SEARCH = {
+  en:{"search_surprise_none":"Nothing new turned up this time. Press it again, or try an example above.", "search_strict_w":"Only these have all of it. Closest, without “{w}”:", "search_strict":"Only these have all of it. Closest:", "tab_library": "Library", "search_ph": "A title, a person, a mood…", "search_try": "Try", "search_examples": "korean thriller|french new wave|sci-fi from the 70s|films about cats", "search_understood": "Understood", "search_picks": "Picks", "search_like": "Films like {title}", "search_without": "Without “{w}”", "search_relaxed_w": "Nothing has all of it. Closest, without “{w}”:", "search_relaxed": "Nothing has all of it. Closest:", "search_none_all": "Nothing has all of it at once. Try it without one part:", "search_none_one": "Nothing for this one. These always work:", "search_that_all": "That is all for this query.", "search_end": "That is everything for this query.", "search_more": "More", "search_nothing": "Nothing under that title, and no words I could read. These always work:", "search_drop": "Remove {w}", "surprise_btn": "Surprise Me"},
+  ru:{"search_surprise_none":"В этот раз ничего нового. Нажми ещё раз или попробуй пример выше.", "search_strict_w":"Целиком подходит только это. Ближе всего, без «{w}»:", "search_strict":"Целиком подходит только это. Ближе всего:", "tab_library": "Библиотека", "search_ph": "Фильм, имя, настроение…", "search_try": "Попробуй", "search_examples": "корейский триллер|новая волна|фантастика 70-х|фильмы про котиков", "search_understood": "Понято", "search_picks": "Подборка", "search_like": "Похожее на «{title}»", "search_without": "Без «{w}»", "search_relaxed_w": "Всё сразу не нашлось. Ближе всего, без «{w}»:", "search_relaxed": "Всё сразу не нашлось. Ближе всего:", "search_none_all": "Всё сразу не нашлось. Попробуй без одного из условий:", "search_none_one": "По этому ничего нет. Вот что точно сработает:", "search_that_all": "По этому запросу это всё.", "search_end": "Больше по этому запросу ничего нет.", "search_more": "Ещё", "search_nothing": "Под таким названием ничего нет, и слов, которые я понимаю, тоже. Вот что точно сработает:", "search_drop": "Убрать «{w}»", "surprise_btn": "Удиви меня"},
+  uk:{"search_surprise_none":"Цього разу нічого нового. Натисни ще раз або спробуй приклад вище.", "search_strict_w":"Повністю підходить лише це. Найближче, без «{w}»:", "search_strict":"Повністю підходить лише це. Найближче:", "tab_library": "Бібліотека", "search_ph": "Назва, людина, настрій…", "search_try": "Спробуй", "search_examples": "комедія 90-х|фантастика 80-х|вестерн|нуар", "search_understood": "Зрозуміло", "search_picks": "Добірка", "search_like": "Схоже на «{title}»", "search_without": "Без «{w}»", "search_relaxed_w": "Усе разом не знайшлося. Найближче, без «{w}»:", "search_relaxed": "Усе разом не знайшлося. Найближче:", "search_none_all": "Усе разом не знайшлося. Спробуй без однієї з умов:", "search_none_one": "За цим нічого немає. Ось що точно спрацює:", "search_that_all": "За цим запитом це все.", "search_end": "Більше за цим запитом нічого немає.", "search_more": "Ще", "search_nothing": "Під такою назвою нічого немає, і слів, які я розумію, теж. Ось що точно спрацює:", "search_drop": "Прибрати «{w}»", "surprise_btn": "Здивуй мене"},
+  ka:{"search_surprise_none":"ამჯერად ახალი არაფერია. კიდევ დააჭირე ან სცადე ზემოთ მოცემული მაგალითი.", "search_strict_w":"სრულად მხოლოდ ესენი ერგება. ყველაზე ახლოს, „{w}“-ის გარეშე:", "search_strict":"სრულად მხოლოდ ესენი ერგება. ყველაზე ახლოს:", "tab_library": "ბიბლიოთეკა", "search_ph": "ფილმი, სახელი, ჟანრი…", "search_try": "სცადე", "search_examples": "კომედია|ფანტასტიკა", "search_understood": "გასაგებია", "search_picks": "რჩევები", "search_like": "„{title}“-ის მსგავსი", "search_without": "„{w}“-ის გარეშე", "search_relaxed_w": "ყველაფერი ერთად ვერ მოიძებნა. ყველაზე ახლოს, „{w}“-ის გარეშე:", "search_relaxed": "ყველაფერი ერთად ვერ მოიძებნა. ყველაზე ახლოს:", "search_none_all": "ყველაფერი ერთად ვერ მოიძებნა. სცადე ერთი პირობის გარეშე:", "search_none_one": "ამით ვერაფერი მოიძებნა. ეს ნამდვილად იმუშავებს:", "search_that_all": "ამ მოთხოვნით ეს ყველაფერია.", "search_end": "ამ მოთხოვნით მეტი არაფერია.", "search_more": "მეტი", "search_nothing": "ამ სათაურით ვერაფერი მოიძებნა და ნაცნობი სიტყვებიც არ არის. ეს ნამდვილად იმუშავებს:", "search_drop": "„{w}“-ის მოხსნა", "surprise_btn": "გამაკვირვე"},
+  es:{"search_surprise_none":"Esta vez no salió nada nuevo. Pulsa otra vez o prueba un ejemplo de arriba.", "search_strict_w":"Solo estas tienen todo. Lo más cercano, sin «{w}»:", "search_strict":"Solo estas tienen todo. Lo más cercano:", "tab_library": "Biblioteca", "search_ph": "Película, persona, género…", "search_try": "Prueba", "search_examples": "thriller coreano|comedia francesa|anime japonés|nouvelle vague", "search_understood": "Entendido", "search_picks": "Sugerencias", "search_like": "Parecidas a «{title}»", "search_without": "Sin «{w}»", "search_relaxed_w": "No hay nada con todo a la vez. Lo más cercano, sin «{w}»:", "search_relaxed": "No hay nada con todo a la vez. Lo más cercano:", "search_none_all": "No hay nada con todo a la vez. Prueba sin una de las partes:", "search_none_one": "No hay nada para esto. Esto siempre funciona:", "search_that_all": "Eso es todo para esta búsqueda.", "search_end": "No hay nada más para esta búsqueda.", "search_more": "Más", "search_nothing": "No hay nada con ese título ni palabras que entienda. Esto siempre funciona:", "search_drop": "Quitar «{w}»", "surprise_btn": "Sorpréndeme"},
+  fr:{"search_surprise_none":"Rien de nouveau cette fois. Appuie encore ou essaie un exemple ci-dessus.", "search_strict_w":"Seuls ceux-ci réunissent tout. Le plus proche, sans « {w} » :", "search_strict":"Seuls ceux-ci réunissent tout. Le plus proche :", "tab_library": "Bibliothèque", "search_ph": "Film, personne, humeur…", "search_try": "Essaie", "search_examples": "thriller coréen|comédie française|horreur japonaise|nouvelle vague", "search_understood": "Compris", "search_picks": "Suggestions", "search_like": "Dans le même esprit que « {title} »", "search_without": "Sans « {w} »", "search_relaxed_w": "Rien ne réunit tout. Le plus proche, sans « {w} » :", "search_relaxed": "Rien ne réunit tout. Le plus proche :", "search_none_all": "Rien ne réunit tout. Essaie sans l’une des conditions :", "search_none_one": "Rien pour cette recherche. Ceci marche toujours :", "search_that_all": "C’est tout pour cette recherche.", "search_end": "Il n’y a rien de plus pour cette recherche.", "search_more": "Plus", "search_nothing": "Rien sous ce titre, et aucun mot que je comprenne. Ceci marche toujours :", "search_drop": "Retirer « {w} »", "surprise_btn": "Surprends-moi"},
+  de:{"search_surprise_none":"Diesmal kam nichts Neues. Drück noch mal oder probier ein Beispiel oben.", "search_strict_w":"Nur diese haben alles. Am nächsten, ohne „{w}“:", "search_strict":"Nur diese haben alles. Am nächsten:", "tab_library": "Bibliothek", "search_ph": "Titel, Person, Stimmung…", "search_try": "Probier mal", "search_examples": "koreanischer Thriller|französische Komödie|Nouvelle Vague|Science-Fiction der 70er", "search_understood": "Verstanden", "search_picks": "Tipps", "search_like": "Ähnlich wie „{title}“", "search_without": "Ohne „{w}“", "search_relaxed_w": "Nichts hat alles zugleich. Am nächsten, ohne „{w}“:", "search_relaxed": "Nichts hat alles zugleich. Am nächsten:", "search_none_all": "Nichts hat alles zugleich. Versuch es ohne eine Bedingung:", "search_none_one": "Dazu gibt es nichts. Das klappt immer:", "search_that_all": "Das ist alles zu dieser Suche.", "search_end": "Mehr gibt es zu dieser Suche nicht.", "search_more": "Mehr", "search_nothing": "Unter diesem Titel gibt es nichts, und kein Wort, das ich verstehe. Das klappt immer:", "search_drop": "„{w}“ entfernen", "surprise_btn": "Überrasch mich"},
+  it:{"search_surprise_none":"Questa volta niente di nuovo. Premi ancora o prova un esempio qui sopra.", "search_strict_w":"Solo questi hanno tutto. Il più vicino, senza «{w}»:", "search_strict":"Solo questi hanno tutto. Il più vicino:", "tab_library": "Libreria", "search_ph": "Titolo, persona, umore…", "search_try": "Prova", "search_examples": "horror giapponese|commedia italiana|nouvelle vague|fantascienza anni 70", "search_understood": "Capito", "search_picks": "Consigli", "search_like": "Simili a «{title}»", "search_without": "Senza «{w}»", "search_relaxed_w": "Niente ha tutto insieme. Il più vicino, senza «{w}»:", "search_relaxed": "Niente ha tutto insieme. Il più vicino:", "search_none_all": "Niente ha tutto insieme. Prova senza una delle condizioni:", "search_none_one": "Niente per questa ricerca. Questo funziona sempre:", "search_that_all": "È tutto per questa ricerca.", "search_end": "Non c’è altro per questa ricerca.", "search_more": "Altro", "search_nothing": "Niente con questo titolo, e nessuna parola che capisco. Questo funziona sempre:", "search_drop": "Togli «{w}»", "surprise_btn": "Sorprendimi"}
+};
+Object.keys(_I18N_SEARCH).forEach(l => Object.assign(I18N[l], _I18N_SEARCH[l]));
 // The Android half is not a nicety. Tapping any imdb.com link hands off to the IMDb app, which
 // has no export, so the instruction "open imdb.com" fails silently for every Android user who
 // follows it the obvious way. Typing the address is what keeps them in the browser.
@@ -4961,8 +4983,10 @@ function setLang(l) {
   _applyI18n();
   // Re-render dynamic content
   renderHistory(); renderListTabs();
-  const activeTab = ["search","recs","history","inbox"].find(n => document.getElementById("tab-"+n)?.style.display !== "none");
+  const activeTab = ["search","history","maps","inbox"].find(n => document.getElementById("tab-"+n)?.style.display !== "none");
   if (activeTab === "inbox") renderInbox();
+  // Примеры и «Для тебя» рисуются кодом, data-i18n до них не достаёт.
+  _forYou = null; _searchHomeRefresh();
 }
 // Apply i18n to a specific container (for dynamically-shown elements like modals)
 function _applyI18nElement(container) {
@@ -5553,6 +5577,7 @@ async function onSignedIn(user) {
   } catch(e) {}
   initUI(); // Update again if DB name differs from metadata
   renderGuestBanner(); // hide banner if user just converted from guest to real account
+  _searchHomeRefresh(); // «Для тебя» и подсказка новичку зависят от библиотеки, а она пришла только сейчас
   if (!isGuest) {
     loadInboxCache(); // non-blocking — cache ready before user opens Inbox
     loadFriendsCache().then(() => checkPendingFriendInvite()); // non-blocking; then process ?friend= referral
@@ -5596,7 +5621,8 @@ function _resetAccountState(prevUid, { wipeLocal = false } = {}) {
   _blockedIds = new Set();
   try { if (typeof _map !== 'undefined' && _map) _mapsSetMine(false); } catch (e) {}
   _tasteCache = null; _lastSeeds = [];
-  _picksRemaining = null; _pressState = { key: '', n: 0 };
+  _srchGen++; _srch = null; _forYou = null;
+  try { const si = document.getElementById('search-input'); if (si) si.value = ''; } catch (e) {}
   _shownSurprises.length = 0;
   try { sessionStorage.removeItem('shownSurprises'); } catch (e) {}
   // Аватар хранится на браузер, а не на аккаунт: оставленный, он надевался на следующего.
@@ -5612,11 +5638,10 @@ function _resetAccountState(prevUid, { wipeLocal = false } = {}) {
   }
   // На экране не должно остаться ничего от прежнего человека, даже если следующий -
   // гость, которому эти блоки никто не перерисует.
-  ['inbox-list', 'inbox-friends-block', 'rec-results', 'history-list'].forEach(id => {
+  ['inbox-list', 'inbox-friends-block', 'search-results', 'search-foryou', 'history-list'].forEach(id => {
     const el = document.getElementById(id); if (el) el.innerHTML = '';
   });
   const badge = document.getElementById('inbox-badge'); if (badge) badge.style.display = 'none';
-  try { _renderPicksMeter(); } catch (e) {}
   try { switchTab('search'); } catch (e) {}
   _resetAuthButtons();
 }
@@ -6152,7 +6177,9 @@ async function tmdbSearch(q) {
     Title: r.title || r.name,
     Year: (r.release_date || r.first_air_date || "").slice(0,4),
     Poster: r.poster_path ? TMDB_IMG + r.poster_path : "",
-    Rating: r.vote_average ? r.vote_average.toFixed(1) : null, Genre: ""
+    Rating: r.vote_average ? r.vote_average.toFixed(1) : null, Genre: "",
+    // Единому поиску: совпало ли название точно и известен ли фильм хоть кому-то.
+    OrigTitle: r.original_title || r.original_name || "", votes: r.vote_count || 0,
   }));
 }
 async function tmdbDetail(id, type) {
@@ -6260,21 +6287,18 @@ function switchTab(name) {
     showGuestConvertModal();
     return;
   }
-  ["search","recs","history","maps","inbox"].forEach(t => {
+  ["search","history","maps","inbox"].forEach(t => {
     document.getElementById("tab-"+t).style.display = t === name ? "block" : "none";
     document.getElementById("tab-btn-"+t).classList.toggle("active", t === name);
   });
   if (name === "history") { renderListTabs(); renderHistory(); }
-  if (name === "search") { setTimeout(() => { const si = document.getElementById('search-input'); if (si && !si.value) si.focus(); }, 150); }
+  if (name === "search") {
+    const si = document.getElementById('search-input');
+    if (si && !si.value.trim() && !document.getElementById('search-results').innerHTML) _searchHome(true);
+    setTimeout(() => { if (si && !si.value) si.focus(); }, 150);
+  }
   if (name === "inbox") { renderInbox(); markInvitesSeen(); }
   if (name === "maps") _mapsShow();
-  if (name === "recs") {
-    const watched = watchHistory.filter(h => h.status === "watched");
-    document.getElementById("rec-history-hint").textContent = watched.length > 0
-      ? `${t('based_on_label')}: ${watched.length}`
-      : t('recs_hint_empty');
-    _maybeShowPicksHint(watched.length);
-  }
 }
 
 // One-time hint: explain that Picks are random without watched films.
@@ -6582,8 +6606,14 @@ function _repaintCardsFor(tmdbID) {
 }
 
 function movieCardHTML(m, why) {
-  // Safety net: strip em/en dashes from AI "why" text (prompt also forbids them)
-  if (why) why = String(why).replace(/\s*[—–]\s*/g, ' - ').trim();
+  // why - строка, или { match, more } из единого поиска: совпавшее с запросом выделено,
+  // связь с твоими фильмами следом. Тире в обоих заменяются, как и раньше.
+  const _dash = x => String(x || '').replace(/\s*[—–]\s*/g, ' - ').trim();
+  let whyHTML = '';
+  if (why && typeof why === 'object') {
+    const a = _dash(why.match), b = _dash(why.more);
+    whyHTML = (a ? `<b>${escapeHtml(a)}</b>` : '') + (a && b ? ' · ' : '') + (b ? escapeHtml(b) : '');
+  } else if (why) whyHTML = escapeHtml(_dash(why));
   const status = getEntryStatus(m.tmdbID || m.id);
   const rating = m.Rating ? ` · ★ ${m.Rating}` : "";
   const genre = m.Genre ? ` · ${m.Genre.split(",")[0]}` : "";
@@ -6601,7 +6631,7 @@ function movieCardHTML(m, why) {
       <button class="act-btn act-btn-ico" onclick="_maybePickList(_movieRegistry['${key}'],'plan')" title="${t('act_addlist')}">${_icoBookmark(false)}</button>
       <button class="act-btn act-btn-ico" onclick="openAdd(_movieRegistry['${key}'],'watched')" title="${t('mark_watched')}">${_icoEye(false)}</button>`;
   }
-  const topRadius = why ? "12px 12px 0 0" : "12px";
+  const topRadius = whyHTML ? "12px 12px 0 0" : "12px";
   const idVal = m.tmdbID || m.id;
   const typeVal = m.type || "movie";
   const shareBtn = idVal ? `<button class="act-btn act-btn-ico" onclick="openShare(_movieRegistry['${key}'])" title="${t('act_share')}">${_icoShare()}</button>` : "";
@@ -6621,7 +6651,7 @@ function movieCardHTML(m, why) {
           ${shareBtn}
         </div>
       </div>
-      ${why ? `<div class="why-strip"><span class="why-brand">Cinemail</span> ${escapeHtml(why)}</div>` : ""}
+      ${whyHTML ? `<div class="why-strip" dir="auto">${whyHTML}</div>` : ""}
     </div>`;
 }
 
@@ -6647,70 +6677,383 @@ function personRowHTML(p) {
 }
 const _SEARCH_LABEL = 'font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin:2px 0 8px;font-weight:600';
 
+// ── ЕДИНЫЙ ПОИСК ──────────────────────────────────────────────────────────────
+// Решено 9 октября, собрано 10-го по макету docs/mockups/one-search.html. Было два поля:
+// «Поиск» искал названия, «Подборки» разбирали жанр, страну, эпоху и тему. Люди набирали
+// название в подборках и настроение в поиске, и каждое поле отвечало не на свой вопрос.
+//
+// Теперь набранное идёт двумя путями сразу, и что показать сверху, решает название:
+//   - совпало точно и разбору сказать нечего ("fargo") - найденное, и строка "Похожее"
+//     на один тап, но подборка сама не запускается;
+//   - разбор понял жанр, страну, тему, человека ("корейский триллер") - подборка, над ней
+//     строка «Понято», где каждый кусок снимается крестиком;
+//   - оба ("love": фильм Ноэ и романтика) - сначала точное название, потом подборка.
+// Голого «ничего не найдено» нет: слишком узко - сказать, что снято; не понято ничего -
+// показать запросы, которые точно сработают.
+let _srch = null;        // открытая выдача: запрос, разбор, буфер, сколько показано
+let _srchGen = 0;        // ответ на старый запрос не рисуется поверх нового
+const _SRCH_STEP = 5;
+
+// Названия жанров на языке интерфейса - для подписи под карточкой. Один запрос на язык.
+let _gNames = { lang: null, map: null, p: null };
+function _genreNames() {
+  if (_gNames.lang === _lang && (_gNames.map || _gNames.p)) return _gNames.p || Promise.resolve(_gNames.map);
+  const lang = _lang;
+  _gNames = { lang, map: null, p: tmdbFetch(`/genre/movie/list?language=${_tmdbLang()}`)
+    .then(r => { const m = new Map(((r && r.genres) || []).map(g => [String(g.id), g.name])); if (_gNames.lang === lang) _gNames = { lang, map: m, p: null }; return m; })
+    .catch(() => { if (_gNames.lang === lang) _gNames = { lang: null, map: null, p: null }; return new Map(); }) };
+  return _gNames.p;
+}
+
+// Название без артикля и знаков: "The Godfather" и "godfather" - одно и то же название.
+const _titleKey = x => _normTitle(String(x || '').replace(/^\s*(the|a|an|le|la|les|l'|der|die|das|el|los|las|il|lo|gli)\s+/i, ''));
+
+async function _searchPeople(q) {
+  // Без жёсткого порога популярности, чтобы классики и неанглоязычные авторы тоже находились.
+  // Сортировка внутри одного запроса: при слиянии нескольких по одной популярности терялось,
+  // на какой вопрос человек ответил (замер на "Рук", Шах Рукх Кхан вперёд тех, кого искали).
+  try {
+    const r = await tmdbFetch(`/search/person?query=${encodeURIComponent(q)}&include_adult=false&language=${_tmdbLang()}`);
+    return (r.results || [])
+      .filter(p => p.id && p.known_for_department && ((p.known_for || []).length || p.profile_path))
+      .sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+  } catch (e) { return []; }
+}
+
+const _srchSect = label => `<div class="srch-sect">${escapeHtml(label)}</div>`;
+
+function _renderSearchExamples(boxId = 'search-examples') {
+  const box = document.getElementById(boxId);
+  if (!box) return;
+  const ex = String(t('search_examples') || '').split('|').map(x => x.trim()).filter(Boolean);
+  box.innerHTML = ex.map(q => `<button type="button" class="srch-chip" dir="auto" data-q="${escapeHtml(q)}">${escapeHtml(q)}</button>`).join('');
+}
+
+// Пустое поле: примеры, «Удиви меня», подсказка новичку и подборка для тебя.
+function _searchHome(show, forYou = true) {
+  const home = document.getElementById('search-home');
+  if (!home) return;
+  home.style.display = show ? '' : 'none';
+  if (!show) return;
+  _renderSearchExamples();
+  const watched = watchHistory.filter(h => h.status === 'watched' && _isMine(h)).length;
+  _maybeShowPicksHint(watched);
+  const fy = document.getElementById('search-foryou');
+  if (fy) fy.style.display = forYou ? '' : 'none';
+  if (forYou) _searchForYou(watched);
+}
+// Библиотека пришла позже, чем экран нарисовался: дорисовать то, что от неё зависит.
+function _searchHomeRefresh() {
+  const home = document.getElementById('search-home');
+  const tab = document.getElementById('tab-search');
+  if (home && tab && tab.style.display !== 'none' && home.style.display !== 'none') _searchHome(true);
+}
+
+// «Для тебя» на пустом поле. Около двадцати обращений к TMDB, поэтому один раз за сессию и
+// на аккаунт: список хранится, а карточки рисуются заново, чтобы отметки «смотрел» были свежими.
+let _forYou = null;
+async function _searchForYou(watched) {
+  const box = document.getElementById('search-foryou');
+  if (!box) return;
+  if (watched < SURPRISE_MIN_WATCHED) { box.innerHTML = ''; return; }
+  const key = (currentUser?.id || 'guest') + ':' + _lang + ':' + _acctGen;
+  const draw = list => {
+    const lib = _libraryKeys();
+    const fresh = list.filter(m => !lib.ids.has(String(m.id)));
+    box.innerHTML = fresh.length ? _srchSect(t('picks_for_you'))
+      + `<div class="card-list">${fresh.map(m => movieCardHTML(m, _srchCaption(m, null))).join('')}</div>` : '';
+  };
+  if (_forYou && _forYou.key === key) { if (_forYou.list) draw(_forYou.list); return; }
+  _forYou = { key, list: null };
+  try {
+    const list = await _tastePicks(3);
+    if (!_forYou || _forYou.key !== key) return;
+    _forYou.list = list;
+    const home = document.getElementById('search-home');
+    if (home && home.style.display !== 'none') draw(list);
+  } catch (e) { if (_forYou && _forYou.key === key) _forYou = null; }
+}
+
+// Тот же расчёт, что у «Удиви меня» в режиме вкуса, без перемешивания результата.
+async function _tastePicks(limit) {
+  const watchedEntries = watchHistory.filter(h => h.status === 'watched' && _isMine(h));
+  const seeds = _pickSeeds(watchedEntries);
+  const tally = await _tallyFromSeeds(seeds);
+  const lib = _libraryKeys();
+  const pool = [...tally.values()].filter(c => c.Title && !lib.ids.has(String(c.id)) && !lib.titles.has(lib.norm(c.Title)));
+  pool.sort((a, b) => b.votes - a.votes || b.voteCount - a.voteCount);
+  const band = _balanceKinds(_diversify(pool, 8), seeds, 8).slice(0, limit);
+  return _enrichWhy(band.map(c => ({ ...c, why: _tallyWhy(c) })), null);
+}
+
+// ── Подпись под карточкой ─────────────────────────────────────────────────────
+// Сначала что совпало с запросом, потом связь с твоими фильмами. Совпавшее берётся из
+// фактов фильма (его жанры), а не из запроса: повторять вопрос под ответом - то,
+// из-за чего прежняя «По запросу «…»» читалась как сбой. Снятое при ослаблении не обещаем.
+function _matchPart(m, c) {
+  if (!c) return '';
+  const drop = new Set(m._relaxed || c.relaxed || []);
+  if (drop.has('allButPerson')) return '';
+  const parts = [];
+  if (!drop.has('genre') && (c.genreIds || []).length && _gNames.map) {
+    const asked = new Set(c.genreIds.map(String));
+    const g = (m.gids || m._genres || []).map(String).filter(x => asked.has(x)).map(x => _gNames.map.get(x)).filter(Boolean);
+    if (g.length) parts.push(g.slice(0, 2).join(', '));
+  }
+  // Тема - только когда она одна: две темы уходят в TMDB через ИЛИ, и какая из них у этого
+  // фильма, мы не знаем. Сказать обе значило бы сказать неправду про одну.
+  const subj = (c.chips || []).filter(ch => ch.kind === 'subject');
+  if (!drop.has('subject') && !m._noKw && subj.length === 1 && (c.keyword || c.curated)) parts.push(subj[0].label);
+  const mv = (c.chips || []).find(ch => ch.kind === 'movement');
+  if (c.movement && mv) parts.push(mv.label);
+  else if (c.country) parts.push(_mapsCountry(c.country));
+  // Год не повторяем: он стоит строкой выше, в самой карточке.
+  const s = parts.join(' · ');
+  return s ? s[0].toLocaleUpperCase(_lang) + s.slice(1) : '';
+}
+function _srchCaption(m, c) {
+  const match = _matchPart(m, c), more = m.why || '';
+  return (match || more) ? { match, more } : null;
+}
+
+// ── Поиск ─────────────────────────────────────────────────────────────────────
 async function doSearch() {
-  const raw = document.getElementById("search-input").value.trim();
-  if (!raw) return;
-  const el = document.getElementById("search-results");
-  el.innerHTML = loadingHTML(randQuote(), false);
+  const inp = document.getElementById('search-input');
+  const el = document.getElementById('search-results');
+  const raw = (inp?.value || '').trim();
+  const gen = ++_srchGen;
+  _srch = null;
+  if (!raw) { el.innerHTML = ''; _searchHome(true); return; }
+  _searchHome(false);
+  try { inp.blur(); } catch (e) {}          // на телефоне убрать клавиатуру с выдачи
+  el.innerHTML = loadingHTML(randQuote(), true);
+  const slowTimer = startSlowLoadingIndicator();
   try {
     const { title, year } = parseQuery(raw);
-    // This used to translate a Cyrillic query to English through Haiku first, then search both
-    // forms. The model is gone, and measuring showed the translation was not carrying the
-    // search anyway: TMDB indexes alternative titles per country, so "Крепкий орешек" returns
-    // the whole Die Hard series from TMDB's own index with no translation involved.
-    const q = title;
+    const [titles, people, c] = await Promise.all([
+      title ? tmdbSearchWithYear(title, year) : Promise.resolve([]),
+      (title && !year) ? _searchPeople(title) : Promise.resolve([]),
+      _constraintsFor(raw).catch(e => { console.warn('[search] parse', e); return null; }),
+      _genreNames(),
+    ]);
+    if (gen !== _srchGen) return;
 
-    // Films
-    let results = await tmdbSearchWithYear(q, year);
+    const tk = _titleKey(title);
+    const exact = tk ? titles.filter(m => _titleKey(m.Title) === tk || _titleKey(m.OrigTitle) === tk) : [];
+    // Точное название, которое знает хоть кто-то: фильм "Horror" с двадцатью голосами не
+    // должен заслонять хорроры.
+    const strong = exact.filter(m => (m.votes || 0) >= 50).sort((a, b) => (b.votes || 0) - (a.votes || 0));
+    // Понял ли разбор что-то СВОЁ, кроме названия. Год при точном названии ("fargo 1996") и
+    // тема из непонятого остатка, найденная в индексе TMDB, своим не считаются: это и было
+    // название.
+    const picksRun = !!(c && c.matched && (c.movement || c.person || c.country || (c.genreIds || []).length
+      || c.curated || c.recent || (c.keyword && c.kwTrusted) || (!strong.length && (c.keyword || c.decade || c.year))));
+    if (c) c.chips = (c.chips || []).slice().sort((a, b) => a.toks[0] - b.toks[0]);
 
-    // People: search both the translated query AND the original (Cyrillic) one, merge by id.
-    // No hard popularity filter so classic / non-English creators surface too.
-    let people = [];
-    if (!year) {
-      const pqs = [q];
-      // Rank WITHIN each query, then keep the queries in order - which is what the film
-      // half already does by appending the second query's results after the first.
-      //
-      // Sorting the merged pile by popularity alone loses which question a person answered.
-      // Measured on "Рук" when a translation step still existed: an English hit and a Cyrillic
-      // one arrived together, and Shah Rukh Khan - matched only through his Russian alias, far
-      // above anyone in the "Fist" results - took first place over the people who matched
-      // what was actually being searched for.
-      const seenP = new Set(), merged = [];
-      for (const pq of pqs) {
-        try {
-          const r = await tmdbFetch(`/search/person?query=${encodeURIComponent(pq)}&include_adult=false&language=${_tmdbLang()}`);
-          (r.results || [])
-            .filter(p => p.id && !seenP.has(p.id) && p.known_for_department && ((p.known_for || []).length || p.profile_path))
-            .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
-            .forEach(p => { seenP.add(p.id); merged.push(p); });
-        } catch(e) {}
-      }
-      people = merged.slice(0, 3);
-    }
+    const showTitles = picksRun ? strong.slice(0, 3) : titles;
+    const showPeople = picksRun ? people.filter(p => c.person && p.id === c.person).slice(0, 1) : people.slice(0, 3);
+    const like = !picksRun && strong.length ? strong[0] : null;
 
-    if (!results.length && !people.length) {
-      el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🤷</div><div class="empty-state-title">${t('err_no_results_title')}</div><p>${t('err_no_results_sub')}</p></div>`;
+    if (!picksRun && !showTitles.length && !showPeople.length) {
+      el.innerHTML = `<div class="srch-note" style="margin-top:4px">${escapeHtml(t('search_nothing'))}</div><div class="srch-chips" id="search-examples-none"></div>`;
+      _renderSearchExamples('search-examples-none');
       return;
     }
-    const peopleBlock = people.length
-      ? `<div style="${_SEARCH_LABEL}">${t('search_people')}</div><div class="card-list" style="margin-bottom:16px">${people.map(personRowHTML).join("")}</div>`
-        + (results.length ? `<div style="${_SEARCH_LABEL}">${t('search_films')}</div>` : "")
-      : "";
-    el.innerHTML = peopleBlock + `<div class="card-list">${results.map(m => movieCardHTML(m)).join("")}</div>`;
-    if (results.length) _maybeShowSearchCoach();
-  } catch(e) {
-    // A refused request gets a sentence a person can act on. The raw code ("internal",
-    // "http_500") goes to the console, where it is useful, and not onto the screen, where it
-    // is not - but the screen must still say the server is at fault rather than show an
-    // empty-results shrug that reads as "your film does not exist".
-    const why = e.tmdbRefused
-      ? (e.tmdbRefused.error === "limit_reached" ? t('imp_limit_day') : t('err_server_busy'))
-      : escapeHtml(e.message || "");
-    if (e.tmdbRefused) console.warn("[search] refused:", e.tmdbRefused);
-    el.innerHTML = `<div class="empty-state"><div class="empty-state-title">${t('err_connection')}</div><p>${why}</p></div>`;
+    let html = '';
+    if (showPeople.length) html += _srchSect(t('search_people')) + `<div class="card-list">${showPeople.map(personRowHTML).join('')}</div>`;
+    if (showTitles.length) html += _srchSect(t('search_films')) + `<div class="card-list">${showTitles.map(m => movieCardHTML(m)).join('')}</div>`;
+    if (like) html += `<div id="srch-picks"><button type="button" class="srch-line" data-like="${escapeHtml(String(like.id))}" data-type="${like.type === 'tv' ? 'tv' : 'movie'}" data-title="${escapeHtml(like.Title)}">${icon('sparkles', 18)}<span dir="auto">${escapeHtml(t('search_like').replace('{title}', like.Title))}</span><span class="srch-chev">›</span></button></div>`;
+    if (picksRun) html += `<div id="srch-picks">${_srchSect(t('search_picks'))}${_srchGot(c)}${loadingHTML(randQuote(), false)}</div>`;
+    el.innerHTML = html;
+    if (showTitles.length) _maybeShowSearchCoach();
+    if (!picksRun) return;
+
+    const list = await _searchByQuery(raw, 0, c);
+    if (gen !== _srchGen) return;
+    const read = list._read || null;
+    list.slice(0, 7).forEach(m => { m._enr = true; });
+    list.forEach(m => { m._relaxed = m._strict ? [] : (c.relaxed || []).slice(); });
+    const lib = _libraryKeys(), shownIds = new Set(showTitles.map(x => String(x.id)));
+    const usable = list.filter(m => !lib.ids.has(String(m.tmdbID || m.id)) && !lib.titles.has(lib.norm(m.Title)) && !shownIds.has(String(m.id)));
+    _srch = { q: raw, c, buf: usable, shown: 0, press: 0, read, kind: 'q', gen,
+              seen: new Set([...usable.map(m => String(m.id)), ...shownIds]), done: _searchWrapped };
+    _renderPicks(true);
+  } catch (e) {
+    if (gen !== _srchGen) return;
+    // Отказ сервера - не отсутствие фильма. Код ошибки - в консоль, человеку - фраза, по
+    // которой можно что-то сделать.
+    const why = e.tmdbRefused || (e.tmdb && e.tmdb.error)
+      ? ((e.tmdbRefused || e.tmdb).error === 'limit_reached' ? t('imp_limit_day') : t('err_server_busy'))
+      : escapeHtml(e.message || '');
+    if (e.tmdbRefused) console.warn('[search] refused:', e.tmdbRefused);
+    const box = document.getElementById('srch-picks') || el;
+    box.innerHTML = e.message === 'timeout_or_cancelled'
+      ? `<div class="empty-state"><div class="empty-state-title">${t('err_took_long_title')}</div><p>${t('err_took_long_sub')}</p></div>`
+      : `<div class="empty-state"><div class="empty-state-title">${t('err_connection')}</div><p>${why}</p></div>`;
+  } finally { clearTimeout(slowTimer); }
+}
+
+// Строка «Понято»: что пошло в дело, каждый кусок снимается крестиком.
+function _srchGot(c) {
+  const chips = (c && c.chips) || [];
+  if (!chips.length) return '';
+  return `<div class="srch-got"><span class="srch-got-l">${escapeHtml(t('search_understood'))}</span>${chips.map((ch, k) =>
+    `<button type="button" class="srch-tok" dir="auto" data-drop="${k}" aria-label="${escapeHtml(t('search_drop').replace('{w}', ch.label))}">${escapeHtml(ch.label)}${icon('x', 14)}</button>`).join('')}</div>`;
+}
+
+// Какой кусок предложить снять, когда выдача короткая. Тема уже всего, человек - никогда:
+// назвавший режиссёра просил его, а не ближайшее к нему.
+const _DROP_ORDER = ['subject', 'country', 'time', 'genre', 'movement'];
+function _srchDropCandidates(c, n) {
+  const chips = (c && c.chips) || [];
+  if (chips.length < 2) return [];
+  const out = [];
+  for (const kind of _DROP_ORDER)
+    chips.forEach((ch, k) => { if (ch.kind === kind && out.length < n) out.push(k); });
+  return out;
+}
+const _srchWithoutLine = (c, k) => `<button type="button" class="srch-line" data-drop="${k}">${icon('search', 18)}<span dir="auto">${escapeHtml(t('search_without').replace('{w}', c.chips[k].label))}</span><span class="srch-chev">›</span></button>`;
+
+// Что пришлось снять, словами человека. strict - над ослабленным уже стоит то, что подошло
+// целиком, и фраза говорит "только это", а не "ничего".
+function _srchRelaxNote(c, strict) {
+  const r = new Set((c && c.relaxed) || []);
+  if (!r.size) return '';
+  const chips = c.chips || [];
+  const labels = r.has('allButPerson') ? chips.filter(ch => ch.kind !== 'person').map(ch => ch.label)
+    : chips.filter(ch => (r.has('subject') && ch.kind === 'subject') || (r.has('genre') && ch.kind === 'genre')).map(ch => ch.label);
+  const k = strict ? 'search_strict' : 'search_relaxed';
+  return `<div class="srch-note" dir="auto">${escapeHtml(labels.length ? t(k + '_w').replace('{w}', labels.join(', ')) : t(k))}</div>`;
+}
+
+function _renderPicks(first) {
+  const box = document.getElementById('srch-picks');
+  const s = _srch;
+  if (!box || !s) return;
+  const c = s.c;
+  if (first) {
+    const head = (s.kind === 'like' ? _srchSect(t('search_like').replace('{title}', s.title)) : _srchSect(t('search_picks')) + _srchGot(c))
+      + (s.read ? `<div class="srch-skip" dir="auto">${escapeHtml(s.read)}</div>` : '');
+    if (!s.buf.length) {
+      const drops = _srchDropCandidates(c, 2);
+      box.innerHTML = head + (drops.length
+        ? `<div class="srch-note">${escapeHtml(t('search_none_all'))}</div>${drops.map(k => _srchWithoutLine(c, k)).join('')}`
+        : `<div class="srch-note">${escapeHtml(t('search_none_one'))}</div><div class="srch-chips" id="search-examples-none"></div>`);
+      if (!drops.length) _renderSearchExamples('search-examples-none');
+      return;
+    }
+    const strictTop = s.buf[0] && s.buf[0]._strict;
+    box.innerHTML = head + (c && !strictTop ? _srchRelaxNote(c, false) : '') + `<div class="card-list" id="srch-list"></div><div id="srch-tail"></div>`;
+  }
+  const listEl = document.getElementById('srch-list'), tail = document.getElementById('srch-tail');
+  if (!listEl || !tail) return;
+  const from = s.shown, part = s.buf.slice(from, from + _SRCH_STEP);
+  s.shown += part.length;
+  listEl.insertAdjacentHTML('beforeend', part.map((m, i) => {
+    const prev = s.buf[from + i - 1];
+    const note = (c && !m._strict && prev && prev._strict) ? _srchRelaxNote(c, true) : '';
+    return note + movieCardHTML(m, _srchCaption(m, c));
+  }).join(''));
+  let t2 = '';
+  if (s.shown < s.buf.length || !s.done) t2 = `<button type="button" class="srch-more" id="srch-more">${escapeHtml(t('search_more'))}</button>`;
+  else if (s.shown > _SRCH_STEP) t2 = `<div class="srch-end">${escapeHtml(t('search_end'))}</div>`;
+  // Короткая выдача без ослабления: предложить снять один кусок, и сказать какой.
+  if (first && c && s.buf.length < _SRCH_STEP && !(c.relaxed || []).length) {
+    const k = _srchDropCandidates(c, 1)[0];
+    if (k != null) t2 += `<div class="srch-note" style="margin-top:14px">${escapeHtml(t('search_that_all'))}</div>` + _srchWithoutLine(c, k);
+  }
+  tail.innerHTML = t2;
+}
+
+async function _searchMore() {
+  const s = _srch;
+  if (!s) return;
+  const btn = document.getElementById('srch-more');
+  if (btn) { btn.disabled = true; btn.textContent = t('searching'); }
+  try {
+    if (s.shown >= s.buf.length && !s.done && s.kind === 'q') {
+      s.press++;
+      const more = await _searchByQuery(s.q, s.press, s.c);
+      if (s !== _srch) return;
+      more.slice(0, 7).forEach(m => { m._enr = true; });
+      more.forEach(m => { m._relaxed = m._strict ? [] : (s.c.relaxed || []).slice(); });
+      const lib = _libraryKeys();
+      const fresh = more.filter(m => !s.seen.has(String(m.id)) && !lib.ids.has(String(m.tmdbID || m.id)) && !lib.titles.has(lib.norm(m.Title)));
+      fresh.forEach(m => s.seen.add(String(m.id)));
+      s.buf.push(...fresh);
+      if (_searchWrapped || !fresh.length) s.done = true;
+    }
+    const need = s.buf.slice(s.shown, s.shown + _SRCH_STEP).filter(m => !m._enr);
+    if (need.length) { await _enrichWhy(need, s.c); need.forEach(m => { m._enr = true; }); }
+    if (s !== _srch) return;
+    if (s.shown >= s.buf.length) s.done = true;
+    _renderPicks(false);
+  } catch (e) {
+    if (btn) { btn.disabled = false; btn.textContent = t('search_more'); }
+    showToast(t('err_server_busy'), true);
   }
 }
+
+// «Похожее на Fargo»: рекомендации TMDB к этому фильму, со связью с твоими, где она есть.
+async function _searchLike(id, type, title) {
+  const box = document.getElementById('srch-picks');
+  if (!box) return;
+  const gen = _srchGen;
+  box.innerHTML = _srchSect(t('search_like').replace('{title}', title)) + loadingHTML(randQuote(), false);
+  try {
+    const r = await tmdbFetch(`/${type}/${encodeURIComponent(id)}/recommendations?language=${_tmdbLang()}`);
+    if (r && r.error) { const e = new Error(r.error); e.tmdb = r; throw e; }
+    if (gen !== _srchGen) return;
+    const lib = _libraryKeys();
+    const list = ((r && r.results) || []).filter(x => !lib.ids.has(String(x.id)) && !lib.titles.has(lib.norm(x.title || x.name))).map(x => ({
+      id: x.id, tmdbID: String(x.id), type: x.media_type === 'tv' || type === 'tv' ? 'tv' : 'movie',
+      Title: x.title || x.name, Year: (x.release_date || x.first_air_date || '').slice(0, 4),
+      Poster: x.poster_path ? TMDB_IMG + x.poster_path : '',
+      Rating: x.vote_average ? x.vote_average.toFixed(1) : null, Genre: '', why: null,
+    }));
+    await _enrichWhy(list, null);
+    if (gen !== _srchGen) return;
+    list.slice(0, 7).forEach(m => { m._enr = true; });
+    _srch = { q: null, c: null, buf: list, shown: 0, press: 0, kind: 'like', title, gen, seen: new Set(list.map(m => String(m.id))), done: true };
+    _renderPicks(true);
+  } catch (e) {
+    if (gen !== _srchGen) return;
+    box.innerHTML = `<div class="empty-state"><div class="empty-state-title">${t('err_connection')}</div><p>${escapeHtml(t('err_server_busy'))}</p></div>`;
+  }
+}
+
+// Снять кусок из «Понято» и искать снова. Слова убираются из того, что было набрано,
+// и поле показывает новый запрос - видно, что именно изменилось.
+function _searchDrop(k) {
+  const s = _srch, c = s && s.c;
+  const ch = c && c.chips && c.chips[k];
+  if (!ch) return;
+  const inp = document.getElementById('search-input');
+  inp.value = c.toks.filter((_, i) => !ch.toks.includes(i)).join(' ').replace(/^[\s,;]+|[\s,;]+$/g, '');
+  doSearch();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const tab = document.getElementById('tab-search');
+  const inp = document.getElementById('search-input');
+  if (!tab || !inp) return;
+  tab.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('button');
+    if (!b || !tab.contains(b)) return;
+    if (b.classList.contains('srch-chip') && b.dataset.q != null) { inp.value = b.dataset.q; doSearch(); }
+    else if (b.dataset.drop != null) _searchDrop(Number(b.dataset.drop));
+    else if (b.dataset.like) _searchLike(b.dataset.like, b.dataset.type, b.dataset.title);
+    else if (b.id === 'srch-more') _searchMore();
+  });
+  // Поле очистили (крестиком или стёрли) - вернуть домашний экран, а не висящую выдачу.
+  inp.addEventListener('input', () => {
+    if (inp.value.trim()) return;
+    _srchGen++; _srch = null;
+    document.getElementById('search-results').innerHTML = '';
+    _searchHome(true);
+  });
+  _searchHome(true);
+});
 
 // ── Detail ────────────────────────────────────────────────────────────────────
 function clickableNames(str, closeModal) {
@@ -7803,7 +8146,7 @@ function getSeasonalContext() {
 // watched films it degrades into near-random suggestions, which wastes the killer
 // feature's one first impression (and spends AI budget to make a bad one). Framed as
 // progress rather than a lock, so it also nudges the habit that feeds stats, the
-// taste profile and Wrapped. Note: loadRecs() is NOT gated - a typed request stands
+// taste profile and Wrapped. Note: a typed search is NOT gated - a typed request stands
 // on its own without history.
 const SURPRISE_MIN_WATCHED = 5;
 
@@ -8045,66 +8388,20 @@ async function _discoverPicks(mode) {
   }));
 }
 
-// ── The picks meter ──────────────────────────────────────────────────────────
-// Ten presses a week. Not a new restriction: the worker live in Cloudflare has been enforcing
-// exactly ten all along - the repo lowered it to 5 on 13 Sep and that was never pasted in - so
-// this preserves what people already have rather than changing it. Nobody gains and nobody
-// loses on the day it deploys, which is the only safe version of this change.
-//
-// Spent BEFORE the press, because the press costs about sixteen TMDB requests on the taste
-// path and refunding is not a thing. If the worker has not been updated yet it answers 404,
-// and an old worker must never block a press - so anything other than an explicit refusal is
-// treated as permission.
-let _picksRemaining = null;
-async function _spendPick() {
-  // Проверочный режим не тратит подборку, и только для НАШЕГО движка. У него нет
-  // денежной цены: он ходит в TMDB, а TMDB ограничен отдельно и на стороне воркера
-  // (2000 в день), то есть настоящий потолок никуда не девается. Счётчик подборок -
-  // это метроном ощущения, а не касса, и на время сравнения плеч он мешает.
-  // У плеча ИИ расход остаётся всегда: там за каждое нажатие платят деньгами.
-  if (PICKS_ENGINE === 'engine' && PICKS_ENGINE_FORCED) return { ok: true };
-  try {
-    const { data: { session } } = await sbClient.auth.getSession();
-    if (!session) return { ok: true };
-    const res = await fetch(PROXY_URL.replace(/\/$/, "") + "/picks/spend", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + session.access_token },
-    });
-    if (res.status === 404) return { ok: true };          // worker not updated yet
-    const data = await res.json().catch(() => ({}));
-    if (res.status === 429) return { ok: false, data };
-    if (!res.ok) return { ok: true };                      // never block on an unclear answer
-    if (typeof data.remaining === "number") { _picksRemaining = data.remaining; _renderPicksMeter(); }
-    return { ok: true, data };
-  } catch (e) { return { ok: true }; }                     // offline or blocked: let them press
-}
-
-// The counter sits in the slot the model's counter used to occupy. It says what is left and
-// nothing else - there is no paid tier to point at, and hinting at one that does not exist
-// would be a promise nobody decided to make.
-function _renderPicksMeter() {
-  const el = document.getElementById("ai-counter");
-  if (!el) return;
-  if (_picksRemaining === null) { el.textContent = ""; return; }
-  el.textContent = `${_picksRemaining} ${t('picks_left_week')}`;
-}
-
 async function surpriseMeEngine() {
-  const el = document.getElementById("rec-results");
-  const seen = watchHistory.filter(h => h.status === "watched").length;
+  // Выдача под кнопкой, на месте результатов поиска; «Для тебя» на это время прячется,
+  // чтобы два списка подборок не стояли друг над другом.
+  const el = document.getElementById("search-results");
+  _srchGen++; _srch = null;
+  _searchHome(true, false);
+  const seen = watchHistory.filter(h => h.status === "watched" && _isMine(h)).length;
   if (seen < SURPRISE_MIN_WATCHED) {
     el.innerHTML = `<div class="empty-state">
       <div class="empty-state-icon">✨</div>
       <div class="empty-state-title">${escapeHtml(t('surprise_need_title'))}</div>
       <p>${escapeHtml(t('surprise_need_sub').replace('{n}', seen).replace('{need}', SURPRISE_MIN_WATCHED))}</p>
-      <button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${escapeHtml(t('empty_list_btn'))}</button>
+      <button onclick="document.getElementById('search-input').focus()" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${escapeHtml(t('empty_list_btn'))}</button>
     </div>`;
-    return;
-  }
-  const spent = await _spendPick();
-  if (!spent.ok) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-state-title">${t('recs_unavail_title')}</div><p>${escapeHtml(t('picks_exhausted'))}</p></div>`;
-    _picksRemaining = 0; _renderPicksMeter();
     return;
   }
   el.innerHTML = loadingHTML(randQuote(), true, true);
@@ -8112,7 +8409,7 @@ async function surpriseMeEngine() {
   try {
     const mode = getSurpriseMode();
     const recentlyShown = new Set(_shownSurprises.slice(-30));
-    const watchedEntries = watchHistory.filter(h=>h.status==="watched");
+    const watchedEntries = watchHistory.filter(h=>h.status==="watched" && _isMine(h));
     const lib = _libraryKeys();
     let pool;
     if (mode === "taste") {
@@ -8141,14 +8438,15 @@ async function surpriseMeEngine() {
     const details = await _enrichWhy(
       band.slice(0, 3).map(c => ({ ...c, why: c._why || _tallyWhy(c) })), null, _generic);
     if (!details.length) {
-      el.innerHTML = `<div class="empty-state"><div class="empty-state-title">${t('recs_none_title')}</div><p>${t('recs_none_sub')}</p></div>`;
+      // Примеры стоят прямо над этим местом - пересказывать их текстом незачем.
+      el.innerHTML = `<div class="srch-note" style="margin-top:16px">${escapeHtml(t('search_surprise_none'))}</div>`;
       return;
     }
     details.forEach(m=>{if(m.Title)_shownSurprises.push(m.Title);});
     sessionStorage.setItem("shownSurprises", JSON.stringify(_shownSurprises.slice(-30)));
-    const modeLabel = "✨ " + (mode==="random"?t('picks_random'):mode==="seasonal"?t('picks_tonight'):t('picks_for_you'));
+    const modeLabel = mode==="random"?t('picks_random'):mode==="seasonal"?t('picks_tonight'):t('picks_for_you');
     el.innerHTML = `
-      <div class="picks-banner"><div class="picks-banner-label">${modeLabel}</div></div>
+      <div class="srch-sect" style="margin-top:18px">${escapeHtml(modeLabel)}</div>
       <div class="card-list">${details.map(m=>movieCardHTML(m,m.why)).join("")}</div>
       ${_pickQualityHint(watchedEntries.length)}`;
   } catch(e) {
@@ -8803,7 +9101,9 @@ function _splitQuery(q) {
     // Remove the winning phrase from the query so its words do not also seed the subject pass.
     const win = movements[0];
     const re = new RegExp(win._hit.split('').join('\\s*'), 'gi');
-    qLeft = qLeft.replace(re, ' ');
+    // Пробелы той же длины, а не один: так слова исходного запроса стоят на тех же местах,
+    // и строка «Понято» может сказать, какое слово набранного что значило.
+    qLeft = qLeft.replace(re, m => ' '.repeat(m.length));
   }
   const words = _qNorm(qLeft).split(' ').filter(Boolean)
     // Prefix matching only for stop words long enough to be unambiguous. Italian "per" was
@@ -8868,19 +9168,25 @@ function _splitQuery(q) {
   // кино, а не ещё и кино "про сны" из-за одиночного "sueno". Поэтому фразы ищутся ПЕРВЫМИ, по
   // всем таблицам сразу, а их слова откладываются в сторону.
   const _phraseWords = new Set(), _phraseRows = new Set();
-  const _phraseHit = phrase => {
+  // Какая таблица поняла слово. Нужно строке «Понято»: когда TMDB пуст и движок снимает
+  // жанр или тему, человеку называют именно снятое слово.
+  const _kindOf = new Map();
+  const _phraseHit = (phrase, kind) => {
     const parts = phrase.split('_').map(p => _fold(_qNorm(p))).filter(Boolean);
     for (let i = 0; i + parts.length <= allWords.length; i++)
       if (parts.every((p, j) => _partHit(allWords[i + j], p))) {
-        for (let j = 0; j < parts.length; j++) { matchedWords.add(allWords[i + j]); _phraseWords.add(allWords[i + j]); }
+        for (let j = 0; j < parts.length; j++) {
+          matchedWords.add(allWords[i + j]); _phraseWords.add(allWords[i + j]);
+          if (!_kindOf.has(allWords[i + j])) _kindOf.set(allWords[i + j], kind);
+        }
         return true;
       }
     return false;
   };
-  for (const tbl of [_MOODS, _GENRE_WORDS, _SUBJECTS, _COUNTRIES])
+  for (const [tbl, kind] of [[_MOODS, 'genre'], [_GENRE_WORDS, 'genre'], [_SUBJECTS, 'subject'], [_COUNTRIES, 'country']])
     for (const row of tbl)
-      if (row.terms.split(' ').some(t => t.includes('_') && _phraseHit(t))) _phraseRows.add(row);
-  const hit = tbl => tbl.filter(row => {
+      if (row.terms.split(' ').some(t => t.includes('_') && _phraseHit(t, kind))) _phraseRows.add(row);
+  const hit = (tbl, kind) => tbl.filter(row => {
     const all = row.terms.split(' ').filter(s => s.length > 2);
     // "=слово" - только это слово целиком, без приставки и без стеммера. Для форм, которые
     // стеммер сводит с чужим словом: "дорогой" (дорогая, "Дорогой Джон") и "дорога" дают одну основу.
@@ -8890,7 +9196,7 @@ function _splitQuery(q) {
     words.forEach(w0 => {
       const w = _fold(w0);
       if (_phraseWords.has(w)) return;
-      if (exact.includes(w)) { matchedWords.add(w0); found = true; return; }
+      if (exact.includes(w)) { matchedWords.add(w0); if (!_kindOf.has(w)) _kindOf.set(w, kind); found = true; return; }
       const ws = _stem(w);
       // Две мерки, и они ловят разное. Стеммер сводит формы ОДНОГО слова: тихой и тихий,
       // любви и любовь, коты и кошки. Приставка перекрывает границу между частями речи,
@@ -8902,14 +9208,14 @@ function _splitQuery(q) {
       // обеих сторон: и у слова из запроса, и у термина после нормализации.
       if (stems.some(st => _pfxHit(w, st) || (st.length < 4 && w === st)
                         || (ws.length >= 4 && _stem(st).length >= 4 && ws === _stem(st))))
-        { matchedWords.add(w0); found = true; }
+        { matchedWords.add(w0); if (!_kindOf.has(w)) _kindOf.set(w, kind); found = true; }
     });
     return found;
   });
-  const moods = hit(_MOODS);
-  const genres = hit(_GENRE_WORDS);
-  const subjects = hit(_SUBJECTS);
-  const countries = hit(_COUNTRIES);
+  const moods = hit(_MOODS, 'genre');
+  const genres = hit(_GENRE_WORDS, 'genre');
+  const subjects = hit(_SUBJECTS, 'subject');
+  const countries = hit(_COUNTRIES, 'country');
   const decade = _decadeFrom(flat, q);
   const year = _yearFrom(flat, q);
   // A decade word has done its job and must not go on to the keyword search as if it were a
@@ -8940,8 +9246,34 @@ function _splitQuery(q) {
 
   let rest = words.filter(w => !matchedWords.has(w)).join(' ');
   rest = rest.split(' ').filter(w => w.length > 2).join(' ').trim();
+
+  // ПОНЯТОЕ КУСКАМИ, КАК ОНО СТОИТ В НАБРАННОМ. Для строки «Понято» над выдачей: каждый
+  // кусок снимается крестиком, и запрос перезапускается без него. Подпись - слово, как
+  // его набрал человек ("70-х", а не "70"), фраза - один кусок, а не три слова.
+  const toks = [], chips = [];
+  for (const m of String(q).matchAll(/\S+/g)) {
+    const left = qLeft.slice(m.index, m.index + m[0].length);
+    toks.push({ s: m[0], w: _qNorm(left).split(' ').filter(Boolean).map(_fold) });
+  }
+  const _mset = new Set([...matchedWords].map(_fold));
+  const _restSet = new Set(rest.split(' ').filter(Boolean).map(_fold));
+  const _label = ix => ix.map(i => toks[i].s).join(' ').replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '');
+  const _mv = toks.map((tk, i) => (!tk.w.length && /[\p{L}\p{N}]/u.test(tk.s)) ? i : -1).filter(i => i >= 0);
+  if (movements.length && _mv.length) chips.push({ label: _label(_mv), toks: _mv, kind: 'movement' });
+  let prevPhrase = null;
+  toks.forEach((tk, i) => {
+    const got = tk.w.filter(w => _mset.has(w));
+    if (!got.length) { prevPhrase = null; return; }
+    const kind = _kindOf.get(got[0]) || 'time';
+    const phrase = got.some(w => _phraseWords.has(w));
+    if (phrase && prevPhrase && prevPhrase.kind === kind) { prevPhrase.toks.push(i); prevPhrase.label = _label(prevPhrase.toks); return; }
+    const chip = { label: _label([i]), toks: [i], kind };
+    chips.push(chip);
+    prevPhrase = phrase ? chip : null;
+  });
+  const restToks = toks.map((tk, i) => tk.w.some(w => _restSet.has(w)) ? i : -1).filter(i => i >= 0);
   return { movements, moods, genres, subjects, countries, decade, year, subject: rest,
-           recent, recentIfPerson,
+           recent, recentIfPerson, toks: toks.map(tk => tk.s), chips, restToks,
            // Слова, которые мы ДЕЙСТВИТЕЛЬНО поняли. Считались давно и наружу не
            // отдавались, а именно они - честный ответ на вопрос "что ты прочитал".
            matchedWords: [...matchedWords].sort((a, b) => words.indexOf(a) - words.indexOf(b)) };
@@ -9691,9 +10023,10 @@ function _planQuery(c) {
 // тестом, не трогая сеть, и порядок веток перестаёт влиять на результат.
 async function _constraintsFor(q) {
   const { movements, moods, genres, subjects, countries, decade, year, subject, matchedWords,
-          recent, recentIfPerson } = _splitQuery(q);
+          recent, recentIfPerson, toks, chips, restToks } = _splitQuery(q);
   const c = {
     why: t('why_for_query').replace('{q}', q), matchedWords,
+    toks: toks || [], chips: (chips || []).slice(), restToks: restToks || [], personName: null,
     matched: false, movement: null, person: null, decade: null, country: null,
     keywords: [], genreIds: [], genreAnd: false, curated: null, pins: 0,
   };
@@ -9703,8 +10036,11 @@ async function _constraintsFor(q) {
   const person = movements.length ? null : await _personId(subject);
   if (person) {
     c.person = person.id;
+    c.personName = person.name;
     c.why = t('why_person').replace('{name}', person.name);
     c.matched = true;
+    // Имя собрано из того, что таблицы не поняли, - значит и кусок в «Понято» из тех же слов.
+    if (c.restToks.length) c.chips.push({ label: person.name, toks: c.restToks.slice(), kind: 'person' });
   }
 
   // Свежесть решается ЗДЕСЬ, потому что только здесь известно, назван ли человек.
@@ -9768,6 +10104,10 @@ async function _constraintsFor(q) {
       c.keywords = found;
       if (subjects.length) c.why = t('why_for_query').replace('{q}', subjects.map(x => x.k).join(', '));
       c.matched = true;
+      // Тема из НЕпонятого остатка, найденная в индексе TMDB, - тоже понятое, и снимается так же.
+      c.kwTrusted = subjects.length > 0;
+      if (!subjects.length && c.restToks.length && !c.person)
+        c.chips.push({ label: c.restToks.map(i => c.toks[i]).join(' '), toks: c.restToks.slice(), kind: 'subject' });
     }
   }
   if (c.genreIds.length) c.matched = true;
@@ -10021,6 +10361,7 @@ async function _personFilms(c) {
     Released: film.release_date || '',
     Poster: film.poster_path ? TMDB_IMG + film.poster_path : '',
     Rating: film.vote_average ? film.vote_average.toFixed(1) : null, Genre: '', why: null,
+    gids: (film.genre_ids || []).map(String),
   }));
 }
 
@@ -10032,7 +10373,9 @@ async function _personFilms(c) {
 // 1 - вторая и так далее; изменил запрос - снова с начала. Кончилась выдача - по кругу.
 // Случайность осталась там, где её обещают: в "Удиви меня".
 let _searchWrapped = false;
-async function _searchByQuery(q, press = 0) {
+// pre - уже разобранный запрос. Единый поиск разбирает его один раз, параллельно с поиском
+// по названию, и не платит за разбор (имя, теги) второй раз.
+async function _searchByQuery(q, press = 0, pre = null) {
   _searchWrapped = false;
   // Порция из готового списка (кураторский, фильмография): пятёрка за нажатие, по кругу.
   const _portion = list => {
@@ -10040,7 +10383,8 @@ async function _searchByQuery(q, press = 0) {
     if (off && off >= list.length) { _searchWrapped = true; return list.slice(0, 12); }
     return list.slice(off, off + 12);
   };
-  const c = await _constraintsFor(q);
+  const c = pre || await _constraintsFor(q);
+  c.relaxed = [];
   if (c.curated) {                                  // кураторский список ответил сам
     const lib0 = _libraryKeys();
     const unseen = c.curated.filter(m => !lib0.ids.has(String(m.id))
@@ -10118,6 +10462,11 @@ async function _searchByQuery(q, press = 0) {
     _searchWrapped = true;
   }
   const _deep = press > 0 && !_searchWrapped;   // на глубокой странице показываем, что есть
+  // ТО, ЧТО ПОДХОДИТ ЦЕЛИКОМ, НЕ ВЫБРАСЫВАЕТСЯ ВМЕСТЕ С ОСЛАБЛЕНИЕМ. Найдено 10 октября при
+  // сборке единого поиска: "грустное про маяк" находило два фильма про маяк, их было меньше
+  // трёх, цикл снимал тему - и два точных ответа исчезали под общими драмами. Теперь они
+  // идут первыми, а ослабленное - после строки, которая говорит, что снято.
+  const _strictRes = res;
   for (const drop of ['&votes', 'without_keywords', 'with_keywords', '&genres', 'with_genres']) {
     if (_deep || _fresh(res) >= 3) break;
     if (drop === '&votes') {
@@ -10139,6 +10488,12 @@ async function _searchByQuery(q, press = 0) {
     res = await tmdbFetch(`/discover/movie?${p.toString()}`);
     if (res && res.error) break;
   }
+  // ЧТО ИЗ НАЗВАННОГО ЧЕЛОВЕКОМ ПРИШЛОСЬ СНЯТЬ. Порог голосов и чужие темы - наши числа, о
+  // них молчим. Тема и жанр - его слова, и выдача без них обязана это сказать, а подпись под
+  // карточкой - не обещать снятого: "маяк" под фильмом без маяка был бы неправдой.
+  if (_asAsked.has('with_keywords') && !p.has('with_keywords')) c.relaxed.push('subject');
+  if (_asAsked.has('with_genres') && !p.has('with_genres')) c.relaxed.push('genre');
+  else if (p.has('with_genres') && p.get('with_genres') !== _asAsked.get('with_genres')) c.relaxed.push('genreOr');
   // Последнее слово за человеком: если после всего пусто, отдаём просто его фильмы.
   if (c.person && _fresh(res) < 1) {
     const only = new URLSearchParams({
@@ -10146,17 +10501,20 @@ async function _searchByQuery(q, press = 0) {
       with_people: String(c.person), 'with_runtime.gte': '60', 'vote_count.gte': '20',
     });
     const r2 = await tmdbFetch(`/discover/movie?${only.toString()}`);
-    if (r2 && !r2.error && _fresh(r2) > 0) res = r2;
+    if (r2 && !r2.error && _fresh(r2) > 0) { res = r2; c.relaxed = ['allButPerson']; }
   }
-  const _cands = ((res && res.results) || [])
-    .filter(x => !_lib.ids.has(String(x.id)) && !_lib.titles.has(_lib.norm(x.title || x.name)))
-    .map(x => ({
+  const _toCand = x => ({
       id: x.id, tmdbID: String(x.id), type: 'movie',
       Title: x.title || x.name, Year: (x.release_date || '').slice(0, 4),
       Released: x.release_date || '',
       Poster: x.poster_path ? TMDB_IMG + x.poster_path : '',
       Rating: x.vote_average ? x.vote_average.toFixed(1) : null, Genre: '', why: c.why,
-    }));
+      gids: (x.genre_ids || []).map(String),
+    });
+  const _isFresh = x => !_lib.ids.has(String(x.id)) && !_lib.titles.has(_lib.norm(x.title || x.name));
+  const _cands = ((res && res.results) || []).filter(_isFresh).map(_toCand);
+  const _strict = (c.relaxed.length && _strictRes !== res)
+    ? ((_strictRes && _strictRes.results) || []).filter(_isFresh).map(x => ({ ..._toCand(x), _strict: true })) : [];
 
   const _taste = await _tasteIndex();
   let ranked = _rankByTaste(_cands, _taste, c.why);
@@ -10187,6 +10545,9 @@ async function _searchByQuery(q, press = 0) {
           Released: x.release_date || '',
           Poster: x.poster_path ? TMDB_IMG + x.poster_path : '',
           Rating: x.vote_average ? x.vote_average.toFixed(1) : null, Genre: '',
+          gids: (x.genre_ids || []).map(String),
+          // Этот запрос шёл БЕЗ темы (with_keywords снят выше): подпись не должна её обещать.
+          _noKw: true,
           // Имя без должности - половина ответа. Сообщено 26 сентября: "With Dave
           // Porter" не говорит, играл он или написал музыку, а он композитор.
           // Состав кандидата всё равно загружается для подписи, так что роль
@@ -10206,86 +10567,13 @@ async function _searchByQuery(q, press = 0) {
   // Сортировка устойчивая: внутри одной даты остаётся порядок вкуса.
   if (c.recent) ranked = [...ranked].sort((a, b) =>
     String(b.Released || '').localeCompare(String(a.Released || '')));
+  if (_strict.length) {
+    const ids = new Set(_strict.map(m => String(m.id)));
+    ranked = [..._strict, ...ranked.filter(m => !ids.has(String(m.id)))];
+  }
   return _enrichWhy(ranked, c);
 }
 
-
-let _pressState = { key: '', n: 0 };
-async function loadRecsEngine() {
-  const q = document.getElementById("rec-input").value.trim();
-  const btn = document.getElementById("rec-btn");
-  const el = document.getElementById("rec-results");
-  btn.disabled=true; // label stays "Find" — loading is shown in the results area below
-  el.innerHTML=loadingHTML(randQuote(),true,true);
-  const slowTimer = startSlowLoadingIndicator();
-  try {
-    // An empty field is not an error and should not be one: it means "anything good for me",
-    // which is exactly what the taste tally answers. Hand it over rather than scolding.
-    if (!q) { btn.disabled=false; btn.textContent=t('find_btn'); _setSurpriseMode('taste'); return surpriseMeEngine(); }
-    const spent = await _spendPick();
-    if (!spent.ok) {
-      el.innerHTML = `<div class="empty-state"><div class="empty-state-title">${t('recs_unavail_title')}</div><p>${escapeHtml(t('picks_exhausted'))}</p></div>`;
-      _picksRemaining = 0; _renderPicksMeter();
-      btn.disabled=false; btn.textContent=t('find_btn'); return;
-    }
-    // Тот же запрос - следующая порция; другой запрос - с начала. Регистр и пробелы
-    // по краям не делают запрос другим.
-    const _key = q.toLowerCase().replace(/\s+/g, ' ');
-    if (_pressState.key === _key) _pressState.n++; else _pressState = { key: _key, n: 0 };
-    const details = await _searchByQuery(q, _pressState.n);
-    if (_searchWrapped) _pressState.n = 0;
-    // Drop anything already in the library. The prompt does say "none may appear in the
-    // watched or watchlist lists above", and the model obeys it - but it is only ever
-    // SHOWN a sample of the library, and the watchlist was
-    // trimmed to the last 6. A film it never saw can therefore come back as a
-    // recommendation, which is how Felicity's picks returned The Power of the Dog, a film
-    // she had watched and rated 4 stars. Nothing in the prompt can fix that; the check has
-    // to happen here, against the whole library.
-    //
-    // Matched on the resolved TMDB id, which is exact where a title match is not. Seven
-    // are requested so that five survive the filter.
-    const _norm = _normTitle;
-    const knownIds = new Set(watchHistory.map(h=>String(h.tmdbID)).filter(Boolean));
-    const knownTitles = new Set(watchHistory.map(h=>_norm(h.title)).filter(Boolean));
-    // ПОМНИМ ПОКАЗАННОЕ, КАК ЭТО ДАВНО ДЕЛАЕТ "УДИВИ МЕНЯ".
-    //
-    // Порог в 1000 голосов на голом жанре оставляет от "action" тысячи фильмов, а
-    // от "documentary" или "вестерн" пару десятков - жанры на TMDB очень разного
-    // размера. Сортировка по средней оценке из маленького набора всегда отдаёт одну
-    // и ту же верхушку, и подборка перестаёт быть подборкой. Сообщено 26 сентября:
-    // "documentary" повторял один и тот же короткий список.
-    //
-    // Подгонять порог под каждый жанр - это таблица исключений, которая устареет.
-    // Помнить показанное - одно правило, работающее на любом запросе.
-    // ПАМЯТЬ О ПОКАЗАННОМ - ДЛЯ "УДИВИ МЕНЯ", А НЕ ДЛЯ ЯВНОГО ЗАПРОСА.
-    //
-    // Вчера я добавил её и сюда, чтобы "documentary" не повторял один короткий
-    // список. Сегодняшние скриншоты показали цену: "denis villeneuve cyberpunk
-    // 2010s" первым нажатием отдавал Blade Runner 2049, а вторым и третьим -
-    // Steven Universe, Mommy, Hacksaw Ridge. Лучшие совпадения вычёркивались
-    // именно потому, что их уже показали.
-    //
-    // Это разные обещания. "Удиви меня" обещает НОВОЕ, и там повтор - провал.
-    // Явный запрос обещает ОТВЕТ НА НЕГО, и там разнообразие - провал: человек
-    // жмёт второй раз, чтобы проверить, не показалось ли, и получает чужую выдачу.
-    const usable = details.filter(m =>
-      !(m.tmdbID && knownIds.has(String(m.tmdbID))) && !knownTitles.has(_norm(m.Title)));
-    const fresh = usable.slice(0, 5);
-    // "Понято: комедия · франция" - это ответ на ЗАПРОС, а не на "почему этот фильм",
-    // и повторённое под каждой карточкой оно превращалось в шум. Здесь оно стоит
-    // один раз над списком и делает границу разбора видимой: сразу ясно, какое из
-    // набранных слов мы не прочитали.
-    const readLine = details._read
-      ? `<div class="picks-read" dir="auto">${escapeHtml(details._read)}</div>` : "";
-    el.innerHTML = fresh.length
-      ? `${readLine}<div class="card-list">${fresh.map(m=>movieCardHTML(m,m.why)).join("")}</div>`
-      : `<div class="empty-state"><div class="empty-state-icon">🤷</div><div class="empty-state-title">${t('recs_none_title')}</div><p>${t('recs_none_sub')}</p></div>`;
-  } catch(e) {
-    if (e.message==="timeout_or_cancelled") el.innerHTML=`<div class="empty-state"><div class="empty-state-icon">⏱</div><div class="empty-state-title">${t('err_took_long_title')}</div><p>${t('err_took_long_sub')}</p></div>`;
-    else el.innerHTML=`<div class="empty-state"><div class="empty-state-title">${t('err_generic')}</div><p>${e.message}</p></div>`;
-  } finally { clearTimeout(slowTimer); }
-  btn.disabled=false; btn.textContent=t('find_btn');
-}
 
 // ── Share ─────────────────────────────────────────────────────────────────────
 let currentShareMovie = null;
@@ -15882,7 +16170,7 @@ function _missingWords() {
 }
 
 function _renderSuggest() {
-  const inp = document.getElementById('rec-input');
+  const inp = document.getElementById('search-input');
   const box = document.getElementById('rec-suggest');
   if (!inp || !box) return;
   const items = _suggestFor(_lastToken(inp.value));
@@ -15899,7 +16187,7 @@ function _renderSuggest() {
 }
 
 function _applySuggest(word) {
-  const inp = document.getElementById('rec-input');
+  const inp = document.getElementById('search-input');
   if (!inp) return;
   // Заменяем только допечатываемую часть; набранное до запятой остаётся как есть.
   const v = inp.value, cut = v.lastIndexOf(',');
@@ -15909,7 +16197,7 @@ function _applySuggest(word) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const inp = document.getElementById('rec-input');
+  const inp = document.getElementById('search-input');
   const box = document.getElementById('rec-suggest');
   if (!inp || !box) return;
   inp.addEventListener('input', _renderSuggest);
@@ -15922,304 +16210,14 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ── ЧЕМ СЧИТАТЬ ПОДБОРКИ: ОДИН ПЕРЕКЛЮЧАТЕЛЬ ────────────────────────────────
-//
-// В приложении живут ОБА плеча сразу: модель через воркер и наш разбор запроса.
-// Выбор - одна строка ниже, то есть смена умолчания стоит один деплой и откат
-// стоит ровно столько же. Это и есть смысл: движок ещё строится, и возможность
-// вернуть людей на работающее за одну минуту дороже, чем экономия на мёртвом коде.
-//
-// Отдельный человек переключает себе сам, без деплоя:
-//     cinemail.app/?picks=engine   - наш движок
-//     cinemail.app/?picks=ai       - модель
-//     cinemail.app/?picks=default  - вернуться к умолчанию
-// Выбор запоминается на устройстве и переживает перезагрузку.
-//
-// ПОЧЕМУ УМОЛЧАНИЕ 'ai': ровно то, что у людей сейчас. Деплой не должен менять
-// подборки никому - он везёт починенную кнопку "назад" и восемнадцать коммитов
-// остальной работы. Умолчание меняется, когда слепой стенд скажет, что можно.
-//
-// §1.C TMDB: путь к модели остаётся в приложении, то есть положение то же, что
-// сегодня, - ни лучше, ни хуже. Оно обязано измениться ДО подачи в сторы, и это
-// записано как условие подачи, а не как "когда-нибудь".
-//
-// В ТЕСТОВОЙ СБОРКЕ УМОЛЧАНИЕ 'engine', с 1 октября 2026, решением Dafa. Она
-// существует, чтобы проверять новое, а до этого кнопка Suggest здесь вызывала ИИ,
-// который не менялся: свежесть, точный год и починка имён были видны только тому,
-// кто знал про ?picks=engine. Первая же живая проверка это и показала - "новинки 2026"
-// ушли в модель и вернулись фильмами 2024-2025 годов.
-//
-// В ПРОДАКШЕН ЭТА СТРОКА НЕ ПЕРЕНОСИТСЯ. docs/promote.py сохраняет умолчание, которое
-// стоит в app/index.html, и печатает его. Продакшен переключается отдельным решением,
-// после слепого стенда, а не как побочный эффект переноса.
-const PICKS_ENGINE_DEFAULT = 'engine';
-
-let PICKS_ENGINE_FORCED = false;
-const PICKS_ENGINE = (() => {
-  let q = null;
-  try { q = new URLSearchParams(location.search).get('picks'); } catch (e) {}
-  try {
-    if (q === 'default') localStorage.removeItem('picks_engine');
-    else if (q === 'ai' || q === 'engine') localStorage.setItem('picks_engine', q);
-    const saved = localStorage.getItem('picks_engine');
-    if (saved === 'ai' || saved === 'engine') { PICKS_ENGINE_FORCED = true; return saved; }
-  } catch (e) { /* приватное окно: остаёмся на умолчании */ }
-  if (q === 'ai' || q === 'engine') { PICKS_ENGINE_FORCED = true; return q; }
-  return PICKS_ENGINE_DEFAULT;
-})();
-
-async function loadRecs()   { return PICKS_ENGINE === 'ai' ? loadRecsAI()   : loadRecsEngine(); }
-async function surpriseMe() { return PICKS_ENGINE === 'ai' ? surpriseMeAI() : surpriseMeEngine(); }
-
-// Пометка на экране, и она не украшение: без неё легко час сравнивать плечо
-// с ним же самим и не заметить. Видна только тому, кто переключился руками.
-function _renderEngineBadge() {
-  const host = document.getElementById('rec-history-hint');
-  if (!host) return;
-  let el = document.getElementById('engine-badge');
-  if (!PICKS_ENGINE_FORCED) { if (el) el.remove(); return; }
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'engine-badge';
-    el.style.cssText = 'margin-top:6px;font-size:11px;letter-spacing:.06em;text-indent:.06em;'
-      + 'color:var(--muted);border:1px solid var(--border,#26264a);border-radius:6px;'
-      + 'padding:3px 7px;display:inline-block';
-    host.parentNode.insertBefore(el, host.nextSibling);
-  }
-  el.textContent = (PICKS_ENGINE === 'ai' ? 'AI' : 'ENGINE') + ' · ?picks=default';
-}
-document.addEventListener('DOMContentLoaded', _renderEngineBadge);
-
-// ── ПЛЕЧО ИИ, взято дословно из v0.57.33 ────────────────────────────────────
-// Не переписано по памяти и не восстановлено по описанию: вырезано из того самого
-// коммита, который сейчас работает у людей (edb3730), проверено на баланс скобок и
-// на то, что не зовёт ничего исчезнувшего. Однажды воспроизведённый по памяти
-// промпт разошёлся с настоящим в трёх местах сразу.
-const ANTHROPIC_KEY = "enabled";
-let _aiAbortController = null;
-function _crewRule() {
-  return `NEVER name the director, cinematographer, composer, or any crew member OF A FILM YOU ARE SUGGESTING - you do not have their credits and any name you produce will be wrong. Describe what the film does instead. You MAY name people from the person's own watched list, because those credits are given to you above.`;
-}
-function _recLangRule() {
-  const names = { en:'English', ru:'Russian', uk:'Ukrainian', ka:'Georgian', es:'Spanish', fr:'French', de:'German', it:'Italian' };
-  const lang = names[_lang] || 'English';
-  return `\n\nWrite every "why" value in ${lang}, speaking to the user directly, informally and warmly (use the informal "you" where the language distinguishes it). Do NOT use em dashes or any emoji in "why". Keep each "title" in its original language - do not translate titles.`;
-}
-function _tasteSample(entries, limit = 12) {
-  const rated = entries.filter(e => Number(e.stars) > 0)
-                       .sort((a, b) => Number(b.stars) - Number(a.stars));
-  const picked = rated.slice(0, Math.max(0, limit - 3));
-  const ids = new Set(picked.map(e => e.id ?? e.title));
-  for (const e of [...entries].reverse()) {            // newest first
-    if (picked.length >= limit) break;
-    const key = e.id ?? e.title;
-    if (!ids.has(key)) { picked.push(e); ids.add(key); }
-  }
-  return picked;
-}
-function cancelAIRequest() { if (_aiAbortController) { _aiAbortController.abort(); _aiAbortController = null; } }
-function extractJSON(text) {
-  const cleaned = text.replace(/```json|```/g, "").trim();
-  const match = cleaned.match(/\[[\s\S]*\]/);
-  if (!match) throw new Error("No JSON array in response");
-  return JSON.parse(match[0]);
-}
-function getTasteContext(watchedEntries) {
-  if (!watchedEntries||!watchedEntries.length) return "";
-  function topNames(field, min, max) {
-    const map = {};
-    watchedEntries.forEach(h => { if (!h[field]) return; h[field].split(", ").forEach(name => { name=name.trim(); if(name) map[name]=(map[name]||0)+1; }); });
-    return Object.entries(map).filter(([,c])=>c>=min).sort((a,b)=>b[1]-a[1]).slice(0,max).map(([name,c])=>`${name} (${c})`).join(", ");
-  }
-  const composers        = topNames("composer",2,3);
-  const directors        = topNames("director",2,3);
-  const cinematographers = topNames("cinematographer",2,3);
-  const actors           = topNames("actors",2,4);
-  const lines = [];
-  if (composers)        lines.push(`Favourite composers by films watched: ${composers}`);
-  if (directors)        lines.push(`Favourite directors by films watched: ${directors}`);
-  if (cinematographers) lines.push(`Favourite cinematographers by films watched: ${cinematographers}`);
-  if (actors)           lines.push(`Favourite actors by films watched: ${actors}`);
-  return lines.join("\n");
-}
-function handleRateLimitHit(data) {
-  const resetStr = formatReset(data.reset_at);
-  // An IP refusal is not this person's budget running out - it is everyone behind one
-  // address sharing a wall. The old code showed them the IP's numbers, so someone with
-  // 50 a week was told they had "used all 200" while the counter beside it still read
-  // 47 left: two parts of one screen disagreeing, and the louder one untrue.
-  if (data.scope === "ip") {
-    showToast(t('limit_ip_shared').replace('{reset}', resetStr));
-    return;
-  }
-  const seen = localStorage.getItem("seenLimitExplainer") === "1";
-  if (!seen) { showLimitExplainer(data, resetStr); localStorage.setItem("seenLimitExplainer", "1"); }
-  else showToast(t('limit_picks_reached').replace('{n}', data.limit || 5).replace('{reset}', resetStr));
-}
-async function proxyFetch(body) {
-  const { data: { session } } = await sbClient.auth.getSession();
-  if (!session) throw new Error("Not signed in");
-  _aiAbortController = new AbortController();
-  const timeoutId = setTimeout(() => _aiAbortController?.abort(), 15000);
-  let res;
-  try {
-    res = await fetch(PROXY_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + session.access_token },
-      body: JSON.stringify(body),
-      signal: _aiAbortController.signal,
-    });
-  } catch(e) {
-    clearTimeout(timeoutId);
-    if (e.name === "AbortError") throw new Error("timeout_or_cancelled");
-    throw e;
-  } finally { clearTimeout(timeoutId); }
-  const remaining = res.headers.get("X-RateLimit-Remaining");
-  const limit = res.headers.get("X-RateLimit-Limit");
-  const period = res.headers.get("X-RateLimit-Period");
-  if (remaining !== null && limit !== null) updateAICounter(+remaining, +limit, period);
-  if (res.status === 429) { const data = await res.json().catch(() => ({})); handleRateLimitHit(data); throw new Error("rate_limited"); }
-  if (res.status === 401) { showToast(t('toast_session_expired')); throw new Error("unauthorized"); }
-  if (!res.ok) throw new Error("Proxy error " + res.status);
-  return res.json();
-}
-async function proxyFetchWithRetry(body) {
-  let data = await proxyFetch(body);
-  let text = (data.content||[]).map(b=>b.text||"").join("");
-  try { return extractJSON(text); } catch(e) {
-    const retryMessages = [...body.messages,
-      { role: "assistant", content: text },
-      { role: "user", content: "Your response was not valid JSON. Reply ONLY with a valid JSON array, no prose, no markdown." }
-    ];
-    data = await proxyFetch({ ...body, messages: retryMessages });
-    text = (data.content||[]).map(b=>b.text||"").join("");
-    return extractJSON(text);
-  }
-}
-async function translateQuery(q) {
-  if (!ANTHROPIC_KEY) return q;
-  try {
-    const d = await proxyFetch({ model: "claude-haiku-4-5-20251001", max_tokens: 100,
-      messages: [{ role: "user", content: `Translate this movie/show title to English for searching. Reply with ONLY the English title, nothing else: "${q}"` }]
-    });
-    return d.content?.[0]?.text?.trim() || q;
-  } catch { return q; }
-}
-function updateAICounter(remaining, limit, period) {
-  _aiQuota = { remaining, limit, period };
-  const el = document.getElementById("ai-counter");
-  if (!el) return;
-  if (remaining === null || limit === null) { el.textContent = ""; return; }
-  // Labelled from the server's own answer, so an app deployed before the worker still
-  // says "today" and is right, instead of saying "this week" and being wrong.
-  el.textContent = `${remaining}/${limit} ${t(period === "week" ? 'picks_left_week' : 'picks_left_today')}`;
-  el.style.color = remaining <= 3 ? "#f87171" : "var(--muted)";
-}
-async function loadRecsAI() {
-  const q = document.getElementById("rec-input").value.trim();
-  const btn = document.getElementById("rec-btn");
-  const el = document.getElementById("rec-results");
-  btn.disabled=true; // label stays "Find" — loading is shown in the results area below
-  el.innerHTML=loadingHTML(randQuote(),true,true);
-  const slowTimer = startSlowLoadingIndicator();
-  try {
-    let suggestions = [];
-    if (ANTHROPIC_KEY) {
-      const watchedEntries = watchHistory.filter(h=>h.status==="watched");
-      const watched = _tasteSample(watchedEntries).map(m=>`${m.title} (${m.year})${m.stars?" "+m.stars+"★":""}${m.comment?` — "${m.comment}"`:""}"`).join("\n");
-      const planned = watchHistory.filter(h=>h.status==="plan").slice(-6).map(m=>m.title).join(", ");
-      const tasteCtx = getTasteContext(watchedEntries);
-      const hasQ = !!q;
-      const requestBlock = hasQ
-        ? `THE REQUEST (this is the PRIMARY filter): "${q}"\n\nEvery suggestion MUST clearly satisfy this request. If the request names a specific person, title, franchise, place, year, or era, stay precise and literal — do NOT drift to only loosely-related films. Broaden interpretation only when the request is a vague mood or theme.`
-        : `No specific request — surprise them with excellent films matched to their taste below.`;
-      const whyRule = hasQ
-        ? `Each "why" MUST first state how the film satisfies the request "${q}" (name the explicit connection), then it may add how it fits their taste.`
-        : `Each "why" explains in one sentence why it fits their taste.`;
-      const prompt = `You are a film expert helping someone find what to watch.\n\n${requestBlock}\n\n${watched?`The person has watched these (use ONLY as a secondary tie-breaker for tone/quality — and DO NOT suggest any of them):\n${watched}`:"No watch history yet."}${planned?`\nOn their watchlist — DO NOT suggest: ${planned}`:""}${tasteCtx?`\n${tasteCtx}`:""}\n\nSuggest exactly 7 films or TV shows.\nRules:\n- CRITICAL: none may appear in the watched or watchlist lists above.\n- ${whyRule}\n- ${_crewRule()}\n- Vary genres/eras only when the request does not imply a specific style.${_recLangRule()}\n\nReply ONLY with a JSON array, no other text:\n[{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
-      try { suggestions = await proxyFetchWithRetry({ model:"claude-haiku-4-5-20251001", max_tokens:1200, messages:[{role:"user",content:prompt}] }); }
-      catch(e) { if (e.message==="rate_limited") { el.innerHTML=""; btn.disabled=false; btn.textContent=t('find_btn'); return; } throw e; }
-    } else {
-      el.innerHTML=`<div class="empty-state"><div class="empty-state-icon">🔑</div><div class="empty-state-title">${t('recs_unavail_title')}</div><p>${t('recs_unavail_sub')}</p></div>`;
-      btn.disabled=false; btn.textContent=t('find_btn'); return;
-    }
-    const details = await Promise.all(suggestions.map(async s => {
-      const pick = await tmdbResolveTitle(s.title, s.year, s.type);
-      return pick ? {...pick,why:s.why} : {Title:s.title,Year:s.year||"",Poster:"",tmdbID:null,type:s.type||"movie",why:s.why};
-    }));
-    // Drop anything already in the library. The prompt does say "none may appear in the
-    // watched or watchlist lists above", and the model obeys it - but it is only ever
-    // SHOWN a sample: _tasteSample sends 12 of the watched films and the watchlist is
-    // trimmed to the last 6. A film it never saw can therefore come back as a
-    // recommendation, which is how Felicity's picks returned The Power of the Dog, a film
-    // she had watched and rated 4 stars. Nothing in the prompt can fix that; the check has
-    // to happen here, against the whole library.
-    //
-    // Matched on the resolved TMDB id, which is exact where a title match is not. Seven
-    // are requested so that five survive the filter.
-    const _norm = t => String(t||"").toLowerCase().replace(/[^a-z0-9]/g,"");
-    const knownIds = new Set(watchHistory.map(h=>String(h.tmdbID)).filter(Boolean));
-    const knownTitles = new Set(watchHistory.map(h=>_norm(h.title)).filter(Boolean));
-    const fresh = details.filter(m =>
-      !(m.tmdbID && knownIds.has(String(m.tmdbID))) && !knownTitles.has(_norm(m.Title))
-    ).slice(0, 5);
-    el.innerHTML = fresh.length
-      ? `<div class="card-list">${fresh.map(m=>movieCardHTML(m,m.why)).join("")}</div>`
-      : `<div class="empty-state"><div class="empty-state-icon">🤷</div><div class="empty-state-title">${t('recs_none_title')}</div><p>${t('recs_none_sub')}</p></div>`;
-  } catch(e) {
-    if (e.message==="timeout_or_cancelled") el.innerHTML=`<div class="empty-state"><div class="empty-state-icon">⏱</div><div class="empty-state-title">${t('err_took_long_title')}</div><p>${t('err_took_long_sub')}</p></div>`;
-    else el.innerHTML=`<div class="empty-state"><div class="empty-state-title">${t('err_generic')}</div><p>${e.message}</p></div>`;
-  } finally { clearTimeout(slowTimer); _aiAbortController=null; }
-  btn.disabled=false; btn.textContent=t('find_btn');
-}
-async function surpriseMeAI() {
-  const el = document.getElementById("rec-results");
-  const seen = watchHistory.filter(h => h.status === "watched").length;
-  if (seen < SURPRISE_MIN_WATCHED) {
-    el.innerHTML = `<div class="empty-state">
-      <div class="empty-state-icon">✨</div>
-      <div class="empty-state-title">${escapeHtml(t('surprise_need_title'))}</div>
-      <p>${escapeHtml(t('surprise_need_sub').replace('{n}', seen).replace('{need}', SURPRISE_MIN_WATCHED))}</p>
-      <button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${escapeHtml(t('empty_list_btn'))}</button>
-    </div>`;
-    return;
-  }
-  el.innerHTML = loadingHTML(randQuote(), true, true);
-  const slowTimer = startSlowLoadingIndicator();
-  try {
-    const mode = getSurpriseMode();
-    const recentlyShown = _shownSurprises.slice(-9).join(", ");
-    const watchedEntries = watchHistory.filter(h=>h.status==="watched");
-    const watched = _tasteSample(watchedEntries).map(m=>`${m.title} (${m.year})${m.stars?" "+m.stars+"\u2605":""}`).join(", ");
-    const planned = watchHistory.filter(h=>h.status==="plan").slice(-6).map(m=>m.title).join(", ");
-    const tasteCtx = getTasteContext(watchedEntries);
-    const angles = ["Focus on films from non-English speaking countries.","Focus on films from the 1970s or 1980s.","Focus on documentary or animated films.","Focus on recent films from the last 3 years.","Focus on cult classics or underrated gems.","Focus on films from Asia or Latin America.","Include at least one silent era or black-and-white film.","Focus on films with female directors.","Mix decades: one classic, one from 90s-2000s, one recent."];
-    const angle = angles[Math.floor(Math.random()*angles.length)];
-    let prompt = "";
-    if (mode==="random") prompt = `Pick 3 great films or shows completely at random — pure instinct, no context. ${angle} Make them wildly different in genre, era, country.${recentlyShown?"\nDO NOT repeat: "+recentlyShown:""}${tasteCtx?"\n"+tasteCtx:""}\n${_crewRule()}${_recLangRule()}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why it's a must-watch"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
-    else if (mode==="seasonal") { const ctx=getSeasonalContext(); prompt = `Suggest 3 films perfectly suited for right now: ${ctx}. Match the mood of the moment. ${angle}${recentlyShown?"\nDO NOT repeat: "+recentlyShown:""}${watched?"\nAlready watched — skip: "+watched:""}${tasteCtx?"\n"+tasteCtx:""}\n${_crewRule()}${_recLangRule()}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why it fits tonight"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`; }
-    else prompt = `Suggest 3 films based on taste. ${angle} Vary genre, era, country.${watched?"\nWatch history: "+watched:" No history — use acclaimed films."}${planned?"\nDO NOT suggest from watchlist: "+planned:""}${recentlyShown?"\nDO NOT repeat recently shown: "+recentlyShown:""}${watched?"\nDO NOT suggest already watched: "+watched:""}${tasteCtx?"\n"+tasteCtx:""}\n${_crewRule()}${_recLangRule()}\n\nReply ONLY with JSON array: [{"title":"...","year":"...","type":"movie or tv","why":"one sentence why they'd love it"},{"title":"...","year":"...","type":"movie or tv","why":"..."},{"title":"...","year":"...","type":"movie or tv","why":"..."}]`;
-    let suggestions;
-    try { suggestions = await proxyFetchWithRetry({ model:"claude-haiku-4-5-20251001", max_tokens:700, messages:[{role:"user",content:prompt}] }); }
-    catch(e) { if (e.message==="rate_limited") { el.innerHTML=""; return; } throw e; }
-    if (!Array.isArray(suggestions)) suggestions = [suggestions];
-    const details = await Promise.all(suggestions.map(async s => {
-      const pick = await tmdbResolveTitle(s.title, s.year, s.type);
-      return pick ? {...pick,why:s.why} : {Title:s.title,Year:s.year||"",Poster:"",tmdbID:null,type:s.type||"movie",why:s.why};
-    }));
-    details.forEach(m=>{if(m.Title)_shownSurprises.push(m.Title);});
-    sessionStorage.setItem("shownSurprises", JSON.stringify(_shownSurprises.slice(-30)));
-    const modeLabel = "✨ " + (mode==="random"?t('picks_random'):mode==="seasonal"?t('picks_tonight'):t('picks_for_you'));
-    el.innerHTML = `
-      <div class="picks-banner"><div class="picks-banner-label">${modeLabel}</div></div>
-      <div class="card-list">${details.map(m=>movieCardHTML(m,m.why)).join("")}</div>
-      ${_pickQualityHint(watchedEntries.length)}`;
-  } catch(e) {
-    if (e.message==="timeout_or_cancelled") el.innerHTML=`<div class="empty-state"><div class="empty-state-icon">⏱</div><div class="empty-state-title">${t('err_took_long_title')}</div><p>${t('err_took_long_sub')}</p></div>`;
-    else el.innerHTML=`<div class="empty-state"><div class="empty-state-title">${t('err_generic')}</div><p>${e.message}</p></div>`;
-  } finally { clearTimeout(slowTimer); _aiAbortController=null; }
-}
-// ── конец плеча ИИ ──────────────────────────────────────────────────────────
+// ── ПОДБОРКИ СЧИТАЕТ ТОЛЬКО ДВИЖОК ─────────────────────────────────────────
+// До 10 октября здесь жили оба плеча: модель через воркер и наш разбор, с переключателем
+// ?picks=ai|engine и значком на экране. Путь к модели убран вместе со вкладкой Picks:
+// TMDB, пункт 1.C, запрещает их контент в связке с ИИ, и подача в сторы требует, чтобы
+// этого пути не было вовсе. Модельная версия - в git, тег ai-picks-archive.
+// Старый выбор ?picks=ai на устройстве больше ничего не значит; стираем, чтобы не копился.
+try { localStorage.removeItem('picks_engine'); } catch (e) {}
+async function surpriseMe() { return surpriseMeEngine(); }
 
 // ── КНОПКА "НАЗАД": ОДИН СЛОЙ НА ВСЁ ПРИЛОЖЕНИЕ ─────────────────────────────
 //
