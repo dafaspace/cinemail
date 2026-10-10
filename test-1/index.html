@@ -2894,7 +2894,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.11-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.12-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -15829,8 +15829,11 @@ async function surpriseMeAI() {
       // вызов, ушедший в ошибку или в гостевую заглушку, оставил бы лишнюю запись,
       // и одно нажатие "назад" съедалось бы впустую.
       const arm = () => { if (shown() && !stack.some(x => x.name === name)) push(name, rawClose); };
-      if (r && typeof r.then === 'function') return r.then(v => { arm(); return v; });
+      // Запись - в тот момент, когда экран показан, а не когда догрузились данные: см.
+      // комментарий у пары фильм/персона ниже. Если экран появляется только после await,
+      // запись ставится по завершении, как раньше.
       arm();
+      if (r && typeof r.then === 'function') return r.then(v => { arm(); return v; });
       return r;
     };
     window[closeName] = function () {
@@ -15861,11 +15864,21 @@ async function surpriseMeAI() {
     for (const [openName, elId] of [['openDetail', 'detail-overlay'], ['openPerson', 'person-overlay']]) {
       const rawOpen = window[openName];
       if (typeof rawOpen !== 'function') continue;
+      // ЗАПИСЬ СТАВИТСЯ, КАК ТОЛЬКО ЭКРАН ПОКАЗАН, А НЕ ПОСЛЕ ЗАГРУЗКИ. Проверка кода 9 октября:
+      // карточка показывается до первого await, а запись ставилась в .then(), то есть после
+      // всех запросов к TMDB. Пока карточка грузилась, "назад" было некуда, и на медленной
+      // сети системная кнопка закрывала приложение при открытой карточке - ровно жалоба
+      // 23 сентября, ради которой этот слой писался. Второе следствие: флаг restoring
+      // успевал сброситься раньше отложенной записи, и каждый круг "карточка, персона,
+      // назад" оставлял в истории мёртвую запись.
+      // Флаг восстановления запоминается В МОМЕНТ ВЫЗОВА, а повторная запись не ставится.
       window[openName] = function () {
+        const wasRestoring = restoring;
         const r = rawOpen.apply(this, arguments);
-        const arm = () => { if (!restoring && shownEl(elId)) { chain++; push('modal', stepBack); } };
-        if (r && typeof r.then === 'function') return r.then(v => { arm(); return v; });
+        let armed = false;
+        const arm = () => { if (!armed && !wasRestoring && shownEl(elId)) { armed = true; chain++; push('modal', stepBack); } };
         arm();
+        if (r && typeof r.then === 'function') return r.then(v => { arm(); return v; });
         return r;
       };
     }
