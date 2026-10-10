@@ -2044,6 +2044,34 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   border:1px solid color-mix(in srgb, var(--accent) 34%, transparent);
   color:var(--text);transition:background .15s}
 #rec-suggest .sug:hover{background:color-mix(in srgb, var(--accent) 22%, transparent)}
+
+/* ── Maps (v1: места съёмок) ─────────────────────────────────────────── */
+#tab-maps.tab-panel { padding: 0 0 80px; }
+.maps-bar { display: flex; gap: 6px; padding: 10px 14px; }
+.maps-seg { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--border); background: none;
+            color: var(--muted); font: 500 13px 'DM Sans','Noto Sans Georgian',sans-serif; cursor: pointer; }
+.maps-seg.on { background: var(--primary); border-color: var(--primary); color: #0d0d1a; }
+.maps-map { height: 52vh; min-height: 280px; background: #0d0d1a; }
+.maps-sheet { padding: 12px 14px 4px; }
+.maps-hint { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.maps-place-n { font-family: 'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif; font-size: 22px; letter-spacing: .4px; line-height: 1.1; }
+.maps-place-m { color: var(--muted); font-size: 12px; margin-top: 3px; }
+.maps-note { color: var(--muted); font-size: 12px; font-style: italic; margin: 8px 0 4px; }
+.maps-film { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 6px 2px; border-bottom: 1px solid var(--border); cursor: pointer; }
+.maps-film-t { font-size: 14px; }
+.maps-film-y { color: var(--muted); font-size: 12px; }
+.maps-badge { margin-left: auto; font-size: 10px; color: var(--muted); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; white-space: nowrap; }
+.maps-more { color: var(--muted); font-size: 12px; padding: 10px 2px; }
+.maps-credit { color: var(--muted); font-size: 10px; padding: 8px 14px 0; }
+.maps-head { display: flex; align-items: flex-start; gap: 8px; }
+.maps-x { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 44px; height: 44px; margin: -8px -10px 0 auto;
+          border: none; background: none; color: var(--muted); cursor: pointer; }
+.maps-back { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0; margin: -10px 0 2px; border: none; background: none;
+             color: var(--primary); font: 500 13px 'DM Sans','Noto Sans Georgian',sans-serif; cursor: pointer; line-height: 1; }
+.maps-onmap { display: inline-flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; min-height: 44px; padding: 0 14px;
+              border-radius: 10px; border: 1px solid var(--border); background: none; color: var(--text); font: 500 12px 'DM Sans','Noto Sans Georgian',sans-serif; cursor: pointer; }
+.maplibregl-ctrl-attrib { font-size: 9px !important; background: rgba(13,13,26,.7) !important; color: #8a8a96 !important; }
+.maplibregl-ctrl-attrib a { color: #8a8a96 !important; }
 </style>
 </head>
 <body>
@@ -2578,6 +2606,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     <button class="tab-btn active" id="tab-btn-search" onclick="switchTab('search')"><span data-ic="search"></span><span data-i18n="tab_search">Search</span></button>
     <button class="tab-btn" id="tab-btn-recs" onclick="switchTab('recs')"><span data-ic="sparkles"></span><span data-i18n="tab_picks">Picks</span></button>
     <button class="tab-btn" id="tab-btn-history" onclick="switchTab('history')"><span data-ic="list-checks"></span><span data-i18n="tab_lists">Lists</span></button>
+    <button class="tab-btn" id="tab-btn-maps" onclick="switchTab('maps')"><span data-ic="map-pin"></span><span data-i18n="tab_maps">Maps</span></button>
     <button class="tab-btn" id="tab-btn-inbox" onclick="switchTab('inbox')"><span style="position:relative;display:inline-block"><span data-ic="inbox"></span><span id="inbox-badge" class="inbox-badge">0</span></span><span data-i18n="tab_inbox_label">Inbox</span></button>
   </div>
 
@@ -2631,6 +2660,19 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     <!-- Only filled on the Watched tab - see renderHistory(). -->
     <div id="acc-profile-stats" style="margin-bottom:14px"></div>
     <div id="history-list"></div>
+  </div>
+
+  <!-- ── TAB: Maps ─────────────────────────────────────────────────────
+       v1 - места съёмок (docs/maps-design.md, раздел 6). Пятая вкладка временно: после
+       слияния поиска с подборками она займёт место Picks. -->
+  <div id="tab-maps" class="tab-panel" style="display:none">
+    <div class="maps-bar">
+      <button class="maps-seg on" id="maps-seg-all" onclick="_mapsSetMine(false)" data-i18n="maps_all">All films</button>
+      <button class="maps-seg" id="maps-seg-mine" onclick="_mapsSetMine(true)" data-i18n="maps_mine">My films</button>
+    </div>
+    <div id="maps-map" class="maps-map"></div>
+    <div id="maps-sheet" class="maps-sheet"></div>
+    <div class="maps-credit" data-i18n="maps_credit">Places: Wikidata, via Movie Scene Map</div>
   </div>
 
   <!-- ── TAB: Inbox ───────────────────────────────────────────────────── -->
@@ -2894,7 +2936,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.15-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.60.0-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -4505,6 +4547,18 @@ const _I18N_LB = {
   it:{ lb_import_btn:"↑ Importa da Letterboxd", lb_matching:"Abbinamento film…", lb_not_lb:"Non sembra un CSV di Letterboxd.", imdb_import_btn:"↑ Importa da IMDb", imdb_not_imdb:"Non sembra un CSV di IMDb.", imp_pick_imdb:"Scegli il .csv esportato da IMDb (Your Ratings o Watchlist).", imp_none_found:"Nessun film trovato in questo file.", imp_found:"Trovati {n} film. Abbinamento…", imp_saving:"Salvataggio di {n} film…", imp_added:"aggiunti", imp_updated:"aggiornati", imp_notfound:"non trovati", imp_nothing:"Niente importato", imp_failed:"Importazione non riuscita", share_link_btn:"Condividi il link del film", share_outside_lbl:"Non è su Cinemail?", share_outside_hint:"Invia un link che chiunque può aprire: il tuo messaggio viaggia con lui.", share_outside_btn:"Copia un link da inviare ovunque", surprise_need_title:"I consigli diventano personali a 5 film", picks_hint_early:"Ora Cinemail legge i tuoi generi, epoche e paesi. Verso i 15 film inizia a notare i tuoi registi e compositori preferiti: lì i consigli diventano personali. Ne hai {n}.", picks_hint_mid:"Quasi: verso i 15 film emergono registi e compositori ricorrenti e i consigli si affinano parecchio. Ne hai {n}.", surprise_need_sub:"{n} di {need} ✨ Segna qualche film come visto: più ne aggiungi, migliori sono i consigli.", sending:"Invio…", share_pick_friend:"Scegli almeno un amico", share_sent_to:"Inviato a", share_failed:"Invio non riuscito", share_link_copied:"Link copiato", imp_reading:"Lettura del file…", imp_where:"I film sono in {list} e in {watched}." },
 };
 Object.keys(_I18N_LB).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_LB[l]); });
+// Карты, v1 (10 окт 2026). Все восемь языков, ключи сверены скриптом при вставке.
+const _I18N_MAPS = {
+  en:{"tab_maps": "Maps", "maps_all": "All films", "maps_mine": "My films", "maps_stats": "{f} films and series · {p} places", "maps_mine_stats": "Films you have watched with known filming places: {n}", "maps_hint": "Tap a point to see what was filmed there.", "maps_mine_empty": "Mark films as watched and the places they were filmed in appear here.", "maps_per_wiki": "per Wikipedia", "maps_place_note": "Filmed here. Which scene is not recorded.", "maps_film_note": "Filmed in these places. Which scene where is not recorded.", "maps_more": "+{n} more", "maps_loading": "Loading the map…", "maps_failed": "The map could not load. Check the connection and open the tab again.", "maps_film_block": "Filming locations", "maps_on_map": "On the map", "maps_also": "Also filmed in", "maps_credit": "Places: Wikidata, via Movie Scene Map", "maps_cat_city": "City", "maps_cat_landmark": "Landmark", "maps_cat_nature": "Nature", "maps_cat_castle": "Castle", "maps_cat_studio": "Studio", "maps_cat_street": "Street or square", "maps_cat_region": "Region", "maps_cat_fiction": "Fictional place"},
+  ru:{"tab_maps": "Карты", "maps_all": "Все фильмы", "maps_mine": "Мои фильмы", "maps_stats": "{f} фильмов и сериалов · {p} мест", "maps_mine_stats": "Просмотренных тобой фильмов с известными местами съёмок: {n}", "maps_hint": "Нажми на точку, чтобы увидеть, что там снимали.", "maps_mine_empty": "Отмечай фильмы просмотренными, и здесь появятся места, где их снимали.", "maps_per_wiki": "по Википедии", "maps_place_note": "Здесь снимали. Какую сцену - неизвестно.", "maps_film_note": "Снимали в этих местах. Какую сцену где - неизвестно.", "maps_more": "ещё {n}", "maps_loading": "Загружаю карту…", "maps_failed": "Карта не загрузилась. Проверь связь и открой вкладку снова.", "maps_film_block": "Места съёмок", "maps_on_map": "На карте", "maps_also": "Снимали также в", "maps_credit": "Места: Wikidata, через Movie Scene Map", "maps_cat_city": "Город", "maps_cat_landmark": "Достопримечательность", "maps_cat_nature": "Природа", "maps_cat_castle": "Замок", "maps_cat_studio": "Студия", "maps_cat_street": "Улица или площадь", "maps_cat_region": "Регион", "maps_cat_fiction": "Вымышленное место"},
+  uk:{"tab_maps": "Мапи", "maps_all": "Усі фільми", "maps_mine": "Мої фільми", "maps_stats": "{f} фільмів і серіалів · {p} місць", "maps_mine_stats": "Переглянутих тобою фільмів із відомими місцями зйомок: {n}", "maps_hint": "Торкнися точки, щоб побачити, що там знімали.", "maps_mine_empty": "Познач фільми переглянутими, і тут з'являться місця, де їх знімали.", "maps_per_wiki": "за Вікіпедією", "maps_place_note": "Тут знімали. Яку сцену - невідомо.", "maps_film_note": "Знімали в цих місцях. Яку сцену де - невідомо.", "maps_more": "ще {n}", "maps_loading": "Завантажую мапу…", "maps_failed": "Мапа не завантажилася. Перевір з'єднання і відкрий вкладку знову.", "maps_film_block": "Місця зйомок", "maps_on_map": "На мапі", "maps_also": "Знімали також у", "maps_credit": "Місця: Wikidata, через Movie Scene Map", "maps_cat_city": "Місто", "maps_cat_landmark": "Пам'ятка", "maps_cat_nature": "Природа", "maps_cat_castle": "Замок", "maps_cat_studio": "Студія", "maps_cat_street": "Вулиця або площа", "maps_cat_region": "Регіон", "maps_cat_fiction": "Вигадане місце"},
+  ka:{"tab_maps": "რუკა", "maps_all": "ყველა ფილმი", "maps_mine": "ჩემი ფილმები", "maps_stats": "{f} ფილმი და სერიალი · {p} ადგილი", "maps_mine_stats": "შენ მიერ ნანახი ფილმები ცნობილი გადაღების ადგილებით: {n}", "maps_hint": "შეეხე წერტილს, რომ ნახო, რა გადაიღეს იქ.", "maps_mine_empty": "მონიშნე ფილმები ნანახად და აქ გამოჩნდება მათი გადაღების ადგილები.", "maps_per_wiki": "ვიკიპედიის მიხედვით", "maps_place_note": "აქ გადაიღეს. რომელი სცენა - უცნობია.", "maps_film_note": "გადაიღეს ამ ადგილებში. რომელი სცენა სად - უცნობია.", "maps_more": "კიდევ {n}", "maps_loading": "რუკა იტვირთება…", "maps_failed": "რუკა ვერ ჩაიტვირთა. შეამოწმე კავშირი და ხელახლა გახსენი ჩანართი.", "maps_film_block": "გადაღების ადგილები", "maps_on_map": "რუკაზე", "maps_also": "ასევე გადაიღეს", "maps_credit": "ადგილები: Wikidata, Movie Scene Map-ის გავლით", "maps_cat_city": "ქალაქი", "maps_cat_landmark": "ღირსშესანიშნაობა", "maps_cat_nature": "ბუნება", "maps_cat_castle": "ციხესიმაგრე", "maps_cat_studio": "სტუდია", "maps_cat_street": "ქუჩა ან მოედანი", "maps_cat_region": "რეგიონი", "maps_cat_fiction": "გამოგონილი ადგილი"},
+  es:{"tab_maps": "Mapas", "maps_all": "Todas", "maps_mine": "Mis películas", "maps_stats": "{f} películas y series · {p} lugares", "maps_mine_stats": "Películas que has visto con lugares de rodaje conocidos: {n}", "maps_hint": "Toca un punto para ver qué se rodó allí.", "maps_mine_empty": "Marca películas como vistas y aquí aparecerán los lugares donde se rodaron.", "maps_per_wiki": "según Wikipedia", "maps_place_note": "Se rodó aquí. Qué escena, no consta.", "maps_film_note": "Se rodó en estos lugares. Qué escena en cuál, no consta.", "maps_more": "{n} más", "maps_loading": "Cargando el mapa…", "maps_failed": "El mapa no se pudo cargar. Revisa tu conexión y vuelve a abrir la pestaña.", "maps_film_block": "Lugares de rodaje", "maps_on_map": "En el mapa", "maps_also": "También se rodó en", "maps_credit": "Lugares: Wikidata, vía Movie Scene Map", "maps_cat_city": "Ciudad", "maps_cat_landmark": "Monumento", "maps_cat_nature": "Naturaleza", "maps_cat_castle": "Castillo", "maps_cat_studio": "Estudio", "maps_cat_street": "Calle o plaza", "maps_cat_region": "Región", "maps_cat_fiction": "Lugar ficticio"},
+  fr:{"tab_maps": "Cartes", "maps_all": "Tous les films", "maps_mine": "Mes films", "maps_stats": "{f} films et séries · {p} lieux", "maps_mine_stats": "Films que tu as vus dont on connaît les lieux de tournage : {n}", "maps_hint": "Touche un point pour voir ce qui y a été tourné.", "maps_mine_empty": "Marque des films comme vus et les lieux de leur tournage apparaîtront ici.", "maps_per_wiki": "selon Wikipédia", "maps_place_note": "Tourné ici. Quelle scène, on ne le sait pas.", "maps_film_note": "Tourné dans ces lieux. Quelle scène où, on ne le sait pas.", "maps_more": "{n} de plus", "maps_loading": "Chargement de la carte…", "maps_failed": "La carte n'a pas pu se charger. Vérifie ta connexion et rouvre l'onglet.", "maps_film_block": "Lieux de tournage", "maps_on_map": "Sur la carte", "maps_also": "Aussi tourné à", "maps_credit": "Lieux : Wikidata, via Movie Scene Map", "maps_cat_city": "Ville", "maps_cat_landmark": "Monument", "maps_cat_nature": "Nature", "maps_cat_castle": "Château", "maps_cat_studio": "Studio", "maps_cat_street": "Rue ou place", "maps_cat_region": "Région", "maps_cat_fiction": "Lieu fictif"},
+  de:{"tab_maps": "Karten", "maps_all": "Alle Filme", "maps_mine": "Meine Filme", "maps_stats": "{f} Filme und Serien · {p} Orte", "maps_mine_stats": "Gesehene Filme mit bekannten Drehorten: {n}", "maps_hint": "Tippe auf einen Punkt, um zu sehen, was dort gedreht wurde.", "maps_mine_empty": "Markiere Filme als gesehen, dann erscheinen hier ihre Drehorte.", "maps_per_wiki": "laut Wikipedia", "maps_place_note": "Hier gedreht. Welche Szene, ist nicht bekannt.", "maps_film_note": "An diesen Orten gedreht. Welche Szene wo, ist nicht bekannt.", "maps_more": "{n} weitere", "maps_loading": "Karte wird geladen…", "maps_failed": "Die Karte konnte nicht geladen werden. Prüfe deine Verbindung und öffne den Tab erneut.", "maps_film_block": "Drehorte", "maps_on_map": "Auf der Karte", "maps_also": "Auch gedreht in", "maps_credit": "Orte: Wikidata, über Movie Scene Map", "maps_cat_city": "Stadt", "maps_cat_landmark": "Sehenswürdigkeit", "maps_cat_nature": "Natur", "maps_cat_castle": "Burg", "maps_cat_studio": "Studio", "maps_cat_street": "Straße oder Platz", "maps_cat_region": "Region", "maps_cat_fiction": "Fiktiver Ort"},
+  it:{"tab_maps": "Mappe", "maps_all": "Tutti i film", "maps_mine": "I miei film", "maps_stats": "{f} film e serie · {p} luoghi", "maps_mine_stats": "Film che hai visto con luoghi delle riprese noti: {n}", "maps_hint": "Tocca un punto per vedere cosa è stato girato lì.", "maps_mine_empty": "Segna i film come visti e qui compariranno i luoghi in cui sono stati girati.", "maps_per_wiki": "secondo Wikipedia", "maps_place_note": "Girato qui. Quale scena, non è noto.", "maps_film_note": "Girato in questi luoghi. Quale scena dove, non è noto.", "maps_more": "altri {n}", "maps_loading": "Caricamento della mappa…", "maps_failed": "Impossibile caricare la mappa. Controlla la connessione e riapri la scheda.", "maps_film_block": "Luoghi delle riprese", "maps_on_map": "Sulla mappa", "maps_also": "Girato anche in", "maps_credit": "Luoghi: Wikidata, tramite Movie Scene Map", "maps_cat_city": "Città", "maps_cat_landmark": "Monumento", "maps_cat_nature": "Natura", "maps_cat_castle": "Castello", "maps_cat_studio": "Studio", "maps_cat_street": "Via o piazza", "maps_cat_region": "Regione", "maps_cat_fiction": "Luogo immaginario"},
+};
+Object.keys(_I18N_MAPS).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_MAPS[l]); });
 // The Android half is not a nicety. Tapping any imdb.com link hands off to the IMDb app, which
 // has no export, so the instruction "open imdb.com" fails silently for every Android user who
 // follows it the obvious way. Typing the address is what keeps them in the browser.
@@ -5540,6 +5594,7 @@ function _resetAccountState(prevUid, { wipeLocal = false } = {}) {
   _inboxCache = { received: [], sent: [] }; _inboxCacheLoaded = false;
   _chatViewPartnerId = null; _expandedInviteId = null;
   _blockedIds = new Set();
+  try { if (typeof _map !== 'undefined' && _map) _mapsSetMine(false); } catch (e) {}
   _tasteCache = null; _lastSeeds = [];
   _picksRemaining = null; _pressState = { key: '', n: 0 };
   _shownSurprises.length = 0;
@@ -6205,13 +6260,14 @@ function switchTab(name) {
     showGuestConvertModal();
     return;
   }
-  ["search","recs","history","inbox"].forEach(t => {
+  ["search","recs","history","maps","inbox"].forEach(t => {
     document.getElementById("tab-"+t).style.display = t === name ? "block" : "none";
     document.getElementById("tab-btn-"+t).classList.toggle("active", t === name);
   });
   if (name === "history") { renderListTabs(); renderHistory(); }
   if (name === "search") { setTimeout(() => { const si = document.getElementById('search-input'); if (si && !si.value) si.focus(); }, 150); }
   if (name === "inbox") { renderInbox(); markInvitesSeen(); }
+  if (name === "maps") _mapsShow();
   if (name === "recs") {
     const watched = watchHistory.filter(h => h.status === "watched");
     document.getElementById("rec-history-hint").textContent = watched.length > 0
@@ -6848,11 +6904,13 @@ async function openDetail(id, type) {
       ${crew}${tvInfo}
       ${d.Country ? `<div style="margin-bottom:14px"><div class="crew-label" data-i18n="country_lang">Country / Language</div><div class="crew-val">${escapeHtml(d.Country)} · ${escapeHtml(d.Language)}</div></div>` : ""}
       <div id="where-to-watch">${_whereToWatchInner(d.WatchAll || {})}</div>
+      <div id="detail-locations"></div>
       ${watchedStatusLine}
       ${checklistSection}
       <div class="modal-actions">${actionBtns}</div>
       <button onclick="shareFilmLink('${escapeJsAttr(id)}','${escapeJsAttr(type || 'movie')}')" style="width:100%;margin-top:10px;padding:11px;border-radius:11px;background:none;border:1px solid var(--border);color:var(--text);font-size:13px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px">${icon('link', 15)}<span>${escapeHtml(t('share_outside_btn'))}</span></button>`;
     window._detailMovie = d;
+    _renderDetailLocations(id, type || 'movie');
     // After paint, not during: the pass reads offsetTop, which is meaningless until the
     // browser has laid the names out.
     requestAnimationFrame(() => clampNameRows(document.getElementById("detail-content")));
@@ -12457,6 +12515,7 @@ const ICONS = {
   "check": '<path d="M20 6 9 17l-5-5" />',
   "film": '<rect width="18" height="18" x="3" y="3" rx="2" /><path d="M7 3v18" /><path d="M3 7.5h4" /><path d="M3 12h18" /><path d="M3 16.5h4" /><path d="M17 3v18" /><path d="M17 7.5h4" /><path d="M17 16.5h4" />',
   "globe": '<circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /><path d="M2 12h20" />',
+  "map-pin": '<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" /><circle cx="12" cy="10" r="3" />',
   "inbox": '<polyline points="22 12 16 12 14 15 10 15 8 12 2 12" /><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />',
   "key": '<path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4" /><path d="m21 2-9.6 9.6" /><circle cx="7.5" cy="15.5" r="5.5" />',
   "link": '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />',
@@ -14838,6 +14897,312 @@ async function loadFeedbackReplies() {
       <button onclick="loadFeedbackReplies()" style="background:none;border:1px solid var(--border);color:var(--muted);font-size:11px;padding:3px 8px;border-radius:6px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">↺ ${t("retry")}</button>
     </div>`;
   }
+}
+
+// ── КАРТЫ: ГДЕ СНИМАЛИ ─────────────────────────────────────────────────────
+//
+// Maps v1, решение Дафы от 9 октября (docs/maps-design.md, раздел 6): вкладка с картой мира,
+// первая версия - только места съёмок. Данные - app/maps-data.json, собранный
+// docs/maps/build-maps-data.py из атласа Movie Scene Map (CC0, факты Wikidata), мост в TMDB
+// сверен на 50 фильмах из 50.
+//
+// Три уровня доказательности, и они видны на карте, а не смешаны в одну булавку:
+//   s  - утверждение Wikidata: залитая точка
+//   w  - только текст Википедии: полое кольцо, в списке "по Википедии"
+//   c  - известна только страна или регион: точки нет вовсе, только строка в карточке фильма
+// И точность места: категория city значит "где-то в городе", и такая точка рисуется мягким
+// кругом, а не булавкой на здании. Больше половины мест в данных - именно города.
+//
+// Место - не сцена. Wikidata говорит "снимали здесь" и молчит, какую сцену, - мы тоже.
+//
+// Грузится только при первом открытии вкладки или карточки фильма: MapLibre ~230 КБ и данные
+// ~1 МБ в gzip не трогают первый экран. Источник тайлов - настройка (MAPS_STYLE): OpenFreeMap
+// без ключа и лимитов, но это проект одного человека, и замена - одна строка.
+const MAPS_LIB = 'https://unpkg.com/maplibre-gl@4.7.1/dist/';
+const MAPS_STYLE = 'https://tiles.openfreemap.org/styles/positron';
+let _mapsData = null, _mapsDataP = null, _mlP = null, _map = null, _mapsMine = false, _mapsSel = null;
+// Режим одного фильма (из кнопки «На карте» в карточке): на карте только его места, под картой их список.
+let _mapsFilm = null;
+
+function _loadMapsData() {
+  if (_mapsData) return Promise.resolve(_mapsData);
+  if (_mapsDataP) return _mapsDataP;
+  _mapsDataP = fetch('maps-data.json').then(r => { if (!r.ok) throw new Error('maps-data ' + r.status); return r.json(); })
+    .then(d => {
+      // Обратный индекс место -> фильмы, один раз: нужен и карте (сколько фильмов в точке),
+      // и списку под ней.
+      const at = d.p.map(() => []);
+      for (const [key, v] of Object.entries(d.f)) {
+        for (const i of v[0]) at[i].push([key, 0]);
+        for (const i of v[1]) at[i].push([key, 1]);
+      }
+      d.at = at;
+      _mapsData = d; return d;
+    })
+    .catch(e => { _mapsDataP = null; throw e; });
+  return _mapsDataP;
+}
+
+function _loadMapLibre() {
+  if (window.maplibregl) return Promise.resolve(window.maplibregl);
+  if (_mlP) return _mlP;
+  _mlP = new Promise((res, rej) => {
+    const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = MAPS_LIB + 'maplibre-gl.css';
+    document.head.appendChild(css);
+    const s = document.createElement('script'); s.src = MAPS_LIB + 'maplibre-gl.js';
+    s.onload = () => window.maplibregl ? res(window.maplibregl) : rej(new Error('maplibre'));
+    s.onerror = () => { _mlP = null; rej(new Error('maplibre')); };
+    document.head.appendChild(s);
+  });
+  return _mlP;
+}
+
+const _mapsKey = h => (h.mediaType === 'tv' ? 't' : 'm') + h.tmdbID;
+function _mapsMineSet() {
+  return new Set(watchHistory.filter(h => h.status === 'watched' && h.tmdbID && _isMine(h)).map(_mapsKey));
+}
+
+// Точки для текущего режима: все места или только места моих просмотренных фильмов.
+function _mapsFeatures() {
+  const d = _mapsData, mine = _mapsMine ? _mapsMineSet() : null, feats = [];
+  const isCity = c => d.cats[c] === 'city' || d.cats[c] === 'region';
+  if (_mapsFilm && d.f[_mapsFilm]) {
+    const v = d.f[_mapsFilm];
+    for (const [ix, w] of [[v[0], 0], [v[1], 1]]) for (const i of ix) {
+      const [lon, lat, cat] = d.p[i];
+      feats.push({ type: 'Feature', geometry: { type: 'Point', coordinates: [lon, lat] },
+                   properties: { i, ns: w ? 0 : 1, nw: w, city: isCity(cat) ? 1 : 0 } });
+    }
+    return { type: 'FeatureCollection', features: feats };
+  }
+  for (let i = 0; i < d.p.length; i++) {
+    let ns = 0, nw = 0;
+    for (const [key, w] of d.at[i]) { if (mine && !mine.has(key)) continue; w ? nw++ : ns++; }
+    if (!ns && !nw) continue;
+    const [lon, lat, cat] = d.p[i];
+    feats.push({ type: 'Feature', geometry: { type: 'Point', coordinates: [lon, lat] },
+                 properties: { i, ns, nw, city: isCity(cat) ? 1 : 0 } });
+  }
+  return { type: 'FeatureCollection', features: feats };
+}
+
+// OpenFreeMap positron, перекрашенный в цвета Cinemail - тот же приём, что в макете
+// docs/mockups/lisbon-screens.html. Иконки POI спрятаны: на карте мест съёмок они шум.
+function _mapsPaint(map) {
+  for (const l of map.getStyle().layers) {
+    const id = l.id;
+    try {
+      if (l.type === 'background') map.setPaintProperty(id, 'background-color', '#0d0d1a');
+      else if (l.type === 'fill') {
+        const c = /water/.test(id) ? '#101a33' : /park|wood|grass|landcover|landuse/.test(id) ? '#11161a' : /building/.test(id) ? '#17172a' : '#0f0f1c';
+        map.setPaintProperty(id, 'fill-color', c);
+        map.setPaintProperty(id, 'fill-outline-color', /building/.test(id) ? '#1d1d33' : c);
+      } else if (l.type === 'line') map.setPaintProperty(id, 'line-color',
+        /water|river/.test(id) ? '#101a33' : /boundary|admin/.test(id) ? '#2a2a40' : /motorway|trunk|primary|major/.test(id) ? '#3a3a55' : '#24243a');
+      else if (l.type === 'symbol') {
+        if (/poi/.test(id)) { map.setLayoutProperty(id, 'visibility', 'none'); continue; }
+        map.setPaintProperty(id, 'text-color', /water/.test(id) ? '#4a6496' : '#8a8a96');
+        map.setPaintProperty(id, 'text-halo-color', '#0d0d1a');
+        // Названия на языке интерфейса. Стиль по умолчанию пишет местное имя и латиницу
+        // вперемешку - на одном экране арабский, болгарский и белорусский. Тайлы OpenMapTiles
+        // несут name:<язык> для всех восьми наших; нет перевода - латиница, потом местное.
+        if (map.getLayoutProperty(id, 'text-field'))
+          map.setLayoutProperty(id, 'text-field', ['coalesce', ['get', 'name:' + _lang], ['get', 'name:latin'], ['get', 'name']]);
+      }
+    } catch (e) {}
+  }
+}
+
+async function _mapsShow() {
+  const box = document.getElementById('maps-map');
+  if (!box) return;
+  if (_map) { _map.resize(); return; }
+  _mapsSheet(`<div class="maps-hint">${escapeHtml(t('maps_loading'))}</div>`);
+  let ml;
+  try { [ml] = await Promise.all([_loadMapLibre(), _loadMapsData()]); }
+  catch (e) { _mapsSheet(`<div class="maps-hint">${escapeHtml(t('maps_failed'))}</div>`); return; }
+  const map = _map = new ml.Map({ container: box, style: MAPS_STYLE, center: [10, 30], zoom: 1.3,
+                                  attributionControl: { compact: true }, dragRotate: false, pitchWithRotate: false });
+  map.touchZoomRotate.disableRotation();
+  map.on('style.load', () => _mapsPaint(map));
+  map.on('load', () => {
+    map.addSource('places', { type: 'geojson', data: _mapsFeatures(), cluster: true, clusterRadius: 42, clusterMaxZoom: 11,
+                              clusterProperties: { n: ['+', ['+', ['get', 'ns'], ['get', 'nw']]] } });
+    map.addLayer({ id: 'clusters', type: 'circle', source: 'places', filter: ['has', 'point_count'],
+      paint: { 'circle-color': 'rgba(245,197,24,0.18)', 'circle-stroke-color': '#F5C518', 'circle-stroke-width': 1.5,
+               'circle-radius': ['step', ['get', 'point_count'], 12, 20, 15, 200, 18, 1000, 22] } });
+    map.addLayer({ id: 'cluster-n', type: 'symbol', source: 'places', filter: ['has', 'point_count'],
+      layout: { 'text-field': ['get', 'point_count_abbreviated'], 'text-size': 11, 'text-font': ['Noto Sans Regular'] },
+      paint: { 'text-color': '#F5C518' } });
+    // Только город: мягкий круг, не булавка на здании.
+    map.addLayer({ id: 'pt-city', type: 'circle', source: 'places', filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'city'], 1]],
+      paint: { 'circle-radius': 9, 'circle-color': 'rgba(245,197,24,0.10)', 'circle-stroke-color': 'rgba(245,197,24,0.6)', 'circle-stroke-width': 1 } });
+    // Точное место по Wikidata - залитая точка; только по Википедии - полое кольцо.
+    map.addLayer({ id: 'pt-exact', type: 'circle', source: 'places', filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'city'], 0], ['>', ['get', 'ns'], 0]],
+      paint: { 'circle-radius': 5, 'circle-color': '#F5C518', 'circle-stroke-color': '#0d0d1a', 'circle-stroke-width': 1.5 } });
+    map.addLayer({ id: 'pt-wiki', type: 'circle', source: 'places', filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'city'], 0], ['==', ['get', 'ns'], 0]],
+      paint: { 'circle-radius': 4.5, 'circle-color': '#0d0d1a', 'circle-stroke-color': '#F5C518', 'circle-stroke-width': 2 } });
+    // Выбранная точка - кольцо вокруг, чтобы было видно, к чему относится список под картой.
+    map.addLayer({ id: 'pt-sel', type: 'circle', source: 'places', filter: ['==', ['get', 'i'], -1],
+      paint: { 'circle-radius': 12, 'circle-color': 'rgba(0,0,0,0)', 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2 } });
+    map.on('click', 'clusters', async e => {
+      const f = e.features[0];
+      const z = await map.getSource('places').getClusterExpansionZoom(f.properties.cluster_id);
+      map.easeTo({ center: f.geometry.coordinates, zoom: z });
+    });
+    for (const id of ['pt-city', 'pt-exact', 'pt-wiki']) {
+      map.on('click', id, e => _mapsSelect(e.features[0].properties.i));
+      map.on('mouseenter', id, () => { map.getCanvas().style.cursor = 'pointer'; });
+      map.on('mouseleave', id, () => { map.getCanvas().style.cursor = ''; });
+    }
+    map.on('mouseenter', 'clusters', () => { map.getCanvas().style.cursor = 'pointer'; });
+    map.on('mouseleave', 'clusters', () => { map.getCanvas().style.cursor = ''; });
+    _mapsIdle();
+    if (_mapsPendingFocus) { const k = _mapsPendingFocus; _mapsPendingFocus = null; _mapsFocusFilm(k); }
+  });
+}
+
+function _mapsSheet(html) { const el = document.getElementById('maps-sheet'); if (el) el.innerHTML = html; }
+
+// Без выбранной точки: сколько всего и как пользоваться. "Мои" без просмотренных - объяснить,
+// а не показать пустой мир, который читается как поломка.
+function _mapsIdle() {
+  _mapsSel = null;
+  if (_map && _map.getLayer('pt-sel')) _map.setFilter('pt-sel', ['==', ['get', 'i'], -1]);
+  const d = _mapsData; if (!d) return;
+  if (_mapsFilm && d.f[_mapsFilm]) {
+    const v = d.f[_mapsFilm], key = _mapsFilm, type = key[0] === 't' ? 'tv' : 'movie';
+    const row = (i, w) => { const p = d.p[i]; return `<div class="maps-film" onclick="_mapsGoPlace(${i})">
+      <span class="maps-film-t">${escapeHtml(p[3])}</span><span class="maps-film-y">${escapeHtml(_mapsCatLabel(p[2]))}${p[4] ? ' · ' + escapeHtml(_mapsCountry(p[4])) : ''}</span>
+      ${w ? `<span class="maps-badge">${escapeHtml(t('maps_per_wiki'))}</span>` : ''}</div>`; };
+    _mapsSheet(`<div class="maps-head"><div class="maps-place" style="cursor:pointer" onclick="openDetail('${escapeJsAttr(key.slice(1))}','${type}')">
+        <div class="maps-place-n">${escapeHtml(v[3])}</div>
+        <div class="maps-place-m">${v[4] ? escapeHtml(String(v[4])) : ''}</div></div>
+        <button class="maps-x" onclick="_mapsSetMine(false)" aria-label="${escapeHtml(t('maps_all'))}">${icon('x', 18)}</button></div>
+      <div class="maps-note">${escapeHtml(t('maps_film_note'))}</div>
+      ${v[0].map(i => row(i, 0)).join('')}${v[1].map(i => row(i, 1)).join('')}
+      ${(also => also.length ? `<div class="maps-more">${escapeHtml(t('maps_also'))}: ${also.map(escapeHtml).join(', ')}</div>` : '')(_mapsAlso(v))}`);
+    return;
+  }
+  if (_mapsMine) {
+    const mine = _mapsMineSet(); let films = 0;
+    for (const k of mine) if (d.f[k] && (d.f[k][0].length || d.f[k][1].length)) films++;
+    if (!films) { _mapsSheet(`<div class="maps-hint">${escapeHtml(t('maps_mine_empty'))}</div>`); return; }
+    _mapsSheet(`<div class="maps-hint">${escapeHtml(t('maps_mine_stats').replace('{n}', films))}<br>${escapeHtml(t('maps_hint'))}</div>`);
+  } else {
+    _mapsSheet(`<div class="maps-hint">${escapeHtml(t('maps_stats').replace('{f}', Object.keys(d.f).length.toLocaleString()).replace('{p}', d.p.length.toLocaleString()))}<br>${escapeHtml(t('maps_hint'))}</div>`);
+  }
+}
+
+function _mapsCatLabel(c) { return t('maps_cat_' + _mapsData.cats[c]) || _mapsData.cats[c]; }
+// Код страны -> название на языке интерфейса; браузер без Intl.DisplayNames покажет код.
+let _mapsDN = null, _mapsDNLang = null;
+function _mapsCountry(iso) {
+  try {
+    if (_mapsDNLang !== _lang) { _mapsDN = new Intl.DisplayNames([_lang], { type: 'region' }); _mapsDNLang = _lang; }
+    return _mapsDN.of(iso) || iso;
+  } catch (e) { return iso; }
+}
+// Строка «Снимали также в»: регионы атласа приходят английскими названиями. Страну, у которой
+// уже есть точка, не повторяем; остальные страны переводим через их код, регионы (California)
+// остаются как есть.
+let _mapsEnIso = null;
+function _mapsAlso(v) {
+  const d = _mapsData;
+  if (!_mapsEnIso) {
+    _mapsEnIso = {};
+    try { const en = new Intl.DisplayNames(['en'], { type: 'region' });
+          for (const p of d.p) if (p[4] && !(p[4] in _mapsEnIso)) _mapsEnIso[en.of(p[4])] = p[4]; } catch (e) {}
+    for (const k of Object.keys(_mapsEnIso)) if (k.length === 2) delete _mapsEnIso[k];
+  }
+  const have = new Set([...v[0], ...v[1]].map(i => d.p[i][4]));
+  return v[2].filter(r => !have.has(_mapsEnIso[r])).map(r => _mapsEnIso[r] ? _mapsCountry(_mapsEnIso[r]) : r);
+}
+
+function _mapsSelect(i) {
+  const d = _mapsData; if (!d) return;
+  _mapsSel = i;
+  if (_map && _map.getLayer('pt-sel')) _map.setFilter('pt-sel', ['==', ['get', 'i'], i]);
+  const [lon, lat, cat, name, iso] = d.p[i];
+  const mine = _mapsMine ? _mapsMineSet() : null;
+  const rows = d.at[i].filter(([k]) => !mine || mine.has(k))
+    .sort((a, b) => a[1] - b[1] || (d.f[b[0]][5] - d.f[a[0]][5]));
+  const shown = rows.slice(0, 40).map(([k, w]) => {
+    const v = d.f[k], type = k[0] === 't' ? 'tv' : 'movie', id = k.slice(1);
+    return `<div class="maps-film" onclick="openDetail('${escapeJsAttr(id)}','${type}')">
+      <span class="maps-film-t">${escapeHtml(v[3])}</span>${v[4] ? `<span class="maps-film-y">${escapeHtml(String(v[4]))}</span>` : ''}
+      ${w ? `<span class="maps-badge">${escapeHtml(t('maps_per_wiki'))}</span>` : ''}</div>`;
+  }).join('');
+  const more = rows.length > 40 ? `<div class="maps-more">${escapeHtml(t('maps_more').replace('{n}', rows.length - 40))}</div>` : '';
+  const back = _mapsFilm && d.f[_mapsFilm]
+    ? `<button class="maps-back" onclick="_mapsIdle()">${icon('map-pin', 14)} ${escapeHtml(d.f[_mapsFilm][3])}</button>` : '';
+  _mapsSheet(`${back}<div class="maps-place">
+      <div class="maps-place-n">${escapeHtml(name)}</div>
+      <div class="maps-place-m">${escapeHtml(_mapsCatLabel(cat))}${iso ? ' · ' + escapeHtml(_mapsCountry(iso)) : ''}</div>
+    </div>
+    <div class="maps-note">${escapeHtml(t('maps_place_note'))}</div>
+    ${shown}${more}`);
+}
+
+function _mapsSetMine(on) {
+  _mapsMine = !!on; _mapsFilm = null;
+  document.getElementById('maps-seg-all')?.classList.toggle('on', !_mapsMine);
+  document.getElementById('maps-seg-mine')?.classList.toggle('on', _mapsMine);
+  if (_map && _map.getSource('places')) _map.getSource('places').setData(_mapsFeatures());
+  _mapsIdle();
+}
+
+// Из карточки фильма: открыть вкладку и показать места этого фильма.
+let _mapsPendingFocus = null;
+function _mapsFocusFilm(key) {
+  if (!_map || !_map.getSource('places')) { _mapsPendingFocus = key; return; }
+  const d = _mapsData, v = d.f[key]; if (!v) return;
+  const pts = [...v[0], ...v[1]].map(i => d.p[i]);
+  if (!pts.length) return;
+  // Ни «Все», ни «Мои»: третий режим, выход из него - любой из двух сегментов или крестик.
+  _mapsFilm = key; _mapsMine = false;
+  document.getElementById('maps-seg-all')?.classList.remove('on');
+  document.getElementById('maps-seg-mine')?.classList.remove('on');
+  _map.getSource('places').setData(_mapsFeatures());
+  if (pts.length === 1) _map.easeTo({ center: [pts[0][0], pts[0][1]], zoom: 9 });
+  else {
+    const lons = pts.map(p => p[0]), lats = pts.map(p => p[1]);
+    _map.fitBounds([[Math.min(...lons), Math.min(...lats)], [Math.max(...lons), Math.max(...lats)]], { padding: 50, maxZoom: 10 });
+  }
+  _mapsIdle();
+}
+// Строка места в списке фильма: подлететь и открыть, что ещё там снимали.
+function _mapsGoPlace(i) {
+  const p = _mapsData.p[i], c = _mapsData.cats[p[2]];
+  _map.easeTo({ center: [p[0], p[1]], zoom: c === 'region' ? 7 : c === 'city' ? 10 : 12 });
+  _mapsSelect(i);
+}
+function _mapsOpenFilm(key) {
+  closeDetail();
+  switchTab('maps');
+  _mapsFocusFilm(key);
+}
+
+// Блок «Места съёмок» в карточке фильма. Нет мест - нет блока: пустой блок на каждой второй
+// карточке хуже, чем никакого (maps-design.md, раздел 3).
+async function _renderDetailLocations(id, type) {
+  const el = document.getElementById('detail-locations');
+  if (!el) return;
+  let d;
+  try { d = await _loadMapsData(); } catch (e) { return; }
+  const key = (type === 'tv' ? 't' : 'm') + id, v = d.f[key];
+  if (!v || document.getElementById('detail-locations') !== el) return;   // карточку уже сменили
+  const names = ix => ix.map(i => d.p[i]).sort((a, b) => (d.cats[a[2]] === 'city') - (d.cats[b[2]] === 'city'))
+    .slice(0, 6).map(p => escapeHtml(p[3])).join(', ');
+  const parts = [];
+  if (v[0].length) parts.push(`<div class="crew-val">${names(v[0])}${v[0].length > 6 ? ` <span style="color:var(--muted)">+${v[0].length - 6}</span>` : ''}</div>`);
+  if (v[1].length) parts.push(`<div class="crew-val" style="color:var(--muted)">${escapeHtml(t('maps_per_wiki'))}: ${names(v[1])}${v[1].length > 6 ? ` +${v[1].length - 6}` : ''}</div>`);
+  const also = _mapsAlso(v);
+  if (also.length) parts.push(`<div class="crew-val" style="color:var(--muted)">${escapeHtml(t('maps_also'))}: ${also.slice(0, 6).map(escapeHtml).join(', ')}</div>`);
+  if (!parts.length) return;
+  const onMap = (v[0].length || v[1].length)
+    ? `<button class="maps-onmap" onclick="_mapsOpenFilm('${escapeJsAttr(key)}')">${icon('map-pin', 14)} ${escapeHtml(t('maps_on_map'))}</button>` : '';
+  el.innerHTML = `<div style="margin-bottom:14px"><div class="crew-label">${escapeHtml(t('maps_film_block'))}</div>${parts.join('')}${onMap}</div>`;
 }
 
 // ── Native (Capacitor) tweaks — only run inside the iOS/Android app wrapper ──
