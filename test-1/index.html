@@ -2894,7 +2894,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.8-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.9-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -5513,20 +5513,77 @@ async function onSignedIn(user) {
   _pushSyncOnLogin(); // native-only, non-prompting: refresh push token if already granted
 }
 
-async function signOut() {
+// ── СМЕНА АККАУНТА: ОДИН СБРОС НА ВСЁ ───────────────────────────────────────
+//
+// Проверка кода 9 октября нашла восемь дефектов в пяти областях с одной причиной: выход
+// и смена аккаунта сбрасывали состояние по кусочку, каждый путь свой кусочек, и всегда
+// чего-то не хватало. Кнопка «Выйти» чистила библиотеку и входящие, но не друзей, не
+// списки, не вкус и не токен пуша. Выход, пришедший ИЗВНЕ - из другой вкладки, с другого
+// устройства, по отозванному токену - не чистил вообще ничего, только показывал экран
+// входа. Удаление аккаунта оставляло полную копию библиотеки в localStorage.
+// Следующий человек на том же устройстве видел чужих друзей в приглашении, чужие входящие
+// и чужие фильмы с заметками, а телефон продолжал получать чужие пуши.
+//
+// Поэтому одна функция, и её зовут все три пути: кнопка, событие SIGNED_OUT и удаление.
+// Новое состояние, привязанное к аккаунту, добавляется СЮДА, а не в один из путей.
+let _deviceToken = null; // токен пуша этого устройства, чтобы освободить его при выходе
+function _resetAccountState(prevUid, { wipeLocal = false } = {}) {
+  _acctGen++;
   stopInboxPolling();
-  await sbClient.auth.signOut();
-  // Drop the cached avatar with the session. It is per-browser, not per-account, so
-  // leaving it behind meant the next person to sign in on this device wore the previous
-  // one's character until their own profile arrived over the network.
-  localStorage.removeItem('avEmoji');
-  localStorage.removeItem('avColor');
-  localStorage.removeItem('avOwner');
   currentUser = null;
   watchHistory = [];
-  _inboxCache = { received: [], sent: [] };
-  _inboxCacheLoaded = false;
-  _expandedInviteId = null;
+  _listsCache = []; _activeListId = 'personal';
+  _friendsCache = []; _friendRequestsCache = [];
+  _inboxCache = { received: [], sent: [] }; _inboxCacheLoaded = false;
+  _chatViewPartnerId = null; _expandedInviteId = null;
+  _tasteCache = null; _lastSeeds = [];
+  _picksRemaining = null; _pressState = { key: '', n: 0 };
+  _shownSurprises.length = 0;
+  try { sessionStorage.removeItem('shownSurprises'); } catch (e) {}
+  // Аватар хранится на браузер, а не на аккаунт: оставленный, он надевался на следующего.
+  ['avEmoji', 'avColor', 'avOwner'].forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+  // Офлайн-копия библиотеки и порядок фильмов - полная копия чужих оценок и заметок.
+  // Стирается, когда человек ушёл сам или удалил аккаунт; при простой смене - нет.
+  if (wipeLocal && prevUid) {
+    try {
+      for (const k of Object.keys(localStorage))
+        if (k.endsWith(':' + prevUid) && (k.startsWith('cm_cache_') || k.startsWith('movieOrder:')))
+          localStorage.removeItem(k);
+    } catch (e) {}
+  }
+  // На экране не должно остаться ничего от прежнего человека, даже если следующий -
+  // гость, которому эти блоки никто не перерисует.
+  ['inbox-list', 'inbox-friends-block', 'rec-results', 'history-list'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.innerHTML = '';
+  });
+  const badge = document.getElementById('inbox-badge'); if (badge) badge.style.display = 'none';
+  try { _renderPicksMeter(); } catch (e) {}
+  try { switchTab('search'); } catch (e) {}
+  _resetAuthButtons();
+}
+// Кнопки входа выключаются на время запроса и включались обратно только при ошибке.
+// После успешного входа и выхода человек видел серую «…», которая ничего не делает,
+// а в нативной сборке перезагрузить страницу нечем.
+function _resetAuthButtons() {
+  for (const [id, key] of [['signin-btn', 'sign_in'], ['signup-btn', 'sign_up']]) {
+    const b = document.getElementById(id); if (b) { b.disabled = false; b.textContent = t(key); }
+  }
+  for (const id of ['guest-signin-btn', 'guest-signup-btn']) {
+    const a = document.getElementById(id); if (a) { a.style.opacity = ''; a.style.pointerEvents = ''; }
+  }
+}
+
+async function signOut() {
+  const prev = currentUser && currentUser.id;
+  // Токен пуша освобождается ДО выхода: удалить свою строку можно, только пока сессия жива.
+  // Иначе телефон продолжал получать пуши прежнего владельца, а новый - не получал никаких.
+  if (_deviceToken && prev) {
+    try { await sbClient.from('device_tokens').delete().eq('token', _deviceToken); } catch (e) {}
+  }
+  // scope 'local': выход на этом устройстве. По умолчанию supabase-js выходит ВЕЗДЕ и
+  // отзывает все токены - выход на телефоне выкидывал человека и с ноутбука.
+  await sbClient.auth.signOut({ scope: 'local' });
+  _resetAccountState(prev, { wipeLocal: true });
   document.getElementById("main-app").style.display = "none";
   showScreen("signin");
   document.getElementById("signin-email").value = "";
@@ -5647,12 +5704,11 @@ async function deleteAccount() {
     // Delete auth user via edge function or RPC
     const { error } = await sbClient.rpc('delete_user');
     if (error) throw error;
-    // Sign out and reset
-    await sbClient.auth.signOut();
-    currentUser = null;
-    watchHistory = [];
-    _inboxCache = { received: [], sent: [] };
-    _inboxCacheLoaded = false;
+    // Sign out and reset. Удалённый аккаунт уносит с собой и копию на устройстве: окно
+    // обещает "навсегда удалить историю и списки", а копия в localStorage их хранила.
+    const _prevUid = currentUser && currentUser.id;
+    await sbClient.auth.signOut({ scope: 'local' });
+    _resetAccountState(_prevUid, { wipeLocal: true });
     overlay.remove();
     document.getElementById("main-app").style.display = "none";
     showScreen("signin");
@@ -9093,15 +9149,22 @@ async function _personLookup(q) {
 //
 // Cached because (1) costs about sixteen requests. Cleared when the library changes.
 let _tasteCache = null;
+// Растёт при каждой смене аккаунта (_resetAccountState); долгие вычисления сверяются с ним.
+// Объявлен здесь, а не у выхода, потому что движок вырезается в стенды вместе с этим блоком.
+let _acctGen = 0;
 function _clearTasteCache() { _tasteCache = null; }
 
 async function _tasteIndex() {
   if (_tasteCache) return _tasteCache;
+  // Вычисление длится секунды. Если за это время сменился аккаунт, результат прежнего
+  // человека не кладётся в кэш поверх сброса - иначе подборки нового шли по чужому вкусу.
+  const _gen = _acctGen;
+  const _keep = v => { if (_gen === _acctGen) _tasteCache = v; return v; };
   const watched = watchHistory.filter(h => h.status === 'watched' && h.tmdbID);
   const loved = watched.filter(e => Number(e.stars) >= _SEED_MIN_STARS);
   // Below three loved films there is nothing to read, and guessing from two would be worse
   // than admitting we do not know. The caller falls back to plain quality order.
-  if (loved.length < 3) return (_tasteCache = { thin: true, tally: new Map(), crew: new Set(), crewIds: [], decades: {}, byPerson: new Map(), tags: { pos: [], neg: [] } });
+  if (loved.length < 3) return _keep({ thin: true, tally: new Map(), crew: new Set(), crewIds: [], decades: {}, byPerson: new Map(), tags: { pos: [], neg: [] } });
 
   let tally = new Map();
   try { tally = await _tallyFromSeeds(_pickSeeds(loved, 8, false), 2); } catch (e) { /* taste is optional */ }
@@ -9167,7 +9230,7 @@ async function _tasteIndex() {
   let tags = { pos: [], neg: [] };
   try { tags = await _tagProfile(watched.filter(e => _affinity(e))); } catch (e) { /* темы - добавка */ }
 
-  return (_tasteCache = { thin: false, tally, crew, crewIds, decades, byPerson, tags });
+  return _keep({ thin: false, tally, crew, crewIds, decades, byPerson, tags });
 }
 
 
@@ -14677,13 +14740,22 @@ function _pushPlugin() {
 }
 function _isNativePlatform() { return !!_pushPlugin(); }
 async function _saveDeviceToken(token) {
+  if (token) _deviceToken = token;
   if (!token || !currentUser || currentUser.is_anonymous || !sbClient) return;
   const platform = (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform()) || "ios";
+  // ТОКЕН МОГ ОСТАТЬСЯ ЗА ПРЕЖНИМ ВЛАДЕЛЬЦЕМ УСТРОЙСТВА - если тот не вышел кнопкой, а
+  // сессия кончилась иначе. Тогда upsert отклоняется политикой (чужую строку обновлять
+  // нельзя), а supabase-js возвращает ошибку, а не бросает её, и её никто не читал.
+  // claim_device_token (docs/fix-device-token-claim-2026-10-10.sql) забирает токен себе
+  // на сервере; пока функция не создана, остаётся прежний upsert - и его ошибка теперь видна.
   try {
-    await sbClient.from("device_tokens").upsert(
+    const { error: rpcErr } = await sbClient.rpc('claim_device_token', { p_token: token, p_platform: platform });
+    if (!rpcErr) return;
+    const { error } = await sbClient.from("device_tokens").upsert(
       { user_id: currentUser.id, token, platform, updated_at: new Date().toISOString() },
       { onConflict: "token" }
     );
+    if (error) console.warn("[push] save token:", error.message, "- run docs/fix-device-token-claim-2026-10-10.sql");
   } catch (e) { console.warn("[push] save token:", e && e.message); }
 }
 function _wirePushListeners() {
@@ -14846,6 +14918,9 @@ function initUI() {
         if (!session.user.is_anonymous) renderGuestBanner();
         return;
       }
+      // Другой человек без выхода между ними (вход поверх чужой сессии): сначала сброс,
+      // иначе onSignedIn не заменяет непустую чужую библиотеку пустой своей.
+      if (currentUser && currentUser.id !== session.user.id) _resetAccountState(currentUser.id);
       await onSignedIn(session.user);
     }
     else if(event==="PASSWORD_RECOVERY"){
@@ -14855,7 +14930,10 @@ function initUI() {
       document.getElementById("main-app").style.display="none";
       showScreen("reset");
     }
-    else if(event==="SIGNED_OUT"){showScreen("signin");document.getElementById("main-app").style.display="none";}
+    // Выход, пришедший извне: другая вкладка, другое устройство, отозванный токен. Раньше
+    // здесь только показывался экран входа, а библиотека, списки и входящие прежнего
+    // человека оставались в памяти до следующего входа - и доставались ему.
+    else if(event==="SIGNED_OUT"){_resetAccountState(currentUser && currentUser.id, { wipeLocal: true });showScreen("signin");document.getElementById("main-app").style.display="none";}
   });
 })();
 
