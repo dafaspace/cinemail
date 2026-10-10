@@ -2894,7 +2894,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.7-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.8-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8014,7 +8014,7 @@ const _MOODS = [
   // single entry covers inflections: "уютн" catches уютный / уютное / уютную.
   { id:'cosy',    g:'35,10751,10749', terms:'cosy cozy warm feelgood уютн тепл добр ностальг винтажн затишн gemutlich gemütlich accogliente douillet acogedor затишн' },
   { id:'autumn',  g:'18,9648',        terms:'autumn fall melanchol осенн меланхол грусн сумрачн herbst autunno automne otoño otono შემოდგომ herbstlich' },
-  { id:'heavy',   g:'18,10752,36',    terms:'heavy hard bleak grim тяжел мрачн жестк готич депресс schwer pesante lourd duro' },
+  { id:'heavy',   g:'18,10752,36',    terms:'heavy =hard bleak grim тяжел мрачн жестк готич депресс schwer pesante lourd duro' },
   { id:'light',   g:'35,10749,16',    terms:'light easy fun лёгк легк весел непринужд leicht leggero léger ligero' },
   { id:'slow',    g:'18',             terms:'slow quiet contemplative медленн тих тихи тихо созерцат медитат гипнотич langsam lento lent' },
   { id:'think',   g:'18,878,9648',    terms:'think clever mind подумать умн сложн интеллект nachdenk riflessiv réfléch pensar' },
@@ -8037,10 +8037,10 @@ const _MOODS = [
 const _GENRE_WORDS = [
   { g:'10749', terms:'romance romantic романт мелодрам romantik romantico romantique romantica რომანტ' },
   { g:'35',    terms:'comedy комеди komodie komödie commedia comedie comédia კომედ' },
-  { g:'27',    terms:'horror ужас хоррор страшилк schrecken orrore horreur terror საშინელ' },
+  { g:'27',    terms:'horror ужас ужастик хоррор страшилк schrecken orrore horreur terror საშინელ' },
   { g:'53',    terms:'thriller триллер spannung thriller suspense' },
   { g:'9648',  terms:'mystery detective детектив загадк krimi giallo policier misterio დეტექტ' },
-  { g:'878',   terms:'scifi science fiction фантаст sci scifi sciencefiction fantascienza fantascience ფანტასტ' },
+  { g:'878',   terms:'scifi science_fiction научн_фантаст фантаст sci scifi sciencefiction fantascienza fantascience ფანტასტ' },
   { g:'14',    terms:'fantasy фэнтези фентези fantasie fantasia fantaisie' },
   { g:'16',    terms:'animation anime cartoon аниме анимаци мультфильм мультик мультиплика zeichentrick animazione animacion ანიმაც' },
   { g:'99',    terms:'documentary докуметал документал докуфильм dokumentarfilm documentario documentaire documental' },
@@ -8154,7 +8154,7 @@ const _SUBJECTS = [
   { k:'space',        terms:'космос космич weltraum espace espacio spazio კოსმ space' },
   { k:'alien',        terms:'инопланет пришелец ausserirdisch außerirdisch extraterrestre alieno alien alienigenas alienígenas' },
   { k:'robot',        terms:'робот roboter robot' },
-  { k:'time travel',  terms:'путешествиевовремени времени машинавремени zeitreise voyagedanstemps time travel' },
+  { k:'time travel',  terms:'путешествиевовремени путешеств_во_времени во_времени машинавремени машина_времени zeitreise voyagedanstemps voyage_dans_le_temps viaje_en_el_tiempo viaggio_nel_tempo time_travel timetravel' },
   { k:'vampire',      terms:'вампир vampir vampire vampiro' },
   { k:'zombie',       terms:'зомби zombi' },
   { k:'ghost',        terms:'привид призрак привиден полтергейст geist fantome fantôme fantasma ghost' },
@@ -8172,8 +8172,8 @@ const _SUBJECTS = [
   { k:'mountain',     terms:'гора горы горный горах альпин berg montagne montana montagna მთა mountain' },
   { k:'forest',       terms:'лес леса лесу лесн ліс лісов wald foret forêt bosque foresta ტყე forest' },
   { k:'sea',          terms:'море морск meer mer mare океан mare ზღვა sea seas' },
-  { k:'road trip',    terms:'дорог роудтрип поездк road reise voyage viaje viaggio trip roadtrip roadmovie' },
-  { k:'courtroom',    terms:'судебн залсуда зале зал суда присяжн адвокатск courtroom trial gericht tribunal juicio processo gerichtssaal' },
+  { k:'road trip',    terms:'=дорога =дороги =дороге =дорогу роудтрип поездк road reise voyage viaje viaggio trip roadtrip roadmovie' },
+  { k:'courtroom',    terms:'судебн залсуда зал_суда зале_суда присяжн адвокатск courtroom trial gericht tribunal juicio processo gerichtssaal' },
   { k:'single location', terms:'камерн однойкомнат однакомнат singlelocation onelocation huisclos' },
   { k:'radio',        terms:'радиостанц радиоэфир радиовед radio funk' },
   { k:'cyberpunk',    terms:'киберпанк cyberpunk' },
@@ -8195,12 +8195,12 @@ const _SUBJECTS = [
   { k:'heist',        terms:'ограблен пограбуван raub braquage atraco rapina heist raubzug' },
   { k:'spy',          terms:'шпион шпигун spion espion espia spia spy spies' },
   { k:'mafia',        terms:'мафи гангстер mafia gangster' },
-  { k:'serial killer',terms:'маньяк серийн серийныйубийца serienmorder serienmörder tueur asesinoserie serial killer' },
+  { k:'serial killer',terms:'маньяк серийн серийн_убийц серийныйубийца serienmorder serienmörder tueur_en_serie asesinoserie asesino_en_serie serial_killer serialkiller' },
   { k:'boxing',       terms:'бокс boxen boxe boxeo pugilato boxing' },
   { k:'football',     terms:'футбол fussball fußball football futbol calcio' },
   { k:'chess',        terms:'шахмат шахів шахова schach echecs échecs ajedrez scacchi chess' },
   { k:'music',        terms:'музык музик musik musique musica მუსიკ music' },
-  { k:'rock band',    terms:'группа рокгруп band groupe banda rock rockband' },
+  { k:'rock band',    terms:'рокгруп рок_группа rockband rock_band groupe_de_rock banda_de_rock gruppo_rock rockgruppe' },
   { k:'painter',      terms:'художник маляр maler peintre pintor pittore მხატვ painter' },
   { k:'writer',       terms:'писател письмен schriftsteller ecrivain écrivain escritor scrittore მწერალ writer' },
   { k:'dance',        terms:'танц tanz danse baile danza ცეკვ dance' },
@@ -8214,7 +8214,7 @@ const _SUBJECTS = [
   { k:'chef',         terms:'повар кухн koch cuisinier cocinero cuoco chef' },
   { k:'pilot',        terms:'пилот лётчик летчик pilot pilote piloto' },
   { k:'childhood',    terms:'детств дитинств kindheit enfance infancia infanzia ბავშვ childhood' },
-  { k:'old age',      terms:'старость старик пожилой пожилые alter vieillesse vejez vecchiaia old olds age ages' },
+  { k:'old age',      terms:'старость старик пожилой пожилые alter vieillesse vejez vecchiaia old_age' },
   { k:'death',        terms:'смерт tod mort muerte morte სიკვდილ death' },
   { k:'illness',      terms:'болезн хвороб krankheit maladie enfermedad malattia illness' },
   { k:'addiction',    terms:'наркот зависим sucht drogue droga addiction' },
@@ -8222,15 +8222,15 @@ const _SUBJECTS = [
   { k:'cooking',      terms:'кулинар готовк приготовлен повар кухня кухни ресторан kochen cuisine cocina cucina food cooking' },
   { k:'teenager',     terms:'подрост тинейдж юност старшеклассник teenager jugendlich adolescent adolescente' },
   { k:'lighthouse',   terms:'маяк leuchtturm phare faro lighthouse' },
-  { k:'scientist',    terms:'учёный ученый научн лаборат лаборатор эксперимент wissenschaftler scientifique cientifico scienziato scientist' },
+  { k:'scientist',    terms:'учёный ученый лаборат лаборатор wissenschaftler scientifique cientifico scienziato scientist' },
   { k:'bureaucracy',  terms:'бюрократ чиновник канцеляр burokratie bürokratie bureaucratie burocracia burocrazia bureaucracy bureaucracies' },
   { k:'jazz',         terms:'джаз jazz' },
   { k:'loneliness',   terms:'одиночеств одинок lonel einsamkeit solitude soledad solitudine loneliness' },
   { k:'dream',        terms:'сновиден сюрреалист абсурдист traum reve rêve sueno sogno surreal dream surrealism surrealismo surrealismus' },
   { k:'skateboarding',terms:'скейт skateboard' },
-  { k:'artist',       terms:'художествен искусств творчеств kunst artiste arte artist' },
+  { k:'artist',       terms:'художник художниц искусств творчеств kunst artiste arte artist' },
   { k:'silent film',  terms:'безмолвн бездиалог безсловес silentfilm silent film' },
-  { k:'road movie',   terms:'роудмуви роуд-муви роуд roadmovie road movie roadtrip roadmovie' },
+  { k:'road movie',   terms:'роудмуви роуд-муви роуд roadmovie road_movie roadtrip roadmovie' },
   { k:'christmas',    terms:'рождеств різдв weihnacht noel noël navidad natale christmas' },
   { k:'wedding',      terms:'свадьб весілл hochzeit mariage boda matrimonio ქორწ wedding' },
   { k:'winter',       terms:'зим зимн winter hiver invierno inverno ზამთარ' },
@@ -8241,16 +8241,16 @@ const _SUBJECTS = [
   // тега. Зато есть кураторский список - человек знает, какие фильмы такие, и
   // отдаёт их списком. Мы перестаём делать вид, что понимаем настроение, и
   // берём ответ у того, кто действительно понимает.
-  { k:"kinetic", terms:"kinetic visceral relentless pulsepounding adrenaline breathless frantic кинетичн висцеральн неистов безостановочн адреналин на разрыв бешеный ритм кінетичн шалений адреналін visceral frenetico adrenalina trepidante viscéral haletant effréné adrénaline rasant atemlos adrenalin viscerale frenetico adrenalina კინეტიკური ადრენალინი" },
+  { k:"kinetic", terms:"kinetic visceral relentless pulsepounding adrenaline breathless frantic кинетичн висцеральн неистов безостановочн адреналин на_разрыв бешеный_ритм кінетичн шалений адреналін visceral frenetico adrenalina trepidante viscéral haletant effréné adrénaline rasant atemlos adrenalin viscerale frenetico adrenalina კინეტიკური ადრენალინი" },
   { k:"slow burn", terms:"slowburn slow burn meditative hypnotic deliberate contemplative immersive rigorous медленное горение медитативн гипнотическ созерцательн неторопл томительн тягуч медитативн гіпнотичн споглядальн pausado meditativo hipnotico contemplativo contemplatif hypnotique lent meditativ hypnotisch bedachtig meditativo ipnotico contemplativo მედიტაციური ჰიპნოტური" },
   { k:"whimsical", terms:"whimsical quirky symmetrical pastel storybook twee playful причудлив чудаковат симметричн пастельн сказочн игрушечн затейлив вигадлив дивакуват симетричн caprichoso excentrico simetrico pastel fantasque excentrique symetrique pastel skurril verspielt symmetrisch pastell bizzarro stravagante simmetrico pastello უცნაური სიმეტრიული" },
   { k:"neon noir", terms:"neon neondrenched neonlit synthwave неон неонов неоновый синтвейв неон неонові синтвейв neon neon neon neon ნეონი" },
   { k:"claustrophobic", terms:"claustrophobic claustrophobia dread unhinged unsettling paranoid oppressive клаустрофоб замкнут тесн безумие паранойя гнетущ тревожн давящ клаустрофоб замкнут божевілля паранойя claustrofobico opresivo paranoia angustioso claustrophobe oppressant paranoia angoissant klaustrophob beklemmend paranoid claustrofobico opprimente paranoia angosciante კლაუსტროფობიური შემზარავი" },
-  { k:"folk horror", terms:"folkhorror folk horror eerie ritual pagan daylight horror haunting фольклорн языческ ритуальн обряд жутк деревенск хоррор при свете дня фольклорн язичницьк ритуальн моторошн folclorico pagano ritual inquietante folklorique paien rituel inquietant folk heidnisch ritual unheimlich folkloristico pagano rituale inquietante ფოლკლორული რიტუალური" },
+  { k:"folk horror", terms:"folkhorror folk_horror ritual pagan фольклорн фольклорный_хоррор деревенский_хоррор языческ ритуальн обряд фольклорн язичницьк ритуальн folclorico pagano ritual folklorique paien rituel heidnisch ritual folkloristico pagano rituale ფოლკლორული რიტუალური" },
   { k:"mind bending", terms:"mindbending mind bending cerebral surreal puzzle convoluted unreliable labyrinth взрыв мозга головолом сюрреалист лабиринт запутанн ненадежн рассказчик замороченн головолом сюрреаліст лабіринт заплутан rompecabezas cerebral surrealista laberinto casse tete cerebral surrealiste labyrinthe kopfzerbrechen zerebral surreal labyrinth rompicapo cerebrale surreale labirinto თავსატეხი სიურრეალისტური surrealism surrealismo surrealismus" },
-  { k:"bittersweet", terms:"bittersweet wistful understated горьковат светлая грусть недосказанн гіркувато світлий сум agridulce doux amer bittersuss agrodolce მწარე ტკბილი" },
-  { k:"epic", terms:"epic epics sweeping grand scale monumental saga эпическ эпос масштабн грандиозн полотно сага размах монументальн епічн масштабн грандіозн сага epico epopeya grandioso gran escala epique fresque grandiose ampleur episch monumental grossangelegt saga epico kolossale grandioso saga ეპიკური მასშტაბური" },
-  { k:"dreamlike", terms:"dreamlike dream logic oneiric reverie sleepwalking trance сновидческ как во сне сон наяву грез бред марев транс дремотн сновидн як уві сні марення транс onirico como un sueno ensonacion onirique comme un reve reverie traumhaft traumartig traumlogik onirico come un sogno სიზმრისეული ონირიული" },
+  { k:"bittersweet", terms:"bittersweet wistful understated горьковат светлая_грусть недосказанн гіркувато світлий_сум agridulce doux_amer bittersuss agrodolce მწარე_ტკბილი" },
+  { k:"epic", terms:"epic epics sweeping grand_scale monumental saga эпическ эпос масштабн грандиозн полотно сага размах монументальн епічн масштабн грандіозн сага epico epopeya grandioso gran_escala epique fresque grandiose ampleur episch monumental grossangelegt saga epico kolossale grandioso saga ეპიკური მასშტაბური" },
+  { k:"dreamlike", terms:"dreamlike dream_logic oneiric reverie sleepwalking trance сновидческ как_во_сне сон_наяву грез бред марев транс дремотн сновидн як_уві_сні марення транс onirico como_un_sueno ensonacion onirique comme_un_reve reverie traumhaft traumartig traumlogik onirico come_un_sogno სიზმრისეული ონირიული" },
   // ЭТИ ГРУППЫ СЛЕПЫ К СЛОЮ, И ЭТО ВРЕМЕННО, А НЕ ПРАВИЛЬНО.
   //
   // Dafa сформулировал правило дважды за один час, и вторая формулировка отменяет
@@ -8268,13 +8268,13 @@ const _SUBJECTS = [
   // Оставлено здесь, а не в заметках, потому что иначе через месяц это прочтут как
   // решённое. Источник списков - docs/film-epithets.json.
   { k:"beautiful", terms:"beautiful gorgeous ravishing visually stunning красив прекрасн визуально роскошн любоват изумительн красив прекрасн розкішн hermoso precioso deslumbrante magnifique splendide sublime wunderschon prachtig bellissimo splendido ლამაზი მშვენიერი" },
-  { k:"haunting", terms:"haunting lingering unshakeable stays with you щемящ неотвязн преследующ засевш западающ неотпускающ щемк невідступн переслідує inolvidable persistente obsesionante obsedant lancinant nachhallend eindringlich ossessionante persistente დაუვიწყარი" },
-  { k:"moving", terms:"moving touching heartbreaking poignant tearjerker трогательн пронзительн до слез душеразд берущ за душу растрогат зворушлив пронизлив до сліз conmovedor emotivo desgarrador emouvant bouleversant poignant ruhrend ergreifend herzzerreissend commovente toccante struggente ამაღელვებელი" },
-  { k:"austere", terms:"austere ascetic spare severe аскетичн суров скупо строгая форма аскетичне суворе austero adusto austere depouille streng karg austero spoglio ასკეტური" },
+  { k:"haunting", terms:"haunting lingering unshakeable stays_with_you щемящ неотвязн преследующ засевш западающ неотпускающ щемк невідступн переслідує inolvidable persistente obsesionante obsedant lancinant nachhallend eindringlich ossessionante persistente დაუვიწყარი" },
+  { k:"moving", terms:"moving touching heartbreaking poignant tearjerker трогательн пронзительн до_слез душеразд берущ_за_душу растрогат зворушлив пронизлив до_сліз conmovedor emotivo desgarrador emouvant bouleversant poignant ruhrend ergreifend herzzerreissend commovente toccante struggente ამაღელვებელი" },
+  { k:"austere", terms:"austere ascetic spare severe аскетичн суров скупо строгая_форма аскетичне суворе austero adusto austere depouille streng karg austero spoglio ასკეტური" },
   { k:"playful", terms:"playful impish mischievous игрив озорн шаловлив пустотлив грайлив jugueton travieso espiegle verspielt giocoso მოთამაშე" },
-  { k:"restrained", terms:"restrained reserved understated spare emotion сдержанн скуп негромк приглушенн стриман негучне contenido sobrio retenu pudique zuruckhaltend sobrio ᲗᲐᲕᲨᲔᲙᲐᲕᲔᲑᲣᲚᲘ" },
+  { k:"restrained", terms:"restrained reserved understated spare_emotion сдержанн скуп негромк приглушенн стриман негучне contenido sobrio retenu pudique zuruckhaltend sobrio ᲗᲐᲕᲨᲔᲙᲐᲕᲔᲑᲣᲚᲘ" },
   { k:"delicate", terms:"delicate fragile deft хрупк деликатн невесом ажурн крихк делікатн delicado fragil delicat zart delicato ნაზი" },
-  { k:"eerie", terms:"eerie uncanny otherworldly жутков потусторонн зловещ мороз по коже моторошн inquietante sobrenatural etrange inquietant unheimlich inquietante საშიში" },
+  { k:"eerie", terms:"eerie uncanny otherworldly жутков потусторонн зловещ мороз_по_коже моторошн inquietante sobrenatural etrange inquietant unheimlich inquietante საშიში" },
   { k:"erotic", terms:"erotic desire эротичн желание влечен эротичне eroticо erotique erotisch erotico ეროტიული" },
   { k:"experimental", terms:"experimental avantgarde экспериментальн авангардн формальн эксперимент експериментальн experimental experimentale experimentell sperimentale ექსპერიმენტული" },
   { k:"exquisite", terms:"exquisite refined изысканн утончённ утонченн вишукан exquisito refinado exquis raffine erlesen squisito რაფინირებული" },
@@ -8282,9 +8282,9 @@ const _SUBJECTS = [
   { k:"powerful", terms:"powerful forceful overwhelming мощн сокрушительн оглушительн пробирает потужн poderoso arrollador puissant bouleversant wuchtig uberwaltigend potente ძლიერი" },
   { k:"sensual", terms:"sensual tactile чувственн телесн осязаем чуттєв sensual sensuel sinnlich sensuale სენსუალური" },
   { k:"poetic", terms:"poetic lyrical поэтичн лиричн поэзия кинопоэзия поетичн ліричн poetico lirico poetique lyrique poetisch lyrisch poetico lirico პოეტური" },
-  { k:"chilling", terms:"chilling bloodcurdling леденящ холодок по спине озноб морозн страх крижан escalofriante glacant eiskalt agghiacciante შემზარავი" },
-  { k:"dark", terms:"darkness pitchblack мрачн беспросветн темнота черная сторона похмур sombrio tenebroso sombre tenebreux dustere finster cupo tenebroso ბნელი" },
-  { k:"disturbing", terms:"disturbing troubling выбива из колеи беспокоящ смущающ травмирующ тривожн perturbador inquietante derangeant verstorend perturbante შემაშფოთებელი" },
+  { k:"chilling", terms:"chilling bloodcurdling леденящ холодок_по_спине озноб страх крижан escalofriante glacant eiskalt agghiacciante შემზარავი" },
+  { k:"dark", terms:"darkness pitchblack мрачн беспросветн темнота черная_сторона похмур sombrio tenebroso sombre tenebreux dustere finster cupo tenebroso ბნელი" },
+  { k:"disturbing", terms:"disturbing troubling выбива_из_колеи беспокоящ смущающ травмирующ тривожн perturbador inquietante derangeant verstorend perturbante შემაშფოთებელი" },
 ];
 // MOVEMENTS, SCHOOLS AND ERAS. Each is a country, a stretch of years, and sometimes a handful
 // of people - which is to say each is an exact query, not an approximation. "Французская новая
@@ -8674,16 +8674,60 @@ function _splitQuery(q) {
   //
   // Поэтому разрез по письменности, а не по длине. Ровно это правило уже стоит на _QSTOP
   // двадцатью строками выше - там оно появилось, когда итальянское "per" съедало "perros".
+  // КОРОТКОЙ КИРИЛЛИЧЕСКОЙ ОСНОВЕ - КОРОТКИЙ ХВОСТ. Проверка кода 9 октября нашла, что
+  // "любой хвост" делает из основы ловушку: "гора" ловила "гораздо", "транс" - "трансформеры"
+  // и "трансильванию". Длинной основе русская морфология нужна целиком ("фантаст" обязан
+  // ловить "фантастические", +7), а основа в четыре-пять букв - это уже почти слово, и
+  // хвост длиннее окончания означает другое слово.
   const _pfxHit = (w, st) => {
     if (st.length < 4) return false;
     if (!w.startsWith(st)) return false;
-    if (/[^\u0000-ɏ]/.test(st)) return true;     // кириллица, грузинский: хвост любой
+    if (/[^\u0000-ɏ]/.test(st))                     // кириллица, грузинский
+      return st.length >= 6 || w.length - st.length <= (st.length === 5 ? 3 : 2);
     return w.length - st.length <= 2;                  // латиница: только короткое окончание
   };
+  // ФРАЗА В ТАБЛИЦЕ ПИШЕТСЯ ЧЕРЕЗ ПОДЧЁРКИВАНИЕ: stays_with_you, как_во_сне, folk_horror.
+  // До 9 октября фразы стояли через пробел, а terms режется по пробелу, поэтому каждая фраза
+  // молча превращалась в набор отдельных слов: "folk horror" делал триггером голое "horror",
+  // и любой хоррор отвечал фолк-хоррором; "stays with you" делал триггером "you"; "como un
+  // sueño" - "como", и испанское "фильмы как Амели" всегда уходило в сновидческое.
+  // Фраза совпадает, только если ВСЕ её слова стоят в запросе подряд. Ищем по запросу ДО
+  // стоп-слов: "во", "un", "with" - стоп-слова, а внутри фразы они как раз и держат смысл.
+  // Ударения в латинице снимаются при сравнении: человек пишет "sueño" и "rêve", таблица -
+  // "sueno" и "reve". Только у латинских букв: NFD раскладывает и кириллическое "й" на "и"
+  // с бревисом, и снимать бревис значило бы ломать русский.
+  const _fold = x => x.normalize('NFD').replace(/([a-z])[\u0300-\u036f]+/g, '$1').normalize('NFC');
+  const allWords = _qNorm(qLeft).split(' ').filter(Boolean).map(_fold);
+  const _partHit = (w, part) => part.length < 4 ? w === part
+    : (w === part || _pfxHit(w, part) || (_stem(w).length >= 4 && _stem(w) === _stem(part)));
+  // ДЛИННОЕ СОВПАДЕНИЕ ВАЖНЕЕ КОРОТКОГО и здесь. Слово, вошедшее во фразу, принадлежит ей и
+  // для одиночных совпадений в других строках уже не годится: "como un sueño" - это сновидческое
+  // кино, а не ещё и кино "про сны" из-за одиночного "sueno". Поэтому фразы ищутся ПЕРВЫМИ, по
+  // всем таблицам сразу, а их слова откладываются в сторону.
+  const _phraseWords = new Set(), _phraseRows = new Set();
+  const _phraseHit = phrase => {
+    const parts = phrase.split('_').map(p => _fold(_qNorm(p))).filter(Boolean);
+    for (let i = 0; i + parts.length <= allWords.length; i++)
+      if (parts.every((p, j) => _partHit(allWords[i + j], p))) {
+        for (let j = 0; j < parts.length; j++) { matchedWords.add(allWords[i + j]); _phraseWords.add(allWords[i + j]); }
+        return true;
+      }
+    return false;
+  };
+  for (const tbl of [_MOODS, _GENRE_WORDS, _SUBJECTS, _COUNTRIES])
+    for (const row of tbl)
+      if (row.terms.split(' ').some(t => t.includes('_') && _phraseHit(t))) _phraseRows.add(row);
   const hit = tbl => tbl.filter(row => {
-    const stems = row.terms.split(' ').filter(s => s.length > 2);
-    let found = false;
-    words.forEach(w => {
+    const all = row.terms.split(' ').filter(s => s.length > 2);
+    // "=слово" - только это слово целиком, без приставки и без стеммера. Для форм, которые
+    // стеммер сводит с чужим словом: "дорогой" (дорогая, "Дорогой Джон") и "дорога" дают одну основу.
+    const exact = all.filter(s => s[0] === '=').map(s => _fold(s.slice(1)));
+    const stems = all.filter(s => !s.includes('_') && s[0] !== '=').map(_fold);
+    let found = _phraseRows.has(row);
+    words.forEach(w0 => {
+      const w = _fold(w0);
+      if (_phraseWords.has(w)) return;
+      if (exact.includes(w)) { matchedWords.add(w0); found = true; return; }
       const ws = _stem(w);
       // Две мерки, и они ловят разное. Стеммер сводит формы ОДНОГО слова: тихой и тихий,
       // любви и любовь, коты и кошки. Приставка перекрывает границу между частями речи,
@@ -8695,7 +8739,7 @@ function _splitQuery(q) {
       // обеих сторон: и у слова из запроса, и у термина после нормализации.
       if (stems.some(st => _pfxHit(w, st) || (st.length < 4 && w === st)
                         || (ws.length >= 4 && _stem(st).length >= 4 && ws === _stem(st))))
-        { matchedWords.add(w); found = true; }
+        { matchedWords.add(w0); found = true; }
     });
     return found;
   });
@@ -9295,9 +9339,15 @@ function _rankByTaste(cands, taste, fallbackWhy) {
 // Only the films that will actually be shown are fetched - seven, in parallel, so it costs one
 // round trip rather than one per film. Ranking happens on id and year alone, which is why the
 // table stores the year: it is the one fact about a film that reads the same in every language.
-async function _curatedSubject(key, taste, wantGenres) {
-  const rows = _SUBJECT_FILMS[key];
+async function _curatedSubject(key, taste, wantGenres, years) {
+  let rows = _SUBJECT_FILMS[key];
   if (!rows) return null;                       // no list for this subject: caller falls back
+  // Названные годы - фильтр по полке, а не повод её выбросить: год у каждой строки уже есть.
+  // Если в нужные годы на полке меньше трёх фильмов, отвечает не она, а поиск по теме.
+  if (years) {
+    rows = rows.filter(([, y]) => y >= years[0] && y <= years[1]);
+    if (rows.length < 3) return null;
+  }
   const lib = _libraryKeys();
   const fresh = rows.filter(([id]) => !lib.ids.has(String(id)));
   if (!fresh.length) return [];                 // they have seen the lot; say so by returning nothing
@@ -9523,8 +9573,15 @@ async function _constraintsFor(q) {
     // запросом, тем он точнее. "serial killer" должен бить "killer" по той же
     // причине, и когда такая пара появится, она уже будет решена.
     subjects.sort((a, b) => String(b.k).length - String(a.k).length);
-    for (const sj of subjects) {
-      const curated = await _curatedSubject(sj.k, await _tasteIndex(), c.genreIds);
+    // ПОЛКА ОТВЕЧАЕТ ТОЛЬКО ЗА ТО, ЧТО ОНА ЗНАЕТ. Найдено проверкой кода 9 октября:
+    // "кристофер нолан мрачное" отдавало общую полку мрачного кино без единого Нолана,
+    // "мрачные фильмы 70-х" и "красивое японское кино" - одну и ту же полку для любых лет
+    // и стран. Человек, страна, движение и свежесть полке неизвестны, и с ними отвечает поиск
+    // по теме, который их учитывает. Годы полка знает сама и фильтрует по ним.
+    const _pinned = c.person || c.country || c.movement || c.recent;
+    const _years = c.decade ? [c.decade, c.decade + 9] : c.year ? [c.year, c.year] : null;
+    for (const sj of (_pinned ? [] : subjects)) {
+      const curated = await _curatedSubject(sj.k, await _tasteIndex(), c.genreIds, _years);
       if (curated && curated.length >= 3) {
         // Своя строка "По запросу «space»" стояла под ВСЕМИ пятью карточками, потому
         // что отличалась от c.why и поэтому не считалась заменяемой. Кураторский
