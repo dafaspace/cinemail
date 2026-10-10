@@ -2894,7 +2894,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.12-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.13-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -5881,12 +5881,24 @@ async function loadHistoryFromDB() {
   _clearTasteCache();   // библиотека меняется - модель вкуса вместе с ней
   const uid = currentUser?.id;
   const sharedIds = (_listsCache || []).map(l => l.id).filter(Boolean);
-  let query = "watchlist?order=sort_order.asc.nullslast,created_at.desc";
+  // id последним ключом: без него порядок строк с одинаковыми sort_order и created_at не
+  // определён, и страницы ниже могли бы перекрываться или терять строки на стыке.
+  let query = "watchlist?order=sort_order.asc.nullslast,created_at.desc,id.asc";
   if (uid && sharedIds.length) {
-    query = `watchlist?or=(user_id.eq.${uid},list_id.in.(${sharedIds.join(',')}))&order=sort_order.asc.nullslast,created_at.desc`;
+    query = `watchlist?or=(user_id.eq.${uid},list_id.in.(${sharedIds.join(',')}))&order=sort_order.asc.nullslast,created_at.desc,id.asc`;
   }
-  const rows = await sbFetch(query);
-  if (!Array.isArray(rows)) return watchHistory;
+  // СТРАНИЦАМИ ПО 1000. Supabase отдаёт не больше 1000 строк на запрос (Max rows), и один
+  // запрос без limit молча обрезал библиотеку: после импорта 1400 фильмов самые старые 400
+  // пропадали из Просмотренного, профиля и подборок, а повторная отметка вставляла дубль.
+  // getBackupData рядом листал страницами с самого начала, основная загрузка - нет.
+  // Найдено проверкой кода 9 октября.
+  const PAGE = 1000, rows = [];
+  for (let from = 0; ; from += PAGE) {
+    const page = await sbFetch(`${query}&limit=${PAGE}&offset=${from}`);
+    if (!Array.isArray(page)) { if (!rows.length) return watchHistory; break; }
+    rows.push(...page);
+    if (page.length < PAGE || rows.length > 100000) break;
+  }
   const mapped = rows.map(r => ({
     id: r.id, tmdbID: r.imdb_id, title: r.title, year: r.year,
     poster: r.poster, stars: Number(r.stars) || 0, comment: r.comment || "",
@@ -6318,9 +6330,12 @@ function startSlowLoadingIndicator() {
 // watched" is not a question about the film, it is a question about a person, and it has to name
 // which one. Without the owner test a film a friend rated reads as watched by me, with their
 // stars and their note. Rows with no addedBy are local/guest rows and count as mine.
-function _myRows(tmdbID) {
+function _isMine(h) {
   const uid = currentUser?.id || null;
-  return watchHistory.filter(h => h.tmdbID === String(tmdbID) && (!h.addedBy || !uid || h.addedBy === uid));
+  return !h.addedBy || !uid || h.addedBy === uid;
+}
+function _myRows(tmdbID) {
+  return watchHistory.filter(h => h.tmdbID === String(tmdbID) && _isMine(h));
 }
 // My own opinion of a film, wherever it happens to be filed. One film can occupy several rows -
 // one per list it sits in - and only one of them carries the watched status, the stars and the
@@ -7522,8 +7537,30 @@ async function confirmEdit() {
 }
 
 // ── Delete ────────────────────────────────────────────────────────────────────
+// КРЕСТИК УБИРАЕТ ФИЛЬМ ОТСЮДА, А НЕ МНЕНИЕ О НЁМ. Одна строка часто держит сразу и место в
+// списке, и статус «просмотрено», звёзды, заметку: confirmAdd с 15 сентября не обнуляет
+// list_id. Крестик удалял строку целиком, и чистка списка «Выходные» стирала оценку 4.5 и
+// заметку без возможности вернуть. toggleFilmInList на то же действие уже поступал правильно -
+// отцеплял такую строку, - а крестик нет. Найдено проверкой кода 9 октября.
+//   в именованном списке:  просмотренную строку - отцепить от списка, оценка остаётся
+//   в «Просмотренном»:     строку, которая ещё и в списке, - вернуть в список как «посмотреть»,
+//                          а не убирать из списка заодно
+//   всё остальное:         удалить, как раньше
 async function deleteItem(id) {
-  try { await deleteEntryFromDB(id); watchHistory = watchHistory.filter(h => h.id !== id); renderHistory(); }
+  const row = watchHistory.find(h => h.id === id);
+  try {
+    if (row && row.listId && _activeListId === row.listId && row.status === 'watched') {
+      await updateEntryInDB(id, { list_id: null });
+      watchHistory = watchHistory.map(h => h.id === id ? { ...h, listId: null } : h);
+    } else if (row && row.listId && _activeListId === 'watched') {
+      await updateEntryInDB(id, { status: 'plan' });
+      watchHistory = watchHistory.map(h => h.id === id ? { ...h, status: 'plan' } : h);
+    } else {
+      await deleteEntryFromDB(id);
+      watchHistory = watchHistory.filter(h => h.id !== id);
+    }
+    renderHistory();
+  }
   catch(e) { alert(t('err_could_not_delete') + e.message); }
 }
 // Inline "tap to confirm" delete: first tap arms (× → "Delete?"), second tap within 3s deletes.
@@ -7565,11 +7602,15 @@ function renderHistory() {
   // exactly these films, so this is the one tab where it means anything.
   const statsEl = document.getElementById('acc-profile-stats');
   if (statsEl) {
-    if (isWatchedTab) renderProfileStats(watchHistory.filter(h => h.status === 'watched'));
+    // Только МОИ строки. watchHistory держит и строки других участников общих списков, и до
+    // 10 октября их фильмы, звёзды и заметки попадали в моё «Просмотренное», в счётчик, в
+    // среднюю оценку и в профиль кино - а время просмотра на том же экране их уже отсекало,
+    // так что цифры одного экрана расходились. Найдено проверкой кода 9 октября.
+    if (isWatchedTab) renderProfileStats(watchHistory.filter(h => h.status === 'watched' && _isMine(h)));
     else statsEl.innerHTML = '';
   }
   if (isWatchedTab) {
-    filtered = watchHistory.filter(h => h.status === 'watched');
+    filtered = watchHistory.filter(h => h.status === 'watched' && _isMine(h));
   } else if (_activeListId === 'personal') {
     // My List is a QUEUE, so `plan` belongs here: a watched film has left the queue by watching.
     filtered = watchHistory.filter(h => h.status === 'plan' && !h.listId);
@@ -7607,8 +7648,8 @@ function renderHistory() {
     });
   }
 
-  const watched = watchHistory.filter(h => h.status === "watched");
-  const plan = watchHistory.filter(h => h.status === "plan");
+  const watched = watchHistory.filter(h => h.status === "watched" && _isMine(h));
+  const plan = watchHistory.filter(h => h.status === "plan" && _isMine(h));
   const rated = watched.filter(h => h.stars > 0);
   const avg = rated.length ? (rated.reduce((a,b)=>a+b.stars,0)/rated.length).toFixed(1)+"★" : "—";
 
@@ -7625,7 +7666,9 @@ function renderHistory() {
     const tabName = _activeListId === 'personal'
       ? ((currentUser?.displayName||'My')+"'s List")
       : (_listsCache.find(l => l.id === _activeListId)?.name || 'List');
-    headerHTML = `<span>${filtered.length} to watch</span><span style="color:var(--muted)">${tabName}</span>`;
+    // Имя задаёт владелец списка и через вступление по ссылке оно попадает в чужой браузер:
+    // без escapeHtml здесь был XSS, хотя в пустом состоянии рядом то же имя экранировано.
+    headerHTML = `<span>${filtered.length} to watch</span><span style="color:var(--muted)">${escapeHtml(tabName)}</span>`;
   }
   el.innerHTML = `
     <div class="history-header">${headerHTML}</div>
@@ -7648,7 +7691,7 @@ function renderHistory() {
             <div class="hist-poster">${item.poster&&item.poster!=="N/A"?`<img src="${escapeHtml(item.poster)}" alt="" class="poster-zoomable" onclick="event.stopPropagation();openLightbox('${escapeJsAttr(item.poster)}','${escapeJsAttr(item.title)}${item.year?' ('+escapeJsAttr(item.year)+')':''}')" onerror="this.parentNode.innerHTML=icon('film',26)"`+`>`:icon('film',22)}</div>
             <div style="flex:1;min-width:0">
               <div class="hist-title">${escapeHtml(item.title)}</div>
-              <div class="hist-meta">${item.year} · ${item.date}</div>
+              <div class="hist-meta">${escapeHtml(item.year ?? '')} · ${escapeHtml(item.date ?? '')}</div>
               ${opStatus==="watched"
                 ? `<div style="display:flex;gap:2px;margin-top:3px">${starsHTML(opStars)}</div>`
                 : ''}
