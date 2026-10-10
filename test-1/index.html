@@ -2894,7 +2894,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.10-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.59.11-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -5536,6 +5536,7 @@ function _resetAccountState(prevUid, { wipeLocal = false } = {}) {
   _friendsCache = []; _friendRequestsCache = [];
   _inboxCache = { received: [], sent: [] }; _inboxCacheLoaded = false;
   _chatViewPartnerId = null; _expandedInviteId = null;
+  _blockedIds = new Set();
   _tasteCache = null; _lastSeeds = [];
   _picksRemaining = null; _pressState = { key: '', n: 0 };
   _shownSurprises.length = 0;
@@ -10433,6 +10434,7 @@ async function unblockUser(userId) {
     const { error } = await sbClient.rpc('unblock_user', { p_target: userId });
     if (error) throw new Error(error.message);
     renderBlockedList();
+    loadInboxCache();
     showToast(t('unblock_done'));
   } catch (e) { showToast(t('block_failed') + ': ' + e.message, true); }
 }
@@ -12030,16 +12032,34 @@ function _mergeMessages(oldMsgs, newMsgs) {
   return merged;
 }
 
+// КОГО Я ЗАБЛОКИРОВАЛ - ЕГО ПЕРЕПИСКИ НЕТ НИ В СПИСКЕ, НИ В ЗВУКЕ, НИ В СЧЁТЧИКЕ.
+// Проверка кода 9 октября: block_user удаляет только приглашения ОТ заблокированного, а мои
+// ему остаются, и он продолжал отвечать в старой переписке - приходили звук, тост «X ответил»
+// и цифра на вкладке, а переписка висела во Входящих. Экран блокировки обещает обратное.
+// Это половина в приложении; вторая, в базе (ответ и пуш не должны проходить вовсе) -
+// отдельной правкой.
+let _blockedIds = new Set();
+async function _loadBlockedIds() {
+  if (!currentUser || isGuestUser()) { _blockedIds = new Set(); return; }
+  try {
+    const { data } = await sbClient.from('blocked_users').select('blocked_id').eq('blocker_id', currentUser.id);
+    _blockedIds = new Set((data || []).map(b => b.blocked_id));
+  } catch (e) { /* без списка блокировок Входящие всё равно показываем */ }
+}
+const _partnerOf = inv => inv && (inv.from_user_id === currentUser?.id ? inv.to_user_id : inv.from_user_id);
+const _notBlocked = inv => !_blockedIds.has(_partnerOf(inv));
+
 async function loadInboxCache() {
   if (!currentUser) return;
   try {
+    await _loadBlockedIds();
     const sel = "id,tmdb_id,title,year,poster,media_type,message,status,read_at,messages,last_msg_at,created_at,from_user_id,to_user_id,from_name,to_name,type,list_id";
     const [recRes, sentRes] = await Promise.all([
       sbClient.from("invites").select(sel).eq("to_user_id", currentUser.id).order("created_at",{ascending:false}),
       sbClient.from("invites").select(sel).eq("from_user_id", currentUser.id).order("created_at",{ascending:false}).limit(50)
     ]);
-    _inboxCache.received = recRes.data || [];
-    _inboxCache.sent = sentRes.data || [];
+    _inboxCache.received = (recRes.data || []).filter(_notBlocked);
+    _inboxCache.sent = (sentRes.data || []).filter(_notBlocked);
     _inboxCacheLoaded = true;
     _updateInboxBadge();
     if (document.getElementById("tab-inbox")?.style.display !== "none") renderInboxFromCache();
@@ -12648,12 +12668,14 @@ function startInboxPolling() {
   // Received: INSERT and UPDATE
   _realtimeChannel = sbClient.channel("inbox-rcv-" + uid)
     .on("postgres_changes",{event:"INSERT",schema:"public",table:"invites",filter:`to_user_id=eq.${uid}`},(payload)=>{
+      if (!_notBlocked(payload.new)) return;
       _inboxCache.received.unshift(payload.new);
       _updateInboxBadge();
       notifyNewInvite(1);
       if(document.getElementById("tab-inbox")?.style.display!=="none") renderInboxFromCache();
     })
     .on("postgres_changes",{event:"UPDATE",schema:"public",table:"invites",filter:`to_user_id=eq.${uid}`},(payload)=>{
+      if (!_notBlocked(payload.new)) return;
       const idx=_inboxCache.received.findIndex(i=>i.id===payload.new.id);
       if(idx>=0) {
         const old = _inboxCache.received[idx];
@@ -12669,6 +12691,7 @@ function startInboxPolling() {
   // Sent: UPDATE only (to track reads, accepts, replies)
   _sentRealtimeChannel = sbClient.channel("inbox-sent-" + uid)
     .on("postgres_changes",{event:"UPDATE",schema:"public",table:"invites",filter:`from_user_id=eq.${uid}`},(payload)=>{
+      if (!_notBlocked(payload.new)) return;
       const idx=_inboxCache.sent.findIndex(i=>i.id===payload.new.id);
       if(idx>=0){
         const old=_inboxCache.sent[idx], upd=payload.new;
