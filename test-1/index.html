@@ -6111,6 +6111,20 @@ function _renderWhereToWatch() {
   if (cin && window._detailMovie) cin.innerHTML = _cinemaInner(window._detailMovie);
 }
 
+// ── Чужая страница: в приложении из стора - окном поверх Cinemail, на сайте - вкладкой ──
+// Решено 11 окт (макет docs/mockups/route-options.html, вариант 1): «Маршрут», «Сеансы», «IMAX»
+// и «Википедия» не уводят из приложения, а открываются листом с «Готово» (SFSafariViewController
+// на iPhone, Chrome Custom Tabs на Android, плагин @capacitor/browser). Пока плагина в сборке
+// нет или это сайт - новая вкладка, как было.
+function _inAppBrowser() {
+  const C = window.Capacitor;
+  return !!(C && C.isNativePlatform && C.isNativePlatform() && C.Plugins && C.Plugins.Browser);
+}
+function _openExternal(url) {
+  if (_inAppBrowser()) { window.Capacitor.Plugins.Browser.open({ url, presentationStyle: 'popover' }).catch(() => window.open(url, '_blank', 'noopener')); return; }
+  window.open(url, '_blank', 'noopener');
+}
+
 // ── «В кино» (решено 9 окт, docs/outstanding.md 1.3c) ────────────────────────
 // Дата проката в стране человека из TMDB и две передачи дальше: сеансы ищет Google, IMAX -
 // приложение карт вокруг тебя. Сами мы расписание не храним и не обновляем: каждый источник
@@ -6146,7 +6160,7 @@ function _cinemaInner(d) {
   const ios = (window.Capacitor?.getPlatform?.() === 'ios') || /iPhone|iPad|iPod/.test(navigator.userAgent)
     || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
   const maps = ios ? 'https://maps.apple.com/?q=IMAX' : 'https://www.google.com/maps/search/?api=1&query=IMAX';
-  const btn = (href, ic, label) => `<button type="button" class="maps-onmap" data-href="${escapeHtml(href)}" onclick="window.open(this.dataset.href,'_blank','noopener')">${icon(ic, 14)} ${escapeHtml(label)}</button>`;
+  const btn = (href, ic, label) => `<button type="button" class="maps-onmap" data-href="${escapeHtml(href)}" onclick="_openExternal(this.dataset.href)">${icon(ic, 14)} ${escapeHtml(label)}</button>`;
   return `<div style="margin-bottom:14px"><div class="crew-label">${escapeHtml(t('cin_title'))}</div>
     <div class="crew-val">${escapeHtml(line)}</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">${btn(google, 'search', t('cin_showtimes'))}${btn(maps, 'map-pin', t('cin_imax'))}</div></div>`;
@@ -15834,10 +15848,11 @@ function _mapsSelect(i) {
   // «Маршрут» строит маршрут сразу, от того места, где человек сейчас: daddr у Apple, dir у Google.
   // У города и региона кнопки нет - это область, а не точка, к которой идут (11 окт).
   const isTown = ['city', 'region'].includes(d.cats[cat]);
-  const route = isTown ? '' : ios ? `https://maps.apple.com/?daddr=${lat},${lon}`
+  // В листе поверх приложения - веб-карта Google: ссылка Apple сразу увела бы в приложение Карты.
+  const route = isTown ? '' : (ios && !_inAppBrowser()) ? `https://maps.apple.com/?daddr=${lat},${lon}`
                     : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
   const wiki = q ? `https://www.wikidata.org/wiki/Special:GoToLinkedPage/${_lang}wiki/Q${q}` : '';
-  const ext = (href, ic, label) => `<button type="button" class="maps-onmap" data-href="${escapeHtml(href)}" onclick="window.open(this.dataset.href,'_blank','noopener')">${icon(ic, 14)} ${escapeHtml(label)}</button>`;
+  const ext = (href, ic, label) => `<button type="button" class="maps-onmap" data-href="${escapeHtml(href)}" onclick="_openExternal(this.dataset.href)">${icon(ic, 14)} ${escapeHtml(label)}</button>`;
   _mapsSheet(`${back}<div id="maps-photo"></div><div class="maps-place">
       <div class="maps-place-n" dir="auto">${escapeHtml(_placeName(i))}</div>
       <div class="maps-place-m">${escapeHtml(_placeLine(i))}</div>
