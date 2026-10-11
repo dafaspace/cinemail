@@ -3003,7 +3003,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.66.0-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.66.1-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -10256,7 +10256,10 @@ function _planQuery(c) {
     // иначе полезут фильмы с оценками ожидания. Без свежести год берётся целиком.
     const today = new Date().toISOString().slice(0, 10);
     const end = c.year + '-12-31';
-    p.set('primary_release_date.lte', c.recent && today < end ? today : end);
+    // «Сегодня» как верхняя граница - только для года, который уже идёт. Для следующего года
+    // она давала окно «с 1 января 2027 по сегодня», перевёрнутое, и «новинки 2027» всегда были
+    // пусты (проверка кода 9 окт). Будущий год берётся целиком.
+    p.set('primary_release_date.lte', c.recent && !c.future && today < end ? today : end);
   }
   if (c.recent && !c.movement && !c.decade) {
     // Верхняя граница - сегодня: без неё в выдачу лезет анонсированное, у которого ни
@@ -10302,6 +10305,9 @@ function _planQuery(c) {
   if (c.adult) p.set('without_genres', '16,10751');
   p.set('with_runtime.gte', '60');
   p.set('vote_count.gte', String(_voteFloor(c)));
+  // Будущий год: голосов у объявленных фильмов нет, порог их все отрезал бы, а сортировать по
+  // оценке нечего. Порядок - по популярности, то есть по ожиданию.
+  if (c.future) { p.set('vote_count.gte', '0'); p.set('sort_by', 'popularity.desc'); }
   // Оценочные слова - условия, а не теги (см. _QUALITY).
   const floor = Number(p.get('vote_count.gte'));
   if (c.quality === 'masterpiece') { p.set('vote_average.gte', '8'); p.set('vote_count.gte', String(Math.max(floor, 1000))); }
@@ -10350,6 +10356,8 @@ async function _constraintsFor(q) {
   // Точный год свежесть НЕ отключает: окно даёт год, сортировку - свежесть.
   c.year = (!decade && !movements.length) ? (year || null) : null;
   if (c.year) c.matched = true;
+  // Год, который ещё не начался («новинки 2027»): вышедшего нет, есть объявленное.
+  c.future = !!(c.year && c.year > new Date().getFullYear());
   if (c.recent) c.matched = true;
 
   // Названный жанр жёстче настроения и забирает жанровый слот целиком: "романтический"
@@ -10866,7 +10874,9 @@ async function _searchByQuery(q, press = 0, pre = null) {
   // лучшее из нового, а спрашивали новое. "Лучшие фильмы 2026" - другой запрос, и он
   // по-прежнему сортируется по оценке.
   // Сортировка устойчивая: внутри одной даты остаётся порядок вкуса.
-  if (c.recent) ranked = [...ranked].sort((a, b) =>
+  // Будущий год - по дате выхода, ближайшее первым; вышедшее - новое первым.
+  if (c.future) ranked = [...ranked].sort((a, b) => String(a.Released || '').localeCompare(String(b.Released || '')));
+  else if (c.recent) ranked = [...ranked].sort((a, b) =>
     String(b.Released || '').localeCompare(String(a.Released || '')));
   // «Блокбастер» - порядок по популярности, как отдал TMDB; вкус его не пересортировывает.
   if (c.quality === 'blockbuster') ranked = [...ranked].sort((a, b) => (a._i ?? 0) - (b._i ?? 0));
