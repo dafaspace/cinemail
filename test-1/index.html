@@ -3003,7 +3003,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.66.3-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.66.4-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -7108,7 +7108,9 @@ function _renderPicks(first) {
   let t2 = '';
   if (s.shown < s.buf.length || !s.done) t2 = `<button type="button" class="srch-more" id="srch-more">${escapeHtml(t('search_more'))}</button>`;
   else if (s.shown > _SRCH_STEP) t2 = `<div class="srch-end">${escapeHtml(t('search_end'))}</div>`;
-  if (first) t2 += _picksLeftHTML();
+  // Счётчик стоит под выдачей всегда, а не только под первой порцией: после «Ещё» он пропадал,
+  // и проверить, что «Ещё» нажатий не тратит, было не по чему (проверка test-1, 11 окт).
+  t2 += _picksLeftHTML();
   // Короткая выдача без ослабления: предложить снять один кусок, и сказать какой.
   if (first && c && s.buf.length < _SRCH_STEP && !(c.relaxed || []).length) {
     const k = _srchDropCandidates(c, 1)[0];
@@ -8465,10 +8467,22 @@ async function _tallyFromSeeds(seeds, pages = 2) {
 // Everything the person already has, by TMDB id AND by normalised title. The id alone is not
 // enough: a film imported from IMDb before its tt-id resolved, or added on another device,
 // can sit in the table under a different id for the same film.
-function _libraryKeys() {
+//
+// ЧТО Я УЖЕ ВИДЕЛ, А НЕ ВСЁ, ЧТО ЛЕЖИТ РЯДОМ. До 11 окт здесь была вся библиотека, вместе с
+// общими списками, и «хоррор 70-х» молча терял «Чужого» и «Челюсти»: их добавил кто-то из
+// шести участников общего списка, а сам человек их не смотрел (проверка test-1). Фильм в
+// списке «посмотреть» - законный ответ: карточка покажет закладку. Прячем только своё
+// просмотренное. all = true - всё своё, и просмотренное, и отложенное: «Удиви меня» должен
+// удивлять, а не возвращать твой же список.
+function _libraryKeys(all) {
   const ids = new Set(), titles = new Set();
   const norm = _normTitle;
-  watchHistory.forEach(h => { if (h.tmdbID) ids.add(String(h.tmdbID)); if (h.title) titles.add(norm(h.title)); });
+  const uid = (typeof currentUser !== 'undefined' && currentUser && currentUser.id) || null;
+  watchHistory.forEach(h => {
+    if (h.addedBy && uid && h.addedBy !== uid) return;      // чужая строка в общем списке
+    if (!all && h.status !== 'watched') return;
+    if (h.tmdbID) ids.add(String(h.tmdbID)); if (h.title) titles.add(norm(h.title));
+  });
   return { ids, titles, norm };
 }
 
@@ -8628,7 +8642,7 @@ async function surpriseMeEngine() {
     const mode = getSurpriseMode();
     const recentlyShown = new Set(_shownSurprises.slice(-30));
     const watchedEntries = watchHistory.filter(h=>h.status==="watched" && _isMine(h));
-    const lib = _libraryKeys();
+    const lib = _libraryKeys(true);
     let pool;
     if (mode === "taste") {
       const seeds = _pickSeeds(watchedEntries);
