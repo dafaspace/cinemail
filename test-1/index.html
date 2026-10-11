@@ -3003,7 +3003,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.66.4-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.66.5-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -6961,7 +6961,7 @@ async function doSearch() {
 
     // Подборка стоит одно из десяти недельных нажатий. Найденное по названию уже на экране
     // и остаётся, даже когда нажатия кончились.
-    const spent = await _spendPick('q:' + raw.toLowerCase().replace(/\s+/g, ' '));
+    const spent = await _spendPick('q:' + _picksKey(c, raw));
     if (gen !== _srchGen) return;
     if (!spent.ok) {
       const box = document.getElementById('srch-picks');
@@ -7149,6 +7149,17 @@ async function _searchMore() {
 }
 
 // «Похожее на Fargo»: рекомендации TMDB к этому фильму, со связью с твоими, где она есть.
+// Ключ подборки - понятый запрос, а не набранный текст: «шедевры 80-х» и «шедевры 80х» дают
+// один и тот же запрос к TMDB, и повтор не должен стоить второго нажатия (проверка test-1,
+// 12 окт: 7 -> 6 за то же самое). План запроса уже канонический; человек и полка - отдельно,
+// потому что их ответ приходит не из discover.
+function _picksKey(c, raw) {
+  try {
+    return String(_planQuery(c)) + '|' + (c.person || '') + '|'
+      + (c.curated || []).slice(0, 5).map(m => m.id).join(',');
+  } catch (e) { return String(raw).toLowerCase().replace(/\s+/g, ' '); }
+}
+
 async function _searchLike(id, type, title) {
   const box = document.getElementById('srch-picks');
   if (!box) return;
