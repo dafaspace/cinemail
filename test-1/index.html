@@ -3003,7 +3003,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.66.2-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.66.3-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -6876,28 +6876,19 @@ function _searchHomeRefresh() {
 }
 
 // ── Подпись под карточкой ─────────────────────────────────────────────────────
-// Сначала что совпало с запросом, потом связь с твоими фильмами. Совпавшее берётся из
-// фактов фильма (его жанры), а не из запроса: повторять вопрос под ответом - то,
-// из-за чего прежняя «По запросу «…»» читалась как сбой. Снятое при ослаблении не обещаем.
+// Подпись говорит только то, чего нет в «Понято». На «хоррор 70-х» под каждым из
+// восьмидесяти фильмов стояло «Ужасы» (проверка test-1, 11 окт): строгая выдача вся
+// подходит под запрос, и повторять его под каждым ответом - шум. Страна, движение и тема
+// по той же причине не повторяются. Остаётся один случай, когда совпавшее - новость:
+// жанры не сошлись все вместе, и выдача взяла любой из них, - тогда видно, какой у этого.
+// Главное в подписи - связь с твоими фильмами (m.why), она идёт следом.
 function _matchPart(m, c) {
   if (!c) return '';
   const drop = new Set(m._relaxed || c.relaxed || []);
-  if (drop.has('allButPerson')) return '';
-  const parts = [];
-  if (!drop.has('genre') && (c.genreIds || []).length && _gNames.map) {
-    const asked = new Set(c.genreIds.map(String));
-    const g = (m.gids || m._genres || []).map(String).filter(x => asked.has(x)).map(x => _gNames.map.get(x)).filter(Boolean);
-    if (g.length) parts.push(g.slice(0, 2).join(', '));
-  }
-  // Тема - только когда она одна: две темы уходят в TMDB через ИЛИ, и какая из них у этого
-  // фильма, мы не знаем. Сказать обе значило бы сказать неправду про одну.
-  const subj = (c.chips || []).filter(ch => ch.kind === 'subject');
-  if (!drop.has('subject') && !m._noKw && subj.length === 1 && (c.keyword || c.curated)) parts.push(subj[0].label);
-  const mv = (c.chips || []).find(ch => ch.kind === 'movement');
-  if (c.movement && mv) parts.push(mv.label);
-  else if (c.country) parts.push(_mapsCountry(c.country));
-  // Год не повторяем: он стоит строкой выше, в самой карточке.
-  const s = parts.join(' · ');
+  if (!drop.has('genreOr') || (c.genreIds || []).length < 2 || !_gNames.map) return '';
+  const asked = new Set(c.genreIds.map(String));
+  const g = (m.gids || m._genres || []).map(String).filter(x => asked.has(x)).map(x => _gNames.map.get(x)).filter(Boolean);
+  const s = g.slice(0, 2).join(', ');
   return s ? s[0].toLocaleUpperCase(_lang) + s.slice(1) : '';
 }
 function _srchCaption(m, c) {
