@@ -2989,7 +2989,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.63.0-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.63.1-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8862,12 +8862,14 @@ const _SUBJECTS = [
   { k:"restrained", terms:"restrained reserved understated spare_emotion сдержанн скуп негромк приглушенн стриман негучне contenido sobrio retenu pudique zuruckhaltend sobrio ᲗᲐᲕᲨᲔᲙᲐᲕᲔᲑᲣᲚᲘ" },
   { k:"delicate", terms:"delicate fragile deft хрупк деликатн невесом ажурн крихк делікатн delicado fragil delicat zart delicato ნაზი" },
   { k:"eerie", terms:"eerie uncanny otherworldly жутков потусторонн зловещ мороз_по_коже моторошн inquietante sobrenatural etrange inquietant unheimlich inquietante საშიში" },
-  { k:"erotic", terms:"erotic desire эротичн желание влечен эротичне eroticо erotique erotisch erotico ეროტიული" },
+  // pref - жанры, которые тема подразумевает (порядок = сила), adult - тема для взрослых.
+  // Нужны, когда тему приходится снять: см. _searchByQuery, «снятая тема оставляет вкус».
+  { k:"erotic", pref:"10749,18", adult:1, terms:"erotic desire эротичн желание влечен эротичне eroticо erotique erotisch erotico ეროტიული" },
   { k:"experimental", terms:"experimental avantgarde экспериментальн авангардн формальн эксперимент експериментальн experimental experimentale experimentell sperimentale ექსპერიმენტული" },
   { k:"exquisite", terms:"exquisite refined изысканн утончённ утонченн вишукан exquisito refinado exquis raffine erlesen squisito რაფინირებული" },
-  { k:"intimate", terms:"intimate чутк камерн близост вдвоем камерне інтимне intimo intime intim intimo ინტიმური" },
+  { k:"intimate", pref:"18,10749", terms:"intimate чутк камерн близост вдвоем камерне інтимне intimo intime intim intimo ინტიმური" },
   { k:"powerful", terms:"powerful forceful overwhelming мощн сокрушительн оглушительн пробирает потужн poderoso arrollador puissant bouleversant wuchtig uberwaltigend potente ძლიერი" },
-  { k:"sensual", terms:"sensual tactile чувственн телесн осязаем чуттєв sensual sensuel sinnlich sensuale სენსუალური" },
+  { k:"sensual", pref:"10749,18", adult:1, terms:"sensual tactile чувственн телесн осязаем чуттєв sensual sensuel sinnlich sensuale სენსუალური" },
   { k:"poetic", terms:"poetic lyrical поэтичн лиричн поэзия кинопоэзия поетичн ліричн poetico lirico poetique lyrique poetisch lyrisch poetico lirico პოეტური" },
   { k:"chilling", terms:"chilling bloodcurdling леденящ холодок_по_спине озноб страх крижан escalofriante glacant eiskalt agghiacciante შემზარავი" },
   { k:"dark", terms:"darkness pitchblack мрачн беспросветн темнота черная_сторона похмур sombrio tenebroso sombre tenebreux dustere finster cupo tenebroso ბნელი" },
@@ -10139,6 +10141,11 @@ function _planQuery(c) {
   // с найденной плёнкой, ты не хочешь их и в ответе на точный запрос тоже.
   if (tg.neg.length) p.set('without_keywords', tg.neg.slice(0, 4).map(x => x.id).join(','));
   if (c.genreIds && c.genreIds.length) p.set('with_genres', c.genreIds.join(c.genreAnd ? ',' : '|'));
+  // Тема для взрослых ("чувственное", "эротичное") не отвечает мультфильмом и семейным кино,
+  // даже когда саму тему пришлось снять. Найдено 11 окт на "Western, sensual, 2020s": без темы
+  // третьим вставал детский "Spirit Untamed". Это наше следствие из его слов, а не его слово,
+  // поэтому цикл ослабления его не снимает.
+  if (c.adult) p.set('without_genres', '16,10751');
   p.set('with_runtime.gte', '60');
   p.set('vote_count.gte', String(_voteFloor(c)));
   return p;
@@ -10153,6 +10160,9 @@ async function _constraintsFor(q) {
   const c = {
     why: t('why_for_query').replace('{q}', q), matchedWords,
     toks: toks || [], chips: (chips || []).slice(), restToks: restToks || [], personName: null,
+    // Что тема подразумевает, даже если её саму TMDB не найдёт (см. _SUBJECTS, pref и adult).
+    subjPref: [...new Set(subjects.flatMap(x => String(x.pref || '').split(',').filter(Boolean)))],
+    adult: subjects.some(x => x.adult),
     matched: false, movement: null, person: null, decade: null, country: null,
     keywords: [], genreIds: [], genreAnd: false, curated: null, pins: 0,
   };
@@ -10656,7 +10666,7 @@ async function _searchByQuery(q, press = 0, pre = null) {
       pp.delete('page');
       pp.delete('with_keywords');
       pp.set('vote_count.gte', '50');
-      if (!(c.genreIds || []).includes('99')) pp.set('without_genres', '99');
+      if (!(c.genreIds || []).includes('99')) pp.set('without_genres', [pp.get('without_genres'), '99'].filter(Boolean).join(','));
       pp.set('vote_average.gte', '6.5');
       const r2 = await tmdbFetch(`/discover/movie?${pp.toString()}`);
       const mine = ((r2 && !r2.error && r2.results) || [])
@@ -10693,6 +10703,12 @@ async function _searchByQuery(q, press = 0, pre = null) {
   // Сортировка устойчивая: внутри одной даты остаётся порядок вкуса.
   if (c.recent) ranked = [...ranked].sort((a, b) =>
     String(b.Released || '').localeCompare(String(a.Released || '')));
+  // СНЯТАЯ ТЕМА ОСТАВЛЯЕТ ВКУС. Тему пришлось снять - но "чувственное" всё ещё значит мелодраму
+  // раньше боевика. Фильмы с подразумеваемым жанром идут первыми, внутри - прежний порядок.
+  if (c.relaxed.includes('subject') && (c.subjPref || []).length) {
+    const rank = m => { const g = m.gids || []; const i = c.subjPref.findIndex(x => g.includes(x)); return i < 0 ? 99 : i; };
+    ranked = ranked.map((m, i) => [m, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).map(x => x[0]);
+  }
   if (_strict.length) {
     const ids = new Set(_strict.map(m => String(m.id)));
     ranked = [..._strict, ...ranked.filter(m => !ids.has(String(m.id)))];
