@@ -2087,6 +2087,10 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .maps-note { color: var(--muted); font-size: 12px; font-style: italic; margin: 8px 0 4px; }
 .maps-film { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 6px 2px; border-bottom: 1px solid var(--border); cursor: pointer; }
 .maps-film-t { font-size: 14px; }
+/* Мини-постер: место держится сразу, картинка приходит, когда строка видна. */
+.maps-film-p { width: 30px; height: 45px; flex: none; border-radius: 4px; background: var(--surface2, #1c1c2e) center/cover no-repeat; }
+.maps-more-btn { width: 100%; min-height: 44px; margin-top: 4px; border-radius: 12px; border: 1px solid var(--border); background: none;
+  color: var(--text); font: 15px 'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif; letter-spacing: 1px; text-indent: 1px; cursor: pointer; }
 .maps-film-y { color: var(--muted); font-size: 12px; }
 .maps-badge { margin-left: auto; font-size: 10px; color: var(--muted); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; white-space: nowrap; }
 .maps-more { color: var(--muted); font-size: 12px; padding: 10px 2px; }
@@ -2989,7 +2993,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.63.1-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.63.2-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -15549,20 +15553,89 @@ function _mapsAlso(v) {
   return v[2].filter(r => !have.has(_mapsEnIso[r])).map(r => _mapsEnIso[r] ? _mapsCountry(_mapsEnIso[r]) : r);
 }
 
+// Строки фильмов места: по 40 за раз, «ещё N» - кнопка, а не подпись (сообщено 11 окт: у
+// Лас-Вегаса 25 фильмов оставались недоступны).
+let _mapsRows = [], _mapsShown = 0;
+const _MAPS_STEP = 40;
+function _mapsFilmRow([k, w]) {
+  const d = _mapsData, v = d.f[k], type = k[0] === 't' ? 'tv' : 'movie', id = k.slice(1);
+  return `<div class="maps-film" onclick="openDetail('${escapeJsAttr(id)}','${type}')">
+      <span class="maps-film-p" data-k="${escapeHtml(k)}"></span>
+      <span class="maps-film-t">${escapeHtml(v[3])}</span>${v[4] ? `<span class="maps-film-y">${escapeHtml(String(v[4]))}</span>` : ''}
+      ${w ? `<span class="maps-badge">${escapeHtml(t('maps_per_wiki'))}</span>` : ''}</div>`;
+}
+function _mapsMoreHTML() {
+  const left = _mapsRows.length - _mapsShown;
+  return left > 0 ? `<button type="button" class="maps-more-btn" id="maps-more" onclick="_mapsMore()">${escapeHtml(t('maps_more').replace('{n}', Math.min(left, _MAPS_STEP)))}</button>` : '';
+}
+function _mapsMore() {
+  const btn = document.getElementById('maps-more');
+  if (!btn) return;
+  const part = _mapsRows.slice(_mapsShown, _mapsShown + _MAPS_STEP);
+  _mapsShown += part.length;
+  btn.insertAdjacentHTML('beforebegin', part.map(_mapsFilmRow).join(''));
+  btn.outerHTML = _mapsMoreHTML();
+  _mapsPosters();
+}
+
+// ── Мини-постеры в списке места ───────────────────────────────────────────────
+// В файле мест постеров нет: путь к картинке знает только TMDB, по одному запросу на фильм.
+// Поэтому только для строк, которые реально видны, по четыре сразу, и с памятью на телефоне:
+// открыть то же место второй раз ничего не стоит. Одно место - около десяти запросов из
+// дневных двух тысяч; картинка w92 весит несколько килобайт.
+const _POSTER_KEY = 'cm_posters';
+let _posterCache = null, _posterQueue = [], _posterBusy = 0, _posterIO = null;
+function _posterStore() {
+  if (_posterCache) return _posterCache;
+  try { _posterCache = JSON.parse(localStorage.getItem(_POSTER_KEY) || '{}'); } catch (e) { _posterCache = {}; }
+  return _posterCache;
+}
+function _posterSave() {
+  try {
+    const c = _posterStore(), keys = Object.keys(c);
+    if (keys.length > 3000) keys.slice(0, keys.length - 3000).forEach(k => delete c[k]);   // старые первыми
+    localStorage.setItem(_POSTER_KEY, JSON.stringify(c));
+  } catch (e) {}
+}
+function _posterPaint(el, path) { if (path) el.style.backgroundImage = `url("https://image.tmdb.org/t/p/w92${path}")`; }
+function _posterPump() {
+  while (_posterBusy < 4 && _posterQueue.length) {
+    const el = _posterQueue.shift(), k = el.dataset.k;
+    const c = _posterStore();
+    if (k in c) { _posterPaint(el, c[k]); continue; }
+    _posterBusy++;
+    tmdbFetch(`/${k[0] === 't' ? 'tv' : 'movie'}/${encodeURIComponent(k.slice(1))}?language=${_tmdbLang()}`)
+      .then(r => { if (r && !r.error) { c[k] = r.poster_path || ''; _posterSave(); } _posterPaint(el, c[k]); })
+      .catch(() => {})
+      .finally(() => { _posterBusy--; _posterPump(); });
+  }
+}
+function _mapsPosters() {
+  const els = document.querySelectorAll('#maps-sheet .maps-film-p:not([data-seen])');
+  if (!els.length) return;
+  const c = _posterStore();
+  if (!_posterIO && 'IntersectionObserver' in window)
+    _posterIO = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return;
+      _posterIO.unobserve(e.target); _posterQueue.push(e.target); _posterPump();
+    }), { rootMargin: '200px' });
+  els.forEach(el => {
+    el.dataset.seen = '1';
+    if (el.dataset.k in c) _posterPaint(el, c[el.dataset.k]);
+    else if (_posterIO) _posterIO.observe(el);
+  });
+}
+
 function _mapsSelect(i) {
   const d = _mapsData; if (!d) return;
   _mapsSel = i;
   if (_map && _map.getLayer('pt-sel')) _map.setFilter('pt-sel', ['==', ['get', 'i'], i]);
   const [lon, lat, cat, name, iso] = d.p[i];
-  const rows = d.at[i].slice()
+  _mapsRows = d.at[i].slice()
     .sort((a, b) => a[1] - b[1] || (d.f[b[0]][5] - d.f[a[0]][5]));
-  const shown = rows.slice(0, 40).map(([k, w]) => {
-    const v = d.f[k], type = k[0] === 't' ? 'tv' : 'movie', id = k.slice(1);
-    return `<div class="maps-film" onclick="openDetail('${escapeJsAttr(id)}','${type}')">
-      <span class="maps-film-t">${escapeHtml(v[3])}</span>${v[4] ? `<span class="maps-film-y">${escapeHtml(String(v[4]))}</span>` : ''}
-      ${w ? `<span class="maps-badge">${escapeHtml(t('maps_per_wiki'))}</span>` : ''}</div>`;
-  }).join('');
-  const more = rows.length > 40 ? `<div class="maps-more">${escapeHtml(t('maps_more').replace('{n}', rows.length - 40))}</div>` : '';
+  _mapsShown = Math.min(_MAPS_STEP, _mapsRows.length);
+  const shown = _mapsRows.slice(0, _mapsShown).map(_mapsFilmRow).join('');
+  const more = _mapsMoreHTML();
   const back = _mapsFilm && d.f[_mapsFilm]
     ? `<button class="maps-back" onclick="_mapsIdle()">${icon('map-pin', 14)} ${escapeHtml(d.f[_mapsFilm][3])}</button>` : '';
   _mapsSheet(`${back}<div class="maps-place">
@@ -15571,6 +15644,7 @@ function _mapsSelect(i) {
     </div>
     <div class="maps-note">${escapeHtml(t('maps_place_note'))}</div>
     ${shown}${more}`);
+  _mapsPosters();
 }
 
 // Из режима одного фильма - обратно ко всей карте.
