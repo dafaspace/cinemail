@@ -3003,7 +3003,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.66.1-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.66.2-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -6271,7 +6271,7 @@ async function tmdbResolveTitle(title, year, type) {
     Title: r.title || r.name,
     Year: (r.release_date || r.first_air_date || "").slice(0,4),
     Poster: r.poster_path ? TMDB_IMG + r.poster_path : "",
-    Rating: r.vote_average ? r.vote_average.toFixed(1) : null, Genre: ""
+    Rating: _ratingOf(r), Genre: ""
   };
 }
 
@@ -6295,10 +6295,18 @@ async function tmdbSearch(q) {
     Title: r.title || r.name,
     Year: (r.release_date || r.first_air_date || "").slice(0,4),
     Poster: r.poster_path ? TMDB_IMG + r.poster_path : "",
-    Rating: r.vote_average ? r.vote_average.toFixed(1) : null, Genre: "",
+    Rating: _ratingOf(r), Genre: "",
     // Единому поиску: совпало ли название точно и известен ли фильм хоть кому-то.
     OrigTitle: r.original_title || r.original_name || "", votes: r.vote_count || 0,
   }));
+}
+
+// Оценка из одного-двух голосов - не оценка. «★ 10.0» у забытого вестерна 1951 года стояла
+// рядом с «Фарго» и выглядела выше него (проверка test-1, 11 окт). Меньше двадцати голосов -
+// звезды нет вовсе: пустое место честнее случайной цифры.
+const _MIN_RATED = 20;
+function _ratingOf(r) {
+  return r && r.vote_average && (r.vote_count || 0) >= _MIN_RATED ? r.vote_average.toFixed(1) : null;
 }
 async function tmdbDetail(id, type) {
   type = type || "movie";
@@ -6340,7 +6348,7 @@ async function tmdbDetail(id, type) {
     Poster: detail.poster_path ? TMDB_IMG + detail.poster_path : "",
     Runtime: detail.runtime ? `${detail.runtime} min` : (detail.episode_run_time?.[0] ? `${detail.episode_run_time[0]} min/ep` : ""),
     RuntimeMin: detail.runtime || ((detail.episode_run_time?.[0] || 0) * (detail.number_of_episodes || 0)) || null,
-    Rating: detail.vote_average ? detail.vote_average.toFixed(1) : null,
+    Rating: _ratingOf(detail),
     Plot: detail.overview || "",
     Genre: (detail.genres||[]).map(g=>g.name).join(", "),
     Director: director, Cast: cast, Writers: writers, Composer: composer, Cinematographer: cinematographer,
@@ -6375,7 +6383,7 @@ async function tmdbSearchWithYear(title, year) {
       id: r.id, tmdbID: String(r.id), type: r.media_type, Title: r.title || r.name,
       Year: (r.release_date || r.first_air_date || "").slice(0,4),
       Poster: r.poster_path ? TMDB_IMG + r.poster_path : "",
-      Rating: r.vote_average ? r.vote_average.toFixed(1) : null, Genre: ""
+      Rating: _ratingOf(r), Genre: ""
     }));
   }
   let results = await tmdbSearch(title);
@@ -6932,7 +6940,12 @@ async function doSearch() {
       || c.curated || c.recent || (c.keyword && c.kwTrusted) || (!strong.length && (c.keyword || c.decade || c.year))));
     if (c) c.chips = (c.chips || []).slice().sort((a, b) => a.toks[0] - b.toks[0]);
 
-    const showTitles = picksRun ? strong.slice(0, 3) : titles;
+    // Точные совпадения названия - первыми, самое известное сверху: «fargo» это «Фарго» 1996
+    // года, а не сериал и не «Tales of Wells Fargo» в порядке популярности TMDB.
+    const exactIds = new Set(exact.map(m => String(m.id)));
+    const ordered = [...exact.slice().sort((a, b) => (b.votes || 0) - (a.votes || 0)),
+                     ...titles.filter(m => !exactIds.has(String(m.id)))];
+    const showTitles = picksRun ? strong.slice(0, 3) : ordered;
     const showPeople = picksRun ? people.filter(p => c.person && p.id === c.person).slice(0, 1) : people.slice(0, 3);
     const like = !picksRun && strong.length ? strong[0] : null;
 
@@ -6941,11 +6954,15 @@ async function doSearch() {
       _renderSearchExamples('search-examples-none');
       return;
     }
-    let html = '';
-    if (showPeople.length) html += _srchSect(t('search_people')) + `<div class="card-list">${showPeople.map(personRowHTML).join('')}</div>`;
-    if (city) html += _cityRowHTML(city);
-    if (showTitles.length) html += _srchSect(t('search_films')) + `<div class="card-list">${showTitles.map(m => movieCardHTML(m)).join('')}</div>`;
+    const peopleHTML = showPeople.length ? _srchSect(t('search_people')) + `<div class="card-list">${showPeople.map(personRowHTML).join('')}</div>` : '';
+    const cityHTML = city ? _cityRowHTML(city) : '';
+    const titlesHTML = showTitles.length ? _srchSect(t('search_films')) + `<div class="card-list">${showTitles.map(m => movieCardHTML(m)).join('')}</div>` : '';
+    // Известное точное название важнее однофамильцев: на «fargo» сверху стояли Джеймс, Дре и
+    // Джордж Фарго, а сам фильм начинался ниже экрана (проверка test-1, 11 окт). Человек
+    // впереди, только когда названия такого нет или разбор понял именно его.
+    let html = (!picksRun && strong.length) ? titlesHTML : peopleHTML + cityHTML + titlesHTML;
     if (like) html += `<div id="srch-picks"><button type="button" class="srch-line" data-like="${escapeHtml(String(like.id))}" data-type="${like.type === 'tv' ? 'tv' : 'movie'}" data-title="${escapeHtml(like.Title)}">${icon('sparkles', 18)}<span dir="auto">${escapeHtml(t('search_like').replace('{title}', like.Title))}</span><span class="srch-chev">›</span></button></div>`;
+    if (!picksRun && strong.length) html += peopleHTML + cityHTML;
     if (picksRun) html += `<div id="srch-picks">${_srchSect(t('search_picks'))}${_srchGot(c)}${loadingHTML(randQuote(), false)}</div>`;
     el.innerHTML = html;
     if (showTitles.length) _maybeShowSearchCoach();
@@ -7155,7 +7172,7 @@ async function _searchLike(id, type, title) {
       id: x.id, tmdbID: String(x.id), type: x.media_type === 'tv' || type === 'tv' ? 'tv' : 'movie',
       Title: x.title || x.name, Year: (x.release_date || x.first_air_date || '').slice(0, 4),
       Poster: x.poster_path ? TMDB_IMG + x.poster_path : '',
-      Rating: x.vote_average ? x.vote_average.toFixed(1) : null, Genre: '', why: null,
+      Rating: _ratingOf(x), Genre: '', why: null,
     }));
     await _enrichWhy(list, null);
     if (gen !== _srchGen) return;
@@ -7866,7 +7883,7 @@ async function openPerson(name, personId) {
           const m = { id: r.id, tmdbID: String(r.id), type: r.media_type, Title: r.title||r.name,
             Year: (r.release_date||r.first_air_date||"").slice(0,4),
             Poster: r.poster_path ? `https://image.tmdb.org/t/p/w300${r.poster_path}` : "",
-            Rating: r.vote_average ? r.vote_average.toFixed(1) : null, Genre: "" };
+            Rating: _ratingOf(r), Genre: "" };
           const key = regMovie(m);
           const status = getEntryStatus(m.tmdbID);
           const role = r.character || r.job || "";
@@ -8441,7 +8458,7 @@ async function _tallyFromSeeds(seeds, pages = 2) {
           Year: (c.release_date || c.first_air_date || "").slice(0, 4),
           type: c.media_type || (c.first_air_date ? 'tv' : 'movie'),
           Poster: c.poster_path ? TMDB_IMG + c.poster_path : "",
-          Rating: c.vote_average ? c.vote_average.toFixed(1) : null,
+          Rating: _ratingOf(c),
           Genre: "", tmdbID: String(c.id),
           votes: 0, from: [], voteCount: c.vote_count || 0,
         });
@@ -8528,7 +8545,7 @@ async function _discoverPicks(mode) {
     Title: c.title || c.name,
     Year: (c.release_date || "").slice(0, 4),
     Poster: c.poster_path ? TMDB_IMG + c.poster_path : "",
-    Rating: c.vote_average ? c.vote_average.toFixed(1) : null, Genre: "",
+    Rating: _ratingOf(c), Genre: "",
     votes: 0, from: [], voteCount: c.vote_count || 0,
     _why: mode === 'seasonal'
       ? t('why_season').replace('{season}', t('season_' + season))
@@ -10174,7 +10191,7 @@ async function _curatedSubject(key, taste, wantGenres, years) {
       return { id: m.id, tmdbID: String(m.id), type: 'movie', Title: m.title,
                Year: (m.release_date || '').slice(0, 4),
                Poster: m.poster_path ? TMDB_IMG + m.poster_path : '',
-               Rating: m.vote_average ? m.vote_average.toFixed(1) : null, Genre: '',
+               Rating: _ratingOf(m), Genre: '',
                _genres: (m.genres || []).map(x => String(x.id)),
                why: r.hit ? _tallyWhy(r.hit) : null };
     } catch (e) { return null; }
@@ -10668,7 +10685,7 @@ async function _personFilms(c) {
     Title: film.title || film.name, Year: (film.release_date || '').slice(0, 4),
     Released: film.release_date || '',
     Poster: film.poster_path ? TMDB_IMG + film.poster_path : '',
-    Rating: film.vote_average ? film.vote_average.toFixed(1) : null, Genre: '', why: null,
+    Rating: _ratingOf(film), Genre: '', why: null,
     gids: (film.genre_ids || []).map(String),
   }));
 }
@@ -10816,7 +10833,7 @@ async function _searchByQuery(q, press = 0, pre = null) {
       Title: x.title || x.name, Year: (x.release_date || '').slice(0, 4),
       Released: x.release_date || '',
       Poster: x.poster_path ? TMDB_IMG + x.poster_path : '',
-      Rating: x.vote_average ? x.vote_average.toFixed(1) : null, Genre: '', why: c.why,
+      Rating: _ratingOf(x), Genre: '', why: c.why,
       gids: (x.genre_ids || []).map(String),
     });
   const _isFresh = x => !_lib.ids.has(String(x.id)) && !_lib.titles.has(_lib.norm(x.title || x.name));
@@ -10853,7 +10870,7 @@ async function _searchByQuery(q, press = 0, pre = null) {
           Title: x.title || x.name, Year: (x.release_date || '').slice(0, 4),
           Released: x.release_date || '',
           Poster: x.poster_path ? TMDB_IMG + x.poster_path : '',
-          Rating: x.vote_average ? x.vote_average.toFixed(1) : null, Genre: '',
+          Rating: _ratingOf(x), Genre: '',
           gids: (x.genre_ids || []).map(String),
           // Этот запрос шёл БЕЗ темы (with_keywords снят выше): подпись не должна её обещать.
           _noKw: true,
@@ -16665,9 +16682,13 @@ function _suggestFor(token) {
   const starts = idx.filter(e => e.match.some(m =>
     forms.some(f => m.startsWith(f) || m.split(' ').some(x => x.startsWith(f)))));
   let near = [];
+  // Пропущенная буква - опечатка при любой длине («хорор», «вестрн»). Лишняя или другая
+  // буква в коротком слове - чаще другое слово: «fargo» в одной букве от «faro», маяка
+  // по-испански, и под названием фильма выскакивал «маяк» (проверка test-1, 11 окт).
+  // Поэтому слово длиннее подсказки или той же длины ловим только с шести букв.
   if (!starts.length && t.length >= 4) {
     near = idx.filter(e => e.match.some(m =>
-      Math.abs(m.length - t.length) <= 2 && _lev(m, t) <= 1));
+      (m.length > t.length || t.length >= 6) && Math.abs(m.length - t.length) <= 2 && _lev(m, t) <= 1));
   }
   const res = [...starts, ...near].map(e => e.show).filter(Boolean);
   // ЗАПИСЫВАЕМ ТО, ЧЕГО У НАС НЕТ. Слово длиной от четырёх букв, на которое мы не
