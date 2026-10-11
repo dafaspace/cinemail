@@ -2079,10 +2079,6 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 
 /* ── Maps (v1: места съёмок) ─────────────────────────────────────────── */
 #tab-maps.tab-panel { padding: 0 0 80px; }
-.maps-bar { display: flex; gap: 6px; padding: 10px 14px; }
-.maps-seg { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--border); background: none;
-            color: var(--muted); font: 500 13px 'DM Sans','Noto Sans Georgian',sans-serif; cursor: pointer; }
-.maps-seg.on { background: var(--primary); border-color: var(--primary); color: #0d0d1a; }
 .maps-map { height: 52vh; min-height: 280px; background: #0d0d1a; }
 .maps-sheet { padding: 12px 14px 4px; }
 .maps-hint { color: var(--muted); font-size: 13px; line-height: 1.5; }
@@ -2708,7 +2704,6 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div data-i18n="picks_random_hint" style="margin-bottom:9px;color:#cfcfcf">Without watched films, picks are random. Mark 5-10 films as Watched and they become personal to your taste.</div>
         <button onclick="dismissPicksHint()" data-i18n="picks_hint_got" style="padding:5px 14px;border-radius:8px;background:rgba(245,197,24,0.15);border:1px solid rgba(245,197,24,0.3);color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">Got it</button>
       </div>
-      <div id="search-foryou"></div>
     </div>
     <div id="search-results"></div>
   </div>
@@ -2728,10 +2723,6 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
        v1 - места съёмок (docs/maps-design.md, раздел 6). Пятая вкладка временно: после
        слияния поиска с подборками она займёт место Picks. -->
   <div id="tab-maps" class="tab-panel" style="display:none">
-    <div class="maps-bar">
-      <button class="maps-seg on" id="maps-seg-all" onclick="_mapsSetMine(false)" data-i18n="maps_all">All films</button>
-      <button class="maps-seg" id="maps-seg-mine" onclick="_mapsSetMine(true)" data-i18n="maps_mine">My films</button>
-    </div>
     <div id="maps-map" class="maps-map"></div>
     <div id="maps-sheet" class="maps-sheet"></div>
     <div class="maps-credit" data-i18n="maps_credit">Places: Wikidata, via Movie Scene Map</div>
@@ -2998,7 +2989,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.62.0-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.63.0-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -4611,28 +4602,28 @@ const _I18N_LB = {
 Object.keys(_I18N_LB).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_LB[l]); });
 // Карты, v1 (10 окт 2026). Все восемь языков, ключи сверены скриптом при вставке.
 const _I18N_MAPS = {
-  en:{"maps_find_me":"Show where I am", "maps_loc_off":"Location is not available", "maps_loc_denied":"Cinemail cannot see where you are. Allow location in the browser or phone settings.", "tab_maps": "Maps", "maps_all": "All films", "maps_mine": "My films", "maps_stats": "{f} films and series · {p} places", "maps_mine_stats": "Films you have watched with known filming places: {n}", "maps_hint": "Tap a point to see what was filmed there.", "maps_mine_empty": "Mark films as watched and the places they were filmed in appear here.", "maps_per_wiki": "per Wikipedia", "maps_place_note": "Filmed here. Which scene is not recorded.", "maps_film_note": "Filmed in these places. Which scene where is not recorded.", "maps_more": "+{n} more", "maps_loading": "Loading the map…", "maps_failed": "The map could not load. Check the connection and open the tab again.", "maps_film_block": "Filming locations", "maps_on_map": "On the map", "maps_also": "Also filmed in", "maps_credit": "Places: Wikidata, via Movie Scene Map", "maps_cat_city": "City", "maps_cat_landmark": "Landmark", "maps_cat_nature": "Nature", "maps_cat_castle": "Castle", "maps_cat_studio": "Studio", "maps_cat_street": "Street or square", "maps_cat_region": "Region", "maps_cat_fiction": "Fictional place"},
-  ru:{"maps_find_me":"Показать, где я", "maps_loc_off":"Местоположение недоступно", "maps_loc_denied":"Cinemail не видит, где ты. Разреши доступ к местоположению в настройках браузера или телефона.", "tab_maps": "Карты", "maps_all": "Все фильмы", "maps_mine": "Мои фильмы", "maps_stats": "{f} фильмов и сериалов · {p} мест", "maps_mine_stats": "Просмотренных тобой фильмов с известными местами съёмок: {n}", "maps_hint": "Нажми на точку, чтобы увидеть, что там снимали.", "maps_mine_empty": "Отмечай фильмы просмотренными, и здесь появятся места, где их снимали.", "maps_per_wiki": "по Википедии", "maps_place_note": "Здесь снимали. Какую сцену - неизвестно.", "maps_film_note": "Снимали в этих местах. Какую сцену где - неизвестно.", "maps_more": "ещё {n}", "maps_loading": "Загружаю карту…", "maps_failed": "Карта не загрузилась. Проверь связь и открой вкладку снова.", "maps_film_block": "Места съёмок", "maps_on_map": "На карте", "maps_also": "Снимали также в", "maps_credit": "Места: Wikidata, через Movie Scene Map", "maps_cat_city": "Город", "maps_cat_landmark": "Достопримечательность", "maps_cat_nature": "Природа", "maps_cat_castle": "Замок", "maps_cat_studio": "Студия", "maps_cat_street": "Улица или площадь", "maps_cat_region": "Регион", "maps_cat_fiction": "Вымышленное место"},
-  uk:{"maps_find_me":"Показати, де я", "maps_loc_off":"Місцезнаходження недоступне", "maps_loc_denied":"Cinemail не бачить, де ти. Дозволь доступ до місцезнаходження в налаштуваннях браузера чи телефона.", "tab_maps": "Мапи", "maps_all": "Усі фільми", "maps_mine": "Мої фільми", "maps_stats": "{f} фільмів і серіалів · {p} місць", "maps_mine_stats": "Переглянутих тобою фільмів із відомими місцями зйомок: {n}", "maps_hint": "Торкнися точки, щоб побачити, що там знімали.", "maps_mine_empty": "Познач фільми переглянутими, і тут з'являться місця, де їх знімали.", "maps_per_wiki": "за Вікіпедією", "maps_place_note": "Тут знімали. Яку сцену - невідомо.", "maps_film_note": "Знімали в цих місцях. Яку сцену де - невідомо.", "maps_more": "ще {n}", "maps_loading": "Завантажую мапу…", "maps_failed": "Мапа не завантажилася. Перевір з'єднання і відкрий вкладку знову.", "maps_film_block": "Місця зйомок", "maps_on_map": "На мапі", "maps_also": "Знімали також у", "maps_credit": "Місця: Wikidata, через Movie Scene Map", "maps_cat_city": "Місто", "maps_cat_landmark": "Пам'ятка", "maps_cat_nature": "Природа", "maps_cat_castle": "Замок", "maps_cat_studio": "Студія", "maps_cat_street": "Вулиця або площа", "maps_cat_region": "Регіон", "maps_cat_fiction": "Вигадане місце"},
-  ka:{"maps_find_me":"მაჩვენე, სად ვარ", "maps_loc_off":"მდებარეობა მიუწვდომელია", "maps_loc_denied":"Cinemail ვერ ხედავს, სად ხარ. დაუშვი მდებარეობაზე წვდომა ბრაუზერის ან ტელეფონის პარამეტრებში.", "tab_maps": "რუკა", "maps_all": "ყველა ფილმი", "maps_mine": "ჩემი ფილმები", "maps_stats": "{f} ფილმი და სერიალი · {p} ადგილი", "maps_mine_stats": "შენ მიერ ნანახი ფილმები ცნობილი გადაღების ადგილებით: {n}", "maps_hint": "შეეხე წერტილს, რომ ნახო, რა გადაიღეს იქ.", "maps_mine_empty": "მონიშნე ფილმები ნანახად და აქ გამოჩნდება მათი გადაღების ადგილები.", "maps_per_wiki": "ვიკიპედიის მიხედვით", "maps_place_note": "აქ გადაიღეს. რომელი სცენა - უცნობია.", "maps_film_note": "გადაიღეს ამ ადგილებში. რომელი სცენა სად - უცნობია.", "maps_more": "კიდევ {n}", "maps_loading": "რუკა იტვირთება…", "maps_failed": "რუკა ვერ ჩაიტვირთა. შეამოწმე კავშირი და ხელახლა გახსენი ჩანართი.", "maps_film_block": "გადაღების ადგილები", "maps_on_map": "რუკაზე", "maps_also": "ასევე გადაიღეს", "maps_credit": "ადგილები: Wikidata, Movie Scene Map-ის გავლით", "maps_cat_city": "ქალაქი", "maps_cat_landmark": "ღირსშესანიშნაობა", "maps_cat_nature": "ბუნება", "maps_cat_castle": "ციხესიმაგრე", "maps_cat_studio": "სტუდია", "maps_cat_street": "ქუჩა ან მოედანი", "maps_cat_region": "რეგიონი", "maps_cat_fiction": "გამოგონილი ადგილი"},
-  es:{"maps_find_me":"Mostrar dónde estoy", "maps_loc_off":"Ubicación no disponible", "maps_loc_denied":"Cinemail no ve dónde estás. Permite la ubicación en los ajustes del navegador o del teléfono.", "tab_maps": "Mapas", "maps_all": "Todas", "maps_mine": "Mis películas", "maps_stats": "{f} películas y series · {p} lugares", "maps_mine_stats": "Películas que has visto con lugares de rodaje conocidos: {n}", "maps_hint": "Toca un punto para ver qué se rodó allí.", "maps_mine_empty": "Marca películas como vistas y aquí aparecerán los lugares donde se rodaron.", "maps_per_wiki": "según Wikipedia", "maps_place_note": "Se rodó aquí. Qué escena, no consta.", "maps_film_note": "Se rodó en estos lugares. Qué escena en cuál, no consta.", "maps_more": "{n} más", "maps_loading": "Cargando el mapa…", "maps_failed": "El mapa no se pudo cargar. Revisa tu conexión y vuelve a abrir la pestaña.", "maps_film_block": "Lugares de rodaje", "maps_on_map": "En el mapa", "maps_also": "También se rodó en", "maps_credit": "Lugares: Wikidata, vía Movie Scene Map", "maps_cat_city": "Ciudad", "maps_cat_landmark": "Monumento", "maps_cat_nature": "Naturaleza", "maps_cat_castle": "Castillo", "maps_cat_studio": "Estudio", "maps_cat_street": "Calle o plaza", "maps_cat_region": "Región", "maps_cat_fiction": "Lugar ficticio"},
-  fr:{"maps_find_me":"Montrer où je suis", "maps_loc_off":"Position indisponible", "maps_loc_denied":"Cinemail ne voit pas où tu es. Autorise la localisation dans les réglages du navigateur ou du téléphone.", "tab_maps": "Cartes", "maps_all": "Tous les films", "maps_mine": "Mes films", "maps_stats": "{f} films et séries · {p} lieux", "maps_mine_stats": "Films que tu as vus dont on connaît les lieux de tournage : {n}", "maps_hint": "Touche un point pour voir ce qui y a été tourné.", "maps_mine_empty": "Marque des films comme vus et les lieux de leur tournage apparaîtront ici.", "maps_per_wiki": "selon Wikipédia", "maps_place_note": "Tourné ici. Quelle scène, on ne le sait pas.", "maps_film_note": "Tourné dans ces lieux. Quelle scène où, on ne le sait pas.", "maps_more": "{n} de plus", "maps_loading": "Chargement de la carte…", "maps_failed": "La carte n'a pas pu se charger. Vérifie ta connexion et rouvre l'onglet.", "maps_film_block": "Lieux de tournage", "maps_on_map": "Sur la carte", "maps_also": "Aussi tourné à", "maps_credit": "Lieux : Wikidata, via Movie Scene Map", "maps_cat_city": "Ville", "maps_cat_landmark": "Monument", "maps_cat_nature": "Nature", "maps_cat_castle": "Château", "maps_cat_studio": "Studio", "maps_cat_street": "Rue ou place", "maps_cat_region": "Région", "maps_cat_fiction": "Lieu fictif"},
-  de:{"maps_find_me":"Zeigen, wo ich bin", "maps_loc_off":"Standort nicht verfügbar", "maps_loc_denied":"Cinemail sieht nicht, wo du bist. Erlaube den Standort in den Browser- oder Telefoneinstellungen.", "tab_maps": "Karten", "maps_all": "Alle Filme", "maps_mine": "Meine Filme", "maps_stats": "{f} Filme und Serien · {p} Orte", "maps_mine_stats": "Gesehene Filme mit bekannten Drehorten: {n}", "maps_hint": "Tippe auf einen Punkt, um zu sehen, was dort gedreht wurde.", "maps_mine_empty": "Markiere Filme als gesehen, dann erscheinen hier ihre Drehorte.", "maps_per_wiki": "laut Wikipedia", "maps_place_note": "Hier gedreht. Welche Szene, ist nicht bekannt.", "maps_film_note": "An diesen Orten gedreht. Welche Szene wo, ist nicht bekannt.", "maps_more": "{n} weitere", "maps_loading": "Karte wird geladen…", "maps_failed": "Die Karte konnte nicht geladen werden. Prüfe deine Verbindung und öffne den Tab erneut.", "maps_film_block": "Drehorte", "maps_on_map": "Auf der Karte", "maps_also": "Auch gedreht in", "maps_credit": "Orte: Wikidata, über Movie Scene Map", "maps_cat_city": "Stadt", "maps_cat_landmark": "Sehenswürdigkeit", "maps_cat_nature": "Natur", "maps_cat_castle": "Burg", "maps_cat_studio": "Studio", "maps_cat_street": "Straße oder Platz", "maps_cat_region": "Region", "maps_cat_fiction": "Fiktiver Ort"},
-  it:{"maps_find_me":"Mostra dove sono", "maps_loc_off":"Posizione non disponibile", "maps_loc_denied":"Cinemail non vede dove sei. Consenti la posizione nelle impostazioni del browser o del telefono.", "tab_maps": "Mappe", "maps_all": "Tutti i film", "maps_mine": "I miei film", "maps_stats": "{f} film e serie · {p} luoghi", "maps_mine_stats": "Film che hai visto con luoghi delle riprese noti: {n}", "maps_hint": "Tocca un punto per vedere cosa è stato girato lì.", "maps_mine_empty": "Segna i film come visti e qui compariranno i luoghi in cui sono stati girati.", "maps_per_wiki": "secondo Wikipedia", "maps_place_note": "Girato qui. Quale scena, non è noto.", "maps_film_note": "Girato in questi luoghi. Quale scena dove, non è noto.", "maps_more": "altri {n}", "maps_loading": "Caricamento della mappa…", "maps_failed": "Impossibile caricare la mappa. Controlla la connessione e riapri la scheda.", "maps_film_block": "Luoghi delle riprese", "maps_on_map": "Sulla mappa", "maps_also": "Girato anche in", "maps_credit": "Luoghi: Wikidata, tramite Movie Scene Map", "maps_cat_city": "Città", "maps_cat_landmark": "Monumento", "maps_cat_nature": "Natura", "maps_cat_castle": "Castello", "maps_cat_studio": "Studio", "maps_cat_street": "Via o piazza", "maps_cat_region": "Regione", "maps_cat_fiction": "Luogo immaginario"},
+  en:{"maps_find_me":"Show where I am", "maps_loc_off":"Location is not available", "maps_loc_denied":"Cinemail cannot see where you are. Allow location in the browser or phone settings.", "tab_maps": "Maps", "maps_all": "All films", "maps_stats": "{f} films and series · {p} places", "maps_hint": "Tap a point to see what was filmed there.", "maps_per_wiki": "per Wikipedia", "maps_place_note": "Filmed here. Which scene is not recorded.", "maps_film_note": "Filmed in these places. Which scene where is not recorded.", "maps_more": "+{n} more", "maps_loading": "Loading the map…", "maps_failed": "The map could not load. Check the connection and open the tab again.", "maps_film_block": "Filming locations", "maps_on_map": "On the map", "maps_also": "Also filmed in", "maps_credit": "Places: Wikidata, via Movie Scene Map", "maps_cat_city": "City", "maps_cat_landmark": "Landmark", "maps_cat_nature": "Nature", "maps_cat_castle": "Castle", "maps_cat_studio": "Studio", "maps_cat_street": "Street or square", "maps_cat_region": "Region", "maps_cat_fiction": "Fictional place"},
+  ru:{"maps_find_me":"Показать, где я", "maps_loc_off":"Местоположение недоступно", "maps_loc_denied":"Cinemail не видит, где ты. Разреши доступ к местоположению в настройках браузера или телефона.", "tab_maps": "Карты", "maps_all": "Все фильмы", "maps_stats": "{f} фильмов и сериалов · {p} мест", "maps_hint": "Нажми на точку, чтобы увидеть, что там снимали.", "maps_per_wiki": "по Википедии", "maps_place_note": "Здесь снимали. Какую сцену - неизвестно.", "maps_film_note": "Снимали в этих местах. Какую сцену где - неизвестно.", "maps_more": "ещё {n}", "maps_loading": "Загружаю карту…", "maps_failed": "Карта не загрузилась. Проверь связь и открой вкладку снова.", "maps_film_block": "Места съёмок", "maps_on_map": "На карте", "maps_also": "Снимали также в", "maps_credit": "Места: Wikidata, через Movie Scene Map", "maps_cat_city": "Город", "maps_cat_landmark": "Достопримечательность", "maps_cat_nature": "Природа", "maps_cat_castle": "Замок", "maps_cat_studio": "Студия", "maps_cat_street": "Улица или площадь", "maps_cat_region": "Регион", "maps_cat_fiction": "Вымышленное место"},
+  uk:{"maps_find_me":"Показати, де я", "maps_loc_off":"Місцезнаходження недоступне", "maps_loc_denied":"Cinemail не бачить, де ти. Дозволь доступ до місцезнаходження в налаштуваннях браузера чи телефона.", "tab_maps": "Мапи", "maps_all": "Усі фільми", "maps_stats": "{f} фільмів і серіалів · {p} місць", "maps_hint": "Торкнися точки, щоб побачити, що там знімали.", "maps_per_wiki": "за Вікіпедією", "maps_place_note": "Тут знімали. Яку сцену - невідомо.", "maps_film_note": "Знімали в цих місцях. Яку сцену де - невідомо.", "maps_more": "ще {n}", "maps_loading": "Завантажую мапу…", "maps_failed": "Мапа не завантажилася. Перевір з'єднання і відкрий вкладку знову.", "maps_film_block": "Місця зйомок", "maps_on_map": "На мапі", "maps_also": "Знімали також у", "maps_credit": "Місця: Wikidata, через Movie Scene Map", "maps_cat_city": "Місто", "maps_cat_landmark": "Пам'ятка", "maps_cat_nature": "Природа", "maps_cat_castle": "Замок", "maps_cat_studio": "Студія", "maps_cat_street": "Вулиця або площа", "maps_cat_region": "Регіон", "maps_cat_fiction": "Вигадане місце"},
+  ka:{"maps_find_me":"მაჩვენე, სად ვარ", "maps_loc_off":"მდებარეობა მიუწვდომელია", "maps_loc_denied":"Cinemail ვერ ხედავს, სად ხარ. დაუშვი მდებარეობაზე წვდომა ბრაუზერის ან ტელეფონის პარამეტრებში.", "tab_maps": "რუკა", "maps_all": "ყველა ფილმი", "maps_stats": "{f} ფილმი და სერიალი · {p} ადგილი", "maps_hint": "შეეხე წერტილს, რომ ნახო, რა გადაიღეს იქ.", "maps_per_wiki": "ვიკიპედიის მიხედვით", "maps_place_note": "აქ გადაიღეს. რომელი სცენა - უცნობია.", "maps_film_note": "გადაიღეს ამ ადგილებში. რომელი სცენა სად - უცნობია.", "maps_more": "კიდევ {n}", "maps_loading": "რუკა იტვირთება…", "maps_failed": "რუკა ვერ ჩაიტვირთა. შეამოწმე კავშირი და ხელახლა გახსენი ჩანართი.", "maps_film_block": "გადაღების ადგილები", "maps_on_map": "რუკაზე", "maps_also": "ასევე გადაიღეს", "maps_credit": "ადგილები: Wikidata, Movie Scene Map-ის გავლით", "maps_cat_city": "ქალაქი", "maps_cat_landmark": "ღირსშესანიშნაობა", "maps_cat_nature": "ბუნება", "maps_cat_castle": "ციხესიმაგრე", "maps_cat_studio": "სტუდია", "maps_cat_street": "ქუჩა ან მოედანი", "maps_cat_region": "რეგიონი", "maps_cat_fiction": "გამოგონილი ადგილი"},
+  es:{"maps_find_me":"Mostrar dónde estoy", "maps_loc_off":"Ubicación no disponible", "maps_loc_denied":"Cinemail no ve dónde estás. Permite la ubicación en los ajustes del navegador o del teléfono.", "tab_maps": "Mapas", "maps_all": "Todas", "maps_stats": "{f} películas y series · {p} lugares", "maps_hint": "Toca un punto para ver qué se rodó allí.", "maps_per_wiki": "según Wikipedia", "maps_place_note": "Se rodó aquí. Qué escena, no consta.", "maps_film_note": "Se rodó en estos lugares. Qué escena en cuál, no consta.", "maps_more": "{n} más", "maps_loading": "Cargando el mapa…", "maps_failed": "El mapa no se pudo cargar. Revisa tu conexión y vuelve a abrir la pestaña.", "maps_film_block": "Lugares de rodaje", "maps_on_map": "En el mapa", "maps_also": "También se rodó en", "maps_credit": "Lugares: Wikidata, vía Movie Scene Map", "maps_cat_city": "Ciudad", "maps_cat_landmark": "Monumento", "maps_cat_nature": "Naturaleza", "maps_cat_castle": "Castillo", "maps_cat_studio": "Estudio", "maps_cat_street": "Calle o plaza", "maps_cat_region": "Región", "maps_cat_fiction": "Lugar ficticio"},
+  fr:{"maps_find_me":"Montrer où je suis", "maps_loc_off":"Position indisponible", "maps_loc_denied":"Cinemail ne voit pas où tu es. Autorise la localisation dans les réglages du navigateur ou du téléphone.", "tab_maps": "Cartes", "maps_all": "Tous les films", "maps_stats": "{f} films et séries · {p} lieux", "maps_hint": "Touche un point pour voir ce qui y a été tourné.", "maps_per_wiki": "selon Wikipédia", "maps_place_note": "Tourné ici. Quelle scène, on ne le sait pas.", "maps_film_note": "Tourné dans ces lieux. Quelle scène où, on ne le sait pas.", "maps_more": "{n} de plus", "maps_loading": "Chargement de la carte…", "maps_failed": "La carte n'a pas pu se charger. Vérifie ta connexion et rouvre l'onglet.", "maps_film_block": "Lieux de tournage", "maps_on_map": "Sur la carte", "maps_also": "Aussi tourné à", "maps_credit": "Lieux : Wikidata, via Movie Scene Map", "maps_cat_city": "Ville", "maps_cat_landmark": "Monument", "maps_cat_nature": "Nature", "maps_cat_castle": "Château", "maps_cat_studio": "Studio", "maps_cat_street": "Rue ou place", "maps_cat_region": "Région", "maps_cat_fiction": "Lieu fictif"},
+  de:{"maps_find_me":"Zeigen, wo ich bin", "maps_loc_off":"Standort nicht verfügbar", "maps_loc_denied":"Cinemail sieht nicht, wo du bist. Erlaube den Standort in den Browser- oder Telefoneinstellungen.", "tab_maps": "Karten", "maps_all": "Alle Filme", "maps_stats": "{f} Filme und Serien · {p} Orte", "maps_hint": "Tippe auf einen Punkt, um zu sehen, was dort gedreht wurde.", "maps_per_wiki": "laut Wikipedia", "maps_place_note": "Hier gedreht. Welche Szene, ist nicht bekannt.", "maps_film_note": "An diesen Orten gedreht. Welche Szene wo, ist nicht bekannt.", "maps_more": "{n} weitere", "maps_loading": "Karte wird geladen…", "maps_failed": "Die Karte konnte nicht geladen werden. Prüfe deine Verbindung und öffne den Tab erneut.", "maps_film_block": "Drehorte", "maps_on_map": "Auf der Karte", "maps_also": "Auch gedreht in", "maps_credit": "Orte: Wikidata, über Movie Scene Map", "maps_cat_city": "Stadt", "maps_cat_landmark": "Sehenswürdigkeit", "maps_cat_nature": "Natur", "maps_cat_castle": "Burg", "maps_cat_studio": "Studio", "maps_cat_street": "Straße oder Platz", "maps_cat_region": "Region", "maps_cat_fiction": "Fiktiver Ort"},
+  it:{"maps_find_me":"Mostra dove sono", "maps_loc_off":"Posizione non disponibile", "maps_loc_denied":"Cinemail non vede dove sei. Consenti la posizione nelle impostazioni del browser o del telefono.", "tab_maps": "Mappe", "maps_all": "Tutti i film", "maps_stats": "{f} film e serie · {p} luoghi", "maps_hint": "Tocca un punto per vedere cosa è stato girato lì.", "maps_per_wiki": "secondo Wikipedia", "maps_place_note": "Girato qui. Quale scena, non è noto.", "maps_film_note": "Girato in questi luoghi. Quale scena dove, non è noto.", "maps_more": "altri {n}", "maps_loading": "Caricamento della mappa…", "maps_failed": "Impossibile caricare la mappa. Controlla la connessione e riapri la scheda.", "maps_film_block": "Luoghi delle riprese", "maps_on_map": "Sulla mappa", "maps_also": "Girato anche in", "maps_credit": "Luoghi: Wikidata, tramite Movie Scene Map", "maps_cat_city": "Città", "maps_cat_landmark": "Monumento", "maps_cat_nature": "Natura", "maps_cat_castle": "Castello", "maps_cat_studio": "Studio", "maps_cat_street": "Via o piazza", "maps_cat_region": "Regione", "maps_cat_fiction": "Luogo immaginario"},
 };
 Object.keys(_I18N_MAPS).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_MAPS[l]); });
 // ── Единый поиск (10 окт 2026) ───────────────────────────────────────────────
 // Примеры в search_examples проверены разбором на каждом языке: их движок понимает целиком.
 // Прежние примеры из recs_empty_sub на украинском и грузинском он не понимал вовсе.
 const _I18N_SEARCH = {
-  en:{"cin_title":"In cinemas", "cin_from":"{country}: in cinemas from {date}", "cin_showtimes":"Showtimes near me", "cin_imax":"IMAX near me", "cin_q":"showtimes", "search_surprise_none":"Nothing new turned up this time. Press it again, or try an example above.", "search_strict_w":"Only these have all of it. Closest, without “{w}”:", "search_strict":"Only these have all of it. Closest:", "tab_library": "Library", "search_ph": "A title, a person, a mood…", "search_try": "Try", "search_examples": "korean thriller|french new wave|sci-fi from the 70s|films about cats", "search_understood": "Understood", "search_picks": "Picks", "search_like": "Films like {title}", "search_without": "Without “{w}”", "search_relaxed_w": "Nothing has all of it. Closest, without “{w}”:", "search_relaxed": "Nothing has all of it. Closest:", "search_none_all": "Nothing has all of it at once. Try it without one part:", "search_none_one": "Nothing for this one. These always work:", "search_that_all": "That is all for this query.", "search_end": "That is everything for this query.", "search_more": "More", "search_nothing": "Nothing under that title, and no words I could read. These always work:", "search_drop": "Remove {w}", "surprise_btn": "Surprise Me"},
-  ru:{"cin_title":"В кино", "cin_from":"{country}: в прокате с {date}", "cin_showtimes":"Сеансы рядом", "cin_imax":"IMAX рядом", "cin_q":"сеансы", "search_surprise_none":"В этот раз ничего нового. Нажми ещё раз или попробуй пример выше.", "search_strict_w":"Целиком подходит только это. Ближе всего, без «{w}»:", "search_strict":"Целиком подходит только это. Ближе всего:", "tab_library": "Библиотека", "search_ph": "Фильм, имя, настроение…", "search_try": "Попробуй", "search_examples": "корейский триллер|новая волна|фантастика 70-х|фильмы про котиков", "search_understood": "Понято", "search_picks": "Подборка", "search_like": "Похожее на «{title}»", "search_without": "Без «{w}»", "search_relaxed_w": "Всё сразу не нашлось. Ближе всего, без «{w}»:", "search_relaxed": "Всё сразу не нашлось. Ближе всего:", "search_none_all": "Всё сразу не нашлось. Попробуй без одного из условий:", "search_none_one": "По этому ничего нет. Вот что точно сработает:", "search_that_all": "По этому запросу это всё.", "search_end": "Больше по этому запросу ничего нет.", "search_more": "Ещё", "search_nothing": "Под таким названием ничего нет, и слов, которые я понимаю, тоже. Вот что точно сработает:", "search_drop": "Убрать «{w}»", "surprise_btn": "Удиви меня"},
-  uk:{"cin_title":"У кіно", "cin_from":"{country}: у прокаті з {date}", "cin_showtimes":"Сеанси поруч", "cin_imax":"IMAX поруч", "cin_q":"сеанси", "search_surprise_none":"Цього разу нічого нового. Натисни ще раз або спробуй приклад вище.", "search_strict_w":"Повністю підходить лише це. Найближче, без «{w}»:", "search_strict":"Повністю підходить лише це. Найближче:", "tab_library": "Бібліотека", "search_ph": "Назва, людина, настрій…", "search_try": "Спробуй", "search_examples": "комедія 90-х|фантастика 80-х|вестерн|нуар", "search_understood": "Зрозуміло", "search_picks": "Добірка", "search_like": "Схоже на «{title}»", "search_without": "Без «{w}»", "search_relaxed_w": "Усе разом не знайшлося. Найближче, без «{w}»:", "search_relaxed": "Усе разом не знайшлося. Найближче:", "search_none_all": "Усе разом не знайшлося. Спробуй без однієї з умов:", "search_none_one": "За цим нічого немає. Ось що точно спрацює:", "search_that_all": "За цим запитом це все.", "search_end": "Більше за цим запитом нічого немає.", "search_more": "Ще", "search_nothing": "Під такою назвою нічого немає, і слів, які я розумію, теж. Ось що точно спрацює:", "search_drop": "Прибрати «{w}»", "surprise_btn": "Здивуй мене"},
-  ka:{"cin_title":"კინოში", "cin_from":"{country}: პრემიერა კინოთეატრებში: {date}", "cin_showtimes":"სეანსები ახლოს", "cin_imax":"IMAX ახლოს", "cin_q":"სეანსები", "search_surprise_none":"ამჯერად ახალი არაფერია. კიდევ დააჭირე ან სცადე ზემოთ მოცემული მაგალითი.", "search_strict_w":"სრულად მხოლოდ ესენი ერგება. ყველაზე ახლოს, „{w}“-ის გარეშე:", "search_strict":"სრულად მხოლოდ ესენი ერგება. ყველაზე ახლოს:", "tab_library": "ბიბლიოთეკა", "search_ph": "ფილმი, სახელი, ჟანრი…", "search_try": "სცადე", "search_examples": "კომედია|ფანტასტიკა", "search_understood": "გასაგებია", "search_picks": "რჩევები", "search_like": "„{title}“-ის მსგავსი", "search_without": "„{w}“-ის გარეშე", "search_relaxed_w": "ყველაფერი ერთად ვერ მოიძებნა. ყველაზე ახლოს, „{w}“-ის გარეშე:", "search_relaxed": "ყველაფერი ერთად ვერ მოიძებნა. ყველაზე ახლოს:", "search_none_all": "ყველაფერი ერთად ვერ მოიძებნა. სცადე ერთი პირობის გარეშე:", "search_none_one": "ამით ვერაფერი მოიძებნა. ეს ნამდვილად იმუშავებს:", "search_that_all": "ამ მოთხოვნით ეს ყველაფერია.", "search_end": "ამ მოთხოვნით მეტი არაფერია.", "search_more": "მეტი", "search_nothing": "ამ სათაურით ვერაფერი მოიძებნა და ნაცნობი სიტყვებიც არ არის. ეს ნამდვილად იმუშავებს:", "search_drop": "„{w}“-ის მოხსნა", "surprise_btn": "გამაკვირვე"},
-  es:{"cin_title":"En cines", "cin_from":"{country}: en cines desde el {date}", "cin_showtimes":"Horarios cerca", "cin_imax":"IMAX cerca", "cin_q":"cartelera", "search_surprise_none":"Esta vez no salió nada nuevo. Pulsa otra vez o prueba un ejemplo de arriba.", "search_strict_w":"Solo estas tienen todo. Lo más cercano, sin «{w}»:", "search_strict":"Solo estas tienen todo. Lo más cercano:", "tab_library": "Biblioteca", "search_ph": "Película, persona, género…", "search_try": "Prueba", "search_examples": "thriller coreano|comedia francesa|anime japonés|nouvelle vague", "search_understood": "Entendido", "search_picks": "Sugerencias", "search_like": "Parecidas a «{title}»", "search_without": "Sin «{w}»", "search_relaxed_w": "No hay nada con todo a la vez. Lo más cercano, sin «{w}»:", "search_relaxed": "No hay nada con todo a la vez. Lo más cercano:", "search_none_all": "No hay nada con todo a la vez. Prueba sin una de las partes:", "search_none_one": "No hay nada para esto. Esto siempre funciona:", "search_that_all": "Eso es todo para esta búsqueda.", "search_end": "No hay nada más para esta búsqueda.", "search_more": "Más", "search_nothing": "No hay nada con ese título ni palabras que entienda. Esto siempre funciona:", "search_drop": "Quitar «{w}»", "surprise_btn": "Sorpréndeme"},
-  fr:{"cin_title":"Au cinéma", "cin_from":"{country} : au cinéma à partir du {date}", "cin_showtimes":"Séances près de moi", "cin_imax":"IMAX près de moi", "cin_q":"séances", "search_surprise_none":"Rien de nouveau cette fois. Appuie encore ou essaie un exemple ci-dessus.", "search_strict_w":"Seuls ceux-ci réunissent tout. Le plus proche, sans « {w} » :", "search_strict":"Seuls ceux-ci réunissent tout. Le plus proche :", "tab_library": "Bibliothèque", "search_ph": "Film, personne, humeur…", "search_try": "Essaie", "search_examples": "thriller coréen|comédie française|horreur japonaise|nouvelle vague", "search_understood": "Compris", "search_picks": "Suggestions", "search_like": "Dans le même esprit que « {title} »", "search_without": "Sans « {w} »", "search_relaxed_w": "Rien ne réunit tout. Le plus proche, sans « {w} » :", "search_relaxed": "Rien ne réunit tout. Le plus proche :", "search_none_all": "Rien ne réunit tout. Essaie sans l’une des conditions :", "search_none_one": "Rien pour cette recherche. Ceci marche toujours :", "search_that_all": "C’est tout pour cette recherche.", "search_end": "Il n’y a rien de plus pour cette recherche.", "search_more": "Plus", "search_nothing": "Rien sous ce titre, et aucun mot que je comprenne. Ceci marche toujours :", "search_drop": "Retirer « {w} »", "surprise_btn": "Surprends-moi"},
-  de:{"cin_title":"Im Kino", "cin_from":"{country}: im Kino ab {date}", "cin_showtimes":"Vorstellungen in der Nähe", "cin_imax":"IMAX in der Nähe", "cin_q":"Kinoprogramm", "search_surprise_none":"Diesmal kam nichts Neues. Drück noch mal oder probier ein Beispiel oben.", "search_strict_w":"Nur diese haben alles. Am nächsten, ohne „{w}“:", "search_strict":"Nur diese haben alles. Am nächsten:", "tab_library": "Bibliothek", "search_ph": "Titel, Person, Stimmung…", "search_try": "Probier mal", "search_examples": "koreanischer Thriller|französische Komödie|Nouvelle Vague|Science-Fiction der 70er", "search_understood": "Verstanden", "search_picks": "Tipps", "search_like": "Ähnlich wie „{title}“", "search_without": "Ohne „{w}“", "search_relaxed_w": "Nichts hat alles zugleich. Am nächsten, ohne „{w}“:", "search_relaxed": "Nichts hat alles zugleich. Am nächsten:", "search_none_all": "Nichts hat alles zugleich. Versuch es ohne eine Bedingung:", "search_none_one": "Dazu gibt es nichts. Das klappt immer:", "search_that_all": "Das ist alles zu dieser Suche.", "search_end": "Mehr gibt es zu dieser Suche nicht.", "search_more": "Mehr", "search_nothing": "Unter diesem Titel gibt es nichts, und kein Wort, das ich verstehe. Das klappt immer:", "search_drop": "„{w}“ entfernen", "surprise_btn": "Überrasch mich"},
-  it:{"cin_title":"Al cinema", "cin_from":"{country}: al cinema dal {date}", "cin_showtimes":"Orari vicino a me", "cin_imax":"IMAX vicino a me", "cin_q":"orari cinema", "search_surprise_none":"Questa volta niente di nuovo. Premi ancora o prova un esempio qui sopra.", "search_strict_w":"Solo questi hanno tutto. Il più vicino, senza «{w}»:", "search_strict":"Solo questi hanno tutto. Il più vicino:", "tab_library": "Libreria", "search_ph": "Titolo, persona, umore…", "search_try": "Prova", "search_examples": "horror giapponese|commedia italiana|nouvelle vague|fantascienza anni 70", "search_understood": "Capito", "search_picks": "Consigli", "search_like": "Simili a «{title}»", "search_without": "Senza «{w}»", "search_relaxed_w": "Niente ha tutto insieme. Il più vicino, senza «{w}»:", "search_relaxed": "Niente ha tutto insieme. Il più vicino:", "search_none_all": "Niente ha tutto insieme. Prova senza una delle condizioni:", "search_none_one": "Niente per questa ricerca. Questo funziona sempre:", "search_that_all": "È tutto per questa ricerca.", "search_end": "Non c’è altro per questa ricerca.", "search_more": "Altro", "search_nothing": "Niente con questo titolo, e nessuna parola che capisco. Questo funziona sempre:", "search_drop": "Togli «{w}»", "surprise_btn": "Sorprendimi"}
+  en:{"search_picks_left":"Picks left this week: {n}", "cin_title":"In cinemas", "cin_from":"{country}: in cinemas from {date}", "cin_showtimes":"Showtimes near me", "cin_imax":"IMAX near me", "cin_q":"showtimes", "search_surprise_none":"Nothing new turned up this time. Press it again, or try an example above.", "search_strict_w":"Only these have all of it. Closest, without “{w}”:", "search_strict":"Only these have all of it. Closest:", "tab_library": "Library", "search_ph": "A title, a person, a mood…", "search_try": "Try", "search_examples": "korean thriller|french new wave|sci-fi from the 70s|films about cats", "search_understood": "Understood", "search_picks": "Picks", "search_like": "Films like {title}", "search_without": "Without “{w}”", "search_relaxed_w": "Nothing has all of it. Closest, without “{w}”:", "search_relaxed": "Nothing has all of it. Closest:", "search_none_all": "Nothing has all of it at once. Try it without one part:", "search_none_one": "Nothing for this one. These always work:", "search_that_all": "That is all for this query.", "search_end": "That is everything for this query.", "search_more": "More", "search_nothing": "Nothing under that title, and no words I could read. These always work:", "search_drop": "Remove {w}", "surprise_btn": "Surprise Me"},
+  ru:{"search_picks_left":"Подборок осталось на этой неделе: {n}", "cin_title":"В кино", "cin_from":"{country}: в прокате с {date}", "cin_showtimes":"Сеансы рядом", "cin_imax":"IMAX рядом", "cin_q":"сеансы", "search_surprise_none":"В этот раз ничего нового. Нажми ещё раз или попробуй пример выше.", "search_strict_w":"Целиком подходит только это. Ближе всего, без «{w}»:", "search_strict":"Целиком подходит только это. Ближе всего:", "tab_library": "Библиотека", "search_ph": "Фильм, имя, настроение…", "search_try": "Попробуй", "search_examples": "корейский триллер|новая волна|фантастика 70-х|фильмы про котиков", "search_understood": "Понято", "search_picks": "Подборка", "search_like": "Похожее на «{title}»", "search_without": "Без «{w}»", "search_relaxed_w": "Всё сразу не нашлось. Ближе всего, без «{w}»:", "search_relaxed": "Всё сразу не нашлось. Ближе всего:", "search_none_all": "Всё сразу не нашлось. Попробуй без одного из условий:", "search_none_one": "По этому ничего нет. Вот что точно сработает:", "search_that_all": "По этому запросу это всё.", "search_end": "Больше по этому запросу ничего нет.", "search_more": "Ещё", "search_nothing": "Под таким названием ничего нет, и слов, которые я понимаю, тоже. Вот что точно сработает:", "search_drop": "Убрать «{w}»", "surprise_btn": "Удиви меня"},
+  uk:{"search_picks_left":"Добірок залишилося цього тижня: {n}", "cin_title":"У кіно", "cin_from":"{country}: у прокаті з {date}", "cin_showtimes":"Сеанси поруч", "cin_imax":"IMAX поруч", "cin_q":"сеанси", "search_surprise_none":"Цього разу нічого нового. Натисни ще раз або спробуй приклад вище.", "search_strict_w":"Повністю підходить лише це. Найближче, без «{w}»:", "search_strict":"Повністю підходить лише це. Найближче:", "tab_library": "Бібліотека", "search_ph": "Назва, людина, настрій…", "search_try": "Спробуй", "search_examples": "комедія 90-х|фантастика 80-х|вестерн|нуар", "search_understood": "Зрозуміло", "search_picks": "Добірка", "search_like": "Схоже на «{title}»", "search_without": "Без «{w}»", "search_relaxed_w": "Усе разом не знайшлося. Найближче, без «{w}»:", "search_relaxed": "Усе разом не знайшлося. Найближче:", "search_none_all": "Усе разом не знайшлося. Спробуй без однієї з умов:", "search_none_one": "За цим нічого немає. Ось що точно спрацює:", "search_that_all": "За цим запитом це все.", "search_end": "Більше за цим запитом нічого немає.", "search_more": "Ще", "search_nothing": "Під такою назвою нічого немає, і слів, які я розумію, теж. Ось що точно спрацює:", "search_drop": "Прибрати «{w}»", "surprise_btn": "Здивуй мене"},
+  ka:{"search_picks_left":"ამ კვირაში დარჩენილი რჩევები: {n}", "cin_title":"კინოში", "cin_from":"{country}: პრემიერა კინოთეატრებში: {date}", "cin_showtimes":"სეანსები ახლოს", "cin_imax":"IMAX ახლოს", "cin_q":"სეანსები", "search_surprise_none":"ამჯერად ახალი არაფერია. კიდევ დააჭირე ან სცადე ზემოთ მოცემული მაგალითი.", "search_strict_w":"სრულად მხოლოდ ესენი ერგება. ყველაზე ახლოს, „{w}“-ის გარეშე:", "search_strict":"სრულად მხოლოდ ესენი ერგება. ყველაზე ახლოს:", "tab_library": "ბიბლიოთეკა", "search_ph": "ფილმი, სახელი, ჟანრი…", "search_try": "სცადე", "search_examples": "კომედია|ფანტასტიკა", "search_understood": "გასაგებია", "search_picks": "რჩევები", "search_like": "„{title}“-ის მსგავსი", "search_without": "„{w}“-ის გარეშე", "search_relaxed_w": "ყველაფერი ერთად ვერ მოიძებნა. ყველაზე ახლოს, „{w}“-ის გარეშე:", "search_relaxed": "ყველაფერი ერთად ვერ მოიძებნა. ყველაზე ახლოს:", "search_none_all": "ყველაფერი ერთად ვერ მოიძებნა. სცადე ერთი პირობის გარეშე:", "search_none_one": "ამით ვერაფერი მოიძებნა. ეს ნამდვილად იმუშავებს:", "search_that_all": "ამ მოთხოვნით ეს ყველაფერია.", "search_end": "ამ მოთხოვნით მეტი არაფერია.", "search_more": "მეტი", "search_nothing": "ამ სათაურით ვერაფერი მოიძებნა და ნაცნობი სიტყვებიც არ არის. ეს ნამდვილად იმუშავებს:", "search_drop": "„{w}“-ის მოხსნა", "surprise_btn": "გამაკვირვე"},
+  es:{"search_picks_left":"Sugerencias que te quedan esta semana: {n}", "cin_title":"En cines", "cin_from":"{country}: en cines desde el {date}", "cin_showtimes":"Horarios cerca", "cin_imax":"IMAX cerca", "cin_q":"cartelera", "search_surprise_none":"Esta vez no salió nada nuevo. Pulsa otra vez o prueba un ejemplo de arriba.", "search_strict_w":"Solo estas tienen todo. Lo más cercano, sin «{w}»:", "search_strict":"Solo estas tienen todo. Lo más cercano:", "tab_library": "Biblioteca", "search_ph": "Película, persona, género…", "search_try": "Prueba", "search_examples": "thriller coreano|comedia francesa|anime japonés|nouvelle vague", "search_understood": "Entendido", "search_picks": "Sugerencias", "search_like": "Parecidas a «{title}»", "search_without": "Sin «{w}»", "search_relaxed_w": "No hay nada con todo a la vez. Lo más cercano, sin «{w}»:", "search_relaxed": "No hay nada con todo a la vez. Lo más cercano:", "search_none_all": "No hay nada con todo a la vez. Prueba sin una de las partes:", "search_none_one": "No hay nada para esto. Esto siempre funciona:", "search_that_all": "Eso es todo para esta búsqueda.", "search_end": "No hay nada más para esta búsqueda.", "search_more": "Más", "search_nothing": "No hay nada con ese título ni palabras que entienda. Esto siempre funciona:", "search_drop": "Quitar «{w}»", "surprise_btn": "Sorpréndeme"},
+  fr:{"search_picks_left":"Suggestions restantes cette semaine : {n}", "cin_title":"Au cinéma", "cin_from":"{country} : au cinéma à partir du {date}", "cin_showtimes":"Séances près de moi", "cin_imax":"IMAX près de moi", "cin_q":"séances", "search_surprise_none":"Rien de nouveau cette fois. Appuie encore ou essaie un exemple ci-dessus.", "search_strict_w":"Seuls ceux-ci réunissent tout. Le plus proche, sans « {w} » :", "search_strict":"Seuls ceux-ci réunissent tout. Le plus proche :", "tab_library": "Bibliothèque", "search_ph": "Film, personne, humeur…", "search_try": "Essaie", "search_examples": "thriller coréen|comédie française|horreur japonaise|nouvelle vague", "search_understood": "Compris", "search_picks": "Suggestions", "search_like": "Dans le même esprit que « {title} »", "search_without": "Sans « {w} »", "search_relaxed_w": "Rien ne réunit tout. Le plus proche, sans « {w} » :", "search_relaxed": "Rien ne réunit tout. Le plus proche :", "search_none_all": "Rien ne réunit tout. Essaie sans l’une des conditions :", "search_none_one": "Rien pour cette recherche. Ceci marche toujours :", "search_that_all": "C’est tout pour cette recherche.", "search_end": "Il n’y a rien de plus pour cette recherche.", "search_more": "Plus", "search_nothing": "Rien sous ce titre, et aucun mot que je comprenne. Ceci marche toujours :", "search_drop": "Retirer « {w} »", "surprise_btn": "Surprends-moi"},
+  de:{"search_picks_left":"Tipps übrig diese Woche: {n}", "cin_title":"Im Kino", "cin_from":"{country}: im Kino ab {date}", "cin_showtimes":"Vorstellungen in der Nähe", "cin_imax":"IMAX in der Nähe", "cin_q":"Kinoprogramm", "search_surprise_none":"Diesmal kam nichts Neues. Drück noch mal oder probier ein Beispiel oben.", "search_strict_w":"Nur diese haben alles. Am nächsten, ohne „{w}“:", "search_strict":"Nur diese haben alles. Am nächsten:", "tab_library": "Bibliothek", "search_ph": "Titel, Person, Stimmung…", "search_try": "Probier mal", "search_examples": "koreanischer Thriller|französische Komödie|Nouvelle Vague|Science-Fiction der 70er", "search_understood": "Verstanden", "search_picks": "Tipps", "search_like": "Ähnlich wie „{title}“", "search_without": "Ohne „{w}“", "search_relaxed_w": "Nichts hat alles zugleich. Am nächsten, ohne „{w}“:", "search_relaxed": "Nichts hat alles zugleich. Am nächsten:", "search_none_all": "Nichts hat alles zugleich. Versuch es ohne eine Bedingung:", "search_none_one": "Dazu gibt es nichts. Das klappt immer:", "search_that_all": "Das ist alles zu dieser Suche.", "search_end": "Mehr gibt es zu dieser Suche nicht.", "search_more": "Mehr", "search_nothing": "Unter diesem Titel gibt es nichts, und kein Wort, das ich verstehe. Das klappt immer:", "search_drop": "„{w}“ entfernen", "surprise_btn": "Überrasch mich"},
+  it:{"search_picks_left":"Consigli rimasti questa settimana: {n}", "cin_title":"Al cinema", "cin_from":"{country}: al cinema dal {date}", "cin_showtimes":"Orari vicino a me", "cin_imax":"IMAX vicino a me", "cin_q":"orari cinema", "search_surprise_none":"Questa volta niente di nuovo. Premi ancora o prova un esempio qui sopra.", "search_strict_w":"Solo questi hanno tutto. Il più vicino, senza «{w}»:", "search_strict":"Solo questi hanno tutto. Il più vicino:", "tab_library": "Libreria", "search_ph": "Titolo, persona, umore…", "search_try": "Prova", "search_examples": "horror giapponese|commedia italiana|nouvelle vague|fantascienza anni 70", "search_understood": "Capito", "search_picks": "Consigli", "search_like": "Simili a «{title}»", "search_without": "Senza «{w}»", "search_relaxed_w": "Niente ha tutto insieme. Il più vicino, senza «{w}»:", "search_relaxed": "Niente ha tutto insieme. Il più vicino:", "search_none_all": "Niente ha tutto insieme. Prova senza una delle condizioni:", "search_none_one": "Niente per questa ricerca. Questo funziona sempre:", "search_that_all": "È tutto per questa ricerca.", "search_end": "Non c’è altro per questa ricerca.", "search_more": "Altro", "search_nothing": "Niente con questo titolo, e nessuna parola che capisco. Questo funziona sempre:", "search_drop": "Togli «{w}»", "surprise_btn": "Sorprendimi"}
 };
 Object.keys(_I18N_SEARCH).forEach(l => Object.assign(I18N[l], _I18N_SEARCH[l]));
 // The Android half is not a nicety. Tapping any imdb.com link hands off to the IMDb app, which
@@ -5039,8 +5030,8 @@ function setLang(l) {
   renderHistory(); renderListTabs();
   const activeTab = ["search","history","maps","inbox"].find(n => document.getElementById("tab-"+n)?.style.display !== "none");
   if (activeTab === "inbox") renderInbox();
-  // Примеры и «Для тебя» рисуются кодом, data-i18n до них не достаёт.
-  _forYou = null; _searchHomeRefresh();
+  // Примеры рисуются кодом, data-i18n до них не достаёт.
+  _searchHomeRefresh();
 }
 // Apply i18n to a specific container (for dynamically-shown elements like modals)
 function _applyI18nElement(container) {
@@ -5673,9 +5664,9 @@ function _resetAccountState(prevUid, { wipeLocal = false } = {}) {
   _inboxCache = { received: [], sent: [] }; _inboxCacheLoaded = false;
   _chatViewPartnerId = null; _expandedInviteId = null;
   _blockedIds = new Set();
-  try { if (typeof _map !== 'undefined' && _map) _mapsSetMine(false); } catch (e) {}
+  try { if (typeof _map !== 'undefined' && _map) _mapsShowAll(); } catch (e) {}
   _tasteCache = null; _lastSeeds = [];
-  _srchGen++; _srch = null; _forYou = null;
+  _srchGen++; _srch = null; _picksRemaining = null; _picksSpent.clear();
   try { const si = document.getElementById('search-input'); if (si) si.value = ''; } catch (e) {}
   _shownSurprises.length = 0;
   try { sessionStorage.removeItem('shownSurprises'); } catch (e) {}
@@ -5692,7 +5683,7 @@ function _resetAccountState(prevUid, { wipeLocal = false } = {}) {
   }
   // На экране не должно остаться ничего от прежнего человека, даже если следующий -
   // гость, которому эти блоки никто не перерисует.
-  ['inbox-list', 'inbox-friends-block', 'search-results', 'search-foryou', 'history-list'].forEach(id => {
+  ['inbox-list', 'inbox-friends-block', 'search-results', 'history-list'].forEach(id => {
     const el = document.getElementById(id); if (el) el.innerHTML = '';
   });
   const badge = document.getElementById('inbox-badge'); if (badge) badge.style.display = 'none';
@@ -6828,8 +6819,9 @@ function _renderSearchExamples(boxId = 'search-examples') {
   box.innerHTML = ex.map(q => `<button type="button" class="srch-chip" dir="auto" data-q="${escapeHtml(q)}">${escapeHtml(q)}</button>`).join('');
 }
 
-// Пустое поле: примеры, «Удиви меня», подсказка новичку и подборка для тебя.
-function _searchHome(show, forYou = true) {
+// Пустое поле: знак, примеры, «Удиви меня» и подсказка новичку. «Подборка для тебя» здесь
+// была и ушла в платную версию 11 окт: это подборки в обход недельного лимита.
+function _searchHome(show) {
   const home = document.getElementById('search-home');
   if (!home) return;
   home.style.display = show ? '' : 'none';
@@ -6837,52 +6829,12 @@ function _searchHome(show, forYou = true) {
   _renderSearchExamples();
   const watched = watchHistory.filter(h => h.status === 'watched' && _isMine(h)).length;
   _maybeShowPicksHint(watched);
-  const fy = document.getElementById('search-foryou');
-  if (fy) fy.style.display = forYou ? '' : 'none';
-  if (forYou) _searchForYou(watched);
 }
-// Библиотека пришла позже, чем экран нарисовался: дорисовать то, что от неё зависит.
+// Библиотека пришла позже, чем экран нарисовался: подсказка новичку зависит от неё.
 function _searchHomeRefresh() {
   const home = document.getElementById('search-home');
   const tab = document.getElementById('tab-search');
   if (home && tab && tab.style.display !== 'none' && home.style.display !== 'none') _searchHome(true);
-}
-
-// «Для тебя» на пустом поле. Около двадцати обращений к TMDB, поэтому один раз за сессию и
-// на аккаунт: список хранится, а карточки рисуются заново, чтобы отметки «смотрел» были свежими.
-let _forYou = null;
-async function _searchForYou(watched) {
-  const box = document.getElementById('search-foryou');
-  if (!box) return;
-  if (watched < SURPRISE_MIN_WATCHED) { box.innerHTML = ''; return; }
-  const key = (currentUser?.id || 'guest') + ':' + _lang + ':' + _acctGen;
-  const draw = list => {
-    const lib = _libraryKeys();
-    const fresh = list.filter(m => !lib.ids.has(String(m.id)));
-    box.innerHTML = fresh.length ? _srchSect(t('picks_for_you'))
-      + `<div class="card-list">${fresh.map(m => movieCardHTML(m, _srchCaption(m, null))).join('')}</div>` : '';
-  };
-  if (_forYou && _forYou.key === key) { if (_forYou.list) draw(_forYou.list); return; }
-  _forYou = { key, list: null };
-  try {
-    const list = await _tastePicks(3);
-    if (!_forYou || _forYou.key !== key) return;
-    _forYou.list = list;
-    const home = document.getElementById('search-home');
-    if (home && home.style.display !== 'none') draw(list);
-  } catch (e) { if (_forYou && _forYou.key === key) _forYou = null; }
-}
-
-// Тот же расчёт, что у «Удиви меня» в режиме вкуса, без перемешивания результата.
-async function _tastePicks(limit) {
-  const watchedEntries = watchHistory.filter(h => h.status === 'watched' && _isMine(h));
-  const seeds = _pickSeeds(watchedEntries);
-  const tally = await _tallyFromSeeds(seeds);
-  const lib = _libraryKeys();
-  const pool = [...tally.values()].filter(c => c.Title && !lib.ids.has(String(c.id)) && !lib.titles.has(lib.norm(c.Title)));
-  pool.sort((a, b) => b.votes - a.votes || b.voteCount - a.voteCount);
-  const band = _balanceKinds(_diversify(pool, 8), seeds, 8).slice(0, limit);
-  return _enrichWhy(band.map(c => ({ ...c, why: _tallyWhy(c) })), null);
 }
 
 // ── Подпись под карточкой ─────────────────────────────────────────────────────
@@ -6967,6 +6919,15 @@ async function doSearch() {
     if (showTitles.length) _maybeShowSearchCoach();
     if (!picksRun) return;
 
+    // Подборка стоит одно из десяти недельных нажатий. Найденное по названию уже на экране
+    // и остаётся, даже когда нажатия кончились.
+    const spent = await _spendPick('q:' + raw.toLowerCase().replace(/\s+/g, ' '));
+    if (gen !== _srchGen) return;
+    if (!spent.ok) {
+      const box = document.getElementById('srch-picks');
+      if (box) box.innerHTML = _srchSect(t('search_picks')) + _srchGot(c) + _picksOutHTML();
+      return;
+    }
     const list = await _searchByQuery(raw, 0, c);
     if (gen !== _srchGen) return;
     const read = list._read || null;
@@ -7056,6 +7017,7 @@ function _renderPicks(first) {
   let t2 = '';
   if (s.shown < s.buf.length || !s.done) t2 = `<button type="button" class="srch-more" id="srch-more">${escapeHtml(t('search_more'))}</button>`;
   else if (s.shown > _SRCH_STEP) t2 = `<div class="srch-end">${escapeHtml(t('search_end'))}</div>`;
+  if (first) t2 += _picksLeftHTML();
   // Короткая выдача без ослабления: предложить снять один кусок, и сказать какой.
   if (first && c && s.buf.length < _SRCH_STEP && !(c.relaxed || []).length) {
     const k = _srchDropCandidates(c, 1)[0];
@@ -7098,6 +7060,8 @@ async function _searchLike(id, type, title) {
   const box = document.getElementById('srch-picks');
   if (!box) return;
   const gen = _srchGen;
+  const spent = await _spendPick('like:' + type + id);
+  if (!spent.ok) { box.innerHTML = _srchSect(t('search_like').replace('{title}', title)) + _picksOutHTML(); return; }
   box.innerHTML = _srchSect(t('search_like').replace('{title}', title)) + loadingHTML(randQuote(), false);
   try {
     const r = await tmdbFetch(`/${type}/${encodeURIComponent(id)}/recommendations?language=${_tmdbLang()}`);
@@ -8488,12 +8452,72 @@ async function _discoverPicks(mode) {
   }));
 }
 
+// ── ПОДБОРКИ: 10 В НЕДЕЛЮ ────────────────────────────────────────────────────
+// Решено 11 октября, когда урезали бесплатную версию перед переносом в продакшен. Слияние
+// поиска и подборок сняло лимит совсем, а по правилу 17 сентября то, что вышло без предела,
+// без предела и остаётся. Десять - это то, что у людей уже есть (путь ИИ держал десять), не
+// меньше и не больше. Без лимита подборки - в платной версии.
+//
+// Что считается: первое нажатие по запросу, где движок что-то понял; «Похожее на...»; каждое
+// «Удиви меня». Поиск по названию и людям не считается никогда, «Ещё» и повтор того же запроса
+// в той же сессии - тоже.
+//
+// СЧИТАЕТ ВОРКЕР, А ПОКА ОН НЕ УМЕЕТ - ПРИЛОЖЕНИЕ. На 11 октября живой воркер отвечает на
+// /picks/spend 404: путь существует только в репозитории (docs/worker/worker_01.js), а воркер
+// общий с Tunemail и без согласования не переливается. На 404 счёт ведётся здесь, по неделе и
+// аккаунту. Его можно обойти, очистив хранилище, - это предел для честного человека, а не
+// защита; защита придёт с воркером. Неясный ответ сервера нажатие не блокирует никогда.
+const _PICKS_WEEK = 10;
+let _picksRemaining = null;
+const _picksSpent = new Set();
+function _picksWeekKey() {
+  const d = new Date(), back = (d.getUTCDay() + 6) % 7;            // неделя с понедельника, UTC
+  const mon = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - back));
+  return 'cm_picks_w:' + (currentUser?.id || 'anon') + ':' + mon.toISOString().slice(0, 10);
+}
+function _spendLocal() {
+  const k = _picksWeekKey();
+  let n = 0;
+  try {
+    n = Number(localStorage.getItem(k)) || 0;
+    for (const old of Object.keys(localStorage))                  // прошлые недели не копим
+      if (old.startsWith('cm_picks_w:') && old !== k) localStorage.removeItem(old);
+  } catch (e) {}
+  if (n >= _PICKS_WEEK) { _picksRemaining = 0; return { ok: false }; }
+  try { localStorage.setItem(k, String(n + 1)); } catch (e) {}
+  _picksRemaining = _PICKS_WEEK - n - 1;
+  return { ok: true };
+}
+// key - запрос, за который платим; тот же key в той же сессии второй раз не списывается.
+async function _spendPick(key) {
+  if (key && _picksSpent.has(key)) return { ok: true };
+  let out = { ok: true };
+  try {
+    const { data: { session } } = await sbClient.auth.getSession();
+    if (session) {
+      const res = await fetch(PROXY_URL.replace(/\/$/, "") + "/picks/spend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + session.access_token },
+      });
+      if (res.status === 429) { _picksRemaining = 0; out = { ok: false }; }
+      else if (res.ok) {
+        const data = await res.json().catch(() => ({}));
+        if (typeof data.remaining === "number") _picksRemaining = data.remaining;
+      } else out = _spendLocal();                                   // 404 сегодня, 401 и 5xx - тоже сами
+    } else out = _spendLocal();
+  } catch (e) { out = _spendLocal(); }                             // сети нет - считаем сами
+  if (out.ok && key) _picksSpent.add(key);
+  return out;
+}
+const _picksLeftHTML = () => _picksRemaining === null ? ''
+  : `<div class="srch-end">${escapeHtml(t('search_picks_left').replace('{n}', _picksRemaining))}</div>`;
+const _picksOutHTML = () => `<div class="srch-note">${escapeHtml(t('picks_exhausted'))}</div>`;
+
 async function surpriseMeEngine() {
-  // Выдача под кнопкой, на месте результатов поиска; «Для тебя» на это время прячется,
-  // чтобы два списка подборок не стояли друг над другом.
+  // Выдача под кнопкой, на месте результатов поиска.
   const el = document.getElementById("search-results");
   _srchGen++; _srch = null;
-  _searchHome(true, false);
+  _searchHome(true);
   const seen = watchHistory.filter(h => h.status === "watched" && _isMine(h)).length;
   if (seen < SURPRISE_MIN_WATCHED) {
     el.innerHTML = `<div class="empty-state">
@@ -8504,6 +8528,8 @@ async function surpriseMeEngine() {
     </div>`;
     return;
   }
+  const spent = await _spendPick(null);
+  if (!spent.ok) { el.innerHTML = `<div style="margin-top:16px">${_picksOutHTML()}</div>`; return; }
   el.innerHTML = loadingHTML(randQuote(), true, true);
   const slowTimer = startSlowLoadingIndicator();
   try {
@@ -8548,7 +8574,7 @@ async function surpriseMeEngine() {
     el.innerHTML = `
       <div class="srch-sect" style="margin-top:18px">${escapeHtml(modeLabel)}</div>
       <div class="card-list">${details.map(m=>movieCardHTML(m,m.why)).join("")}</div>
-      ${_pickQualityHint(watchedEntries.length)}`;
+      ${_pickQualityHint(watchedEntries.length)}${_picksLeftHTML()}`;
   } catch(e) {
     // A refusal from the proxy is not an absence of films, and saying "no picks found" when the
     // daily TMDB allowance ran out is the same mistake the import made on 7 Sep: it reported a
@@ -15308,7 +15334,7 @@ async function loadFeedbackReplies() {
 // без ключа и лимитов, но это проект одного человека, и замена - одна строка.
 const MAPS_LIB = 'https://unpkg.com/maplibre-gl@4.7.1/dist/';
 const MAPS_STYLE = 'https://tiles.openfreemap.org/styles/positron';
-let _mapsData = null, _mapsDataP = null, _mlP = null, _map = null, _mapsMine = false, _mapsSel = null;
+let _mapsData = null, _mapsDataP = null, _mlP = null, _map = null, _mapsSel = null;
 // Режим одного фильма (из кнопки «На карте» в карточке): на карте только его места, под картой их список.
 let _mapsFilm = null;
 
@@ -15345,14 +15371,11 @@ function _loadMapLibre() {
   return _mlP;
 }
 
-const _mapsKey = h => (h.mediaType === 'tv' ? 't' : 'm') + h.tmdbID;
-function _mapsMineSet() {
-  return new Set(watchHistory.filter(h => h.status === 'watched' && h.tmdbID && _isMine(h)).map(_mapsKey));
-}
-
-// Точки для текущего режима: все места или только места моих просмотренных фильмов.
+// Точки для текущего режима: все места или места одного фильма.
+// «Мои места» (места просмотренного) - платная функция, решено 11 окт; в бесплатной версии
+// её кода нет вовсе, а не выключен флаг: код страницы открыт, флаг включается из консоли.
 function _mapsFeatures() {
-  const d = _mapsData, mine = _mapsMine ? _mapsMineSet() : null, feats = [];
+  const d = _mapsData, feats = [];
   const isCity = c => d.cats[c] === 'city' || d.cats[c] === 'region';
   if (_mapsFilm && d.f[_mapsFilm]) {
     const v = d.f[_mapsFilm];
@@ -15365,7 +15388,7 @@ function _mapsFeatures() {
   }
   for (let i = 0; i < d.p.length; i++) {
     let ns = 0, nw = 0;
-    for (const [key, w] of d.at[i]) { if (mine && !mine.has(key)) continue; w ? nw++ : ns++; }
+    for (const [, w] of d.at[i]) w ? nw++ : ns++;
     if (!ns && !nw) continue;
     const [lon, lat, cat] = d.p[i];
     feats.push({ type: 'Feature', geometry: { type: 'Point', coordinates: [lon, lat] },
@@ -15476,20 +15499,13 @@ function _mapsIdle() {
     _mapsSheet(`<div class="maps-head"><div class="maps-place" style="cursor:pointer" onclick="openDetail('${escapeJsAttr(key.slice(1))}','${type}')">
         <div class="maps-place-n">${escapeHtml(v[3])}</div>
         <div class="maps-place-m">${v[4] ? escapeHtml(String(v[4])) : ''}</div></div>
-        <button class="maps-x" onclick="_mapsSetMine(false)" aria-label="${escapeHtml(t('maps_all'))}">${icon('x', 18)}</button></div>
+        <button class="maps-x" onclick="_mapsShowAll()" aria-label="${escapeHtml(t('maps_all'))}">${icon('x', 18)}</button></div>
       <div class="maps-note">${escapeHtml(t('maps_film_note'))}</div>
       ${v[0].map(i => row(i, 0)).join('')}${v[1].map(i => row(i, 1)).join('')}
       ${(also => also.length ? `<div class="maps-more">${escapeHtml(t('maps_also'))}: ${also.map(escapeHtml).join(', ')}</div>` : '')(_mapsAlso(v))}`);
     return;
   }
-  if (_mapsMine) {
-    const mine = _mapsMineSet(); let films = 0;
-    for (const k of mine) if (d.f[k] && (d.f[k][0].length || d.f[k][1].length)) films++;
-    if (!films) { _mapsSheet(`<div class="maps-hint">${escapeHtml(t('maps_mine_empty'))}</div>`); return; }
-    _mapsSheet(`<div class="maps-hint">${escapeHtml(t('maps_mine_stats').replace('{n}', films))}<br>${escapeHtml(t('maps_hint'))}</div>`);
-  } else {
-    _mapsSheet(`<div class="maps-hint">${escapeHtml(t('maps_stats').replace('{f}', Object.keys(d.f).length.toLocaleString()).replace('{p}', d.p.length.toLocaleString()))}<br>${escapeHtml(t('maps_hint'))}</div>`);
-  }
+  _mapsSheet(`<div class="maps-hint">${escapeHtml(t('maps_stats').replace('{f}', Object.keys(d.f).length.toLocaleString()).replace('{p}', d.p.length.toLocaleString()))}<br>${escapeHtml(t('maps_hint'))}</div>`);
 }
 
 function _mapsCatLabel(c) { return t('maps_cat_' + _mapsData.cats[c]) || _mapsData.cats[c]; }
@@ -15522,8 +15538,7 @@ function _mapsSelect(i) {
   _mapsSel = i;
   if (_map && _map.getLayer('pt-sel')) _map.setFilter('pt-sel', ['==', ['get', 'i'], i]);
   const [lon, lat, cat, name, iso] = d.p[i];
-  const mine = _mapsMine ? _mapsMineSet() : null;
-  const rows = d.at[i].filter(([k]) => !mine || mine.has(k))
+  const rows = d.at[i].slice()
     .sort((a, b) => a[1] - b[1] || (d.f[b[0]][5] - d.f[a[0]][5]));
   const shown = rows.slice(0, 40).map(([k, w]) => {
     const v = d.f[k], type = k[0] === 't' ? 'tv' : 'movie', id = k.slice(1);
@@ -15542,10 +15557,9 @@ function _mapsSelect(i) {
     ${shown}${more}`);
 }
 
-function _mapsSetMine(on) {
-  _mapsMine = !!on; _mapsFilm = null;
-  document.getElementById('maps-seg-all')?.classList.toggle('on', !_mapsMine);
-  document.getElementById('maps-seg-mine')?.classList.toggle('on', _mapsMine);
+// Из режима одного фильма - обратно ко всей карте.
+function _mapsShowAll() {
+  _mapsFilm = null;
   if (_map && _map.getSource('places')) _map.getSource('places').setData(_mapsFeatures());
   _mapsIdle();
 }
@@ -15557,10 +15571,8 @@ function _mapsFocusFilm(key) {
   const d = _mapsData, v = d.f[key]; if (!v) return;
   const pts = [...v[0], ...v[1]].map(i => d.p[i]);
   if (!pts.length) return;
-  // Ни «Все», ни «Мои»: третий режим, выход из него - любой из двух сегментов или крестик.
-  _mapsFilm = key; _mapsMine = false;
-  document.getElementById('maps-seg-all')?.classList.remove('on');
-  document.getElementById('maps-seg-mine')?.classList.remove('on');
+  // Режим одного фильма; выход - крестик в карточке под картой.
+  _mapsFilm = key;
   _map.getSource('places').setData(_mapsFeatures());
   if (pts.length === 1) _map.easeTo({ center: [pts[0][0], pts[0][1]], zoom: 9 });
   else {
