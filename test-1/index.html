@@ -4747,6 +4747,53 @@ Object.keys(_I18N_LISTS_HDR).forEach(l => { if (I18N[l]) I18N[l].lists_header = 
 // Imperative "mark as watched" - detail primary button + mini-eye tooltips (sentence case; button CSS uppercases)
 const _I18N_MARK_W = { en:"Mark as watched", ru:"Отметить просмотренным", uk:"Позначити переглянутим", ka:"მონიშნე ნანახად", es:"Marcar como vista", fr:"Marquer comme vu", de:"Als gesehen markieren", it:"Segna come visto" };
 Object.keys(_I18N_MARK_W).forEach(l => { if (I18N[l]) I18N[l].mark_watched = _I18N_MARK_W[l]; });
+// Строки исправлений по проверке кода 9 окт: у каждой области своё место ниже, чтобы правки
+// разных областей не задевали одни и те же строки при слиянии.
+// I18N-FIX-ANCHOR auth
+// ·
+// ·
+// ·
+// ·
+// I18N-FIX-ANCHOR library
+// ·
+// ·
+// ·
+// ·
+// I18N-FIX-ANCHOR backup
+// ·
+// ·
+// ·
+// ·
+// I18N-FIX-ANCHOR lists
+// ·
+// ·
+// ·
+// ·
+// I18N-FIX-ANCHOR social
+// ·
+// ·
+// ·
+// ·
+// I18N-FIX-ANCHOR ui
+// ·
+// ·
+// ·
+// ·
+// I18N-FIX-ANCHOR picksa
+// ·
+// ·
+// ·
+// ·
+// I18N-FIX-ANCHOR picksb
+// ·
+// ·
+// ·
+// ·
+// I18N-FIX-ANCHOR edge
+// ·
+// ·
+// ·
+// ·
 // Locale-aware plural for the "member(s)" word in member counts.
 function _membersWord(n) {
   const forms = ({
