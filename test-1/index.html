@@ -3015,7 +3015,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.67.0-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.68.0-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -4861,6 +4861,19 @@ Object.keys(_I18N_FIX_UI).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I1
 // ·
 // ·
 // I18N-FIX-ANCHOR picksa
+// Набранное ровно известное название («Die Hard», «Scary Movie») - поиск фильма; подборка по его
+// словам ждёт этой строкой под «Похожее на» (15 окт).
+const _I18N_FIX_PICKSA = {
+  en:{ search_as_words:"Picks for the words: {w}" },
+  ru:{ search_as_words:"Подборка по словам: {w}" },
+  uk:{ search_as_words:"Добірка за словами: {w}" },
+  ka:{ search_as_words:"რჩევები სიტყვებით: {w}" },
+  es:{ search_as_words:"Sugerencias por las palabras: {w}" },
+  fr:{ search_as_words:"Suggestions pour les mots : {w}" },
+  de:{ search_as_words:"Tipps zu den Wörtern: {w}" },
+  it:{ search_as_words:"Consigli per le parole: {w}" },
+};
+Object.keys(_I18N_FIX_PICKSA).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_FIX_PICKSA[l]); });
 // ·
 // ·
 // ·
@@ -7487,10 +7500,31 @@ async function doSearch() {
     // который знают, и в нём есть слово, которого словарь не читает («Games», «Дон», «Story»), -
     // это название, и подборки нет; «Похожее на» под ним остаётся. Запрос, понятый целиком
     // («хоррор», «черная комедия»), - подборка, даже если такой фильм или сериал существует.
-    const wholeTitle = strong.length > 0 && _titleKey(raw) === tk && !!(c && (c.restToks || []).length);
-    const picksRun = !wholeTitle && !!(c && c.matched && (c.movement || (c.curated ? !strong.length
+    // ПРОЧИТАНО ВСЁ, КРОМЕ СЛУЖЕБНОГО СЛОВА, - ТОЖЕ НАЗВАНИЕ. «Die Hard» и «Scary Movie» прошли
+    // правило выше: «die» и «movie» - стоп-слова, «hard» и «scary» - настроения, непрочитанного
+    // слова нет, и подборка тяжёлого кино запускалась вместо фильма (третий круг, 14 окт, остаток).
+    // Набранное ровно известное название, где хоть одно слово движок не взял в «Понято», - поиск
+    // фильма. Но «scary movie» бывает и просьбой о страшном кино, поэтому подборка не пропадает, а
+    // ждёт строкой под «Похожее на»: одно нажатие, и только если человек его сделал.
+    const fullTitle = strong.length > 0 && _titleKey(raw) === tk && !!c;
+    const unreadWord = fullTitle && (c.restToks || []).length > 0;
+    const gapWord = fullTitle && !unreadWord && (c.toks || []).some((tok, i) =>
+      /[\p{L}\p{N}]/u.test(tok) && !(c.chips || []).some(ch => ch.toks.includes(i)));
+    const wholeTitle = unreadWord || gapWord;
+    // Подборка по разбору: с найденным названием (titled) и как если бы его не было.
+    const _pickBy = titled => !!(c && c.matched && (c.movement || (c.curated ? !titled
       : (c.person || c.country || (c.genreIds || []).length || c.recent
-         || (!strong.length && (c.keyword || c.decade || c.year || c.quality || (c.notGenreIds || []).length))))));
+         || (!titled && (c.keyword || c.decade || c.year || c.quality || (c.notGenreIds || []).length))))));
+    const wouldPick = _pickBy(strong.length > 0), wouldPickBare = _pickBy(false);
+    // ПРОЧИТАНО ЦЕЛИКОМ, А НАЗВАНИЕ МАЛОИЗВЕСТНО - ЭТО ПОДБОРКА. «черная комедия» прочитана вся, но
+    // сериал «Черная комедия» (351 голос) делал её поиском названия: правило «полка и тема уступают
+    // названию» писалось для «Alien» и «The Dark Knight», а задело и жанр (живая проверка 15 окт).
+    // Уступают только названию, которое знают все: от тысячи голосов.
+    const fullyRead = fullTitle && !wholeTitle;
+    const famous = (strong[0] && strong[0].votes || 0) >= 1000;
+    const picksRun = !wholeTitle && (wouldPick || (fullyRead && !famous && wouldPickBare));
+    // Известное название, а разбор понял слова: фильм сверху, подборка по словам - строкой.
+    const offerPicks = !picksRun && fullTitle && !unreadWord && wouldPickBare && (c.chips || []).length > 0;
     if (c) c.chips = (c.chips || []).slice().sort((a, b) => a.toks[0] - b.toks[0]);
 
     // Точные совпадения названия - первыми, самое известное сверху: «fargo» это «Фарго» 1996
@@ -7519,34 +7553,15 @@ async function doSearch() {
     let html = (!picksRun && strong.length) ? titlesHTML : peopleHTML + cityHTML + titlesHTML;
     // Названия нашлись, а разбор отказал: подборки не будет, и это видно одной строкой.
     if (_parseErr) html += `<div class="srch-note" style="margin-top:12px">${escapeHtml(_picksErrLine(_parseErr))}</div>`;
-    if (like) html += `<div id="srch-picks"><button type="button" class="srch-line" data-like="${escapeHtml(String(like.id))}" data-type="${like.type === 'tv' ? 'tv' : 'movie'}" data-title="${escapeHtml(like.Title)}">${icon('sparkles', 18)}<span dir="auto">${escapeHtml(t('search_like').replace('{title}', () => like.Title))}</span><span class="srch-chev">›</span></button></div>`;
+    const offerHTML = offerPicks ? `<button type="button" class="srch-line" data-qpicks="1">${icon('search', 18)}<span dir="auto">${escapeHtml(t('search_as_words').replace('{w}', () => c.chips.map(ch => ch.label).join(', ')))}</span><span class="srch-chev">›</span></button>` : '';
+    if (like) html += `<div id="srch-picks"><button type="button" class="srch-line" data-like="${escapeHtml(String(like.id))}" data-type="${like.type === 'tv' ? 'tv' : 'movie'}" data-title="${escapeHtml(like.Title)}">${icon('sparkles', 18)}<span dir="auto">${escapeHtml(t('search_like').replace('{title}', () => like.Title))}</span><span class="srch-chev">›</span></button>${offerHTML}</div>`;
     if (!picksRun && strong.length) html += peopleHTML + cityHTML;
     if (picksRun) html += `<div id="srch-picks">${_srchSect(t('search_picks'))}${_srchGot(c)}${loadingHTML(randQuote(), false)}</div>`;
     el.innerHTML = html;
     if (showTitles.length) _maybeShowSearchCoach();
+    _srchOffer = offerPicks ? { raw, c, showTitles, gen } : null;
     if (!picksRun) return;
-
-    // Подборка стоит одно из десяти недельных нажатий. Найденное по названию уже на экране
-    // и остаётся, даже когда нажатия кончились.
-    const spent = await _spendPick('q:' + _picksKey(c, raw));
-    if (gen !== _srchGen) return;
-    if (!spent.ok) {
-      const box = document.getElementById('srch-picks');
-      if (box) box.innerHTML = _srchSect(t('search_picks')) + _srchGot(c) + _picksOutHTML();
-      return;
-    }
-    const list = await _searchByQuery(raw, 0, c);
-    if (gen !== _srchGen) return;
-    const read = list._read || null;
-    list.slice(0, 7).forEach(m => { m._enr = true; });
-    list.forEach(m => { m._relaxed = m._strict ? [] : (c.relaxed || []).slice(); });
-    // По номеру И типу (_libKey): фильм 100 не прячется из-за сериала 100 в библиотеке или
-    // среди найденного по названию выше (проверка кода 9 окт, #78, остаток в подборках).
-    const lib = _libraryKeys(), shownIds = new Set(showTitles.map(x => _libKey(x.id, x.type)));
-    const usable = list.filter(m => !lib.ids.has(_libKey(m.tmdbID || m.id, m.type)) && !lib.titles.has(lib.norm(m.Title)) && !shownIds.has(_libKey(m.id, m.type)));
-    _srch = { q: raw, c, buf: usable, shown: 0, press: 0, read, kind: 'q', gen,
-              seen: new Set([...usable.map(m => _libKey(m.id, m.type)), ...shownIds]), done: _searchWrapped };
-    _renderPicks(true);
+    await _runQueryPicks(raw, c, showTitles, gen);
   } catch (e) {
     if (gen !== _srchGen) return;
     // Отказ сервера - не отсутствие фильма. Код ошибки - в консоль, человеку - фраза, по
@@ -7556,6 +7571,46 @@ async function doSearch() {
     const box = document.getElementById('srch-picks') || el;
     box.innerHTML = _picksErrHTML(e);
   } finally { clearTimeout(slowTimer); }
+}
+
+// Подборка по понятому запросу - в #srch-picks. Из doSearch сразу, а для набранного названия
+// («Die Hard», «Scary Movie») - по нажатию строки «Подборка по словам» (_srchOffer).
+let _srchOffer = null;
+async function _runQueryPicks(raw, c, showTitles, gen) {
+  // Подборка стоит одно из десяти недельных нажатий. Найденное по названию уже на экране
+  // и остаётся, даже когда нажатия кончились.
+  const spent = await _spendPick('q:' + _picksKey(c, raw));
+  if (gen !== _srchGen) return;
+  if (!spent.ok) {
+    const box = document.getElementById('srch-picks');
+    if (box) box.innerHTML = _srchSect(t('search_picks')) + _srchGot(c) + _picksOutHTML();
+    return;
+  }
+  const list = await _searchByQuery(raw, 0, c);
+  if (gen !== _srchGen) return;
+  const read = list._read || null;
+  list.slice(0, 7).forEach(m => { m._enr = true; });
+  list.forEach(m => { m._relaxed = m._strict ? [] : (c.relaxed || []).slice(); });
+  // По номеру И типу (_libKey): фильм 100 не прячется из-за сериала 100 в библиотеке или
+  // среди найденного по названию выше (проверка кода 9 окт, #78, остаток в подборках).
+  const lib = _libraryKeys(), shownIds = new Set(showTitles.map(x => _libKey(x.id, x.type)));
+  const usable = list.filter(m => !lib.ids.has(_libKey(m.tmdbID || m.id, m.type)) && !lib.titles.has(lib.norm(m.Title)) && !shownIds.has(_libKey(m.id, m.type)));
+  _srch = { q: raw, c, buf: usable, shown: 0, press: 0, read, kind: 'q', gen,
+            seen: new Set([...usable.map(m => _libKey(m.id, m.type)), ...shownIds]), done: _searchWrapped };
+  _renderPicks(true);
+}
+async function _searchOfferPicks() {
+  const o = _srchOffer, box = document.getElementById('srch-picks');
+  if (!o || !box || o.gen !== _srchGen) return;
+  _srchOffer = null;
+  box.innerHTML = _srchSect(t('search_picks')) + _srchGot(o.c) + loadingHTML(randQuote(), false);
+  try { await _runQueryPicks(o.raw, o.c, o.showTitles, o.gen); }
+  catch (e) {
+    if (o.gen !== _srchGen) return;
+    console.warn('[search] offered picks failed:', e.tmdbRefused || e.tmdb || e);
+    const b = document.getElementById('srch-picks');
+    if (b) b.innerHTML = _picksErrHTML(e);
+  }
 }
 
 // ── Город в поиске: «Места съёмок: Лиссабон» ─────────────────────────────────
@@ -7783,6 +7838,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (b.classList.contains('srch-chip') && b.dataset.q != null) { inp.value = b.dataset.q; doSearch(); }
     else if (b.dataset.drop != null) _searchDrop(Number(b.dataset.drop));
     else if (b.dataset.like) _searchLike(b.dataset.like, b.dataset.type, b.dataset.title);
+    else if (b.dataset.qpicks) _searchOfferPicks();
     else if (b.id === 'srch-more') _searchMore();
     else if (b.dataset.city != null) _mapsOpenPlace(Number(b.dataset.city));
   });
@@ -9916,6 +9972,10 @@ const _SUBJECTS = [
   { k:"supernatural", pref:"27", terms:"supernatural paranormal мистик мистическ містик містичн паранормал ubernaturlich soprannaturale surnaturel sobrenatural ზებუნებრივ" },
   { k:"surreal", terms:"weird strange bizarre absurd absurdist странный странное странная странные странного странном абсурд чудн дивне дивний дивна bizarr strano assurdo bizarre absurde extrano absurdo უცნაურ" },
 ];
+// АТМОСФЕРА - раздел «АТМОСФЕРА, А НЕ ПРЕДМЕТ» выше, от kinetic до disturbing. Тега у TMDB для неё
+// нет (или он случайный), отвечает только полка. Нужен, когда слов атмосферы два и больше:
+// «мрачное эпичное кино» (см. _constraintsFor). Добавил строку в тот раздел - добавь ключ сюда.
+const _ATMOS = new Set(['kinetic', 'slow burn', 'whimsical', 'neon noir', 'claustrophobic', 'folk horror', 'mind bending', 'bittersweet', 'epic', 'dreamlike', 'beautiful', 'haunting', 'moving', 'austere', 'playful', 'restrained', 'delicate', 'eerie', 'erotic', 'experimental', 'exquisite', 'intimate', 'powerful', 'sensual', 'poetic', 'chilling', 'dark', 'disturbing']);
 // MOVEMENTS, SCHOOLS AND ERAS. Each is a country, a stretch of years, and sometimes a handful
 // of people - which is to say each is an exact query, not an approximation. "Французская новая
 // волна" is not a mood and not a keyword: it is France, 1958 to 1968. TMDB can answer that
@@ -10722,7 +10782,7 @@ function _toLatin(str) {
 //
 // Порядок обращения в _aliasFor: сначала карта (она выведена из данных), потом моя таблица
 // на семьдесят позиций (заплатка для того, чего в карте нет), потом транслитерация (догадка).
-const NAME_MAP_VER = '6d07a57b0c';
+const NAME_MAP_VER = '0e8d9afe9c';
 let _nameMap = null, _nameMapTried = false;
 const _NAME_MAP_KEY = 'cm_namemap_v1';
 async function _loadNameMap() {
@@ -10778,13 +10838,16 @@ const _NAME_ALIASES = {
   // режиссёр, которого зовут одной фамилией, иначе не находится вовсе (проверка кода 9 окт, #90).
   ozu:'yasujiro ozu',
 };
+// Только свои ключи таблицы: _NAME_ALIASES['constructor'] - функция прототипа, и «constructor»
+// уходил к TMDB строкой «function Object() { [native code] }».
+const _alias = k => Object.prototype.hasOwnProperty.call(_NAME_ALIASES, k) ? _NAME_ALIASES[k] : '';
 function _aliasFor(q) {
   const flat = String(q || '').toLowerCase().replace(/[^\p{L}]/gu, '');
-  if (_NAME_ALIASES[flat]) return _NAME_ALIASES[flat];
+  if (_alias(flat)) return _alias(flat);
   // Одно слово из двух тоже бывает именем: "фильмы Тарковского", "музыка Зиммера".
   for (const w of String(q || '').toLowerCase().split(/\s+/)) {
     const k = w.replace(/[^\p{L}]/gu, '');
-    if (k.length > 3 && _NAME_ALIASES[k]) return _NAME_ALIASES[k];
+    if (k.length > 3 && _alias(k)) return _alias(k);
   }
   return '';
 }
@@ -10827,13 +10890,29 @@ function _caseForms(k, minStem) {
   return out;
 }
 
+// ОБЫЧНОЕ СЛОВО В КАРТЕ - НОЛЬ. Среди ста двадцати тысяч подписей Wikidata есть Королёва,
+// Ковбой, Отец, Луна, и запрос «королева» одним словом уходил в фильмографию чужого человека
+// (проверка кода 9 окт, остаток после третьего круга). docs/mark-common-words.py ставит таким
+// ключам 0 - «известно, что это не имя», по словарю русской и украинской проверки орфографии.
+// Поэтому ключ читается через _nm, а не _nameMap[k]: ноль - это ответ, и на нём перебор
+// падежных форм останавливается («королевы» не доходит до «королев» - Сергея Королёва).
+// hasOwnProperty, а не просто индекс: _nameMap['constructor'] - функция прототипа, и запрос
+// «constructor» становился человеком с номером-функцией.
+function _nm(k) { return Object.prototype.hasOwnProperty.call(_nameMap, k) ? _nameMap[k] : undefined; }
+const _nmKey = x => String(x || '').toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/[^\p{L}\p{N}]/gu, '');
+// Одно слово, про которое карта знает, что оно не имя. Такое не идёт к TMDB и догадкой
+// транслитерацией: «koroleva» нашла бы однофамилицу.
+function _commonWord(q) {
+  if (!_nameMap || /\s/.test(String(q || '').trim())) return false;
+  for (const f of _caseForms(_nmKey(q), 6)) { const v = _nm(f); if (v !== undefined) return v === 0; }
+  return false;
+}
 function _idFromNameMap(q, wholeOnly) {
   if (!_nameMap) return 0;
-  const norm = x => String(x || '').toLowerCase().normalize('NFD')
-    .replace(/\p{M}/gu, '').replace(/[^\p{L}\p{N}]/gu, '');
-  const hit = k => { for (const f of _caseForms(k, 6)) if (_nameMap[f]) return _nameMap[f]; return 0; };
+  const norm = _nmKey;
+  const hit = k => { for (const f of _caseForms(k, 6)) { const v = _nm(f); if (v !== undefined) return v; } return 0; };
   const whole = norm(q);
-  if (_nameMap[whole]) return _nameMap[whole];
+  if (_nm(whole) !== undefined) return _nm(whole);
   const words = String(q || '').split(/\s+/).filter(Boolean);
   // Имя из трёх слов в падеже: "фильмы вонг кар вая" - это вонгкарваи (проверка кода 9 окт, #90).
   // Падеж стоит на последнем слове, и от него остаётся хотя бы две буквы: окончание, съевшее
@@ -10846,7 +10925,7 @@ function _idFromNameMap(q, wholeOnly) {
     const ws = words.map(norm);
     for (let i = ws.length - 1; i >= 0; i--) {
       const head = ws.slice(0, i).join(''), tail = ws.slice(i + 1).join('');
-      for (const f of _caseForms(ws[i], 2)) if (_nameMap[head + f + tail]) return _nameMap[head + f + tail];
+      for (const f of _caseForms(ws[i], 2)) if (_nm(head + f + tail)) return _nm(head + f + tail);
     }
   }
   // wholeOnly - только всё целиком как одно имя, без пар и одиночных слов ниже. Так _personId
@@ -10858,7 +10937,7 @@ function _idFromNameMap(q, wholeOnly) {
   for (let i = 0; i + 1 < words.length; i++) {
     const a = norm(words[i]), b = norm(words[i + 1]);
     for (const fa of _caseForms(a, 3)) for (const fb of _caseForms(b, 4)) {
-      const v = _nameMap[fa + fb]; if (v) return v;
+      const v = _nm(fa + fb); if (v) return v;
     }
   }
   // Фамилия отдельным словом: "фильмы Тарковского", "музыка Циммера".
@@ -10868,7 +10947,7 @@ function _idFromNameMap(q, wholeOnly) {
   // точный ключ: "толстая" найдёт Толстую, а "светлая" не найдёт никого.
   for (const w of words) {
     const k = norm(w);
-    if (k.length > 3) { const v = /(ая|яя|ое|ее|ые|ие)$/.test(k) ? _nameMap[k] : hit(k); if (v) return v; }
+    if (k.length > 3) { const v = /(ая|яя|ое|ее|ые|ие)$/.test(k) ? _nm(k) : hit(k); if (v) return v; }
   }
   return 0;
 }
@@ -10918,7 +10997,7 @@ async function _personId(subject, subjectAll) {
     // обычные окна никогда не спрашивали. Карта здесь отвечает только на всё целиком и только
     // от двух слов; одно короткое слово - лишь точным алиасом ("ozu").
     const known = (all.length >= 2 && _idFromNameMap(whole, true))
-      || _NAME_ALIASES[whole.toLowerCase().replace(/[^\p{L}]/gu, '')];
+      || _alias(whole.toLowerCase().replace(/[^\p{L}]/gu, ''));
     if (known) {
       seen.add(whole); tries++;
       const hit = await _personLookup(whole);
@@ -11002,12 +11081,15 @@ async function _personLookup(q) {
     } catch (e) { /* карта могла устареть - падаем в обычный поиск */ }
   }
   // Алиас идёт перед догадкой: он точный, а транслитерация - приблизительная.
-  const tries = [[q, 1]];
+  // Обычное слово («королева», «отец») не спрашивается у TMDB вовсе: ни как набрано, ни
+  // догадкой. Алиас из таблицы руками остаётся - он знание, а не догадка.
+  const common = _commonWord(q);
+  const tries = common ? [] : [[q, 1]];
   const alias = _aliasFor(q);
   // Латинский алиас ("ozu" -> "yasujiro ozu") точнее набранного: голое "ozu" у TMDB - любой Ozu.
   if (alias && /^[a-z ]+$/.test(String(q).toLowerCase())) tries.unshift([alias, 1]);
   else if (alias) tries.push([alias, 1]);
-  const lat = _toLatin(q);
+  const lat = common ? '' : _toLatin(q);
   if (lat && lat !== q.toLowerCase()) tries.push([lat, 5]);
   // Ц по-русски это ts, а в фамилиях, пришедших из немецкого, это z: Циммер - Zimmer,
   // Цвейг - Zweig. Одна таблица обе передать не может, поэтому второй вариант идёт
@@ -11312,8 +11394,9 @@ function _rankByTaste(cands, taste, fallbackWhy) {
 // Only the films that will actually be shown are fetched - seven, in parallel, so it costs one
 // round trip rather than one per film. Ranking happens on id and year alone, which is why the
 // table stores the year: it is the one fact about a film that reads the same in every language.
-async function _curatedSubject(key, taste, wantGenres, years, notGenres) {
-  let rows = _SUBJECT_FILMS[key];
+async function _curatedSubject(key, taste, wantGenres, years, notGenres, rowsIn) {
+  // rowsIn - готовые строки вместо полки по ключу: пересечение и чередование нескольких полок.
+  let rows = rowsIn || _SUBJECT_FILMS[key];
   if (!rows) return null;                       // no list for this subject: caller falls back
   // Названные годы - фильтр по полке, а не повод её выбросить: год у каждой строки уже есть.
   // Если в нужные годы на полке меньше трёх фильмов, отвечает не она, а поиск по теме.
@@ -11464,7 +11547,8 @@ function _planQuery(c) {
     p.set('sort_by', 'primary_release_date.desc');
   }
   if (c.country && !c.movement) p.set('with_origin_country', c.country);
-  if (c.keywords && c.keywords.length) p.set('with_keywords', c.keywords.slice(0, 4).join('|'));
+  // Несколько предметов - все сразу (запятая у TMDB - «и»); один - любой из его тегов.
+  if (c.keywords && c.keywords.length) p.set('with_keywords', c.kwAll ? c.kwAll.join(',') : c.keywords.slice(0, 4).join('|'));
   const tg = (c.tags || { pos: [], neg: [] });
   // ЧЕМ СЛАБЕЕ ЗАПРОС, ТЕМ ГРОМЧЕ ПРОФИЛЬ. На "корейский триллер 90-х" человек
   // сказал достаточно и наши темы только помешали бы. На голом "анимация" мы иначе
@@ -11613,6 +11697,32 @@ async function _constraintsFor(q) {
     // отвечает поиск по темам, который берёт оба.
     const _wordsOf = r => (rowWords && rowWords.get(r)) || new Set();
     const _alone = sj => subjects.every(o => o === sj || [..._wordsOf(o)].every(w => _wordsOf(sj).has(w)));
+    // Предметы из разных слов: синоним из того же слова («playful» - whimsical и playful) - не второй.
+    const _distinct = subjects.filter((sj, i) => !subjects.slice(0, i).some(o => [..._wordsOf(sj)].every(w => _wordsOf(o).has(w))));
+    // ДВА СЛОВА АТМОСФЕРЫ - ДВЕ ПОЛКИ, А НЕ ТЕГИ. «мрачное эпичное кино» проходило мимо полок: у каждой
+    // свой предмет из своего слова, _alone не пускал ни одну, и ответ шёл из тегов TMDB «epic» и
+    // «dark» - редких и случайных: «Побег из Шоушенка», «Жизнь прекрасна», «Меня зовут Кхан»
+    // (живая проверка 15 окт). Атмосферу фильтром не найти (_ATMOS), поэтому, когда все предметы -
+    // атмосфера с полками, отвечают полки: сначала фильмы, что стоят на всех сразу, потом остальные
+    // с каждой полки по очереди - под строкой «всё сразу не нашлось» (c.curatedOr).
+    if (!_pinned && _distinct.length >= 2 && _distinct.every(sj => _ATMOS.has(sj.k) && _SUBJECT_FILMS[sj.k])) {
+      const shelves = _distinct.map(sj => _SUBJECT_FILMS[sj.k]);
+      const onAll = shelves[0].filter(([id]) => shelves.every(sh => sh.some(r => r[0] === id)));
+      const both = new Set(onAll.map(r => r[0])), rest = [];
+      for (let i = 0; i < Math.max(...shelves.map(sh => sh.length)); i++)
+        for (const sh of shelves) if (sh[i] && !both.has(sh[i][0]) && !rest.some(r => r[0] === sh[i][0])) rest.push(sh[i]);
+      const taste = await _tasteIndex();
+      const strict = onAll.length ? ((await _curatedSubject(null, taste, c.genreIds, _years, c.notGenreIds, onAll)) || []) : [];
+      const near = strict.length >= 3 ? [] : ((await _curatedSubject(null, taste, c.genreIds, _years, c.notGenreIds, rest)) || []);
+      const all = [...strict.map(x => ({ ...x, _strict: near.length > 0 })), ...near];
+      if (all.length >= 3) {
+        c.curated = all.map(x => ({ ...x, why: x.why || null }));
+        c.curatedOr = near.length > 0;
+        c.matched = true;
+        c.subjectLeft = subject || '';
+        return c;
+      }
+    }
     for (const sj of (_pinned ? [] : subjects)) {
       if (!_alone(sj)) continue;
       const curated = await _curatedSubject(sj.k, await _tasteIndex(), c.genreIds, _years, c.notGenreIds);
@@ -11631,11 +11741,28 @@ async function _constraintsFor(q) {
         return c;
       }
     }
-    const terms = subjects.length ? subjects.map(x => x.k) : [subject];
-    const found = [];
-    for (const term of terms.slice(0, 2)) found.push(...await _keywordIds(term, subjects.length > 0));
+    // ПРЕДМЕТЫ ИЗ РАЗНЫХ СЛОВ - ЭТО «И», А НЕ «ИЛИ». «вампиры в космосе» склеивало теги вампиров
+    // и космоса через «|», и выдача была про космос: у космоса их больше (проверка кода 9 окт,
+    // остаток). Теперь у каждого предмета своя группа тегов; план просит фильмы со всеми сразу -
+    // первый тег каждой группы через запятую (c.kwAll), - а цикл ослабления в _searchByQuery
+    // ('&kwOr') отступает к любому из них и говорит об этом. Предмет, прочитанный из того же
+    // слова, что и другой («playful» - whimsical и playful), - синоним, а не второе условие.
+    // Третий предмет больше не теряется молча: спрашиваются до трёх, а в «или» теги идут
+    // по очереди из каждой группы, чтобы больший предмет не вытеснял меньший.
+    // Атмосфера тегом не ищется, когда рядом есть предмет: её теги у TMDB случайны (_ATMOS), и
+    // «мрачное про космос» тянуло «Жизнь прекрасна» и «Снежное братство» по тегу «dark» (живая
+    // проверка 15 окт). Настроение того же слова («мрачн» - heavy) остаётся жанрами.
+    const _topics = subjects.filter(sj => !_ATMOS.has(sj.k));
+    const _use = _topics.length ? _topics : subjects;
+    const terms = _use.length ? _use.map(x => x.k) : [subject];
+    const groups = await Promise.all(terms.slice(0, 3).map(term => _keywordIds(term, subjects.length > 0)));
+    const _alt = gs => { const out = []; for (let i = 0; i < Math.max(0, ...gs.map(g => g.length)); i++) for (const g of gs) if (i < g.length && !out.includes(g[i])) out.push(g[i]); return out; };
+    const found = _alt(groups);
     if (found.length) {
       c.keywords = found;
+      const sep = _use.length ? groups.filter((g, i) => g.length && _distinct.includes(_use[i])) : [];
+      c.kwAll = sep.length >= 2 ? sep.map(g => g[0]) : null;
+      c.kwGroups = sep.length >= 2 ? sep : null;
       if (subjects.length) c.why = t('why_for_query').replace('{q}', subjects.map(x => x.k).join(', '));
       c.matched = true;
       // Тема из НЕпонятого остатка, найденная в индексе TMDB, - тоже понятое, и снимается так же.
@@ -11947,6 +12074,9 @@ async function _searchByQuery(q, press = 0, pre = null) {
   // #107/#108). Здесь лежит сам ответ отказа, чтобы назвать лимит лимитом.
   c.refused = null;
   if (c.curated) {                                  // кураторский список ответил сам
+    // Несколько полок, и на всех сразу нашлось мало: остальное идёт под строкой, что всё сразу не
+    // нашлось (_renderPicks, _srchRelaxNote), как после ослабления в discover.
+    if (c.curatedOr) c.relaxed = ['subjectOr'];
     const lib0 = _libraryKeys();
     const unseen = c.curated.filter(m => !lib0.ids.has(String(m.id))
                                       && !lib0.titles.has(lib0.norm(m.Title)));
@@ -12052,7 +12182,7 @@ async function _searchByQuery(q, press = 0, pre = null) {
   // трёх, цикл снимал тему - и два точных ответа исчезали под общими драмами. Теперь они
   // идут первыми, а ослабленное - после строки, которая говорит, что снято.
   const _strictRes = res;
-  for (const drop of ['&votes', 'without_keywords', 'with_keywords', '&genres', 'with_genres']) {
+  for (const drop of ['&votes', 'without_keywords', '&kwOr', 'with_keywords', '&genres', 'with_genres']) {
     if (_deep || _fresh(res) >= 3) break;
     // Шаг собирается на копии и принимается, только когда TMDB ответил. Здесь стоял break
     // по ошибке уже ПОСЛЕ того, как res стал объектом ошибки: выдача строилась из пустого
@@ -12064,6 +12194,34 @@ async function _searchByQuery(q, press = 0, pre = null) {
       const v = Number(np.get('vote_count.gte') || 0);
       if (v <= 150) continue;
       np.set('vote_count.gte', String(Math.max(150, Math.floor(v / 3))));
+    } else if (drop === '&kwOr') {
+      // «Вампиры в космосе» все сразу почти не встречаются. Шаг меньше, чем снять предметы:
+      // любой из них. То, что подошло целиком, остаётся первым (_strictRes), а строка над
+      // остальным говорит, что всё сразу не нашлось.
+      // ПО ОБРАЩЕНИЮ НА ПРЕДМЕТ, А НЕ ОДНО «ИЛИ». В одном «или» по оценке больший предмет
+      // вытеснял меньший: на «вампиры в космосе» из девяти фильмов вампиров не было ни одного
+      // (живая проверка 15 окт). Каждый фильм помечен своим предметом (_grp), и после ранжирования
+      // предметы идут по очереди.
+      const k = np.get('with_keywords');
+      if (!k || !k.includes(',') || !(c.kwGroups || []).length) continue;
+      np.set('with_keywords', (c.keywords || []).slice(0, 4).join('|'));
+      const per = await Promise.all(c.kwGroups.map(g => {
+        const gp = new URLSearchParams(np.toString());
+        gp.set('with_keywords', g.slice(0, 3).join('|'));
+        return tmdbFetch(`/discover/movie?${gp.toString()}`);
+      }));
+      const bad = per.find(x => x && x.error);
+      if (bad) {
+        if (_fresh(res) > 0) { c.refused = bad; break; }
+        const e = new Error(bad.error); e.tmdb = bad; throw e;
+      }
+      const merged = [], ids = new Set();
+      for (let i = 0; i < 20; i++) per.forEach((x, gi) => {
+        const m = ((x && x.results) || [])[i];
+        if (m && !ids.has(m.id)) { ids.add(m.id); merged.push({ ...m, _grp: gi }); }
+      });
+      res = { results: merged }; p = np;
+      continue;
     } else if (drop === '&genres') {
       // "анимация, триллер" - два названных жанра, значит пересечение. Пересечение
       // часто почти пусто, и раньше следующим шагом жанр выбрасывался ЦЕЛИКОМ: так
@@ -12089,6 +12247,7 @@ async function _searchByQuery(q, press = 0, pre = null) {
   // них молчим. Тема и жанр - его слова, и выдача без них обязана это сказать, а подпись под
   // карточкой - не обещать снятого: "маяк" под фильмом без маяка был бы неправдой.
   if (_asAsked.has('with_keywords') && !p.has('with_keywords')) c.relaxed.push('subject');
+  else if (p.has('with_keywords') && p.get('with_keywords') !== _asAsked.get('with_keywords')) c.relaxed.push('subjectOr');
   if (_asAsked.has('with_genres') && !p.has('with_genres')) c.relaxed.push('genre');
   else if (p.has('with_genres') && p.get('with_genres') !== _asAsked.get('with_genres')) c.relaxed.push('genreOr');
   // Последнее слово за человеком: если после всего пусто, отдаём просто его фильмы.
@@ -12112,6 +12271,7 @@ async function _searchByQuery(q, press = 0, pre = null) {
       Poster: x.poster_path ? TMDB_IMG + x.poster_path : '',
       Rating: _ratingOf(x), Genre: '', why: c.why,
       gids: (x.genre_ids || []).map(String),
+      _grp: x._grp,
     });
   const _isFresh = x => !_lib.ids.has(String(x.id)) && !_lib.titles.has(_lib.norm(x.title || x.name));
   const _cands = ((res && res.results) || []).filter(_isFresh).map(_toCand);
@@ -12205,6 +12365,13 @@ async function _searchByQuery(q, press = 0, pre = null) {
   if (c.relaxed.includes('subject') && (c.subjPref || []).length) {
     const rank = m => { const g = m.gids || []; const i = c.subjPref.findIndex(x => g.includes(x)); return i < 0 ? 99 : i; };
     ranked = ranked.map((m, i) => [m, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).map(x => x[0]);
+  }
+  // Предметы по очереди (см. '&kwOr'): внутри каждого - порядок вкуса и оценки.
+  if (c.relaxed.includes('subjectOr') && (c.kwGroups || []).length) {
+    const lanes = c.kwGroups.map((_, gi) => ranked.filter(m => m._grp === gi));
+    const rest = ranked.filter(m => m._grp == null), out = [];
+    for (let i = 0; lanes.some(l => i < l.length); i++) lanes.forEach(l => { if (l[i]) out.push(l[i]); });
+    ranked = [...out, ...rest];
   }
   if (_strict.length) {
     const ids = new Set(_strict.map(m => String(m.id)));
