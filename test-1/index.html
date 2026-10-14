@@ -10243,6 +10243,7 @@ const _QSTOP = ('про про about with films film movie movies кино фи�
   'voglio vedere consiglia miglior მინდა ნახვა საუკეთესო').split(' ').filter(Boolean);
 
 function _splitQuery(q) {
+  const _decSfx = new Set();   // хвосты десятилетия, набранные отдельным словом («60 х»): кусок «Понято» у них общий с числом
   // Ударения в латинице снимаются при сравнении: человек пишет "sueño" и "rêve", таблица -
   // "sueno" и "reve". Только у латинских букв: NFD раскладывает и кириллическое "й" на "и"
   // с бревисом, и снимать бревис значило бы ломать русский.
@@ -10506,7 +10507,7 @@ function _splitQuery(q) {
     // "Андрей Тарковский" стирал и "70-х" (проверка кода 9 окт, #90, второй круг). Хвосты те же,
     // что понимает _decadeFrom, и только сразу за числом.
     if (decade) words.forEach((w, k) => {
-      if (k && /^(s|х|е|ых|ые|ies|ern|er)$/.test(w) && /^(19|20)?\d0$/.test(words[k - 1])) matchedWords.add(w);
+      if (k && /^(s|х|е|ых|ые|ies|ern|er)$/.test(w) && /^(19|20)?\d0$/.test(words[k - 1])) { matchedWords.add(w); _decSfx.add(w); }
     });
   }
   // Свежесть. Слово съедается в любом случае - иначе "новый" уедет в поиск по
@@ -10566,7 +10567,11 @@ function _splitQuery(q) {
     toks.push({ s: m[0], w: _qNorm(left).split(' ').filter(Boolean).map(_fold) });
   }
   const _mset = new Set([...matchedWords].map(_fold));
-  const _restSet = new Set(restAll.split(' ').filter(Boolean).map(_fold));
+  // Остаток для крестиков - слова длиннее двух букв и слоги собранного имени. Весь restAll сюда не
+  // идёт: одиночные «2», «ад», «в» уходили в кусок человека, и крестик на «Балабанов» стирал и
+  // «2» из «брат 2» (повторная проверка #90). Короткий слог остаётся, только если он часть имени.
+  const _restSet = new Set([...rest.split(' '), ...subjectAll.split(' ').filter(w => w.length >= 2 && !/^\d+$/.test(w))]
+    .filter(Boolean).map(_fold));   // число и одна буква слогом имени не бывают: «брат 2», «нолан в imax»
   const _label = ix => ix.map(i => toks[i].s).join(' ').replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '');
   const _mv = toks.map((tk, i) => (!tk.w.length && /[\p{L}\p{N}]/u.test(tk.s)) ? i : -1).filter(i => i >= 0);
   if (movements.length && _mv.length) chips.push({ label: _label(_mv), toks: _mv, kind: 'movement' });
@@ -10574,6 +10579,9 @@ function _splitQuery(q) {
   toks.forEach((tk, i) => {
     const got = tk.w.filter(w => _mset.has(w));
     if (!got.length) { prevPhrase = null; return; }
+    // «60 х» - один кусок, а не «60» и «х» (повторная проверка #90).
+    const last = chips[chips.length - 1];
+    if (got.every(w => _decSfx.has(w)) && last && last.toks.includes(i - 1)) { last.toks.push(i); last.label = _label(last.toks); prevPhrase = null; return; }
     const kind = _kindOf.get(got[0]) || 'time';
     const phrase = got.some(w => _phraseWords.has(w));
     if (phrase && prevPhrase && prevPhrase.kind === kind) { prevPhrase.toks.push(i); prevPhrase.label = _label(prevPhrase.toks); return; }
@@ -15618,18 +15626,21 @@ async function applyBackupData(rows, onProgress, opts = {}) {
     [(it, x) => !it.places && x.status === it.st],                                       //   любая с тем же статусом
     [(it, x) => !it.places],                                                             //   любая строка фильма
   ];
-  const claimed = new Set();
+  const claimed = new Set(), claimedKnown = new Set();
   for (const [tier, moves] of tiers) for (const it of items) {
     if (it.match) continue;
     const x = it.film.find(y => !claimed.has(y.id) && tier(it, y));
     if (!x) continue;
-    it.match = x; claimed.add(x.id);
+    it.match = x; claimed.add(x.id); if (it.places) claimedKnown.add(x.id);
     // Мнение переехало: возвращаем его на место из копии - «списки и фильмы вернутся», как
     // обещает лист Read me. Не переносим, если место назначения неизвестно (неоднозначное имя
     // без своего списка) или фильм уже лежит там другой моей строкой: двух строк одного фильма
     // в одном списке импорт не создаёт.
-    if (moves && it.r.list_id !== undefined && !it.film.some(y => y !== x && at(it, y))) {
-      it.move = it.r.list_id || null; movedTo.set(x.id, _place(it.r.list_id));
+    // Переносим только свободную строку В список из копии, никогда - ИЗ списка: фильм, который
+    // после копии отметили в общем списке друга, иначе исчезал оттуда у всех участников
+    // (повторная проверка #39). toggleFilmInList делает ровно этот перенос, обратный - нет.
+    if (moves && it.r.list_id && !x.list_id && !it.film.some(y => y !== x && at(it, y))) {
+      it.move = it.r.list_id; movedTo.set(x.id, _place(it.r.list_id));
     }
   }
   // Свободных не осталось. Занятую строку берём ещё раз только там, где это не создаст дубля и
@@ -15638,9 +15649,21 @@ async function applyBackupData(rows, onProgress, opts = {}) {
   // же месте сливается с уже найденной строкой.
   for (const it of items) {
     if (it.match) continue;
-    if (!it.places) { for (const [tier] of tiers.slice(4)) { it.match = it.film.find(y => tier(it, y)) || null; if (it.match) break; } }
+    // Неизвестное место при восстановлении копии не берёт строку, уже занятую строкой с известным
+    // местом: иначе от порядка строк в файле зависело, чьё мнение («шедевр» или «скучно») останется
+    // (повторная проверка #39). Такую строку пропускаем - фильм у человека уже есть.
+    if (!it.places) {
+      for (const [tier] of tiers.slice(4)) {
+        it.match = it.film.find(y => tier(it, y) && (preserveLocal || !claimedKnown.has(y.id))) || null;
+        if (it.match) break;
+      }
+      if (!it.match && !preserveLocal && it.film.length) it.skip = true;
+    }
     else if (it.st === "plan") it.skip = it.film.some(y => at(it, y));
-    else it.match = it.film.find(y => tiers[0][0](it, y)) || null;
+    // Просмотренный повтор сливается с уже найденным мнением о фильме, где бы оно ни лежало:
+    // мнение у фильма одно, и после отказа переносить его из списка (#39) вторая строка «watched»
+    // иначе вставлялась бы на месте из копии.
+    else it.match = it.film.find(y => tiers[0][0](it, y)) || it.film.find(y => y.status === "watched") || null;
   }
   // Sort first, write second. The old version decided and wrote in the same pass, which is
   // what forced one request per film - you cannot batch a decision you have not made yet.
@@ -17137,8 +17160,10 @@ async function backupImportXLSX() {
       rows.forEach(r => {
         const key = r.list_name && r.list_name.toLowerCase();
         if (!key) return;
-        if (map[key]) r.list_id = map[key];
-        if (alts && alts[key]) r.list_places = alts[key];   // имя неоднозначно: сверка по всем кандидатам (#38)
+        // Неоднозначное имя сверяется по всем кандидатам, только если среди них есть куда класть
+        // (map[key]). Без цели место остаётся неизвестным, как было: иначе строка «посмотреть»
+        // вставлялась в «Мой список» при каждом восстановлении (повторная проверка #38).
+        if (map[key]) { r.list_id = map[key]; if (alts && alts[key]) r.list_places = alts[key]; }
       });
     }
     // Место строки для сверки (#39): есть колонка List и ячейка пуста - строка личная (null);
@@ -18954,21 +18979,27 @@ function _renderSuggest() {
   let items = [];
   _sugFrom = 'word';
   const hide = () => { box.style.display = 'none'; box.innerHTML = ''; };
-  if (word !== tail) {
+  const ws = tail.split(/\s+/).filter(Boolean);
+  if (ws.length > 1) {
     // Фраза, набранная целиком («johnny depp», «немое кино»), - готовая запись, и _suggestFor о
     // ней молчит. Это молчание - ответ, а не промах: поиск дальше по последнему слову предлагал
     // ту же запись ещё раз, и чип заменял одно слово - «johnny Johnny Depp» (проверка кода
-    // 9 окт, #113).
-    const tn = _qNorm(tail);
-    if (_suggestIndex().some(e => _qNorm(e.show) === tn)) return hide();
-    items = _suggestFor(tail, true);
-    if (items.length) _sugFrom = 'tail';
+    // 9 окт, #113). Запись может стоять и в конце куска после других слов («триллер johnny
+    // depp»), поэтому проверяются все хвосты от двух слов, а не только кусок целиком.
+    for (let k = ws.length; k >= 2; k--) {
+      const tn = _qNorm(ws.slice(-k).join(' '));
+      if (_suggestIndex().some(e => _qNorm(e.show) === tn)) return hide();
+    }
+    // Начатая фраза дописывается по самому длинному хвосту, и чип заменяет ровно эти слова.
+    for (let k = ws.length; k >= 2 && !items.length; k--) {
+      items = _suggestFor(ws.slice(-k).join(' '), true);
+      if (items.length) _sugFrom = k;
+    }
     // Последнее слово ищется, чтобы ДОПИСАТЬ начатое («корейский трил» -> Триллер). Стоп-слово
     // («кино», «про», «фильмы») движок не читает, и дописывать в нём нечего: «мрачное кино»
-    // давало шесть чужих чипов «... кино». Правило то же, что у стоп-слов в _splitQuery (там же).
-    const wn = _qNorm(word);
-    if (!items.length && _QSTOP.some(st => wn === st || (st.length >= 5 && wn.startsWith(st) && wn.length - st.length <= 3)))
-      return hide();
+    // давало шесть чужих чипов «... кино». Только целое стоп-слово: недописанное «sobrena» -
+    // начало «sobrenatural», а не «sobre» (повторная проверка #113).
+    if (!items.length && _QSTOP.includes(_qNorm(word))) return hide();
   }
   if (!items.length) items = _suggestFor(word);
   if (!items.length) return hide();
@@ -18991,6 +19022,12 @@ function _applySuggest(word) {
   const v = inp.value;
   if (_sugFrom === 'word') {
     inp.value = v.replace(/\s+$/, '').replace(/[^\s,]*$/, '') + word + ', ';
+  } else if (typeof _sugFrom === 'number') {
+    // Хвост из _sugFrom слов последнего куска заменяется записью целиком.
+    const m = v.replace(/\s+$/, ''), cut = m.lastIndexOf(',');
+    const seg = (cut < 0 ? m : m.slice(cut + 1)).trim().split(/\s+/);
+    const keep = seg.slice(0, Math.max(0, seg.length - _sugFrom));
+    inp.value = (cut < 0 ? '' : m.slice(0, cut + 1) + ' ') + [...keep, word].join(' ') + ', ';
   } else {
     const cut = v.lastIndexOf(',');
     inp.value = (cut < 0 ? '' : v.slice(0, cut + 1) + ' ') + word + ', ';
