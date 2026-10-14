@@ -191,7 +191,10 @@ self.addEventListener("fetch", event => {
     event.waitUntil(network.then(response => {
       if (!response || !response.ok) return;
       const clone = response.clone();
-      return caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+      // Под адресом без запроса: ?film=, ?friend=, ?join= иначе каждый клали отдельной копией
+      // оболочки в 940 КБ, которую никто больше не спросит - страница сразу убирает запрос
+      // (третий круг, 14 окт). Поиск ниже и так ищет с ignoreSearch.
+      return caches.open(CACHE_NAME).then(cache => cache.put(url.origin + url.pathname, clone));
     }).catch(() => {}));
     const slow = new Promise(resolve => setTimeout(resolve, NAV_TIMEOUT_MS))
       .then(() => caches.match(event.request)
@@ -222,7 +225,13 @@ self.addEventListener("fetch", event => {
   // Неизменяемое: из своего кэша, и если оно там есть - в сеть не ходим вовсе.
   if (isStatic(url)) {
     event.respondWith(caches.open(STATIC_CACHE).then(cache =>
-      cache.match(event.request).then(hit => hit || fetch(event.request).then(res => {
+      // Лишняя копия с тем же ETag (голый адрес от страницы прежней сборки) остаётся до следующей
+      // пересборки карты: удалять её на попадании - значит качать 1.3 МБ заново всякий раз, когда
+      // старая и новая страницы чередуются (третий круг, 14 окт, проверено sw-test2). Одна копия
+      // лишнего места дешевле повторных загрузок.
+      cache.match(event.request).then(hit => {
+        if (hit) return hit;
+        return fetch(event.request).then(res => {
         if (res && res.ok) {
           // Новая версия легла - прежние копии этого же файла больше не нужны (#124, выше).
           // УДАЛЯЕТСЯ ДРУГОЙ ФАЙЛ, А НЕ ДРУГОЙ АДРЕС (#124, второй круг). Тестовая сборка и
@@ -242,7 +251,8 @@ self.addEventListener("fetch", event => {
             .catch(() => {});
         }
         return res;
-      }))));
+      });
+      })));
     return;
   }
   event.respondWith(
