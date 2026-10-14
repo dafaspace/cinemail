@@ -15,9 +15,25 @@ const CACHE_NAME = "cinemail-" + CACHE_VERSION;
 // В версионном кэше он перекачивался бы при КАЖДОМ обновлении приложения, потому что
 // activate стирает всё, кроме текущего CACHE_NAME. На мобильной связи это мегабайт за
 // правку одной строки, и заметить это было бы нечем.
+//
+// НЕИЗМЕНЯЕМО ОНО ТОЛЬКО ПО АДРЕСУ (проверка кода 9 окт, #124). Карту можно пересобрать
+// (docs/build-name-map.py), а этот кэш переживает любую активацию и отдаёт файл без сети,
+// так что под старым адресом установленные копии не получили бы новую карту никогда, и
+// смена CACHE_VERSION тут не помогает. Поэтому страница просит
+// name-map.json?v=<NAME_MAP_VER> - первые 10 знаков sha1 файла, - и новая карта это новый
+// адрес. Сверка ниже идёт по полному адресу с ?v=, промах качает новую, а записи того же
+// файла с другим ?v= удаляются, чтобы мегабайт старой карты не копился. Что NAME_MAP_VER
+// совпадает с файлом, проверяет docs/promote.py: без этого забытая версия была бы так же
+// невидима, как забытый CACHE_VERSION 7 сентября.
 const STATIC_CACHE = "cinemail-static-v1";
 const STATIC_PATHS = ["name-map.json"];
 const isStatic = (url) => STATIC_PATHS.some(x => url.pathname.endsWith("/" + x) || url.pathname.endsWith(x));
+
+// Сколько навигация ждёт заголовков из сети, прежде чем отдать копию из кэша (#122, ниже).
+const NAV_TIMEOUT_MS = 4000;
+// Корень области воркера: та страница, которая лежит в PRECACHE под двумя ключами, "./" и
+// "./index.html" (#122, ниже).
+const ROOT_PATH = new URL("./", self.location).pathname;
 
 // Files to cache for offline use
 const PRECACHE = [
@@ -31,7 +47,7 @@ const PRECACHE = [
   "./emoji.js?v=0.53.3",
   "./qr.js?v=0.52.0",
   "./supabase.js?v=2.112.4",
-  "./tmdb-logo.svg",   // the app cannot start without it - see the comment in index.html
+  "./tmdb-logo.svg",   // TMDB attribution in About (see the comment in index.html); the app starts without it - what it cannot start without is the shell list in install
   // The 547 KB and 224 KB avatar SHEETS are deliberately not here any more. Avatars are
   // cut into one file per character now (./av/<key>-ink.webp and -fill.webp, about 13 KB
   // the pair), so precaching the sheets would download 771 KB at install for images
@@ -42,9 +58,36 @@ const PRECACHE = [
 // Minimal branded offline page — last-resort fallback so a home-screen launch with
 // no network AND an evicted cache shows a friendly screen (auto-reloading when back
 // online) instead of the browser's error page. Never replaces the cached app shell.
+//
+// ВОСЕМЬ ЯЗЫКОВ, ЗНАЧОК ИЗ ICONS, И ПЕРЕЗАГРУЗКА ТОЛЬКО КОГДА СЕРВЕР ОТВЕТИЛ
+// (проверка кода 9 окт, #121). Раньше здесь были английский текст, эмодзи-хлопушка и
+// setInterval, который раз в 3 секунды перезагружал страницу при navigator.onLine.
+// onLine говорит только "есть сеть", а не "есть интернет": на Wi-Fi гостиницы с
+// captive-порталом он true всё время, и заглушка мигала каждые 3 секунды бесконечно.
+// Теперь раз в 3 секунды уходит HEAD на этот же адрес - не GET, поэтому воркер его не
+// перехватывает (см. первую строку fetch) и он идёт в настоящую сеть, - и перезагрузка
+// случается только когда пришёл хоть какой-то ответ сервера. Через портал HTTPS до
+// cinemail.app не проходит, fetch падает, страница стоит спокойно.
+// Язык - тот же ключ 'lang' в localStorage, что пишет setLang в index.html (страница с
+// того же адреса, хранилище общее), и та же подмена по navigator.language. Тексты живут
+// здесь, а не в I18N: эта страница собирается воркером, когда index.html как раз недоступен.
+// Значок - "film" из ICONS в index.html, та же геометрия, что у icon('film').
+const OFFLINE_TEXT = {
+  en: ["You're offline", "Cinemail will open by itself as soon as the connection is back."],
+  ru: ["Нет подключения", "Cinemail откроется сам, как только вернётся связь."],
+  uk: ["Немає з'єднання", "Cinemail відкриється сам, щойно повернеться зв'язок."],
+  ka: ["კავშირი არ არის", "Cinemail თავად გაიხსნება, როგორც კი კავშირი აღდგება."],
+  es: ["Sin conexión", "Cinemail se abrirá solo en cuanto vuelva la conexión."],
+  fr: ["Pas de connexion", "Cinemail s'ouvrira tout seul dès que la connexion reviendra."],
+  de: ["Keine Verbindung", "Cinemail öffnet sich von selbst, sobald die Verbindung wieder da ist."],
+  it: ["Nessuna connessione", "Cinemail si aprirà da solo appena torna la connessione."],
+};
+const OFFLINE_ICON = '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2" /><path d="M7 3v18" /><path d="M3 7.5h4" /><path d="M3 12h18" /><path d="M3 16.5h4" /><path d="M17 3v18" /><path d="M17 7.5h4" /><path d="M17 16.5h4" /></svg>';
 function offlineFallback() {
+  // '<' в JSON экранирован, чтобы ни одна строка не могла закрыть <script>.
+  const text = JSON.stringify(OFFLINE_TEXT).replace(/</g, "\\u003c");
   return new Response(
-    `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cinemail</title><body style="margin:0;background:#0e081c;color:#e8e8ee;font-family:-apple-system,BlinkMacSystemFont,sans-serif;display:flex;min-height:100vh;align-items:center;justify-content:center;text-align:center"><div style="padding:24px"><div style="font-size:44px">🎬</div><h2 style="font-weight:600;margin:10px 0 6px">You're offline</h2><p style="color:#8a8a96;font-size:14px;margin:0">Cinemail will reload automatically when you're back online.</p></div><script>addEventListener("online",function(){location.reload()});setInterval(function(){if(navigator.onLine)location.reload()},3000)</script>`,
+    `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cinemail</title><body style="margin:0;background:#0e081c;color:#e8e8ee;font-family:-apple-system,BlinkMacSystemFont,'Noto Sans Georgian',sans-serif;display:flex;min-height:100vh;align-items:center;justify-content:center;text-align:center"><div style="padding:24px"><div style="color:#f5c518;display:flex;justify-content:center">${OFFLINE_ICON}</div><h2 id="h" style="font-weight:600;margin:10px 0 6px">${OFFLINE_TEXT.en[0]}</h2><p id="p" style="color:#8a8a96;font-size:14px;margin:0">${OFFLINE_TEXT.en[1]}</p></div><script>(function(){var T=${text},l="en";try{l=localStorage.getItem("lang")||(navigator.language||"en").slice(0,2).toLowerCase()}catch(e){}if(!T[l])l="en";document.documentElement.lang=l;document.getElementById("h").textContent=T[l][0];document.getElementById("p").textContent=T[l][1];var busy=false;function probe(){if(busy)return;busy=true;fetch(location.href,{method:"HEAD",cache:"no-store"}).then(function(){location.reload()},function(){busy=false})}addEventListener("online",probe);setInterval(probe,3000)})()</script>`,
     { headers: { "Content-Type": "text/html; charset=utf-8" } }
   );
 }
@@ -59,8 +102,29 @@ self.addEventListener("install", event => {
       // asset (e.g. exceljs) would otherwise silently prevent index.html — the app
       // shell — from being cached at all, leaving nothing to fall back to offline.
       Promise.allSettled(PRECACHE.map(url =>
-        fetch(url, { cache: "reload" }).then(r => (r && r.ok) ? cache.put(url, r) : null)
-      ))
+        fetch(url, { cache: "reload" }).then(r => {
+          if (r && r.ok) return cache.put(url, r);
+          throw new Error("HTTP " + (r && r.status));
+        })
+      )).then(results => {
+        // НО ОБОЛОЧКА ОБЯЗАНА СКАЧАТЬСЯ, ИНАЧЕ УСТАНОВКИ НЕТ (проверка кода 9 окт, #121).
+        // allSettled делал установку успешной всегда, даже когда index.html оборвался на
+        // середине. Новый воркер активировался, activate стирал старый кэш - а оболочка
+        // была только в нём, - и приложение, открытое секунду назад, без сети становилось
+        // заглушкой. Теперь без оболочки установка падает: браузер выбрасывает новый
+        // воркер, старый остаётся вместе со своим кэшем, а reg.update при следующем
+        // возврате во вкладку пробует снова.
+        // Оболочка - то, без чего приложение не стартует: index.html и supabase.js
+        // (createClient вызывается при запуске, без него экран пустой - см. комментарий
+        // у его <script> в index.html). Остальное по-прежнему необязательно: значки,
+        // emoji.js и qr.js доберёт рантайм-обработчик, exceljs грузится по требованию и
+        // имеет запасной CDN. Ищем по началу адреса, а не по полному: ?v= у supabase.js
+        // меняется с релизом, и список, забытый при смене версии, требовал бы файл, которого
+        // в PRECACHE больше нет, - установка не проходила бы никогда.
+        const isShell = url => url === "./index.html" || url.startsWith("./supabase.js");
+        const missing = PRECACHE.filter((url, i) => isShell(url) && results[i].status !== "fulfilled");
+        if (missing.length) throw new Error("[SW] shell not cached, install aborted: " + missing.join(", "));
+      })
     )
   );
 });
@@ -99,14 +163,43 @@ self.addEventListener("fetch", event => {
   // `cache-control: max-age=600`. For ten minutes after any load this handler was
   // network-first in name only. Tunemail, on the same host, measured the result: the
   // running page was build v56 while sw.js said v57 and the server was serving v57.
+  //
+  // СЕТЬ ПЕРВОЙ, НО НЕ БЕСКОНЕЧНО (проверка кода 9 окт, #122). Раньше кэш достигался только
+  // когда fetch ПАДАЛ, а не когда сеть молчала: при подключении, которое есть, но не
+  // отвечает (метро, слабый сигнал), запуск стоял пустым, пока TCP не отвалится сам, - это
+  // десятки секунд при живой копии в кэше. Ровно та ошибка, которую ниже чинили для картинок.
+  // Теперь сеть получает NAV_TIMEOUT_MS на заголовки ответа; не успела - отдаём копию ЭТОЙ
+  // же страницы из кэша, а запрос в сеть продолжается и кладёт свежую в кэш к следующему
+  // запуску. Свежесть оболочки при работающей сети не страдает: GitHub Pages отвечает
+  // заголовками за доли секунды, тело в 940 КБ таймаут не считает - fetch резолвится на
+  // заголовках. Если копии этой страницы нет - ждём сеть, как раньше: чужая оболочка под
+  // этим адресом (например, продакшен под /test-1/) хуже ожидания.
+  // 4 секунды - выбор, а не замер: дольше, чем отвечает любая живая сеть, и короче, чем
+  // человек готов смотреть на пустой экран.
+  // Копия корня - это и "./", и "./index.html": один файл под двумя ключами (#122, второй
+  // круг). Обязательна при установке только вторая (#121, isShell), поэтому искать по
+  // таймауту надо и по ней. Иначе установка, потерявшая одну "./", проходила, activate
+  // стирал прежний кэш, где "./" была, и следующий запуск на медленной сети снова ждал
+  // сеть - ровно то, что здесь чинится. Для других адресов (/test-1/) замены по-прежнему нет.
+  //
+  // И в кэш кладётся только ответ 200 (тот же пункт: кэш не должен терять рабочую
+  // оболочку). Раньше клался любой: один 404 или 503 от хостинга записывался поверх
+  // предзагруженной "./", и следующий запуск без сети показывал страницу ошибки.
   if (event.request.mode === "navigate" || url.pathname.endsWith(".html")) {
+    const network = fetch(event.request, { cache: "reload" });
+    // clone() здесь, в первом подписчике: до того, как страница начнёт читать тело.
+    event.waitUntil(network.then(response => {
+      if (!response || !response.ok) return;
+      const clone = response.clone();
+      return caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+    }).catch(() => {}));
+    const slow = new Promise(resolve => setTimeout(resolve, NAV_TIMEOUT_MS))
+      .then(() => caches.match(event.request)
+        .then(r => r || caches.match(event.request, { ignoreSearch: true }))
+        .then(r => r || (url.pathname === ROOT_PATH ? caches.match("./index.html") : undefined)))
+      .then(r => r || network);
     event.respondWith(
-      fetch(event.request, { cache: "reload" })
-        .then(response => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-          return response;
-        })
+      Promise.race([network, slow])
         .catch(() => caches.match(event.request)
           .then(r => r || caches.match("./index.html"))
           .then(r => r || offlineFallback())) // never return undefined → never a raw browser error
@@ -127,10 +220,27 @@ self.addEventListener("fetch", event => {
   // `activate` deletes every older cache, so a release always lands on fresh assets.
   // The background fetch keeps the cache current within a release too.
   // Неизменяемое: из своего кэша, и если оно там есть - в сеть не ходим вовсе.
-  if (isStatic(new URL(event.request.url))) {
+  if (isStatic(url)) {
     event.respondWith(caches.open(STATIC_CACHE).then(cache =>
       cache.match(event.request).then(hit => hit || fetch(event.request).then(res => {
-        if (res && res.ok) cache.put(event.request, res.clone());
+        if (res && res.ok) {
+          // Новая версия легла - прежние копии этого же файла больше не нужны (#124, выше).
+          // УДАЛЯЕТСЯ ДРУГОЙ ФАЙЛ, А НЕ ДРУГОЙ АДРЕС (#124, второй круг). Тестовая сборка и
+          // продакшен живут на одном домене, с одним воркером и этим одним кэшем, а между
+          // пересборкой карты и переносом просят разные ?v=, и сервер отдаёт на оба один и тот
+          // же файл. Пока удалялся любой другой ?v=, каждое переключение между сборками стирало
+          // запись соседки и качало 1.3 МБ заново; так же старая страница, ещё не
+          // перезагруженная (#117), с голым адресом. Поэтому копия с тем же ETag, что у только
+          // что скачанной, остаётся - это тот же файл того же выката. Удаляется копия с другим
+          // ETag или без него: другой файл или неизвестно какой, как и раньше.
+          const etag = res.headers.get("ETag");
+          cache.put(event.request, res.clone())
+            .then(() => cache.keys())
+            .then(keys => Promise.all(keys
+              .filter(k => { const u = new URL(k.url); return u.pathname === url.pathname && u.search !== url.search; })
+              .map(k => cache.match(k).then(old => (etag && old && old.headers.get("ETag") === etag) ? false : cache.delete(k)))))
+            .catch(() => {});
+        }
         return res;
       }))));
     return;
