@@ -7481,7 +7481,14 @@ async function doSearch() {
     // "фильмы про котиков" точного названия не имеют и подборку получают. Полка - ответ целиком:
     // жанр при ней только сужает полку, и уступает она вся ("A Beautiful Mind": полка и жанр).
     // Полка движения ("медленное кино") - это движение, оно не уступает.
-    const picksRun = !!(c && c.matched && (c.movement || (c.curated ? !strong.length
+    // НАБРАНО РОВНО ИЗВЕСТНОЕ НАЗВАНИЕ - ЭТО ПОИСК ФИЛЬМА. «Funny Games», «Scary Movie», «Tokyo Story»,
+    // «Тихий Дон», «Die Hard» читались как жанр, страна или настроение и запускали подборку, списывая
+    // нажатие за обычный поиск (третий круг, 14 окт). Если весь запрос - точное название фильма,
+    // который знают, и в нём есть слово, которого словарь не читает («Games», «Дон», «Story»), -
+    // это название, и подборки нет; «Похожее на» под ним остаётся. Запрос, понятый целиком
+    // («хоррор», «черная комедия»), - подборка, даже если такой фильм или сериал существует.
+    const wholeTitle = strong.length > 0 && _titleKey(raw) === tk && !!(c && (c.restToks || []).length);
+    const picksRun = !wholeTitle && !!(c && c.matched && (c.movement || (c.curated ? !strong.length
       : (c.person || c.country || (c.genreIds || []).length || c.recent
          || (!strong.length && (c.keyword || c.decade || c.year || c.quality || (c.notGenreIds || []).length))))));
     if (c) c.chips = (c.chips || []).slice().sort((a, b) => a.toks[0] - b.toks[0]);
@@ -10599,7 +10606,9 @@ function _splitQuery(q) {
   // Остаток длиннее четырёх слов - фраза, а не имя, как и в первом круге; латиницей - длиннее
   // трёх: её имя проверяет платное обращение к TMDB, и выброшенное служебное слово не должно
   // открывать ему фразы, которые первый круг не спрашивал ("to kill a mockingbird").
-  const _oneRun = _nameIx.length && _restIx.length <= (_restIx.every(at => /^[a-z]+$/.test(allWords[at])) ? 3 : 4)
+  // Служебные слова в предел не считаются: «films by wong kar wai» - имя из трёх слов, а «by»
+  // выбрасывается (третий круг, 14 окт).
+  const _oneRun = _nameIx.length && _nameIx.length <= (_restIx.every(at => /^[a-z]+$/.test(allWords[at])) ? 3 : 4)
     && _restIx.filter(at => at >= _nameIx[0] && at <= _nameIx[_nameIx.length - 1]).length === _nameIx[_nameIx.length - 1] - _nameIx[0] + 1;
   const subjectAll = _oneRun ? _nameIx.map(i => allWords[i]).join(' ') : '';
 
@@ -10830,9 +10839,15 @@ function _idFromNameMap(q, wholeOnly) {
   // Падеж стоит на последнем слове, и от него остаётся хотя бы две буквы: окончание, съевшее
   // слово целиком, - это не падеж, а другое слово ("ковбой его" давало "ковбои" минус "его",
   // #90, второй круг).
+  // Падеж бывает и на ПЕРВОМ слове: «фильмы энга ли», «джона ву», «спайка ли» - склоняется имя,
+  // а короткая фамилия стоит как есть (третий круг, 14 окт). Поэтому склоняется по очереди каждое
+  // слово, остальные - как набраны; порог в две буквы тот же.
   if (words.length > 1) {
-    const head = norm(words.slice(0, -1).join(''));
-    for (const f of _caseForms(norm(words[words.length - 1]), 2)) if (_nameMap[head + f]) return _nameMap[head + f];
+    const ws = words.map(norm);
+    for (let i = ws.length - 1; i >= 0; i--) {
+      const head = ws.slice(0, i).join(''), tail = ws.slice(i + 1).join('');
+      for (const f of _caseForms(ws[i], 2)) if (_nameMap[head + f + tail]) return _nameMap[head + f + tail];
+    }
   }
   // wholeOnly - только всё целиком как одно имя, без пар и одиночных слов ниже. Так _personId
   // спрашивает остаток с короткими словами: одиночное слово рядом с коротким ("под ковбой",
@@ -13026,7 +13041,7 @@ function renderListManageStrip() {
     el.innerHTML = `
       <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(248,113,113,0.06);border-radius:10px;border:1px solid rgba(248,113,113,0.15)">
         <span style="flex:1;font-size:12px;color:#f87171">${isOwner ? t('list_delete') : t('list_leave')} <strong>${escapeHtml(list.name)}</strong>?</span>
-        <button onclick="confirmListDelete('${list.id}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${isOwner ? t('list_delete') : t('list_leave')}</button>
+        <button onclick="confirmListDelete('${escapeJsAttr(list.id)}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${isOwner ? t('list_delete') : t('list_leave')}</button>
         <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#aaa;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer">${t('cancel')}</button>
       </div>`;
     return;
@@ -13035,10 +13050,10 @@ function renderListManageStrip() {
   if (_listManageMode === 'rename') {
     el.innerHTML = `
       <div style="display:flex;gap:8px;align-items:center">
-        <input id="list-rename-input" type="text" value="${list.name.replace(/"/g,'&quot;')}"
+        <input id="list-rename-input" type="text" value="${escapeHtml(list.name)}"
           style="flex:1;padding:7px 12px;border-radius:9px;border:1px solid var(--accent-border);background:color-mix(in srgb, var(--accent) 8%, transparent);color:var(--text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none"
-          onkeydown="if(event.key==='Enter')renameList('${list.id}');if(event.key==='Escape'){_listManageMode=null;renderListManageStrip();}">
-        <button onclick="renameList('${list.id}')" style="padding:7px 14px;border-radius:9px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${t('save')}</button>
+          onkeydown="if(event.key==='Enter')renameList('${escapeJsAttr(list.id)}');if(event.key==='Escape'){_listManageMode=null;renderListManageStrip();}">
+        <button onclick="renameList('${escapeJsAttr(list.id)}')" style="padding:7px 14px;border-radius:9px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${t('save')}</button>
         <button onclick="_listManageMode=null;renderListManageStrip()" style="padding:7px 10px;border-radius:9px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;cursor:pointer">✕</button>
       </div>`;
     setTimeout(() => { const i = document.getElementById('list-rename-input'); if(i){i.focus();i.select();} }, 50);
@@ -13087,7 +13102,7 @@ function renderListManageStrip() {
             <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">${m.role === 'owner' ? t('role_owner') : t('role_member')}</div>
           </div>
         </div>
-        ${canKick ? `<button onclick="_kickMember('${list.id}','${m.user_id}')" style="background:none;border:1px solid rgba(248,113,113,0.3);color:#f87171;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">${t('list_remove')}</button>` : ''}
+        ${canKick ? `<button onclick="_kickMember('${escapeJsAttr(list.id)}','${escapeJsAttr(m.user_id)}')" style="background:none;border:1px solid rgba(248,113,113,0.3);color:#f87171;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">${t('list_remove')}</button>` : ''}
       </div>`;
     }).join('');
     el.innerHTML = `<div style="padding:10px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid var(--border)">
