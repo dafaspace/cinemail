@@ -3015,7 +3015,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.68.1-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.68.2-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -7539,9 +7539,13 @@ async function doSearch() {
     // Уступают только названию, которое знают все: от тысячи голосов.
     const fullyRead = fullTitle && !wholeTitle;
     const famous = (strong[0] && strong[0].votes || 0) >= 1000;
-    const picksRun = !wholeTitle && (wouldPick || (fullyRead && !famous && wouldPickBare));
+    // ВЕСЬ ЗАПРОС - ГОРОД, И ОТВЕТ - СТРОКА «МЕСТА СЪЁМОК». «прага» и «рим» читались ещё и страной
+    // и запускали подборку чешского или итальянского кино: на «прагу» один фильм, «Restore
+    // Point», и списанное нажатие (проверка test-1, 15 окт). Фильмы, снятые в городе, - это карта,
+    // а не кино этой страны. _cityFor отвечает, только когда в запросе нет ничего, кроме города.
+    const picksRun = !wholeTitle && !city && (wouldPick || (fullyRead && !famous && wouldPickBare));
     // Известное название, а разбор понял слова: фильм сверху, подборка по словам - строкой.
-    const offerPicks = !picksRun && fullTitle && !unreadWord && wouldPickBare && (c.chips || []).length > 0;
+    const offerPicks = !picksRun && !city && fullTitle && !unreadWord && wouldPickBare && (c.chips || []).length > 0;
     if (c) c.chips = (c.chips || []).slice().sort((a, b) => a.toks[0] - b.toks[0]);
 
     // Точные совпадения названия - первыми, самое известное сверху: «fargo» это «Фарго» 1996
@@ -9659,9 +9663,15 @@ const _MOODS = [
   // neg - жанр, который снимается, когда настроение отрицают: "не страшное" - это без хоррора
   // (проверка кода 9 окт, #95). У остальных настроений такой сердцевины нет: "не слишком
   // грустное" не значит "без драм", и оно честно уходит в «Не учтено».
-  { id:'scary',   g:'27,53', neg:'27', terms:'scary horror tense страшн ужас напряж gruselig spavent effrayant miedo spaventoso creepy жуткий жуткое жуткая моторошн' },
+  // СТРАШНОЕ - ЭТО УЖАСЫ, А НЕ «УЖАСЫ ИЛИ ТРИЛЛЕР». С 53 в «или» по оценке наверх вставали триллеры:
+  // «самые страшные фильмы» отвечали «Тёмным рыцарем», «Паразитами» и «Криминальным чтивом» (проверка
+  // новыми запросами, 15 окт). Напряжённое (tense, напряж) - это триллер, у него своя строка.
+  { id:'scary',   g:'27', neg:'27', terms:'scary horror страшн ужас gruselig spavent effrayant miedo spaventoso creepy жуткий жуткое жуткая моторошн' },
   { id:'funny',   g:'35',             terms:'funny laugh comedy смешн смеш комед lustig divertente drôle drole gracioso hilarious witty satire satirical уморит ржачн угарн остроумн сатира сатиры сатиричес дотепн сатиричн satira satire satirisch witzig spiritoso' },
   { id:'gripping', g:'53,28,12',    terms:'thrilling gripping suspenseful exciting edge_of_seat захватыва саспенс захоплив spannend avvincente palpitant emocionante trepidante' },
+  // Напряжённое - триллер, без боевика и приключений: в «захватывающем» с ними наверх вставали
+  // аниме-боевики 2026 года.
+  { id:'tense',   g:'53',             terms:'tense напряж напруж spannungsgeladen =teso =tesa tendu =tenso =tensa დაძაბულ' },
   { id:'violent',  g:'28,80,53',     terms:'violent brutal bloody gory gore жесток кровав брутальн насили жорстк кривав gewalttatig violento sanglant sangriento sanguinoso' },
   { id:'uplifting', g:'18,35,10751', terms:'uplifting inspiring inspirational вдохновля мотивир воодушев надихаюч inspirierend ispirante inspirant inspirador' },
   { id:'real',    g:'99,36',          terms:'true real documentary реальн документ истинн wahr vero vrai real realism realismo realismus' },
@@ -10248,6 +10258,10 @@ const _RECENT = {
   weak:   'новы новое новая последн нові новий остан '
         + 'new last nuevo nueva ultimo ultima nouveau nouvelle dernier derniere '
         + 'neu letzte letzter nuovo nuova ახალი ბოლო',
+  // Ожидаемое - ещё не вышедшее, по ожиданию. «ожидаемые фильмы 2027» читали только год, а слово
+  // уходило в «Не учтено», хотя порядок как раз по ожиданию (проверка новыми запросами, 15 окт).
+  // Без года - год вперёд от сегодня.
+  upcoming: 'ожидаем долгожданн очікуван upcoming anticipated erwartet attendu esperad attes მოსალოდნელ',
 };
 // Сколько лет считать свежим. Три года, а не один: "новый Вильнёв" в 2026 должен
 // находить и то, что вышло в 2024, а у авторского кино пауза между фильмами больше
@@ -10367,7 +10381,10 @@ const _QSTOP = ('про про about with films film movie movies кино фи�
   // уже значат сортировку по оценке, которая стоит по умолчанию. Раньше это прятало глушение
   // строки при любом теге, снятое проверкой кода 9 окт (#101, #111). «watch» не здесь: от пяти
   // букв стоп-слово режет и приставкой, и оно съело бы «watchmen».
+  // «most», «самые» - тоже (проверка новыми запросами, 15 окт): «most anticipated movies» искало
+  // человека «most» и находило актёра Дона Моста.
   'хочу хочется посмотр посоветуй подскажи покажи лучши лучше подивит порадь найкращ want best recommend ' +
+  'most самые самый самая самое самых найбільш ' +
   'quiero ver recomiend recomiénd mejor veux voir recommand meilleur möchte mochte sehen empfiehl beste ' +
   'voglio vedere consiglia miglior მინდა ნახვა საუკეთესო ' +
   // Связки из живых запросов, которые «Не учтено» называло зря (третий круг, 14 окт).
@@ -10656,6 +10673,7 @@ function _splitQuery(q) {
   };
   const recent = _recHit(_RECENT.strong);
   const recentIfPerson = _recHit(_RECENT.weak);
+  const upcoming = _recHit(_RECENT.upcoming);
 
   // restAll - остаток целиком, с короткими словами: из него куски «Понято», а имя из коротких
   // слогов ("ким ки дук", "джон ву", "энг ли") без них не собрать (проверка кода 9 окт, #90).
@@ -10728,7 +10746,7 @@ function _splitQuery(q) {
   const restToks = toks.map((tk, i) => tk.w.some(w => _restSet.has(w)) && !tk.w.some(w => _mset.has(w)) ? i : -1).filter(i => i >= 0);
   return { movements, moods, genres, subjects, countries, quality, decade, year, subject: rest,
            subjectAll, notGenres: [...new Set(notGenres)], negLeft,
-           recent, recentIfPerson, toks: toks.map(tk => tk.s), chips, restToks, rowWords,
+           recent, recentIfPerson, upcoming, toks: toks.map(tk => tk.s), chips, restToks, rowWords,
            // Слова, которые мы ДЕЙСТВИТЕЛЬНО поняли. Считались давно и наружу не
            // отдавались, а именно они - честный ответ на вопрос "что ты прочитал".
            matchedWords: [...matchedWords].sort((a, b) => words.indexOf(a) - words.indexOf(b)) };
@@ -11604,6 +11622,11 @@ function _planQuery(c) {
   p.set('vote_count.gte', String(_voteFloor(c)));
   // Будущий год: голосов у объявленных фильмов нет, порог их все отрезал бы, а сортировать по
   // оценке нечего. Порядок - по популярности, то есть по ожиданию.
+  if (c.upcoming) {
+    const d = new Date(), y = new Date(d); y.setFullYear(d.getFullYear() + 1);
+    p.set('primary_release_date.gte', d.toISOString().slice(0, 10));
+    p.set('primary_release_date.lte', y.toISOString().slice(0, 10));
+  }
   if (c.future) { p.set('vote_count.gte', '0'); p.set('sort_by', 'popularity.desc'); }
   // Оценочные слова - условия, а не теги (см. _QUALITY).
   const floor = Number(p.get('vote_count.gte'));
@@ -11628,7 +11651,7 @@ function _planQuery(c) {
 // тестом, не трогая сеть, и порядок веток перестаёт влиять на результат.
 async function _constraintsFor(q) {
   const { movements, moods, genres, subjects, countries, decade, year, subject, matchedWords,
-          recent, recentIfPerson, toks, chips, restToks, quality, subjectAll, notGenres, negLeft, rowWords } = _splitQuery(q);
+          recent, recentIfPerson, upcoming, toks, chips, restToks, quality, subjectAll, notGenres, negLeft, rowWords } = _splitQuery(q);
   const c = {
     // Набранное - функцией, а не строкой: «$&» в запросе иначе подставляло бы сам шаблон.
     why: t('why_for_query').replace('{q}', () => q), matchedWords,
@@ -11665,6 +11688,9 @@ async function _constraintsFor(q) {
   if (c.year) c.matched = true;
   // Год, который ещё не начался («новинки 2027»): вышедшего нет, есть объявленное.
   c.future = !!(c.year && c.year > new Date().getFullYear());
+  // «ожидаемые фильмы» без года - то, что выйдет за год вперёд, по ожиданию (_RECENT.upcoming).
+  if (upcoming && !c.year && !decade && !movements.length) { c.future = true; c.upcoming = true; }
+  if (upcoming) c.matched = true;
   if (c.recent) c.matched = true;
 
   // Названный жанр жёстче настроения и забирает жанровый слот целиком: "романтический"
