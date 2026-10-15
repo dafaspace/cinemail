@@ -3015,7 +3015,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.68.0-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.68.1-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -6762,7 +6762,23 @@ async function tmdbSearch(q) {
   if (enRes && enRes.error && multiRes && multiRes.error) {
     const e = new Error(enRes.error); e.tmdbRefused = enRes; throw e;
   }
-  const all = [...(enRes.results||[]), ...(multiRes.results||[])];
+  // ОТВЕТЫ ПО ОЧЕРЕДИ, А НЕ ОДИН ЗА ДРУГИМ. Склейка ставила все десять строк на языке
+  // интерфейса впереди английских, а ниже срезается до десяти: «tokyo story» по-русски отдавал
+  // «Tokyo Love Story» и «Lil’ Tokyo Story», а сам фильм Одзу (1273 голоса, первый в английском
+  // ответе) не доходил до экрана (проверка новыми запросами, 15 окт). Строка на языке интерфейса
+  // остаётся главной: если фильм есть в обоих ответах, берётся она.
+  const _loc = (enRes && enRes.results) || [], _def = (multiRes && multiRes.results) || [];
+  const _locBy = new Map(_loc.map(r => [r.media_type + ':' + r.id, r]));
+  const all = [];
+  for (let i = 0; i < Math.max(_loc.length, _def.length); i++) {
+    if (_loc[i]) all.push(_loc[i]);
+    if (_def[i]) all.push(_locBy.get(_def[i].media_type + ':' + _def[i].id) || _def[i]);
+  }
+  // АНГЛИЙСКОЕ НАЗВАНИЕ - ИЗ ВТОРОГО ОТВЕТА (без language, то есть en-US). Дубли ниже оставляют
+  // русскую строку, и английское название терялось: «oldboy» поднимал наверх ремейк 2013 года,
+  // потому что у оригинала русское «Олдбой» и корейское «올드보이», а точным было только у
+  // ремейка; «tokyo story» не находил «Токийскую повесть» вовсе (проверка новыми запросами, 15 окт).
+  const enTitle = new Map(((multiRes && multiRes.results) || []).map(r => [r.media_type + ':' + r.id, r.title || r.name || '']));
   // Дубли - по типу и номеру, а не по номеру: фильм и сериал с одним id у TMDB - два разных
   // результата, и один из них пропадал из выдачи (проверка кода 9 окт, #78).
   const seen = new Set();
@@ -6778,6 +6794,7 @@ async function tmdbSearch(q) {
     Rating: _ratingOf(r), Genre: "",
     // Единому поиску: совпало ли название точно и известен ли фильм хоть кому-то.
     OrigTitle: r.original_title || r.original_name || "", votes: r.vote_count || 0,
+    EnTitle: enTitle.get(r.media_type + ':' + r.id) || "",
   }));
 }
 
@@ -7476,7 +7493,7 @@ async function doSearch() {
     if (gen !== _srchGen) return;
 
     const tk = _titleKey(title);
-    const exact = tk ? titles.filter(m => _titleKey(m.Title) === tk || _titleKey(m.OrigTitle) === tk) : [];
+    const exact = tk ? titles.filter(m => _titleKey(m.Title) === tk || _titleKey(m.OrigTitle) === tk || _titleKey(m.EnTitle) === tk) : [];
     // Точное название, которое знает хоть кто-то: фильм "Horror" с двадцатью голосами не
     // должен заслонять хорроры.
     const strong = exact.filter(m => (m.votes || 0) >= 50).sort((a, b) => (b.votes || 0) - (a.votes || 0));
@@ -9880,7 +9897,7 @@ const _SUBJECTS = [
   { k:"whimsical", terms:"whimsical quirky symmetrical pastel storybook twee playful причудлив чудаковат симметричн пастельн сказочн игрушечн затейлив вигадлив дивакуват симетричн caprichoso excentrico simetrico pastel fantasque excentrique symetrique pastel skurril verspielt symmetrisch pastell bizzarro stravagante simmetrico pastello უცნაური სიმეტრიული quirky eccentric чудаковат скурил skurril eccentrico excentrique excentrico" },
   { k:"neon noir", terms:"neon_noir неонов_нуар neon neondrenched neonlit synthwave неон неонов неоновый синтвейв неон неонові синтвейв neon neon neon neon ნეონი" },
   { k:"claustrophobic", terms:"claustrophobic claustrophobia dread unhinged unsettling paranoid oppressive клаустрофоб замкнут тесн безумие паранойя гнетущ тревожн давящ клаустрофоб замкнут божевілля паранойя claustrofobico opresivo paranoia angustioso claustrophobe oppressant paranoia angoissant klaustrophob beklemmend paranoid claustrofobico opprimente paranoia angosciante კლაუსტროფობიური შემზარავი" },
-  { k:"folk horror", terms:"folkhorror folk_horror ritual pagan фольклорн фольклорный_хоррор деревенский_хоррор языческ ритуальн обряд фольклорн язичницьк ритуальн folclorico pagano ritual folklorique paien rituel heidnisch ritual folkloristico pagano rituale ფოლკლორული რიტუალური" },
+  { k:"folk horror", terms:"folkhorror folk_horror фолкхоррор фолк_хоррор фолкгорор фолк_горор ritual pagan фольклорн фольклорный_хоррор деревенский_хоррор языческ ритуальн обряд фольклорн язичницьк ритуальн folclorico pagano ritual folklorique paien rituel heidnisch ritual folkloristico pagano rituale ფოლკლორული რიტუალური" },
   { k:"mind bending", terms:"mindbending mind_bending cerebral surreal puzzle convoluted unreliable labyrinth головолом сюрреалист лабиринт запутанн ненадежн_рассказчик замороченн головолом сюрреаліст лабіринт заплутан rompecabezas cerebral surrealista laberinto casse_tete cerebral surrealiste labyrinthe kopfzerbrechen zerebral surreal labyrinth rompicapo cerebrale surreale labirinto თავსატეხი სიურრეალისტური surrealism surrealismo surrealismus twist_ending plot_twist неожиданн_концовк неожиданн_финал вынос_мозга взрыв_мозга" },
   { k:"bittersweet", terms:"bittersweet wistful understated горьковат светлая_грусть недосказанн гіркувато світлий_сум agridulce doux_amer bittersuss agrodolce მწარე_ტკბილი" },
   { k:"epic", terms:"epic epics sweeping grand_scale monumental saga эпическ эпос масштабн грандиозн полотно сага размах монументальн епічн масштабн грандіозн сага epico epopeya grandioso gran_escala epique fresque grandiose ampleur episch monumental grossangelegt saga epico kolossale grandioso saga ეპიკური მასშტაბური эпичн епічн" },
@@ -10163,7 +10180,9 @@ const _qNorm = s => String(s||"").toLowerCase().replace(/[ё]/g,'е').replace(/[
 // Добавлено 11 окт: из 162 частых тегов только эти четыре оставались непонятыми.
 const _QUALITY = [
   { id:'masterpiece', terms:'masterpiece masterpieces шедевр шедеври meisterwerk capolavoro chef_d_oeuvre obra_maestra obras_maestras შედევრ' },
-  { id:'classic',     terms:'classic classics классик класик klassiker classico classique clasico კლასიკ' },
+  // классическ, класичн: «классические вестерны» не читались вовсе - ни приставка «классик»,
+  // ни основа не сводят прилагательное с существительным (проверка новыми запросами, 15 окт).
+  { id:'classic',     terms:'classic classics классик классическ класик класичн klassiker classico classique clasico კლასიკ' },
   { id:'underrated',  terms:'underrated hidden_gem недооцен недооцін незаслуженно_забыт unterschatzt sottovalutato sous_estime infravalorado' },
   { id:'blockbuster', terms:'blockbuster blockbusters блокбастер kassenschlager superproduccion' },
 ];
@@ -11592,7 +11611,14 @@ function _planQuery(c) {
   if (c.quality === 'classic' && !c.decade && !c.year && !c.movement && !c.recent) {
     p.set('primary_release_date.lte', '1979-12-31'); p.set('vote_count.gte', String(Math.max(floor, 500)));
   }
-  if (c.quality === 'underrated') { p.set('vote_average.gte', '7'); p.set('vote_count.gte', '100'); p.set('vote_count.lte', '1500'); }
+  if (c.quality === 'underrated') {
+    p.set('vote_average.gte', '7'); p.set('vote_count.gte', '100'); p.set('vote_count.lte', '1500');
+    // Свежий фильм со сотней голосов не недооценён, а ещё не оценён: первыми в «недооценённых
+    // триллерах» стояли фильмы 2026 года с 8.8 от первых зрителей (проверка новыми запросами,
+    // 15 окт). Без названных лет - только то, что вышло хотя бы два года назад.
+    if (!c.year && !c.decade && !c.movement && !c.recent && !p.get('primary_release_date.lte'))
+      p.set('primary_release_date.lte', (new Date().getFullYear() - 2) + '-12-31');
+  }
   if (c.quality === 'blockbuster') { p.set('sort_by', 'popularity.desc'); p.set('vote_count.gte', String(Math.max(floor, 3000))); }
   return p;
 }
