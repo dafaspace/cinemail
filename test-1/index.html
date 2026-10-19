@@ -3015,7 +3015,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.68.3-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.68.4-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -4863,15 +4863,16 @@ Object.keys(_I18N_FIX_UI).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I1
 // I18N-FIX-ANCHOR picksa
 // Набранное ровно известное название («Die Hard», «Scary Movie») - поиск фильма; подборка по его
 // словам ждёт этой строкой под «Похожее на» (15 окт).
+// search_did_you_mean - над подсказками к опечатке (19 окт).
 const _I18N_FIX_PICKSA = {
-  en:{ search_as_words:"Picks for the words: {w}" },
-  ru:{ search_as_words:"Подборка по словам: {w}" },
-  uk:{ search_as_words:"Добірка за словами: {w}" },
-  ka:{ search_as_words:"რჩევები სიტყვებით: {w}" },
-  es:{ search_as_words:"Sugerencias por las palabras: {w}" },
-  fr:{ search_as_words:"Suggestions pour les mots : {w}" },
-  de:{ search_as_words:"Tipps zu den Wörtern: {w}" },
-  it:{ search_as_words:"Consigli per le parole: {w}" },
+  en:{ search_as_words:"Picks for the words: {w}", search_did_you_mean:"Nothing under that title. Did you mean:" },
+  ru:{ search_as_words:"Подборка по словам: {w}", search_did_you_mean:"Под таким названием ничего нет. Возможно, имелось в виду:" },
+  uk:{ search_as_words:"Добірка за словами: {w}", search_did_you_mean:"Під такою назвою нічого немає. Можливо, малося на увазі:" },
+  ka:{ search_as_words:"რჩევები სიტყვებით: {w}", search_did_you_mean:"ამ სათაურით ვერაფერი მოიძებნა. იქნებ გულისხმობდით:" },
+  es:{ search_as_words:"Sugerencias por las palabras: {w}", search_did_you_mean:"No hay nada con ese título. Quizá quisiste decir:" },
+  fr:{ search_as_words:"Suggestions pour les mots : {w}", search_did_you_mean:"Rien sous ce titre. Tu voulais peut-être dire :" },
+  de:{ search_as_words:"Tipps zu den Wörtern: {w}", search_did_you_mean:"Unter diesem Titel gibt es nichts. Meintest du:" },
+  it:{ search_as_words:"Consigli per le parole: {w}", search_did_you_mean:"Niente con questo titolo. Forse cercavi:" },
 };
 Object.keys(_I18N_FIX_PICKSA).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_FIX_PICKSA[l]); });
 // ·
@@ -7569,6 +7570,14 @@ async function doSearch() {
     // Разбор упёрся в отказ TMDB и ничего не нашлось - так и сказать, а не «таких слов не знаю».
     if (_parseErr && !showTitles.length && !showPeople.length && !city) { el.innerHTML = _picksErrHTML(_parseErr); return; }
     if (!picksRun && !showTitles.length && !showPeople.length && !city) {
+      // Пусто - сначала опечатка: «Spirited Awya» (проверка независимым планом, 19 окт).
+      const fix = await _didYouMean(title || raw);
+      if (gen !== _srchGen) return;
+      if (fix.length) {
+        el.innerHTML = `<div class="srch-note" style="margin-top:4px">${escapeHtml(t('search_did_you_mean'))}</div>`
+          + fix.map(f => `<button type="button" class="srch-line" data-fix="${escapeHtml(f.title)}">${icon('search', 18)}<span dir="auto">${escapeHtml(f.title)}${f.year ? ' · ' + escapeHtml(f.year) : ''}</span><span class="srch-chev">›</span></button>`).join('');
+        return;
+      }
       el.innerHTML = `<div class="srch-note" style="margin-top:4px">${escapeHtml(t('search_nothing'))}</div><div class="srch-chips" id="search-examples-none"></div>`;
       _renderSearchExamples('search-examples-none');
       return;
@@ -7640,6 +7649,51 @@ async function _searchOfferPicks() {
     const b = document.getElementById('srch-picks');
     if (b) b.innerHTML = _picksErrHTML(e);
   }
+}
+
+// ── «Возможно, имелось в виду» ───────────────────────────────────────────────
+// TMDB опечаток не прощает: «Spirited Awya» давало «ничего нет», и человек уходил. Только когда
+// поиск пуст целиком, спрашиваем ещё до трёх раз: без последнего слова, без первого и с самым
+// длинным словом, обрезанным до начала (опечатка чаще в конце). Из найденного берём то, что
+// почти совпадает с набранным по буквам (расстояние Левенштейна, от 75% сходства), - иначе
+// «Spirited» подсказывал бы всё подряд со словом spirited. Латиница спрашивается без языка, чтобы
+// сравнивать с английским названием; кириллица и грузинский - на языке интерфейса.
+function _similar(a, b) {
+  if (!a || !b) return 0;
+  const m = a.length, n = b.length;
+  let prev = Array.from({ length: n + 1 }, (_, j) => j);
+  for (let i = 1; i <= m; i++) {
+    const cur = [i];
+    for (let j = 1; j <= n; j++)
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    prev = cur;
+  }
+  return 1 - prev[n] / Math.max(m, n);
+}
+async function _didYouMean(q) {
+  const key = _titleKey(q);
+  if (!key || key.length < 4) return [];
+  const words = String(q).trim().split(/\s+/).filter(Boolean);
+  const tries = [];
+  const add = x => { if (_titleKey(x).length >= 3 && !tries.includes(x)) tries.push(x); };
+  if (words.length > 1) { add(words.slice(0, -1).join(' ')); add(words.slice(1).join(' ')); }
+  const longest = words.slice().sort((a, b) => b.length - a.length)[0] || '';
+  if (longest.length >= 5) add(words.map(w => w === longest ? w.slice(0, Math.ceil(w.length * 0.6)) : w).join(' '));
+  const lang = /^[\p{Script=Latin}\p{N}\s\p{P}]+$/u.test(q) ? '' : '&language=' + _tmdbLang();
+  const got = await Promise.all(tries.slice(0, 3).map(x =>
+    tmdbFetch(`/search/multi?query=${encodeURIComponent(x)}&include_adult=false${lang}`).catch(() => null)));
+  const seen = new Set(), out = [];
+  for (const r of got) for (const x of ((r && !r.error && r.results) || [])) {
+    if (x.media_type !== 'movie' && x.media_type !== 'tv') continue;
+    const k = x.media_type + ':' + x.id;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    const names = [x.title, x.name, x.original_title, x.original_name].filter(Boolean);
+    const score = Math.max(...names.map(nm => _similar(key, _titleKey(nm))));
+    if (score >= 0.75 && score < 1)
+      out.push({ title: x.title || x.name, year: (x.release_date || x.first_air_date || '').slice(0, 4), score, votes: x.vote_count || 0 });
+  }
+  return out.sort((a, b) => b.score - a.score || b.votes - a.votes).slice(0, 3);
 }
 
 // ── Город в поиске: «Места съёмок: Лиссабон» ─────────────────────────────────
@@ -7868,6 +7922,7 @@ document.addEventListener('DOMContentLoaded', () => {
     else if (b.dataset.drop != null) _searchDrop(Number(b.dataset.drop));
     else if (b.dataset.like) _searchLike(b.dataset.like, b.dataset.type, b.dataset.title);
     else if (b.dataset.qpicks) _searchOfferPicks();
+    else if (b.dataset.fix != null) { inp.value = b.dataset.fix; doSearch(); }
     else if (b.id === 'srch-more') _searchMore();
     else if (b.dataset.city != null) _mapsOpenPlace(Number(b.dataset.city));
   });
