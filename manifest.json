@@ -1,7 +1,7 @@
 {
   "name": "Cinemail",
   "short_name": "Cinemail",
-  "description": "Track films, share with friends, get AI picks - your personal cinema companion",
+  "description": "Keep the films you watched and want to watch, share lists with friends, find what to watch next and where it was filmed",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0d0d1a",
@@ -9,10 +9,16 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "icon.png",
+      "src": "cinemail-icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "cinemail-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

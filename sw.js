@@ -7,7 +7,7 @@
 //
 // Keep this in step with the app version in index.html, so the two can be compared at a
 // glance and a missed bump is visible rather than silent.
-const CACHE_VERSION = "v313-0.58.3";
+const CACHE_VERSION = "v314-0.66.4";
 const CACHE_NAME = "cinemail-" + CACHE_VERSION;
 
 // НЕИЗМЕНЯЕМОЕ ЖИВЁТ ОТДЕЛЬНО И ПЕРЕЖИВАЕТ РЕЛИЗЫ.
@@ -41,8 +41,8 @@ const PRECACHE = [
   "./index.html",
   "./manifest.json",
   "./logo.png",
-  "./icon.png",
-  "./favicon-16.png", "./favicon-32.png", "./favicon-48.png",          // shown on the splash and all four auth screens, not just as the home-screen icon
+  "./cinemail-icon-512.png", "./cinemail-icon-180.png",
+  "./cinemail-icon-16.png", "./cinemail-icon-32.png", "./cinemail-icon-48.png",   // the mark of 10 Oct (brand/); the tab icon and the home-screen icon
   "./exceljs.min.js",
   "./emoji.js?v=0.53.3",
   "./qr.js?v=0.52.0",
