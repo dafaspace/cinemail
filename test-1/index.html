@@ -3015,7 +3015,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.68.5-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.69.0-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -7429,10 +7429,68 @@ async function _searchPeople(q) {
 
 const _srchSect = label => `<div class="srch-sect">${escapeHtml(label)}</div>`;
 
+// ПРИМЕРЫ ПОД ПОЛЕМ - ЧЕТЫРЕ ВИДА ЗАПРОСА, КАЖДЫЙ РАЗ ДРУГИЕ (Dafa, 19 окт). Одни и те же четыре
+// примера переставали замечать, а показывали они четыре приёма из десятков. Четыре места: страна
+// или школа, жанр с годами, настроение, тема; на каждое - случайный из своего запаса, так что
+// рядом всегда четыре разных вида, а не четыре похожих. Каждый пример в запасе разбирается
+// целиком, без «Не учтено» (docs/search-tests.mjs, раздел 7), и подборку не тратит (_srchFree).
+// Добавил пример - прогони тесты: непрочитанное слово в примере уронит их.
+const _EXAMPLE_POOLS = {
+  en: [
+    ['korean thriller', 'french new wave', 'japanese animation', 'italian horror'],
+    ['sci-fi from the 70s', 'westerns from the 60s', 'horror from the 80s', 'comedies from the 90s'],
+    ['something cosy', 'films to cry to', 'light and funny', 'thought-provoking films'],
+    ['films about cats', 'films about space', 'films about chess', 'heist films'],
+  ],
+  ru: [
+    ['корейский триллер', 'новая волна', 'японская анимация', 'итальянские ужасы'],
+    ['фантастика 70-х', 'вестерны 60-х', 'ужасы 80-х', 'комедии 90-х'],
+    ['что-нибудь уютное', 'фильмы, чтобы поплакать', 'лёгкое и смешное', 'кино, чтобы подумать'],
+    ['фильмы про котиков', 'фильмы про космос', 'фильмы про шахматы', 'фильмы про ограбления'],
+  ],
+  uk: [
+    ['корейський трилер', 'нова хвиля', 'японська анімація', 'італійські жахи'],
+    ['фантастика 70-х', 'вестерни 60-х', 'жахи 80-х', 'комедії 90-х'],
+    ['щось затишне', 'фільми, щоб поплакати', 'легке і смішне', 'кіно, щоб подумати'],
+    ['фільми про котів', 'фільми про космос', 'фільми про шахи', 'фільми про пограбування'],
+  ],
+  ka: [
+    ['კორეული თრილერი', 'ახალი ტალღა', 'იაპონური ანიმაცია', 'იტალიური საშინელებათა ფილმები'],
+    ['70-იანების ფანტასტიკა', '60-იანების ვესტერნები', '80-იანების საშინელებათა ფილმები', '90-იანების კომედიები'],
+    ['მყუდრო ფილმი', 'ასატირებელი ფილმები', 'მსუბუქი და სასაცილო', 'დასაფიქრებელი ფილმები'],
+    ['ფილმები კატებზე', 'ფილმები კოსმოსზე', 'ფილმები ჭადრაკზე', 'ფილმები ძაღლებზე'],
+  ],
+  es: [
+    ['thriller coreano', 'comedia francesa', 'anime japonés', 'nouvelle vague'],
+    ['ciencia ficción de los 70', 'westerns de los 60', 'terror de los 80', 'comedias de los 90'],
+    ['algo acogedor', 'películas para llorar', 'ligero y divertido', 'películas que hacen pensar'],
+    ['películas de gatos', 'películas sobre el espacio', 'películas de ajedrez', 'películas de atracos'],
+  ],
+  fr: [
+    ['thriller coréen', 'comédie française', 'horreur japonaise', 'nouvelle vague'],
+    ['science-fiction des années 70', 'westerns des années 60', 'horreur des années 80', 'comédies des années 90'],
+    ['un film douillet', 'films pour pleurer', 'léger et drôle', 'films qui font réfléchir'],
+    ['films sur les chats', "films sur l'espace", 'films sur les échecs', 'films de braquage'],
+  ],
+  de: [
+    ['koreanischer Thriller', 'französische Komödie', 'Nouvelle Vague', 'japanischer Animationsfilm'],
+    ['Science-Fiction der 70er', 'Western der 60er', 'Horror der 80er', 'Komödien der 90er'],
+    ['etwas Gemütliches', 'Filme zum Weinen', 'leicht und lustig', 'Filme zum Nachdenken'],
+    ['Filme über Katzen', 'Filme über den Weltraum', 'Filme über Schach', 'Filme über einen Raubüberfall'],
+  ],
+  it: [
+    ['horror giapponese', 'commedia italiana', 'nouvelle vague', 'thriller coreano'],
+    ['fantascienza anni 70', 'western anni 60', 'horror anni 80', 'commedie anni 90'],
+    ['qualcosa di accogliente', 'film per piangere', 'leggero e divertente', 'film che fanno riflettere'],
+    ['film sui gatti', 'film sullo spazio', 'film sugli scacchi', 'film su una rapina'],
+  ],
+};
 function _renderSearchExamples(boxId = 'search-examples') {
   const box = document.getElementById(boxId);
   if (!box) return;
-  const ex = String(t('search_examples') || '').split('|').map(x => x.trim()).filter(Boolean);
+  const pool = _EXAMPLE_POOLS[_lang] || _EXAMPLE_POOLS.en;
+  const ex = pool.map(slot => slot[Math.floor(Math.random() * slot.length)])
+    .map(q => [Math.random(), q]).sort((x, y) => x[0] - y[0]).map(x => x[1]);
   box.innerHTML = ex.map(q => `<button type="button" class="srch-chip" dir="auto" data-q="${escapeHtml(q)}">${escapeHtml(q)}</button>`).join('');
 }
 
@@ -7481,6 +7539,7 @@ async function doSearch() {
   const el = document.getElementById('search-results');
   const raw = (inp?.value || '').trim();
   const gen = ++_srchGen;
+  const free = _srchFree; _srchFree = false;
   _srch = null;
   if (!raw) { el.innerHTML = ''; _searchHome(true); return; }
   _searchHome(false);
@@ -7599,7 +7658,7 @@ async function doSearch() {
     if (showTitles.length) _maybeShowSearchCoach();
     _srchOffer = offerPicks ? { raw, c, showTitles, gen } : null;
     if (!picksRun) return;
-    await _runQueryPicks(raw, c, showTitles, gen);
+    await _runQueryPicks(raw, c, showTitles, gen, free);
   } catch (e) {
     if (gen !== _srchGen) return;
     // Отказ сервера - не отсутствие фильма. Код ошибки - в консоль, человеку - фраза, по
@@ -7614,10 +7673,16 @@ async function doSearch() {
 // Подборка по понятому запросу - в #srch-picks. Из doSearch сразу, а для набранного названия
 // («Die Hard», «Scary Movie») - по нажатию строки «Подборка по словам» (_srchOffer).
 let _srchOffer = null;
-async function _runQueryPicks(raw, c, showTitles, gen) {
+// Пример под полем подборку не тратит (Dafa, 19 окт): это показ того, что умеет поиск, а не
+// просьба. Ставится нажатием на пример и снимается первым же поиском.
+let _srchFree = false;
+async function _runQueryPicks(raw, c, showTitles, gen, free) {
   // Подборка стоит одно из десяти недельных нажатий. Найденное по названию уже на экране
-  // и остаётся, даже когда нажатия кончились.
-  const spent = await _spendPick('q:' + _picksKey(c, raw));
+  // и остаётся, даже когда нажатия кончились. Пример - бесплатно, и тот же запрос в этой сессии
+  // тоже: ключ ложится в _picksSpent, как оплаченный.
+  const key = 'q:' + _picksKey(c, raw);
+  if (free) _picksSpent.add(key);
+  const spent = free ? { ok: true } : await _spendPick(key);
   if (gen !== _srchGen) return;
   if (!spent.ok) {
     const box = document.getElementById('srch-picks');
@@ -7926,7 +7991,7 @@ document.addEventListener('DOMContentLoaded', () => {
   tab.addEventListener('click', e => {
     const b = e.target.closest && e.target.closest('button');
     if (!b || !tab.contains(b)) return;
-    if (b.classList.contains('srch-chip') && b.dataset.q != null) { inp.value = b.dataset.q; doSearch(); }
+    if (b.classList.contains('srch-chip') && b.dataset.q != null) { inp.value = b.dataset.q; _srchFree = true; doSearch(); }
     else if (b.dataset.drop != null) _searchDrop(Number(b.dataset.drop));
     else if (b.dataset.like) _searchLike(b.dataset.like, b.dataset.type, b.dataset.title);
     else if (b.dataset.qpicks) _searchOfferPicks();
@@ -9724,13 +9789,13 @@ async function surpriseMeEngine() {
 const _MOODS = [
   // terms are matched as substrings against the normalised query, so stems are enough and a
   // single entry covers inflections: "уютн" catches уютный / уютное / уютную.
-  { id:'cosy',    g:'35,10751,10749', terms:'cosy cozy warm feelgood уютн тепл добр ностальг винтажн затишн gemutlich gemütlich accogliente douillet acogedor затишн heartwarming feel_good wholesome nostalgic душевн жизнеутвержд ностальгич ностальгійн herzerwarmend nostalgisch nostalgico nostalgique' },
+  { id:'cosy',    g:'35,10751,10749', terms:'cosy cozy warm feelgood уютн тепл добр ностальг винтажн затишн gemutlich gemütlich accogliente douillet acogedor затишн heartwarming feel_good wholesome nostalgic მყუდრო душевн жизнеутвержд ностальгич ностальгійн herzerwarmend nostalgisch nostalgico nostalgique' },
   { id:'autumn',  g:'18,9648',        terms:'autumn fall melanchol осенн меланхол грусн сумрачн herbst autunno automne otoño otono შემოდგომ herbstlich atmospheric moody атмосферн атмосферное атмосферний atmospharisch atmosferico atmospherique atmosferico' },
   { id:'heavy',   g:'18,10752,36',    terms:'heavy =hard bleak grim тяжел мрачн жестк готич депресс schwer pesante lourd duro depressing gritty депрессивн гнетущ безысходн депресивн' },
-  { id:'light',   g:'35,10749,16',    terms:'light easy fun лёгк легк весел непринужд leicht leggero léger ligero' },
-  { id:'slow',    g:'18',             terms:'slow quiet contemplative медленн тих тихи тихо созерцат медитат гипнотич langsam lento lent minimalist minimal минимали мінімаліст minimalistisch minimalista minimaliste' },
-  { id:'think',   g:'18,878,9648',    terms:'think clever mind подумать умн сложн интеллект nachdenk riflessiv réfléch pensar philosophical thought_provoking философ філософ philosophisch filosofico philosophique filosofico задуматься заставляет_задуматься' },
-  { id:'cry',     g:'18,10749',       terms:'cry sad tears поплакать груст слёз слез traurig triste piangere pleurer sentimental sentiment emotional сентимент эмоциональн емоційн sentimentale sentimentalisch emotionale' },
+  { id:'light',   g:'35,10749,16',    terms:'light easy fun лёгк легк весел непринужд მსუბუქ leicht leggero léger ligero' },
+  { id:'slow',    g:'18',             terms:'slow quiet contemplative медленн повільн =ნელი тих тихи тихо созерцат медитат гипнотич langsam lento lent minimalist minimal минимали мінімаліст minimalistisch minimalista minimaliste' },
+  { id:'think',   g:'18,878,9648',    terms:'think clever mind подумать подума умн сложн интеллект nachdenk riflessiv riflettere დასაფიქრ réfléch pensar philosophical thought_provoking философ філософ philosophisch filosofico philosophique filosofico задуматься заставляет_задуматься' },
+  { id:'cry',     g:'18,10749',       terms:'cry sad tears поплакать поплака llorar weinen ასატირებ груст слёз слез traurig triste piangere pleurer sentimental sentiment emotional сентимент эмоциональн емоційн sentimentale sentimentalisch emotionale' },
   // neg - жанр, который снимается, когда настроение отрицают: "не страшное" - это без хоррора
   // (проверка кода 9 окт, #95). У остальных настроений такой сердцевины нет: "не слишком
   // грустное" не значит "без драм", и оно честно уходит в «Не учтено».
@@ -9738,7 +9803,7 @@ const _MOODS = [
   // «самые страшные фильмы» отвечали «Тёмным рыцарем», «Паразитами» и «Криминальным чтивом» (проверка
   // новыми запросами, 15 окт). Напряжённое (tense, напряж) - это триллер, у него своя строка.
   { id:'scary',   g:'27', neg:'27', terms:'scary horror страшн ужас gruselig spavent effrayant miedo spaventoso creepy жуткий жуткое жуткая моторошн' },
-  { id:'funny',   g:'35',             terms:'funny laugh comedy смешн смеш комед lustig divertente drôle drole gracioso hilarious witty satire satirical уморит ржачн угарн остроумн сатира сатиры сатиричес дотепн сатиричн satira satire satirisch witzig spiritoso' },
+  { id:'funny',   g:'35',             terms:'funny laugh comedy смешн смеш смішн divertid სასაცილ комед lustig divertente drôle drole gracioso hilarious witty satire satirical уморит ржачн угарн остроумн сатира сатиры сатиричес дотепн сатиричн satira satire satirisch witzig spiritoso' },
   { id:'gripping', g:'53,28,12',    terms:'thrilling gripping suspenseful exciting edge_of_seat захватыва саспенс захоплив spannend avvincente palpitant emocionante trepidante' },
   // Напряжённое - триллер, без боевика и приключений: в «захватывающем» с ними наверх вставали
   // аниме-боевики 2026 года.
@@ -9760,13 +9825,13 @@ const _MOODS = [
 // above, and an arbitrary noun in a non-English language still cannot reach TMDB's index.
 const _GENRE_WORDS = [
   { g:'10749', terms:'romance romantic романт мелодрам romantik romantico romantique romantica რომანტ романтичн რომანტიკულ მელოდრამ' },
-  { g:'35',    terms:'comedy комеди komodie komödie commedia comedie comédia კომედ комедія комедії комедію' },
+  { g:'35',    terms:'comedy комеди komodie komödie commedia commedie comedie comédia კომედ კომედიებ комедія комедії комедію' },
   { g:'27',    terms:'horror ужас ужастик хоррор страшилк schrecken orrore horreur terror საშინელ жахи жахів фільм_жахів' },
   { g:'53',    terms:'thriller триллер spannung thriller suspense трилер трилери თრილერ' },
   { g:'9648',  terms:'mystery detective детектив загадк krimi giallo policier misterio დეტექტ детективи დეტექტივ' },
   { g:'878',   terms:'scifi science_fiction научн_фантаст фантаст sci scifi sciencefiction fantascienza fantascience ფანტასტ наукова_фантастика ciencia_ficcion ficcion_cientifica' },
   { g:'14',    terms:'fantasy фэнтези фентези fantasie fantasia fantaisie фентезі ფენტეზ' },
-  { g:'16',    terms:'animation anime cartoon аниме анимаци мультфильм мультик мультиплика zeichentrick animazione animacion ანიმაც аніме мультфільм ანიმე მულტფილმ' },
+  { g:'16',    terms:'animation anime cartoon аниме анимаци мультфильм мультик мультиплика анімац animationsfilm zeichentrick animazione animacion ანიმაც аніме мультфільм ანიმე მულტფილმ' },
   { g:'99',    terms:'documentary докуметал документал докуфильм dokumentarfilm documentario documentaire documental დოკუმენტურ' },
   { g:'18',    terms:'drama драм dramma drame დრამა დრამებ' },
   { g:'28',    terms:'action боевик экшн actionfilm azione бойовик ბოევიკ მძაფრსიუჟეტიან' },
@@ -9876,7 +9941,7 @@ const _SUBJECTS = [
   { k:'shark',        terms:'акул hai requin tiburon squalo shark' },
   { k:'dinosaur',     terms:'динозавр dinosaur dinosaurier dinosaure dinosaurio' },
   { k:'bird',         terms:'птиц птах vogel oiseau pajaro uccell ფრინველ bird' },
-  { k:'space',        terms:'космос космич weltraum espace espacio spazio კოსმ space' },
+  { k:'space',        terms:'космос космич weltraum espace espacio spazio კოსმ კოსმოს space' },
   { k:'alien',        terms:'инопланет пришелец ausserirdisch außerirdisch extraterrestre alieno alien alienigenas alienígenas' },
   { k:'robot',        terms:'робот roboter robot' },
   { k:'time travel',  terms:'путешествиевовремени путешеств_во_времени во_времени машинавремени машина_времени zeitreise voyagedanstemps voyage_dans_le_temps viaje_en_el_tiempo viaggio_nel_tempo time_travel timetravel' },
@@ -9917,13 +9982,13 @@ const _SUBJECTS = [
   { k:'family',       terms:'семья семьи семейн сімʼя сімей familie famille familia famiglia ოჯახ family' },
   { k:'revenge',      terms:'месть мести мстит мстител помста помсти rache vengeance venganza vendetta revenge' },
   { k:'survival',     terms:'выживан виживан uberleben überleben survie supervivencia sopravvivenza survival' },
-  { k:'heist',        terms:'ограблен пограбуван raub braquage atraco rapina heist raubzug' },
+  { k:'heist',        terms:'ограблен пограбуван raub braquage atraco rapina heist raubzug raububerfall' },
   { k:'spy',          terms:'шпион шпигун spion espion espia spia spy spies' },
   { k:'mafia',        terms:'мафи гангстер mafia gangster' },
   { k:'serial killer',terms:'маньяк серийн серийн_убийц серийныйубийца serienmorder serienmörder tueur_en_serie asesinoserie asesino_en_serie serial_killer serialkiller' },
   { k:'boxing',       terms:'бокс boxen boxe boxeo pugilato boxing' },
   { k:'football',     terms:'футбол fussball fußball football futbol calcio' },
-  { k:'chess',        terms:'шахмат шахів шахова schach echecs échecs ajedrez scacchi chess' },
+  { k:'chess',        terms:'шахмат шахів шахова =шахи ჭადრაკ schach echecs échecs ajedrez scacchi chess' },
   { k:'music',        terms:'музык музик musik musique musica მუსიკ music' },
   { k:'rock band',    terms:'рокгруп рок_группа rockband rock_band groupe_de_rock banda_de_rock gruppo_rock rockgruppe' },
   { k:'painter',      terms:'художник маляр maler peintre pintor pittore მხატვ painter' },
@@ -10017,7 +10082,7 @@ const _SUBJECTS = [
   { k:"sensual", pref:"10749,18", adult:1, terms:"sensual tactile чувственн телесн осязаем чуттєв sensual sensuel sinnlich sensuale სენსუალური" },
   { k:"poetic", terms:"poetic lyrical поэтичн лиричн поэзия кинопоэзия поетичн ліричн poetico lirico poetique lyrique poetisch lyrisch poetico lirico პოეტური" },
   { k:"chilling", terms:"chilling bloodcurdling леденящ холодок_по_спине озноб страх крижан escalofriante glacant eiskalt agghiacciante შემზარავი" },
-  { k:"dark", terms:"darkness pitchblack мрачн беспросветн темнота черная_сторона похмур sombrio tenebroso sombre tenebreux dustere finster cupo tenebroso ბნელი dark" },
+  { k:"dark", terms:"darkness pitchblack мрачн беспросветн темнота черная_сторона похмур sombrio tenebroso sombre tenebreux dustere duster oscur finster cupo tenebroso ბნელი dark" },
   { k:"disturbing", terms:"disturbing troubling выбива_из_колеи беспокоящ смущающ травмирующ тривожн perturbador inquietante derangeant verstorend perturbante შემაშფოთებელი" },
   // 11 окт: самые частые теги, которых разбор не понимал (проверка 162 тегов на en и ru).
   { k:"dark comedy", pref:"35", terms:"dark_comedy black_comedy черная_комедия черной_комедии черную_комедию чорна_комедія schwarze_komodie commedia_nera humour_noir comedia_negra humor_negro" },
@@ -10483,6 +10548,9 @@ const _QSTOP = ('про про about with films film movie movies кино фи�
   // человека «most» и находило актёра Дона Моста.
   'хочу хочется посмотр посоветуй подскажи покажи лучши лучше подивит порадь найкращ want best recommend ' +
   'most самые самый самая самое самых найбільш ძალიან წლის წელს ' +
+  // Связки, найденные на примерах под полем (19 окт): «dark and slow», «щось затишне», «algo
+  // acogedor», «etwas Gemütliches», «qualcosa di cupo», «Filme zum Weinen», «film sullo spazio».
+  'and щось щоб და algo que hacen etwas zum den einen qualcosa che fanno sullo sulla qui font ' +
   'quiero ver recomiend recomiénd mejor veux voir recommand meilleur möchte mochte sehen empfiehl beste ' +
   'voglio vedere consiglia miglior მინდა ნახვა საუკეთესო ' +
   // Связки из живых запросов, которые «Не учтено» называло зря (третий круг, 14 окт).
