@@ -3015,7 +3015,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.69.0-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.69.1-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -4863,6 +4863,18 @@ Object.keys(_I18N_FIX_UI).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I1
 // I18N-FIX-ANCHOR picksa
 // Набранное ровно известное название («Die Hard», «Scary Movie») - поиск фильма; подборка по его
 // словам ждёт этой строкой под «Похожее на» (15 окт).
+// privacy_updated - один раз тем, кто зарегистрировался до 19 окт (_privacyNotice).
+const _I18N_FIX_PRIVACY = {
+  en:{ privacy_updated:"Privacy policy updated: picks no longer send your library to an AI, and feedback goes to the developer's Telegram. Details at the bottom of the avatar menu." },
+  ru:{ privacy_updated:"Политика конфиденциальности обновлена: подборки больше не отправляют библиотеку в ИИ, а отзывы идут в Telegram разработчика. Подробнее - внизу меню под аватаром." },
+  uk:{ privacy_updated:"Політику конфіденційності оновлено: добірки більше не надсилають бібліотеку в ШІ, а відгуки йдуть у Telegram розробника. Докладніше - внизу меню під аватаром." },
+  ka:{ privacy_updated:"კონფიდენციალურობის პოლიტიკა განახლდა: რჩევები ბიბლიოთეკას აღარ უგზავნის ხელოვნურ ინტელექტს, უკუკავშირი კი დეველოპერის Telegram-ში მიდის. დაწვრილებით - ავატარის მენიუს ბოლოში." },
+  es:{ privacy_updated:"Política de privacidad actualizada: las sugerencias ya no envían tu biblioteca a una IA y los comentarios llegan al Telegram del desarrollador. Detalles al final del menú del avatar." },
+  fr:{ privacy_updated:"Politique de confidentialité mise à jour : les suggestions n'envoient plus ta bibliothèque à une IA, et les retours vont sur le Telegram du développeur. Détails en bas du menu de l'avatar." },
+  de:{ privacy_updated:"Datenschutzerklärung aktualisiert: Tipps schicken deine Bibliothek nicht mehr an eine KI, und Feedback geht an den Telegram des Entwicklers. Details unten im Avatar-Menü." },
+  it:{ privacy_updated:"Informativa sulla privacy aggiornata: i consigli non inviano più la tua libreria a un'IA e i feedback arrivano al Telegram dello sviluppatore. Dettagli in fondo al menu dell'avatar." },
+};
+Object.keys(_I18N_FIX_PRIVACY).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_FIX_PRIVACY[l]); });
 // search_did_you_mean - над подсказками к опечатке (19 окт).
 const _I18N_FIX_PICKSA = {
   en:{ search_as_words:"Picks for the words: {w}", search_did_you_mean:"Nothing under that title. Did you mean:" },
@@ -6025,6 +6037,20 @@ async function onSignedIn(user) {
   checkPendingFilmLink(); // open a film someone shared via an external /f/ link
   startInboxPolling();
   _pushSyncOnLogin(); // native-only, non-prompting: refresh push token if already granted
+  _privacyNotice(user);
+}
+// ПОЛИТИКА ИЗМЕНИЛАСЬ - СКАЗАТЬ ОДИН РАЗ. privacy.html обещает уведомить в приложении о
+// существенных изменениях, и 19 окт они есть: подборки больше не отправляют библиотеку в ИИ, а
+// отзывы со скриншотом описаны как идущие в Telegram разработчика. Аккаунт, созданный позже, уже
+// получил новую политику при регистрации. Раз на устройство, без сети.
+const PRIVACY_VER = '2026-10-19';
+function _privacyNotice(user) {
+  try {
+    if (localStorage.getItem('cm_privacy_seen') === PRIVACY_VER) return;
+    localStorage.setItem('cm_privacy_seen', PRIVACY_VER);
+    if (!user || !user.created_at || String(user.created_at).slice(0, 10) >= PRIVACY_VER) return;
+    setTimeout(() => showToast(t('privacy_updated'), false, 9000), 1500);
+  } catch (e) {}
 }
 
 // ── СМЕНА АККАУНТА: ОДИН СБРОС НА ВСЁ ───────────────────────────────────────
@@ -15646,7 +15672,7 @@ function _safeErr(e) {
   return m;
 }
 
-function showToast(msg, isError=false) {
+function showToast(msg, isError=false, ms=2500) {
   const existing=document.getElementById("toast");
   if (existing){existing.classList.remove("show");}
   const t=document.getElementById("toast");
@@ -15654,7 +15680,7 @@ function showToast(msg, isError=false) {
   if (isError) { t.style.borderColor="rgba(248,113,113,0.4)"; t.style.color="#fca5a5"; t.style.background="#3b0a0a"; }
   else { t.style.borderColor="var(--border)"; t.style.color="var(--text)"; t.style.background="var(--surface2)"; }
   t.classList.add("show");
-  setTimeout(()=>{t.classList.remove("show");},2500);
+  setTimeout(()=>{t.classList.remove("show");},ms);
 }
 
 // ── Account ───────────────────────────────────────────────────────────────────

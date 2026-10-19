@@ -7,7 +7,7 @@
 //
 // Keep this in step with the app version in index.html, so the two can be compared at a
 // glance and a missed bump is visible rather than silent.
-const CACHE_VERSION = "v314-0.66.4";
+const CACHE_VERSION = "v315-0.69.1";
 const CACHE_NAME = "cinemail-" + CACHE_VERSION;
 
 // НЕИЗМЕНЯЕМОЕ ЖИВЁТ ОТДЕЛЬНО И ПЕРЕЖИВАЕТ РЕЛИЗЫ.
@@ -41,7 +41,7 @@ const PRECACHE = [
   "./index.html",
   "./manifest.json",
   "./logo.png",
-  "./cinemail-icon-512.png", "./cinemail-icon-180.png",
+  "./cinemail-mark-512.png", "./cinemail-icon-512.png", "./cinemail-maskable-512.png", "./cinemail-icon-180.png",
   "./cinemail-icon-16.png", "./cinemail-icon-32.png", "./cinemail-icon-48.png",   // the mark of 10 Oct (brand/); the tab icon and the home-screen icon
   "./exceljs.min.js",
   "./emoji.js?v=0.53.3",
