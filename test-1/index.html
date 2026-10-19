@@ -3015,7 +3015,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.68.4-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.68.5-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -7675,11 +7675,15 @@ async function _didYouMean(q) {
   if (!key || key.length < 4) return [];
   const words = String(q).trim().split(/\s+/).filter(Boolean);
   const tries = [];
-  const add = x => { if (_titleKey(x).length >= 3 && !tries.includes(x)) tries.push(x); };
+  // Остаток короче четырёх букв («The» от «The godfathr») - не название, а обращение впустую.
+  const add = x => { if (_titleKey(x).length >= 4 && !tries.includes(x)) tries.push(x); };
   if (words.length > 1) { add(words.slice(0, -1).join(' ')); add(words.slice(1).join(' ')); }
   const longest = words.slice().sort((a, b) => b.length - a.length)[0] || '';
   if (longest.length >= 5) add(words.map(w => w === longest ? w.slice(0, Math.ceil(w.length * 0.6)) : w).join(' '));
-  const lang = /^[\p{Script=Latin}\p{N}\s\p{P}]+$/u.test(q) ? '' : '&language=' + _tmdbLang();
+  // Язык ответа - по письму запроса, а не по интерфейсу: «интерстеллр» в английском интерфейсе
+  // получал «Interstellar» и сравнивал кириллицу с латиницей - сходство ноль (проверка test-1, 19 окт).
+  const lang = /\p{Script=Georgian}/u.test(q) ? '&language=ka-GE'
+    : /\p{Script=Cyrillic}/u.test(q) ? '&language=' + (_lang === 'uk' || /[іїєґ]/i.test(q) ? 'uk-UA' : 'ru-RU') : '';
   const got = await Promise.all(tries.slice(0, 3).map(x =>
     tmdbFetch(`/search/multi?query=${encodeURIComponent(x)}&include_adult=false${lang}`).catch(() => null)));
   const seen = new Set(), out = [];
@@ -7693,7 +7697,11 @@ async function _didYouMean(q) {
     if (score >= 0.75 && score < 1)
       out.push({ title: x.title || x.name, year: (x.release_date || x.first_air_date || '').slice(0, 4), score, votes: x.vote_count || 0 });
   }
-  return out.sort((a, b) => b.score - a.score || b.votes - a.votes).slice(0, 3);
+  // Одно название - одна строка: «The Godfather» 1972, 2023 и 2022 - это три раза одно и то же
+  // для человека, который опечатался (проверка test-1, 19 окт). Остаётся самый известный.
+  const best = new Map();
+  for (const f of out.sort((a, b) => b.votes - a.votes)) { const k = _titleKey(f.title); if (!best.has(k)) best.set(k, f); }
+  return [...best.values()].sort((a, b) => b.score - a.score || b.votes - a.votes).slice(0, 3);
 }
 
 // ── Город в поиске: «Места съёмок: Лиссабон» ─────────────────────────────────
