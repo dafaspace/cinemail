@@ -3052,7 +3052,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.70.0-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.0-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -4912,10 +4912,16 @@ const _I18N_FIX_PRIVACY = {
   it:{ privacy_updated:"Informativa sulla privacy aggiornata: i consigli non inviano più la tua libreria a un'IA e i feedback arrivano al Telegram dello sviluppatore. Dettagli in fondo al menu dell'avatar." },
 };
 Object.keys(_I18N_FIX_PRIVACY).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_FIX_PRIVACY[l]); });
-// Слайд карт в онбординге (23 окт). Остальные шесть языков - после того, как Dafa утвердит текст.
+// Слайд карт в онбординге (23 окт; шесть остальных языков 24 окт, по утверждённым en/ru).
 const _I18N_FIX_OBMAP = {
   en:{ ob_map_title:"Where was it filmed", ob_map_body:"More than 30,000 filming places on a world map. Open a film to see where it was shot, or tap “Where am I” to find what was filmed near you. The Odyssey alone was shot in six countries, from Iceland to Morocco." },
   ru:{ ob_map_title:"Где это снимали", ob_map_body:"Более 30 000 мест съёмок на карте мира. Открой фильм, чтобы увидеть, где его снимали, или нажми «Где я», чтобы узнать, что снимали рядом. Одну только «Одиссею» снимали в шести странах, от Исландии до Марокко." },
+  uk:{ ob_map_title:"Де це знімали", ob_map_body:"Понад 30 000 місць зйомок на мапі світу. Відкрий фільм, щоб побачити, де його знімали, або натисни «Де я», щоб дізнатися, що знімали поруч. Саму лише «Одіссею» знімали в шести країнах, від Ісландії до Марокко." },
+  ka:{ ob_map_title:"სად გადაიღეს", ob_map_body:"30 000-ზე მეტი გადაღების ადგილი მსოფლიო რუკაზე. გახსენი ფილმი და ნახე, სად გადაიღეს, ან დააჭირე „სად ვარ“ და გაიგე, რა გადაიღეს შენ ახლოს. მარტო „ოდისეა“ ექვს ქვეყანაში გადაიღეს, ისლანდიიდან მაროკომდე." },
+  es:{ ob_map_title:"Dónde se rodó", ob_map_body:"Más de 30 000 lugares de rodaje en un mapa del mundo. Abre una película para ver dónde se rodó, o toca «Dónde estoy» para descubrir qué se rodó cerca de ti. «La odisea», por sí sola, se rodó en seis países, de Islandia a Marruecos." },
+  fr:{ ob_map_title:"Où a-t-il été tourné", ob_map_body:"Plus de 30 000 lieux de tournage sur une carte du monde. Ouvrez un film pour voir où il a été tourné, ou touchez « Où suis-je » pour découvrir ce qui a été tourné près de vous. À elle seule, « L'Odyssée » a été tournée dans six pays, de l'Islande au Maroc." },
+  de:{ ob_map_title:"Wo wurde das gedreht", ob_map_body:"Mehr als 30.000 Drehorte auf einer Weltkarte. Öffne einen Film, um zu sehen, wo er gedreht wurde, oder tippe auf „Wo bin ich“, um zu erfahren, was in deiner Nähe gedreht wurde. Allein „Die Odyssee“ wurde in sechs Ländern gedreht, von Island bis Marokko." },
+  it:{ ob_map_title:"Dove è stato girato", ob_map_body:"Più di 30.000 luoghi di riprese su una mappa del mondo. Apri un film per vedere dove è stato girato, oppure tocca «Dove sono» per scoprire cosa è stato girato vicino a te. Le riprese di «Odissea» hanno toccato sei paesi, dall'Islanda al Marocco." },
 };
 Object.keys(_I18N_FIX_OBMAP).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_FIX_OBMAP[l]); });
 // Пути назад (дизайн-ревью, 23 окт): к фильму с карты, вернуть снятое слово, к последнему поиску.
