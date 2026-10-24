@@ -2171,7 +2171,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   <div class="ob-slides-wrap" id="ob-slides-wrap">
 
     <!-- Slide 0: Welcome -->
-    <div class="ob-slide">
+    <div class="ob-slide" data-ob="welcome">
       <!-- The mark itself, inline, not the opaque icon: drop-shadow traced the icon's square
            and the glow read as a rectangle behind the mark rather than light coming off it.
            Inline so the reel can turn on show and on tap (brand/web/logo-tap.html, 10 Oct). -->
@@ -2210,7 +2210,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     </div>
 
     <!-- Slide 1: Search -->
-    <div class="ob-slide">
+    <div class="ob-slide" data-ob="search">
       <div class="ob-mock">
         <div class="ob-mock-search">
           <span style="opacity:0.4;display:flex" data-ic="search" data-ic-size="13"></span>
@@ -2245,8 +2245,65 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <div class="ob-body" data-i18n="ob1_body">Heard about a film? Just search. Read the synopsis, check the rating, spot familiar names in the cast. Like it? Drop it into your list.</div>
     </div>
 
+    <!-- Slide: Map. Continues the legend: Taxi Driver (the soundtrack slide) and Past Lives
+         (in "My List") were both shot in the East Village, per Wikipedia - true in maps-data.json
+         on 23 Oct 2026, where the East Village holds 19 films. Real map colours and dot styles
+         (_mapsPaint, the circle layers); the sheet below uses the real map classes. -->
+    <div class="ob-slide" data-ob="map">
+      <div class="ob-mock" style="padding:0">
+        <svg class="ob-map" viewBox="0 0 300 120" width="100%" style="display:block" aria-hidden="true">
+          <defs><clipPath id="ob-map-land"><path d="M58 0 H232 L214 120 H96 Z"/></clipPath></defs>
+          <rect width="300" height="120" fill="#0d0d1a"/>
+          <path d="M0 0 H62 L100 120 H0 Z" fill="#101a33"/>
+          <path d="M228 0 H300 V120 H210 Z" fill="#101a33"/>
+          <path d="M58 0 H232 L214 120 H96 Z" fill="#0f0f1c"/>
+          <g clip-path="url(#ob-map-land)" stroke-linecap="round">
+            <g stroke="#24243a" stroke-width="1">
+              <path d="M40 1 L260 -37 M40 8 L260 -30 M40 15 L260 -23 M40 22 L260 -16 M40 29 L260 -9 M40 36 L260 -2 M40 43 L260 5 M40 50 L260 12 M40 57 L260 19 M40 64 L260 26 M40 71 L260 33 M40 78 L260 40 M40 85 L260 47 M40 92 L260 54 M40 99 L260 61 M40 106 L260 68 M40 113 L260 75 M40 120 L260 82 M40 127 L260 89 M40 134 L260 96 M40 141 L260 103 M40 148 L260 110 M40 155 L260 117"/>
+            </g>
+            <g stroke="#3a3a55" stroke-width="1.6">
+              <path d="M96 0 L128 120 M124 0 L152 120 M152 0 L176 120 M180 0 L200 120"/>
+            </g>
+            <rect x="170" y="70" width="16" height="12" fill="#11161a" transform="rotate(-10 178 76)"/>
+          </g>
+          <text x="262" y="96" fill="#4a6496" font-size="7" font-style="italic" font-family="DM Sans, sans-serif" transform="rotate(-80 262 96)">East River</text>
+          <text x="150" y="115" fill="#8a8a96" font-size="7" letter-spacing="1" font-family="DM Sans, sans-serif">MANHATTAN</text>
+          <g class="ob-map-dots">
+            <circle cx="126" cy="30" r="15" fill="rgba(245,197,24,0.18)" stroke="#F5C518" stroke-width="1.5"/>
+            <text x="126" y="33.5" fill="#F5C518" font-size="10" text-anchor="middle" font-family="Bebas Neue, Oswald, sans-serif">87</text>
+            <circle cx="118" cy="98" r="12" fill="rgba(245,197,24,0.18)" stroke="#F5C518" stroke-width="1.5"/>
+            <text x="118" y="101.5" fill="#F5C518" font-size="9" text-anchor="middle" font-family="Bebas Neue, Oswald, sans-serif">12</text>
+            <circle cx="160" cy="48" r="5" fill="#F5C518" stroke="#0d0d1a" stroke-width="1.5"/>
+            <circle cx="146" cy="70" r="4.5" fill="#0d0d1a" stroke="#F5C518" stroke-width="2"/>
+            <circle cx="198" cy="40" r="4.5" fill="#0d0d1a" stroke="#F5C518" stroke-width="2"/>
+            <circle cx="140" cy="88" r="5" fill="#F5C518" stroke="#0d0d1a" stroke-width="1.5"/>
+          </g>
+          <g class="ob-map-sel">
+            <circle cx="186" cy="66" r="9" fill="rgba(245,197,24,0.10)" stroke="rgba(245,197,24,0.6)" stroke-width="1"/>
+            <circle cx="186" cy="66" r="12" fill="none" stroke="#ffffff" stroke-width="2"/>
+          </g>
+        </svg>
+        <div style="padding:10px 14px 4px">
+          <div class="maps-place">
+            <div class="maps-place-n">East Village</div>
+            <div class="maps-place-m" data-i18n="ob_mock_us">United States</div>
+          </div>
+          <div style="height:4px"></div>
+          <div class="maps-film" style="cursor:default"><span class="maps-film-p" style="background-image:url(posters/taxidriver.jpg)"></span><span class="maps-film-t">Taxi Driver</span><span class="maps-film-y">1976</span><span class="maps-badge" data-i18n="maps_per_wiki">per Wikipedia</span></div>
+          <div class="maps-film" style="cursor:default;border-bottom:none"><span class="maps-film-p" style="background-image:url(posters/pastlives.jpg)"></span><span class="maps-film-t">Past Lives</span><span class="maps-film-y">2023</span><span class="maps-badge" data-i18n="maps_per_wiki">per Wikipedia</span></div>
+        </div>
+      </div>
+      <div class="ob-arr">
+        <svg viewBox="0 0 34 40" width="30" height="36" fill="none">
+          <path d="M17 4 V27 M6 19 L17 33 L28 19" stroke="#F5C518" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="ob-title" data-i18n="ob_map_title">Where was it filmed</div>
+      <div class="ob-body" data-i18n="ob_map_body">More than 30,000 filming places on a world map. Open a film to see where it was shot, or tap "Where am I" to find what was filmed near you. Turns out two of your films were shot in the same neighbourhood.</div>
+    </div>
+
     <!-- Slide 2: Lists -->
-    <div class="ob-slide">
+    <div class="ob-slide" data-ob="lists">
       <div class="ob-mock">
         <div class="list-tabs-row" style="margin-bottom:12px">
           <button class="list-tab personal active" data-i18n="ob_mock_mylist">My List</button>
@@ -2272,7 +2329,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     </div>
 
     <!-- Slide 3: Rate + Cinema Profile -->
-    <div class="ob-slide">
+    <div class="ob-slide" data-ob="rate">
       <div class="ob-mock">
         <div class="add-label" data-i18n="your_rating" style="font-size:11px;color:var(--muted);margin-bottom:6px">Your Rating</div>
         <div style="display:flex;gap:4px;margin-bottom:14px">
@@ -2304,7 +2361,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     </div>
 
     <!-- Slide 4: Soundtracks -->
-    <div class="ob-slide">
+    <div class="ob-slide" data-ob="music">
       <div class="ob-mock">
         <div style="display:flex;gap:11px;margin-bottom:11px">
           <img src="posters/taxidriver.jpg" alt="" style="width:50px;height:75px;border-radius:6px;object-fit:cover;flex-shrink:0">
@@ -2337,7 +2394,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     </div>
 
     <!-- Slide 5: Explore People -->
-    <div class="ob-slide">
+    <div class="ob-slide" data-ob="people">
       <div class="ob-mock">
         <div style="display:flex;gap:11px;margin-bottom:11px">
           <img src="posters/bladerunner.jpg" alt="" style="width:54px;height:81px;border-radius:6px;object-fit:cover;flex-shrink:0">
@@ -2363,7 +2420,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     </div>
 
     <!-- Slide 6: Friends + Inbox -->
-    <div class="ob-slide">
+    <div class="ob-slide" data-ob="share">
       <div class="ob-mock">
         <div class="ob-mock-msg-from">
           <div class="ob-mock-av">L</div>
@@ -2391,7 +2448,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     </div>
 
     <!-- Slide 7: Backup + Stats (real account components) -->
-    <div class="ob-slide">
+    <div class="ob-slide" data-ob="backup">
       <div class="ob-mock">
         <div class="ob-mock-acc-hd" style="margin-bottom:10px">
           <div class="ob-mock-acc-av av-glyph" id="ob-mock-av"></div>
@@ -2428,7 +2485,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     </div>
 
     <!-- Slide 8: Surprise Me / AI Picks -->
-    <div class="ob-slide">
+    <div class="ob-slide" data-ob="surprise">
       <div class="ob-mock">
         <div data-i18n="ob8_picks" style="font-size:11px;color:var(--muted);margin-bottom:10px;letter-spacing:0.3px;text-transform:uppercase">Personal picks for you</div>
         <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px">
@@ -2447,7 +2504,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     </div>
 
     <!-- Slide 9: Finale -->
-    <div class="ob-slide">
+    <div class="ob-slide" data-ob="finale">
       <div id="ob-popcorn" style="font-size:60px;margin-bottom:18px;line-height:1;filter:drop-shadow(0 0 28px rgba(245,197,24,0.25));position:relative"><span data-ic="popcorn" data-ic-size="64" style="color:var(--primary)"></span></div>
       <div class="ob-title" data-i18n="ob9_title">Showtime!</div>
       <div class="ob-body" data-i18n="ob9_body" style="margin-top:6px">All set. What are we waiting for? The movie won't watch itself!</div>
@@ -2456,18 +2513,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   </div>
 
   <div class="ob-bottom">
-    <div class="ob-dots" id="ob-dots">
-      <div class="ob-dot active" onclick="_obGoTo(0)"></div>
-      <div class="ob-dot" onclick="_obGoTo(1)"></div>
-      <div class="ob-dot" onclick="_obGoTo(2)"></div>
-      <div class="ob-dot" onclick="_obGoTo(3)"></div>
-      <div class="ob-dot" onclick="_obGoTo(4)"></div>
-      <div class="ob-dot" onclick="_obGoTo(5)"></div>
-      <div class="ob-dot" onclick="_obGoTo(6)"></div>
-      <div class="ob-dot" onclick="_obGoTo(7)"></div>
-      <div class="ob-dot" onclick="_obGoTo(8)"></div>
-      <div class="ob-dot" onclick="_obGoTo(9)"></div>
-    </div>
+    <div class="ob-dots" id="ob-dots"></div>
     <div class="ob-btn-row">
       <button class="ob-btn-skip" id="ob-skip-btn" onclick="_obFinish()" data-i18n="ob_skip">Skip</button>
       <button class="ob-btn-next" id="ob-next-btn" onclick="_obNext()" data-i18n="ob_next">Next</button>
@@ -4881,6 +4927,12 @@ const _I18N_FIX_PRIVACY = {
   it:{ privacy_updated:"Informativa sulla privacy aggiornata: i consigli non inviano più la tua libreria a un'IA e i feedback arrivano al Telegram dello sviluppatore. Dettagli in fondo al menu dell'avatar." },
 };
 Object.keys(_I18N_FIX_PRIVACY).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_FIX_PRIVACY[l]); });
+// Слайд карт в онбординге (23 окт). Остальные шесть языков - после того, как Dafa утвердит текст.
+const _I18N_FIX_OBMAP = {
+  en:{ ob_map_title:"Where was it filmed", ob_map_body:"More than 30,000 filming places on a world map. Open a film to see where it was shot, or tap “Where am I” to find what was filmed near you. Turns out two of your films were shot in the same neighbourhood.", ob_mock_us:"United States" },
+  ru:{ ob_map_title:"Где это снимали", ob_map_body:"Более 30 000 мест съёмок на карте мира. Открой фильм, чтобы увидеть, где его снимали, или нажми «Где я», чтобы узнать, что снимали рядом. Оказывается, два твоих фильма снимали в одном районе.", ob_mock_us:"США" },
+};
+Object.keys(_I18N_FIX_OBMAP).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_FIX_OBMAP[l]); });
 // Пути назад (дизайн-ревью, 23 окт): к фильму с карты, вернуть снятое слово, к последнему поиску.
 const _I18N_FIX_BACK = {
   en:{ maps_back_film:"Back to the film", search_undo_drop:"Bring back “{w}”", search_back_to:"Back to “{q}”" },
@@ -5403,9 +5455,17 @@ function _applyI18n() {
 // ── Auth helpers ──────────────────────────────────────────────────────────────
 /* ── Onboarding ─────────────────────────────────────────────────────────── */
 let _obSlide = 0;
-const _OB_TOTAL = 10;
+// Сколько слайдов - считает разметка, а не число в коде: слайд карт (23 окт) сдвинул бы каждое
+// «idx === 4» в анимациях и последнюю точку. Анимации ищут слайд по имени (data-ob).
+const _obTotal = () => document.querySelectorAll('.ob-slide').length;
+function _obDots() {
+  const box = document.getElementById('ob-dots');
+  if (!box || box.children.length === _obTotal()) return;
+  box.innerHTML = Array.from({ length: _obTotal() }, (_, i) => `<div class="ob-dot" onclick="_obGoTo(${i})"></div>`).join('');
+}
 
 function _obGoTo(idx) {
+  _obDots();
   _obSlide = idx;
   const wrap = document.getElementById('ob-slides-wrap');
   if (wrap) wrap.style.transform = `translateX(-${idx * 100}vw)`;
@@ -5414,14 +5474,14 @@ function _obGoTo(idx) {
   const nextBtn = document.getElementById('ob-next-btn');
   const skipBtn = document.getElementById('ob-skip-btn');
   if (nextBtn) {
-    if (idx === _OB_TOTAL - 1) {
+    if (idx === _obTotal() - 1) {
       nextBtn.innerHTML = t('ob_start') + ` <svg viewBox="0 0 28 24" width="19" height="16" fill="none" style="vertical-align:middle;margin-left:7px"><path d="M3 12 H21 M14 4.5 L23.5 12 L14 19.5" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
     } else {
       nextBtn.textContent = t('ob_next');
     }
   }
-  if (skipBtn) skipBtn.style.visibility = idx === _OB_TOTAL - 1 ? 'hidden' : 'visible';
-  if (idx === _OB_TOTAL - 1 && !_obPopcornPlayed) { _obPopcornPlayed = true; setTimeout(_obFinalePopcorn, 350); }
+  if (skipBtn) skipBtn.style.visibility = idx === _obTotal() - 1 ? 'hidden' : 'visible';
+  if (idx === _obTotal() - 1 && !_obPopcornPlayed) { _obPopcornPlayed = true; setTimeout(_obFinalePopcorn, 350); }
 }
 let _obPopcornPlayed = false;
 function _popcornPieceSVG(sz){
@@ -5523,11 +5583,12 @@ function _obPlaySlideAnim(idx){
   if (_obReduceMotion()) return;
   const slide = document.querySelectorAll('.ob-slide')[idx];
   if (!slide) return;
+  const ob = slide.dataset.ob;
   const A = (el, kf, opt) => { if (el) { try { el.animate(kf, Object.assign({ easing: _OB_EASE, fill: 'backwards' }, opt)); } catch(e){} } };
   // Base delay so animations begin AFTER the slide-in transition (0.4s) settles,
   // otherwise the start is masked while the slide is still flying into view.
   const BASE = 420;
-  if (idx === 1){ // Find: blocks pop in, then the list item gets ticked
+  if (ob === 'search'){ // Find: blocks pop in, then the list item gets ticked
     const kids = [...(slide.querySelector('.ob-mock')||{children:[]}).children];
     kids.forEach((el,i)=>A(el,[{opacity:0,transform:'translateY(12px) scale(0.96)'},{opacity:1,transform:'none'}],{duration:540,delay:BASE+i*130}));
     // The list shows "Watch with friends" UNchecked, then the checkmark ticks on.
@@ -5538,14 +5599,14 @@ function _obPlaySlideAnim(idx){
       A(row.querySelector('.list-check-icon'), [{transform:'scale(0)',opacity:0},{transform:'scale(1.3)',opacity:1,offset:0.55},{transform:'scale(0.92)',offset:0.78},{transform:'scale(1)',opacity:1}], {duration:620,delay:tickDelay});
       A(row.querySelector('span:last-child'), [{opacity:0,transform:'translateX(8px)'},{opacity:1,transform:'none'}], {duration:480,delay:tickDelay+200});
     }
-  } else if (idx === 2){ // Lists: personal list gets selected, its films appear as content
+  } else if (ob === 'lists'){ // Lists: personal list gets selected, its films appear as content
     const tab = slide.querySelector('.list-tab.personal');
     // tap + light up the personal list tab (it becomes the active gold one)
     A(tab, [{transform:'scale(0.9)',opacity:0.45},{transform:'scale(1.05)',opacity:1,offset:0.55},{transform:'scale(1)',opacity:1}], {duration:560,delay:BASE});
     if (tab){ A(tab, [{boxShadow:'0 0 0 0 rgba(245,197,24,0.55)'},{boxShadow:'0 0 0 7px rgba(245,197,24,0)'}], {duration:700,delay:BASE+120,fill:'none'}); }
     // then the films belonging to that list drop in as its content
     [...slide.querySelectorAll('.ob-mock > div')].slice(1).forEach((c,i)=>A(c,[{opacity:0,transform:'translateY(14px) scale(0.97)'},{opacity:1,transform:'none'}],{duration:520,delay:BASE+420+i*170}));
-  } else if (idx === 3){ // Rate: star sweep 0→5→3.5→4.5 + bars fill
+  } else if (ob === 'rate'){ // Rate: star sweep 0→5→3.5→4.5 + bars fill
     const starsDiv = [...slide.querySelectorAll('.ob-mock > div')].find(d => { const sp=d.querySelectorAll('span'); return sp.length===5 && (sp[0].textContent||'').trim()==='★'; });
     const stars = starsDiv ? [...starsDiv.querySelectorAll('span')] : [];
     if (stars.length === 5){
@@ -5557,14 +5618,14 @@ function _obPlaySlideAnim(idx){
       });
     }
     slide.querySelectorAll('.stats-bar-fill').forEach((f,i)=>{ const w=f.style.width||'0%'; A(f,[{width:'0%'},{width:w}],{duration:680,delay:1620+i*150}); });
-  } else if (idx === 4){ // Soundtracks: streaming buttons pop in
+  } else if (ob === 'music'){ // Soundtracks: streaming buttons pop in
     slide.querySelectorAll('.ob-mock-stream-btn').forEach((b,i)=>A(b,[{opacity:0,transform:'scale(0.4)'},{opacity:1,transform:'scale(1.18)',offset:0.7},{transform:'scale(1)',opacity:1}],{duration:440,delay:230+i*140}));
-  } else if (idx === 5){ // Explore people: rows pop in, then crew names light up
+  } else if (ob === 'people'){ // Explore people: rows pop in, then crew names light up
     const kids = [...(slide.querySelector('.ob-mock')||{children:[]}).children];
     kids.forEach((el,i)=>A(el,[{opacity:0,transform:'translateY(12px) scale(0.96)'},{opacity:1,transform:'none'}],{duration:520,delay:BASE+i*110}));
     const flashStart = BASE + kids.length*110 + 180;
     slide.querySelectorAll('.crew-val span').forEach((n,i)=>{ try { n.animate([{color:'#ddd'},{color:'#F5C518',offset:0.4},{color:'#ddd'}], {duration:760,delay:flashStart+i*340,easing:_OB_EASE}); } catch(e){} });
-  } else if (idx === 6){ // Share: a friend's recommendation arrives, the note types out
+  } else if (ob === 'share'){ // Share: a friend's recommendation arrives, the note types out
     A(slide.querySelector('.ob-mock-msg-from'), [{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}], {duration:460,delay:BASE});
     A(slide.querySelector('.ob-mock-film-chip'), [{opacity:0,transform:'translateY(8px) scale(0.97)'},{opacity:1,transform:'none'}], {duration:500,delay:BASE+260});
     const note = slide.querySelector('[data-i18n="ob_inbox_note"]');
@@ -5573,7 +5634,7 @@ function _obPlaySlideAnim(idx){
       A(note, [{opacity:0},{opacity:1}], {duration:300,delay:BASE+620});
       _obTypewriter(note, txt, 26, BASE+700);
     }
-  } else if (idx === 7){ // Backup: profile stats tick up, then backup options appear
+  } else if (ob === 'backup'){ // Backup: profile stats tick up, then backup options appear
     slide.querySelectorAll('.acc-stats .acc-stat-val').forEach((stat,i)=>{
       const target = parseInt(stat.textContent,10);
       if (!target) return;
@@ -5582,14 +5643,21 @@ function _obPlaySlideAnim(idx){
     });
     // the export/backup buttons appear one by one (your data, always exportable)
     slide.querySelectorAll('.btn-backup').forEach((b,i)=>A(b,[{opacity:0,transform:'translateY(10px) scale(0.97)'},{opacity:1,transform:'none'}],{duration:480,delay:BASE+720+i*110}));
-  } else if (idx === 8){ // Surprise Me: the pick appears, button pulses
+  } else if (ob === 'surprise'){ // Surprise Me: the pick appears, button pulses
     A(slide.querySelector('.ob-mock > div[style*="align-items:center"]'), [{opacity:0,transform:'translateY(11px) scale(0.96)'},{opacity:1,transform:'none'}], {duration:540,delay:160});
     A(slide.querySelector('.ob-mock-surprise'), [{transform:'scale(1)'},{transform:'scale(1.06)',offset:0.5},{transform:'scale(1)'}], {duration:640,delay:680});
+  } else if (ob === 'map'){ // Map: the dots land, East Village is picked, its two films slide in
+    slide.querySelectorAll('.ob-map-dots > *').forEach((d,i)=>A(d,[{opacity:0},{opacity:1}],{duration:360,delay:BASE+i*70}));
+    const sel = slide.querySelector('.ob-map-sel');
+    A(sel,[{opacity:0,transform:'scale(0.4)'},{opacity:1,transform:'scale(1.15)',offset:0.6},{opacity:1,transform:'scale(1)'}],{duration:520,delay:BASE+760});
+    if (sel) sel.style.transformOrigin = '186px 66px';
+    A(slide.querySelector('.maps-place'),[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:440,delay:BASE+1100});
+    slide.querySelectorAll('.maps-film').forEach((r,i)=>A(r,[{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'none'}],{duration:460,delay:BASE+1300+i*180}));
   }
 }
 
 function _obNext() {
-  if (_obSlide < _OB_TOTAL - 1) { _obGoTo(_obSlide + 1); }
+  if (_obSlide < _obTotal() - 1) { _obGoTo(_obSlide + 1); }
   else { _obFinish(); }
 }
 
@@ -5630,7 +5698,7 @@ function _maybeShowOnboarding() {
       if (_obTouchX === null) return;
       const dx = e.changedTouches[0].clientX - _obTouchX;
       _obTouchX = null;
-      if (dx < -40 && _obSlide < _OB_TOTAL - 1) _obGoTo(_obSlide + 1);
+      if (dx < -40 && _obSlide < _obTotal() - 1) _obGoTo(_obSlide + 1);
       else if (dx > 40 && _obSlide > 0) _obGoTo(_obSlide - 1);
     }, { passive: true });
   }
