@@ -2245,52 +2245,37 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <div class="ob-body" data-i18n="ob1_body">Heard about a film? Just search. Read the synopsis, check the rating, spot familiar names in the cast. Like it? Drop it into your list.</div>
     </div>
 
-    <!-- Slide: Map. Continues the legend: Taxi Driver (the soundtrack slide) and Past Lives
-         (in "My List") were both shot in the East Village, per Wikipedia - true in maps-data.json
-         on 23 Oct 2026, where the East Village holds 19 films. Real map colours and dot styles
-         (_mapsPaint, the circle layers); the sheet below uses the real map classes. -->
+    <!-- Slide: Map. Film mode, the way "On the map" opens it from a film card: The Odyssey (Nolan,
+         2026), 43 places in maps-data.json on 24 Oct 2026, all per Wikipedia, in six countries
+         (US, Morocco, Italy, Greece, Iceland, the UK; the US is off this frame). Not drawn by hand:
+         the water and the borders are the app's own map (OpenFreeMap, _mapsPaint colours) read with
+         queryRenderedFeatures at zoom 1, centre -1.5/49.9, 300x190 px, simplified to 0.45 px; the
+         clusters are the app's own source (clusterRadius 42) queried at the same frame. A film that
+         appears on no other slide (Dafa, 24 Oct: repeats read as a small library). -->
     <div class="ob-slide" data-ob="map">
       <div class="ob-mock" style="padding:0">
-        <svg class="ob-map" viewBox="0 0 300 120" width="100%" style="display:block" aria-hidden="true">
-          <defs><clipPath id="ob-map-land"><path d="M58 0 H232 L214 120 H96 Z"/></clipPath></defs>
-          <rect width="300" height="120" fill="#0d0d1a"/>
-          <path d="M0 0 H62 L100 120 H0 Z" fill="#101a33"/>
-          <path d="M228 0 H300 V120 H210 Z" fill="#101a33"/>
-          <path d="M58 0 H232 L214 120 H96 Z" fill="#0f0f1c"/>
-          <g clip-path="url(#ob-map-land)" stroke-linecap="round">
-            <g stroke="#24243a" stroke-width="1">
-              <path d="M40 1 L260 -37 M40 8 L260 -30 M40 15 L260 -23 M40 22 L260 -16 M40 29 L260 -9 M40 36 L260 -2 M40 43 L260 5 M40 50 L260 12 M40 57 L260 19 M40 64 L260 26 M40 71 L260 33 M40 78 L260 40 M40 85 L260 47 M40 92 L260 54 M40 99 L260 61 M40 106 L260 68 M40 113 L260 75 M40 120 L260 82 M40 127 L260 89 M40 134 L260 96 M40 141 L260 103 M40 148 L260 110 M40 155 L260 117"/>
-            </g>
-            <g stroke="#3a3a55" stroke-width="1.6">
-              <path d="M96 0 L128 120 M124 0 L152 120 M152 0 L176 120 M180 0 L200 120"/>
-            </g>
-            <rect x="170" y="70" width="16" height="12" fill="#11161a" transform="rotate(-10 178 76)"/>
-          </g>
-          <text x="262" y="96" fill="#4a6496" font-size="7" font-style="italic" font-family="DM Sans, sans-serif" transform="rotate(-80 262 96)">East River</text>
-          <text x="150" y="115" fill="#8a8a96" font-size="7" letter-spacing="1" font-family="DM Sans, sans-serif">MANHATTAN</text>
+        <svg class="ob-map" viewBox="0 0 300 190" width="100%" style="display:block" aria-hidden="true">
+          <rect width="300" height="190" fill="#0f0f1c"/>
+          <path d="M-1 191L-1 -1L162.5 -1L162.5 89L159 90.5L158 94L151.5 97.5L149 95.5L149.5 100.5L145 99.5L141.5 100.5L141.5 103.5L146 105L151 111.5L150.5 119.5L149 122L142 122L131.5 120.5L127.5 123.5L129 125L129.5 132L127 139.5L128 141L129 141.5L129 146.5L132 146.5L133 145.5L136 146L136.5 148L139 149.5L142 147L148 147L150 144.5L152.5 143.5L153 141L154.5 139.5L153.5 137.5L156.5 131L160.5 130.5L162.5 128.5L162.5 147L155.5 148.5L154 150L151 150.5L148 152.5L141.5 152L139.5 150.5L137.5 150.5L134.5 156L129.5 159L128 161.5L126.5 166L127 170L121 176L118.5 176L117 177.5L115 180.5L113 182L111.5 187.5L108 191ZM146 52.5L142.5 53L140 52.5L138 56.5L137 62L138.5 65L138.5 69.5L140 67.5L141 68.5L140 71L140.5 72L144 73L146 76L145.5 79L141.5 78.5L140.5 81.5L142.5 84L139.5 85.5L140 87.5L144.5 88L142 89L138 94L139.5 95L141.5 93L144 93.5L146 91.5L147 92.5L152 91L156 91L158.5 89L157.5 86.5L158.5 85L159 82L155.5 81L153 74L151 73L148.5 66.5L145.5 66.5L148 61.5L148.5 57.5L142.5 58ZM135 84.5L137 80L136.5 76.5L138 73.5L135 70.5L133 70.5L127 76.5L128 81.5L126 86.5L130 87ZM1 -1L2.5 1L1.5 6L5.5 12.5L6 18.5L7.5 23L12.5 30.5L14.5 36.5L17 39.5L22.5 40L27 44.5L31 44L33.5 33.5L32.5 29L37 23.5L38.5 19.5L38.5 15L41 10.5L49 7.5L51 7L57 2L58.5 -1ZM113 3.5L108.5 3L103.5 7L100 5L96 9L91.5 4L87 5L85 9.5L91 11L91 13L86 14.5L92.5 18L89.5 20.5L101 23.5L112 18L115.5 13L112.5 8.5ZM-1 105.5L0 104.5L1 105L0 108.5L2 109L3.5 109L4.5 105L3.5 100.5L1.5 101L2 98L-0.5 96.5ZM146.5 57.5L146.5 -1L290.5 -1L290.5 0.5L286 2L284 -1L279.5 -1L281 1.5L279.5 6.5L276.5 4L274 3.5L267.5 10.5L269.5 15.5L267 17L260 13L258 15.5L260 18L259.5 21.5L253.5 17.5L253.5 7.5L248.5 2.5L251 1.5L263.5 7L268 5L271.5 1.5L271 -1L193.5 -1L184.5 17L178.5 24L171 29L168.5 33L170.5 52.5L174.5 55.5L178 54L184 47.5L185.5 51L191 69.5L194.5 69L196 65L199.5 65.5L201 61L202 52L205 50.5L208 44L205 41L203 37L205 28.5L215 17.5L214.5 13.5L217.5 9L222.5 7L226.5 10L226.5 13L218 21.5L215.5 25.5L214 29L215.5 34.5L215 40.5L217.5 42.5L219.5 45.5L229 42.5L234 42L237 44.5L234 47.5L231 48L228 47L220.5 49L221 52.5L223 54.5L224 53.5L223 61L220.5 61L218.5 57L215.5 59L214.5 62L215 70.5L211 72L210 74L207.5 74L207.5 73L204.5 72L194.5 77.5L193 75.5L190 74L188.5 75L185.5 76L185.5 74.5L182.5 73L182 69L184 65L184.5 66L185.5 64L184 63L183.5 61.5L184.5 60L184.5 57L181 60L178.5 60.5L177.5 63.5L177.5 68.5L179.5 76L177.5 78.5L177 77.5L174.5 77.5L174 78.5L171.5 78.5L167.5 80.5L165 87.5L163.5 88.5L159 90.5L158 94L151.5 97.5L149 95.5L149.5 100.5L146.5 99.5L146.5 92L147 92.5L152 91L156 91L158.5 89L157.5 86.5L158.5 85L159 82L155.5 81L153 74L151 73L148.5 66.5L146.5 66.5L148.5 57.5ZM190.5 68L189.5 65.5L185.5 67.5L185.5 69.5L188.5 72ZM146.5 105.5L151 111.5L150.5 119.5L149 122L146.5 122ZM146.5 147L148 147L150 144.5L152.5 143.5L153 141L154.5 139.5L153.5 137.5L154.5 134.5L156.5 131L160.5 130.5L163 128L163 123.5L167.5 122L173 123L179.5 118L183.5 120L184 124L188.5 128.5L191 130.5L193 130.5L198 135L200 139L199 142.5L200 142.5L201.5 139L203 139L203 137L201 135.5L202.5 133.5L205 134L206.5 135.5L207 134.5L204 131.5L199.5 129L200.5 128.5L199.5 127.5L197.5 127.5L194 124.5L193 121.5L190 119.5L189 117.5L189.5 114L191.5 112.5L194 113.5L193 113.5L194 116.5L195 114.5L196.5 115.5L198 118.5L197.5 118.5L200 121.5L208 126.5L210 128.5L209.5 134L211 135.5L214.5 141L216 146.5L218.5 148L220 148L219 145L221 144.5L220 142.5L222.5 143.5L222.5 141.5L219.5 139L220.5 138L219.5 136L218.5 134L219 133L220.5 135L222.5 135L223.5 134.5L222 132.5L225 131.5L228.5 132L229.5 134.5L233 131L236.5 131L237 130L234.5 129L233 125L234 122.5L235.5 121L236.5 116L237 116.5L238.5 115.5L238.5 114.5L242 109L244.5 108.5L244.5 110L249 111.5L250 112L246.5 114.5L249.5 115.5L249 117.5L250.5 118L254.5 116L257.5 115L258 114L255.5 114L254 113L254 110.5L256 109L265.5 106.5L265.5 107.5L261.5 109L263 110.5L260.5 114L258.5 114.5L261 117L264.5 118.5L269 123L272 125L273 127.5L272.5 129L269 131L266.5 131L263.5 131.5L254.5 127.5L249.5 127.5L246.5 128.5L243 131L237.5 130.5L236.5 133.5L232 133.5L229 137L230.5 138.5L229 141.5L231.5 143.5L233 147L236 147L239 149L241 148.5L241.5 147L244.5 147L247 149L251 148.5L253 146.5L255.5 147.5L257 147L256 148.5L257 150L256.5 151.5L256.5 154L253.5 160.5L252.5 164.5L250.5 166.5L246 165.5L245 166.5L244.5 165L242.5 164.5L240 165L236.5 167L229.5 164.5L226 164.5L225 163.5L220.5 162.5L219.5 161L215.5 160.5L211.5 162.5L210.5 164L211.5 166.5L208.5 169L199 165L197.5 162.5L187 159.5L186 159L185 157L183.5 157L183 155L185 153.5L185.5 150.5L184.5 149.5L184.5 148L186 146L185.5 145.5L183.5 147L183.5 145L181.5 144.5L176.5 146.5L175 145.5L172 145.5L169.5 147L168 146.5L158.5 147.5L155.5 148.5L154 150L151 150.5L148 152.5L146.5 152ZM252.5 150.5L246 152.5L246.5 154L248 154.5L251 153L250.5 152ZM221.5 150.5L221 152L224.5 152.5L224.5 153L228.5 153L229 152L227.5 152.5L227.5 151.5L223.5 151.5ZM198.5 141.5L193.5 142L190 142L189.5 143.5L197.5 147ZM180.5 130.5L179 131.5L177.5 131.5L178.5 138L179.5 139L180.5 138L182 138L182 133ZM181.5 127L181 123.5L178.5 126.5L179.5 129L180.5 130ZM294 130L289.5 123.5L289.5 121L287 117L290 113L292.5 112.5L294 110L300 107.5L301 107.5L301 114.5L300.5 114.5L300 117.5L297.5 117L297.5 118.5L299 119.5L300.5 123L301 123.5L301 146.5L299 146.5L297 144.5L294.5 144L293.5 139.5L294.5 138.5L295.5 134.5L297.5 134L295.5 133ZM255.5 191L256 189L251.5 182L247.5 174L246.5 170.5L248.5 175L251 177.5L253.5 171.5L253 176L254 176L259.5 184L261 188L262.5 188.5L264.5 191L301 191L300.5 187L301 183.5L300 182.5L299.5 182.5L298.5 184.5L299 186.5L297 183L297 180.5L293 177.5L291 170L292.5 170L293.5 168.5L295.5 170L297 169.5L301 176.5L301 191ZM239 37.5L242 34.5L247 38L248 41L247.5 42L247 41.5L247 43.5L244.5 43.5L244 45L243 45L241 40ZM256 31L258 37.5L257 39L255 39L253.5 38L255.5 38.5L252.5 33.5L252 31L253 31.5L253 30L254 32L255 31.5L253 28.5L254.5 29ZM194 49L194 51L192 52.5L190 53L190 51L193 48.5Z" fill="#101a33"/>
+          <path d="M118.5 191L120 190.5L120 182.5L129.5 182.5L129.5 174L134 171L135.5 171L136 170.5L139 170L140 168.5L144 166.5L143.5 164.5L146 163L150.5 163L151.5 161.5L149.5 158.5L149 154L148 152.5M140.5 186L135.5 186L138.5 211.5M129.5 177.5L129.5 179L126.5 180L122 180L122 180.5L120 182.5L119 186.5L115 190L114 194M129.5 178.5L157.5 198M133 145L133 143.5L134.5 141.5L133.5 140.5L134.5 138.5L133 136L134.5 135.5L134.5 131L136.5 129L135.5 127.5L131 128L131 127L129.5 127.5M149 122L150.5 122.5L150 123.5L154 125L156 125L156.5 124L158 124.5L158.5 126L162.5 126M134 70.5L131 74L132.5 75.5L133.5 75.5L134.5 74L135.5 76L136.5 75.5M161.5 89.5L162.5 91.5M158.5 125L159 125.5M239.5 -4L237 0.5L240 8.5L240 9L239 9.5L238.5 12L239 13L238.5 14L240 15.5L239.5 17L241 20L239.5 22L243 25.5L244 27.5L242.5 31L233 42M214 66L217 64L223 65L225 64L225.5 65L227.5 65.5L230 68M223 10.5L223 8.5L221.5 4.5L222.5 1L221.5 -1M201 -1.5L198 3.5L198.5 5L195.5 6L195.5 12L193 16.5L194.5 17.5L194.5 19.5L194 20.5L192 20L190.5 20.5L189 23L188.5 25L189.5 31L189 34.5L191 37L190.5 38.5L189.5 39L190 44L187.5 47L187.5 50.5L186.5 49.5L185.5 50.5M232 58L233.5 56.5L232.5 51.5L234.5 48L234 47.5M221 76.5L225 76L226.5 74.5L227.5 75.5L227 74.5L228 71.5L230.5 70L229.5 69.5L230 68L233 67L234.5 65.5M221.5 88L223.5 86L227.5 86L231.5 86.5L233 88L234.5 87.5L236 88L237 87.5L238 88.5L240 88L241 89L241 87.5L242.5 85L245.5 85.5L246.5 84L250.5 84L252 86.5L251.5 87L251.5 89L254 89L255.5 93L257 93L258.5 93.5L261 93L262.5 95L263 94.5L268.5 96.5L268.5 98L267 99L268 99.5L267 100.5L268 102L267.5 103.5L265 104L263.5 105L263 107M244.5 85L243 81L243.5 80L245.5 80.5L247.5 79L246.5 77.5L244.5 77L245 76L242 72.5L242 68.5L240.5 67L238 68L238 66.5L235 66L234.5 63.5L233.5 62L233 62L233.5 59.5L232.5 58.5L229.5 58L226 55.5L223.5 56.5M278 131L283 129.5L286.5 131L287 130L285.5 128.5L286.5 128M272.5 129.5L276 129L278.5 132.5L278 133L278.5 134.5L280.5 135L283.5 138.5L286.5 139L291 136L292 137L291 138L291.5 138.5L291 139L292.5 141L293.5 140.5M235.5 120.5L231.5 119L227 121L219.5 120.5L220 119.5L218.5 118L219 117.5L218.5 117L217 117.5L215 116.5L215.5 115L213.5 114L213.5 112.5L212 111M230 102L231 102.5L234 107.5L234.5 114L236 114.5L238 114L239 114.5M234 127.5L232 127L229 128.5M219.5 130L219.5 127.5L218 126M213 128L214 127L218.5 125.5L218 124L219.5 123L218 120.5L219 118.5M211.5 125.5L210 125L209.5 128M209 121.5L212 124M208.5 116L208.5 115L209.5 115L208.5 114L208 112M204.5 124L207 126M207 125.5L207 123.5L208 122L208.5 122.5L208 121.5L210 121L209 120L210 119.5L208.5 118L209.5 116L202.5 114.5L200.5 115.5L199.5 115L199 116.5L203.5 122L204.5 124M189.5 119.5L189.5 119.5M201.5 109.5L199 111L198 114L196 113L194 114L193 113.5M200 108L203.5 111.5L206.5 112.5L210 111L212 111L214.5 110.5L217 105.5L220.5 103L224 103.5L225.5 104.5L228.5 103.5L230.5 101.5L232.5 101L237 103.5L237 105.5L238.5 106.5L238.5 107.5L240 110L236.5 109.5L236.5 111.5L235.5 113.5L234.5 114M193.5 109.5L192.5 110.5L193 111L193 112.5L194 113L193.5 113.5M193.5 100L193.5 101L192.5 101L190.5 103L191.5 105.5L189 104.5L185.5 106L184 105L183.5 106.5L182.5 105.5L181.5 105.5M202.5 100.5L197 99L196 100.5L194.5 100.5L190.5 97L188.5 93.5L189 94L190 93L191 93L195 90.5L195 90L196 91L197 90L200 92L200.5 91.5L201 92L200.5 92.5L201.5 94L202.5 93.5L202.5 92.5L204.5 93L204.5 94L207 95L208.5 97.5L209.5 96.5L210.5 98L211.5 98L212 97.5L216 97L219.5 98.5L219 96.5L223 92L223 90.5L221.5 88.5L221.5 85.5L220 84L222.5 82L221 75L219.5 74L210 74M203 103L205 104L207.5 104L208 103.5L212 102L212.5 101L215.5 101L216 102L217.5 101.5L219.5 103.5M217.5 101.5L218.5 98.5M214 70L218.5 71L219 72L219 74.5M196.5 91L197 89L196 86.5L196.5 85L196 83L194.5 81.5L195.5 80L194.5 76.5M172.5 97L173 95.5L171.5 94L170.5 95.5L171 96.5M171.5 91L170.5 91L171 89.5L168.5 88L167 88L165.5 89L164 89L164 88.5M178 70.5L179 71.5L182 72M175 79.5L174.5 82.5L173.5 82.5L174.5 84L173.5 85.5L171 86.5L172 88L171 90L172.5 93L171.5 94M181.5 107L181.5 106.5M184 108L185.5 108.5L186.5 107.5L189 107L189.5 108.5L195.5 110L196.5 109L199.5 109L201 107.5L201.5 105L201 104.5L203 104.5L203 103L202.5 101.5L203 99.5L205 99.5L206 98L208 97M174.5 112L173.5 110L171.5 110.5L174 106L176 105M175.5 120.5L175.5 120.5M175.5 120.5L176 119L174 118.5L174 116.5L173 115.5L174.5 114L173.5 112.5L174.5 112L176.5 112L178.5 110L180 112L180.5 109.5L183 110.5L183 109L184 109.5L184 108L181.5 107L181.5 105.5L178.5 104L178.5 105L175.5 104.5L177.5 99L173.5 98.5L172 97L170 97L168 95.5L168 94L167 95L166 94.5L166 93.5L163.5 92L163 91L162.5 91.5L161.5 89.5M149 122L150.5 122.5L150 123.5L154 125L156 125L156.5 124L158 124.5L158.5 126L163.5 126M158.5 125L159 125.5M146.5 163L150.5 163L151.5 161.5L149.5 158.5L149 154L148 152.5M211 136L212 136L212 135L213 134.5L214 132.5L214 132M188.5 190.5L187 188L183.5 187L181 182.5L182.5 180.5L182.5 177L182 172.5L181 169.5L183.5 167L183.5 164L187 162L187 159M181.5 169L180 163L178 161.5L175.5 157L175.5 156L178 154L177.5 147.5L178.5 146M222.5 203L200 190.5L197 192M192.5 191.5L188.5 190.5L175.5 198.5M157.5 198L146.5 190M251.5 165.5L253.5 171.5M254 171L255.5 161L259 162L271 155L272 150.5L272 148L276 144.5L280 145L280.5 146L281.5 145.5M253.5 172L257 172.5L259 170L261 170L262.5 168L259.5 165L265 163L266 162.5L265.5 162L264.5 158.5M226 164.5L224.5 169L225.5 172.5L225.5 195M228.5 132.5L230 129.5L229 128.5L228.5 130L228 130L226 130.5L224 129L219 130L215.5 131.5L213 131.5L212.5 129.5L212.5 126.5L211.5 124.5L213.5 122.5L216 125L215.5 126.5M256.5 149.5L257 150L258.5 148.5L258.5 146.5L261 147L263 146L266.5 147L270 145.5L274.5 145L275 145.5M251 152.5L247.5 152.5M256 160.5L256.5 157L258 157L258.5 155.5L258 154L256.5 154M281.5 136L284.5 136.5L285.5 139M283.5 132.5L283.5 132.5M301 188.5L301 188M300 187L299.5 187L299 186.5M292 174.5L290 174.5L289 173L281.5 172.5L274 166L269 163.5L265.5 162.5M292.5 170L291 168.5L291 166.5L290 166.5L290.5 164L289 161.5L285.5 160L285.5 159L283.5 156.5L283.5 154.5L285.5 152.5L285 151L286 150L283.5 149.5L281 144.5L281 143.5L280 142.5L280.5 141L279.5 137.5L280.5 137L281 136L282 136.5M286.5 172.5L288.5 170L291 170M292.5 128L290.5 130.5L289 130L287.5 128L284 126.5L284.5 125.5L282 124.5L279 125L276 123L272.5 122.5L270 121.5L268.5 121.5L268 122M282.5 131L282.5 131M282.5 130L284 132L283.5 133L285 134L285 135L284 135L286.5 136.5L286.5 139M294.5 110L292.5 109L292.5 108.5L293.5 108.5L291.5 104.5L289 104.5L288 102.5L287 101.5L288 98.5L287.5 97.5L287.5 96L289.5 93L292 95L293 95L292.5 92L297 89L299 87L301 88" fill="none" stroke="#2a2a40" stroke-width="0.8" stroke-linejoin="round"/>
           <g class="ob-map-dots">
-            <circle cx="126" cy="30" r="15" fill="rgba(245,197,24,0.18)" stroke="#F5C518" stroke-width="1.5"/>
-            <text x="126" y="33.5" fill="#F5C518" font-size="10" text-anchor="middle" font-family="Bebas Neue, Oswald, sans-serif">87</text>
-            <circle cx="118" cy="98" r="12" fill="rgba(245,197,24,0.18)" stroke="#F5C518" stroke-width="1.5"/>
-            <text x="118" y="101.5" fill="#F5C518" font-size="9" text-anchor="middle" font-family="Bebas Neue, Oswald, sans-serif">12</text>
-            <circle cx="160" cy="48" r="5" fill="#F5C518" stroke="#0d0d1a" stroke-width="1.5"/>
-            <circle cx="146" cy="70" r="4.5" fill="#0d0d1a" stroke="#F5C518" stroke-width="2"/>
-            <circle cx="198" cy="40" r="4.5" fill="#0d0d1a" stroke="#F5C518" stroke-width="2"/>
-            <circle cx="140" cy="88" r="5" fill="#F5C518" stroke="#0d0d1a" stroke-width="1.5"/>
-          </g>
-          <g class="ob-map-sel">
-            <circle cx="186" cy="66" r="9" fill="rgba(245,197,24,0.10)" stroke="rgba(245,197,24,0.6)" stroke-width="1"/>
-            <circle cx="186" cy="66" r="12" fill="none" stroke="#ffffff" stroke-width="2"/>
+            <circle cx="96.0" cy="21.4" r="12" fill="rgba(245,197,24,0.18)" stroke="#F5C518" stroke-width="1.5"/>
+            <text x="96.0" y="25.2" fill="#F5C518" font-size="11" text-anchor="middle">4</text>
+            <circle cx="145.7" cy="57.3" r="12" fill="rgba(245,197,24,0.18)" stroke="#F5C518" stroke-width="1.5"/>
+            <text x="145.7" y="61.1" fill="#F5C518" font-size="11" text-anchor="middle">4</text>
+            <circle cx="204.0" cy="141.8" r="15" fill="rgba(245,197,24,0.18)" stroke="#F5C518" stroke-width="1.5"/>
+            <text x="204.0" y="145.6" fill="#F5C518" font-size="11" text-anchor="middle">25</text>
+            <circle cx="127.1" cy="170.4" r="12" fill="rgba(245,197,24,0.18)" stroke="#F5C518" stroke-width="1.5"/>
+            <text x="127.1" y="174.2" fill="#F5C518" font-size="11" text-anchor="middle">5</text>
           </g>
         </svg>
         <div style="padding:10px 14px 4px">
-          <div class="maps-place">
-            <div class="maps-place-n">East Village</div>
-            <div class="maps-place-m" data-i18n="ob_mock_us">United States</div>
-          </div>
-          <div style="height:4px"></div>
-          <div class="maps-film" style="cursor:default"><span class="maps-film-p" style="background-image:url(posters/taxidriver.jpg)"></span><span class="maps-film-t">Taxi Driver</span><span class="maps-film-y">1976</span><span class="maps-badge" data-i18n="maps_per_wiki">per Wikipedia</span></div>
-          <div class="maps-film" style="cursor:default;border-bottom:none"><span class="maps-film-p" style="background-image:url(posters/pastlives.jpg)"></span><span class="maps-film-t">Past Lives</span><span class="maps-film-y">2023</span><span class="maps-badge" data-i18n="maps_per_wiki">per Wikipedia</span></div>
+          <div class="maps-head"><div class="maps-place">
+              <div class="maps-place-n">The Odyssey</div>
+              <div class="maps-place-m">2026</div></div>
+            <span class="maps-x" aria-hidden="true"><span data-ic="x" data-ic-size="18"></span></span></div>
+          <div class="maps-film" style="cursor:default"><span class="maps-film-t">Pylos</span><span class="maps-film-y" data-ob-line=":GR"></span><span class="maps-badge" data-i18n="maps_per_wiki">per Wikipedia</span></div>
+          <div class="maps-film" style="cursor:default;border-bottom:none"><span class="maps-film-t">Ouarzazate</span><span class="maps-film-y" data-ob-line=":MA"></span><span class="maps-badge" data-i18n="maps_per_wiki">per Wikipedia</span></div>
         </div>
       </div>
       <div class="ob-arr">
@@ -2299,7 +2284,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         </svg>
       </div>
       <div class="ob-title" data-i18n="ob_map_title">Where was it filmed</div>
-      <div class="ob-body" data-i18n="ob_map_body">More than 30,000 filming places on a world map. Open a film to see where it was shot, or tap "Where am I" to find what was filmed near you. Turns out two of your films were shot in the same neighbourhood.</div>
+      <div class="ob-body" data-i18n="ob_map_body">More than 30,000 filming places on a world map. Open a film to see where it was shot, or tap "Where am I" to find what was filmed near you. The Odyssey alone was shot in six countries, from Iceland to Morocco.</div>
     </div>
 
     <!-- Slide 2: Lists -->
@@ -2489,8 +2474,8 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <div class="ob-mock">
         <div data-i18n="ob8_picks" style="font-size:11px;color:var(--muted);margin-bottom:10px;letter-spacing:0.3px;text-transform:uppercase">Personal picks for you</div>
         <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px">
-          <img src="posters/minotaur.jpg" alt="" style="width:40px;height:60px;border-radius:5px;object-fit:cover;flex-shrink:0">
-          <div style="flex:1;min-width:0"><div class="hist-title">Minotaur</div><div class="hist-meta">2026 · Andrey Zvyagintsev</div></div>
+          <img id="ob-surprise-poster" src="posters/allofasudden.jpg" alt="" style="width:40px;height:60px;border-radius:5px;object-fit:cover;flex-shrink:0">
+          <div style="flex:1;min-width:0"><div class="hist-title" id="ob-surprise-title">All of a Sudden</div><div class="hist-meta" id="ob-surprise-meta">2026 · Ryusuke Hamaguchi</div></div>
         </div>
         <button class="ob-mock-surprise" data-i18n="surprise">Surprise Me</button>
       </div>
@@ -4929,8 +4914,8 @@ const _I18N_FIX_PRIVACY = {
 Object.keys(_I18N_FIX_PRIVACY).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_FIX_PRIVACY[l]); });
 // Слайд карт в онбординге (23 окт). Остальные шесть языков - после того, как Dafa утвердит текст.
 const _I18N_FIX_OBMAP = {
-  en:{ ob_map_title:"Where was it filmed", ob_map_body:"More than 30,000 filming places on a world map. Open a film to see where it was shot, or tap “Where am I” to find what was filmed near you. Turns out two of your films were shot in the same neighbourhood.", ob_mock_us:"United States" },
-  ru:{ ob_map_title:"Где это снимали", ob_map_body:"Более 30 000 мест съёмок на карте мира. Открой фильм, чтобы увидеть, где его снимали, или нажми «Где я», чтобы узнать, что снимали рядом. Оказывается, два твоих фильма снимали в одном районе.", ob_mock_us:"США" },
+  en:{ ob_map_title:"Where was it filmed", ob_map_body:"More than 30,000 filming places on a world map. Open a film to see where it was shot, or tap “Where am I” to find what was filmed near you. The Odyssey alone was shot in six countries, from Iceland to Morocco." },
+  ru:{ ob_map_title:"Где это снимали", ob_map_body:"Более 30 000 мест съёмок на карте мира. Открой фильм, чтобы увидеть, где его снимали, или нажми «Где я», чтобы узнать, что снимали рядом. Одну только «Одиссею» снимали в шести странах, от Исландии до Марокко." },
 };
 Object.keys(_I18N_FIX_OBMAP).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_FIX_OBMAP[l]); });
 // Пути назад (дизайн-ревью, 23 окт): к фильму с карты, вернуть снятое слово, к последнему поиску.
@@ -5464,8 +5449,19 @@ function _obDots() {
   box.innerHTML = Array.from({ length: _obTotal() }, (_, i) => `<div class="ob-dot" onclick="_obGoTo(${i})"></div>`).join('');
 }
 
+// Строки мест на слайде карты - как в настоящем списке: тип и страна на языке интерфейса
+// (t('maps_cat_*') и Intl, без данных карты: онбординг их не грузит).
+function _obPlaceLines() {
+  document.querySelectorAll('[data-ob-line]').forEach(el => {
+    const [cat, iso] = el.dataset.obLine.split(':');
+    let country = iso;
+    try { country = new Intl.DisplayNames([_lang], { type: 'region' }).of(iso) || iso; } catch (e) {}
+    el.textContent = [cat ? (t('maps_cat_' + cat) || '') : '', country].filter(Boolean).join(' · ');
+  });
+}
 function _obGoTo(idx) {
   _obDots();
+  _obPlaceLines();
   _obSlide = idx;
   const wrap = document.getElementById('ob-slides-wrap');
   if (wrap) wrap.style.transform = `translateX(-${idx * 100}vw)`;
@@ -5646,13 +5642,11 @@ function _obPlaySlideAnim(idx){
   } else if (ob === 'surprise'){ // Surprise Me: the pick appears, button pulses
     A(slide.querySelector('.ob-mock > div[style*="align-items:center"]'), [{opacity:0,transform:'translateY(11px) scale(0.96)'},{opacity:1,transform:'none'}], {duration:540,delay:160});
     A(slide.querySelector('.ob-mock-surprise'), [{transform:'scale(1)'},{transform:'scale(1.06)',offset:0.5},{transform:'scale(1)'}], {duration:640,delay:680});
-  } else if (ob === 'map'){ // Map: the dots land, East Village is picked, its two films slide in
-    slide.querySelectorAll('.ob-map-dots > *').forEach((d,i)=>A(d,[{opacity:0},{opacity:1}],{duration:360,delay:BASE+i*70}));
-    const sel = slide.querySelector('.ob-map-sel');
-    A(sel,[{opacity:0,transform:'scale(0.4)'},{opacity:1,transform:'scale(1.15)',offset:0.6},{opacity:1,transform:'scale(1)'}],{duration:520,delay:BASE+760});
-    if (sel) sel.style.transformOrigin = '186px 66px';
-    A(slide.querySelector('.maps-place'),[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:440,delay:BASE+1100});
-    slide.querySelectorAll('.maps-film').forEach((r,i)=>A(r,[{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'none'}],{duration:460,delay:BASE+1300+i*180}));
+  } else if (ob === 'map'){ // Map: the film's places land cluster by cluster, then its list slides in
+    const ds = [...slide.querySelectorAll('.ob-map-dots > circle')];
+    ds.forEach((c,i)=>{ const tx = c.nextElementSibling; [c, tx].forEach(el=>A(el,[{opacity:0},{opacity:1}],{duration:380,delay:BASE+i*160})); });
+    A(slide.querySelector('.maps-head'),[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:440,delay:BASE+ds.length*160+80});
+    slide.querySelectorAll('.maps-film').forEach((r,i)=>A(r,[{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'none'}],{duration:460,delay:BASE+ds.length*160+260+i*180}));
   }
 }
 
@@ -5683,6 +5677,12 @@ function _maybeShowOnboarding() {
   const el = document.getElementById('screen-onboarding');
   if (el) { el.style.display = 'flex'; el.style.opacity = '1'; }
   _obPopcornPlayed = false;
+  // «Удиви меня» в туре - каждый раз один из двух свежих фильмов (Dafa, 24 окт).
+  const pick = [['allofasudden', 'All of a Sudden', '2026 · Ryusuke Hamaguchi'], ['noother', 'No Other Choice', '2025 · Park Chan-wook']][Math.random() < 0.5 ? 0 : 1];
+  const pImg = document.getElementById('ob-surprise-poster'), pT = document.getElementById('ob-surprise-title'), pM = document.getElementById('ob-surprise-meta');
+  if (pImg) pImg.src = 'posters/' + pick[0] + '.jpg';
+  if (pT) pT.textContent = pick[1];
+  if (pM) pM.textContent = pick[2];
   // Повтор тура из аккаунта показывает анимации слайдов заново: набор сыгранных не
   // очищался, и при повторе слайды стояли неподвижно. Проверка кода 9 окт, #13.
   _obAnimPlayed.clear();
