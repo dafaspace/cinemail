@@ -2827,7 +2827,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 <div id="detail-overlay" class="overlay" style="display:none" onclick="closeDetail()">
   <div class="modal" onclick="event.stopPropagation()" style="position:relative">
     <div class="modal-handle"></div>
-    <button onclick="navModalBack()" style="position:absolute;top:18px;right:14px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:6px;z-index:1">×</button>
+    <button onclick="navModalBack()" style="position:absolute;top:18px;right:14px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:6px;z-index:1"><span data-ic="x" data-ic-size="20"></span></button>
     <div id="detail-content" class="modal-body"></div>
   </div>
 </div>
@@ -2835,7 +2835,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 <!-- Person Modal -->
 <div id="person-overlay" class="overlay" style="display:none" onclick="closePerson()">
   <div class="modal" onclick="event.stopPropagation()" style="position:relative">
-    <button onclick="navModalBack()" style="position:absolute;top:18px;right:14px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:6px;z-index:1">×</button>
+    <button onclick="navModalBack()" style="position:absolute;top:18px;right:14px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:6px;z-index:1"><span data-ic="x" data-ic-size="20"></span></button>
     <div class="modal-handle"></div>
     <div id="person-content" class="modal-body"></div>
   </div>
@@ -2845,7 +2845,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 <div id="lightbox-overlay" style="display:none" onclick="closeLightbox()">
   <div id="lightbox-stage" onclick="closeLightbox()">
     <img id="lightbox-img" src="" alt="" onclick="closeLightbox()">
-    <button id="lightbox-close" onclick="event.stopPropagation();closeLightbox()" aria-label="Close">×</button>
+    <button id="lightbox-close" onclick="event.stopPropagation();closeLightbox()" aria-label="Close"><span data-ic="x" data-ic-size="18"></span></button>
   </div>
   <div id="lightbox-title"></div>
 </div>
@@ -2934,7 +2934,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
        tap on the surrounding space bubble up and close, while a tap inside still does not. -->
   <div style="padding:20px;width:100%;display:flex;justify-content:center;min-height:100%">
     <div class="modal-sheet" style="max-width:360px;width:100%;max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 40px);overflow-y:auto;-webkit-overflow-scrolling:touch;align-self:flex-start;position:relative" id="account-modal-sheet" onclick="event.stopPropagation()">
-      <button onclick="closeAccount()" aria-label="Close" style="position:absolute;top:12px;right:12px;z-index:5;width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--muted);font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--accent-border)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">×</button>
+      <button onclick="closeAccount()" aria-label="Close" style="position:absolute;top:12px;right:12px;z-index:5;width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--muted);font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--accent-border)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'"><span data-ic="x" data-ic-size="18"></span></button>
       <div style="text-align:center;padding:8px 0 20px">
         <div class="avatar-wrap" onclick="toggleAvatarPicker()">
           <div class="acc-avatar" id="acc-modal-avatar" style="margin:0">U</div>
@@ -3064,7 +3064,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.3-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.4-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -3113,7 +3113,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 <div id="feedback-overlay" class="overlay" style="display:none; align-items:center;" onclick="closeFeedback()">
   <div style="padding:20px;width:100%;display:flex;justify-content:center;cursor:default" onclick="event.stopPropagation()">
     <div class="modal-sheet" style="max-width:360px; max-height:85vh; display:flex; flex-direction:column; position:relative;">
-      <button onclick="closeFeedback()" aria-label="Close" style="position:absolute;top:12px;right:12px;z-index:5;width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--muted);font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--primary-border)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">×</button>
+      <button onclick="closeFeedback()" aria-label="Close" style="position:absolute;top:12px;right:12px;z-index:5;width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--muted);font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--primary-border)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'"><span data-ic="x" data-ic-size="18"></span></button>
 
       <div style="flex-shrink:0;">
         <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;color:#F5C518;font-size:12px;letter-spacing:2px;margin-bottom:3px" data-i18n="fb_heading">FEEDBACK</div>
@@ -3136,7 +3136,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
           </button>
           <div id="fb-attach-preview" style="display:none;align-items:center;gap:6px">
             <img id="fb-attach-thumb" src="" style="height:32px;width:32px;border-radius:5px;object-fit:cover;border:1px solid var(--border)">
-            <button onclick="clearFbScreenshot()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:0 4px;line-height:1" title="Remove">×</button>
+            <button onclick="clearFbScreenshot()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:0 4px;line-height:1" title="Remove"><span data-ic="x" data-ic-size="18"></span></button>
           </div>
         </div>
 
@@ -6944,6 +6944,26 @@ const _MIN_RATED = 20;
 function _ratingOf(r) {
   return r && r.vote_average && (r.vote_count || 0) >= _MIN_RATED ? r.vote_average.toFixed(1) : null;
 }
+// Название страны или языка по коду на языке интерфейса. Браузер без нужных данных возвращает код
+// или английское - тогда берём то, что прислал TMDB.
+const _intlDN = {};
+function _intlName(type, code, fallback) {
+  try {
+    const k = type + _lang;
+    if (!_intlDN[k]) _intlDN[k] = new Intl.DisplayNames([_lang], { type });
+    const v = code && _intlDN[k].of(code);
+    return v && v.toLowerCase() !== String(code).toLowerCase() ? v : (fallback || code || "");
+  } catch (e) { return fallback || code || ""; }
+}
+// Длительность в карточке на языке интерфейса: «118 min» стояло и в грузинской (29 окт). d.Runtime
+// остаётся как есть - по нему в библиотеку пишутся минуты (_parseRuntimeMin).
+function _runtimeLabel(d) {
+  const m = parseInt(d.Runtime, 10);
+  if (!m) return "";
+  let s;
+  try { s = new Intl.NumberFormat(_lang, { style: "unit", unit: "minute", unitDisplay: "short" }).format(m); } catch (e) { s = m + " min"; }
+  return /\/ep/.test(d.Runtime) ? s + " / " + t("tv_episode") : s;
+}
 async function tmdbDetail(id, type) {
   type = type || "movie";
   // release_dates - для блока «В кино»: тем же обращением, отдельного запроса не стоит.
@@ -6988,8 +7008,10 @@ async function tmdbDetail(id, type) {
     Plot: detail.overview || "",
     Genre: (detail.genres||[]).map(g=>g.name).join(", "),
     Director: director, Cast: cast, Writers: writers, Composer: composer, Cinematographer: cinematographer,
-    Country: (detail.production_countries||[]).map(c=>c.name).join(", "),
-    Language: (detail.spoken_languages||[]).map(l=>l.english_name).join(", "),
+    // Страны и языки - на языке интерфейса по коду, а не английские имена TMDB: в грузинской карточке
+    // «Гурии» стояло «Georgia, Norway ... · Georgian» (29 окт). Нет перевода - английское имя TMDB.
+    Country: (detail.production_countries||[]).map(c=>_intlName("region", c.iso_3166_1, c.name)).join(", "),
+    Language: (detail.spoken_languages||[]).map(l=>_intlName("language", l.iso_639_1, l.english_name)).join(", "),
     Tagline: detail.tagline || "", Status: detail.status || "",
     Seasons: detail.number_of_seasons || null, Episodes: detail.number_of_episodes || null,
     // Already in this response and previously discarded. `next_episode_to_air` is the one
@@ -8382,7 +8404,7 @@ async function openDetail(id, type) {
         <div style="flex:1;min-width:0">
           <div class="modal-title">${escapeHtml(d.Title)}</div>
           ${d.OriginalTitle && d.OriginalTitle !== d.Title ? `<div style="color:var(--muted);font-size:11px;margin-top:1px">${escapeHtml(d.OriginalTitle)}</div>` : ""}
-          <div style="color:var(--muted);font-size:12px;margin-top:3px">${escapeHtml(d.Year)}${d.Runtime ? ` · ${escapeHtml(d.Runtime)}` : ""}</div>
+          <div style="color:var(--muted);font-size:12px;margin-top:3px">${escapeHtml(d.Year)}${_runtimeLabel(d) ? ` · ${escapeHtml(_runtimeLabel(d))}` : ""}</div>
           ${d.Rating ? `<div class="rating-badge">★ ${escapeHtml(d.Rating)} <span>/ 10 TMDB</span></div>` : ""}
           ${d.Tagline ? `<div class="tagline">"${escapeHtml(d.Tagline)}"</div>` : ""}
           <div class="chips">${chips}</div>
@@ -9389,7 +9411,7 @@ function renderHistory() {
                 : ''}
               ${opComment?`<div class="hist-note">"${escapeHtml(opComment)}" <span style="color:var(--muted);font-style:normal;font-size:10px">· ${opDate}</span></div>`:""}
             </div>
-            ${mineRow ? `<button class="hist-del" data-del-id="${item.id}" onclick="event.stopPropagation();_armDelete(${item.id}, this)" title="${t('list_delete')}" style="align-self:flex-start;flex-shrink:0;margin-left:8px">×</button>` : ''}
+            ${mineRow ? `<button class="hist-del" data-del-id="${item.id}" onclick="event.stopPropagation();_armDelete(${item.id}, this)" title="${t('list_delete')}" style="align-self:flex-start;flex-shrink:0;margin-left:8px">${icon('x', 16)}</button>` : ''}
           </div>
           <div style="position:relative;display:flex;justify-content:center;align-items:center;margin-top:8px;min-height:28px">
             ${!isWatchedTab ? `<div class="movie-drag-handle" onpointerdown="event.stopPropagation();_movieDragStart(event,this.closest('.hist-card'))"><div class="movie-drag-dots">${'<span></span>'.repeat(10)}</div></div>` : ''}
@@ -12901,7 +12923,7 @@ function renderFriendsSection() {
           ${_avatarMarkup(id, name, 36)}
           <div style="flex:1;font-size:13px">${escapeHtml(name)}</div>
           <button onclick="event.stopPropagation();_friendDeleteConfirmFid='${fid}';renderFriendsSection()"
-            style="background:none;border:none;color:var(--muted);font-size:18px;line-height:1;cursor:pointer;padding:6px 8px;margin:-6px -4px" title="${t('list_remove')}">×</button>
+            style="background:none;border:none;color:var(--muted);font-size:18px;line-height:1;cursor:pointer;padding:6px 8px;margin:-6px -4px" title="${t('list_remove')}">${icon('x', 16)}</button>
         </div>`;
       }
     }
@@ -13638,7 +13660,7 @@ function renderListManageStrip() {
       <div style="padding:10px;background:color-mix(in srgb, var(--accent) 5%, transparent);border-radius:10px;border:1px solid color-mix(in srgb, var(--accent) 15%, transparent);margin-bottom:4px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <span style="font-size:12px;color:var(--muted)">${t('list_invite_to')} <strong style="color:var(--text)">${escapeHtml(list.name)}</strong></span>
-          <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;line-height:1;padding:2px 4px">×</button>
+          <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;line-height:1;padding:2px 4px">${icon('x', 18)}</button>
         </div>
         ${friends.length ? `<div style="font-size:11px;color:var(--muted);margin-bottom:6px">${t('list_select_friend')}</div>` + friends.map(f => {
           const fi = _friendInfo(f);
@@ -13676,7 +13698,7 @@ function renderListManageStrip() {
     el.innerHTML = `<div style="padding:10px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid var(--border)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <span style="font-size:12px;color:var(--muted)">${t('list_members_title')} · <strong style="color:var(--text)">${escapeHtml(list.name)}</strong></span>
-        <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:2px 4px">×</button>
+        <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:2px 4px">${icon('x', 18)}</button>
       </div>
       ${rows || `<div style="font-size:12px;color:var(--muted);padding:4px 0">${t('no_members')}</div>`}
     </div>`;
@@ -13727,7 +13749,7 @@ function renderListsSection() {
       html += `<div class="list-row" style="flex-direction:column;align-items:flex-start;background:color-mix(in srgb, var(--accent) 5%, transparent);border-radius:8px;padding:10px;gap:6px">
         <div style="display:flex;align-items:center;gap:8px;width:100%">
           <span style="font-size:13px;font-weight:600;flex:1">${escapeHtml(list.name)}</span>
-          <button onclick="event.stopPropagation();_listInviteTargetId=null;renderListsSection()" style="background:none;border:none;color:var(--muted);font-size:18px;line-height:1;cursor:pointer;padding:4px 6px">×</button>
+          <button onclick="event.stopPropagation();_listInviteTargetId=null;renderListsSection()" style="background:none;border:none;color:var(--muted);font-size:18px;line-height:1;cursor:pointer;padding:4px 6px">${icon('x', 18)}</button>
         </div>
         <div style="font-size:11px;color:var(--muted)">${t('select_friend_invite')}</div>
         ${avail.length ? avail.map(f => {
@@ -15208,7 +15230,7 @@ function _renderListInvCard(inv) {
           <button onclick="event.stopPropagation();respondInviteById('${inv.id}','declined')" style="padding:6px 14px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--muted);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">✕ ${t('inv_decline')}</button>
         </div>` : ''}
       </div>
-      <button onclick="event.stopPropagation();_armDeleteInvite('${inv.id}', this)" class="hist-del" style="flex-shrink:0;padding:6px 8px;align-self:flex-start;margin-top:2px">×</button>
+      <button onclick="event.stopPropagation();_armDeleteInvite('${inv.id}', this)" class="hist-del" style="flex-shrink:0;padding:6px 8px;align-self:flex-start;margin-top:2px">${icon('x', 16)}</button>
     </div>
   </div>`;
 }
@@ -15246,7 +15268,7 @@ function _renderInvCard(inv) {
             </div>
             <div style="font-size:10px;color:var(--muted);margin-top:2px">${_fmtDT(inv.last_msg_at || inv.created_at)}</div>
           </div>
-          <button onclick="event.stopPropagation();_armDeleteInvite('${inv.id}', this)" class="hist-del" style="flex-shrink:0;padding:6px 8px;margin-top:2px">×</button>
+          <button onclick="event.stopPropagation();_armDeleteInvite('${inv.id}', this)" class="hist-del" style="flex-shrink:0;padding:6px 8px;margin-top:2px">${icon('x', 16)}</button>
         </div>
         ${inv.message ? `<div style="color:#aaa;font-size:12px;font-style:italic;margin-top:4px">"${escapeHtml(inv.message)}"</div>` : ""}
         ${isPending ? `<div style="display:flex;gap:8px;margin-top:8px;position:relative;z-index:2" onclick="event.stopPropagation()">
@@ -18149,7 +18171,7 @@ async function loadFeedbackReplies() {
       ${data.map(f=>`<div style="margin-bottom:10px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--border)">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
           <div style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px">${typeIcon[f.type]||typeIcon.other} ${_fmtDT(f.created_at)}</div>
-          <button data-del-id="${f.id}" onclick="deleteFeedback('${f.id}')" style="background:none;border:none;color:#888;cursor:pointer;font-size:18px;line-height:1;padding:6px 8px;border-radius:6px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='none'">×</button>
+          <button data-del-id="${f.id}" onclick="deleteFeedback('${f.id}')" style="background:none;border:none;color:#888;cursor:pointer;font-size:18px;line-height:1;padding:6px 8px;border-radius:6px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='none'">${icon('x', 16)}</button>
         </div>
         <div style="font-size:13px;color:#ccc">${escapeHtml(_fbShownMsg(f.message))}</div>
         ${f.screenshot_url?`<a data-shot="${escapeHtml(_fbShotPath(f.screenshot_url))}" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px"><img data-shot-img="${escapeHtml(_fbShotPath(f.screenshot_url))}" style="max-width:120px;max-height:80px;border-radius:6px;border:1px solid var(--border);object-fit:cover" alt="Screenshot"/></a>`:""}
