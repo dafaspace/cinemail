@@ -2105,13 +2105,16 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .maps-film-t { font-size: 14px; }
 /* Мини-постер: место держится сразу, картинка приходит, когда строка видна. */
 .maps-film-p { width: 30px; height: 45px; flex: none; border-radius: 4px; background: var(--surface2, #1c1c2e) center/cover no-repeat; }
-.maps-photo { position: relative; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: var(--surface2, #1c1c2e); margin: 0 0 10px; }
+/* Полоса, а не кадр 16:9: на телефоне фото во всю ширину уводило первый фильм за край листа. */
+.maps-photo { position: relative; aspect-ratio: 16 / 9; max-height: 128px; width: 100%; border-radius: 12px; overflow: hidden; background: var(--surface2, #1c1c2e); margin: 0 0 10px; }
 .maps-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .maps-photo-by { display: block; margin: -6px 0 10px; font-size: 10px; color: var(--muted); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .maps-acts { display: flex; gap: 8px; flex-wrap: wrap; margin: 2px 0 4px; }
 .maps-legend { margin-top: 10px; font-size: 12px; line-height: 1.6; color: var(--muted); }
 .maps-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #F5C518; vertical-align: -1px; margin-right: 3px; }
 .maps-dot.w { background: none; border: 2px solid #F5C518; box-sizing: border-box; }
+.maps-dot.c { width: 13px; height: 13px; background: rgba(245,197,24,0.18); border: 1.5px solid #F5C518; box-sizing: border-box; vertical-align: -2px; }
+.maps-dot.t { width: 13px; height: 13px; background: rgba(245,197,24,0.10); border: 1px solid rgba(245,197,24,0.6); box-sizing: border-box; vertical-align: -2px; }
 .maps-more-btn { width: 100%; min-height: 44px; margin-top: 4px; border-radius: 12px; border: 1px solid var(--border); background: none;
   color: var(--text); font: 15px 'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif; letter-spacing: 1px; text-indent: 1px; cursor: pointer; }
 .maps-film-y { color: var(--muted); font-size: 12px; }
@@ -3065,7 +3068,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.5-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.6-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -4927,6 +4930,18 @@ const _I18N_FIX_PRIVACY = {
   it:{ privacy_upd:"aggiornata", plot_in_en:"Non c'è ancora una descrizione in italiano, ecco quella inglese." },
 };
 Object.keys(_I18N_FIX_PRIVACY).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_FIX_PRIVACY[l]); });
+// Карта, разбор 29 окт: подпись кнопки «назад» к общему виду и легенда из четырёх знаков.
+const _I18N_FIX_MAPBACK = {
+  en:{ maps_back_all:"The whole map", maps_legend4:"{c} several places, the number says how many · {s} exact place, from Wikidata · {w} named in a Wikipedia article · {t} somewhere in this city. Which scene was filmed where is not recorded." },
+  ru:{ maps_back_all:"Вся карта", maps_legend4:"{c} несколько мест, число - сколько · {s} точное место, по Wikidata · {w} названо в статье Википедии · {t} где-то в этом городе. Какую сцену где снимали, не записано." },
+  uk:{ maps_back_all:"Уся мапа", maps_legend4:"{c} кілька місць, число - скільки · {s} точне місце, за Wikidata · {w} назване в статті Вікіпедії · {t} десь у цьому місті. Яку сцену де знімали, не записано." },
+  ka:{ maps_back_all:"მთელი რუკა", maps_legend4:"{c} რამდენიმე ადგილი, რიცხვი - რამდენი · {s} ზუსტი ადგილი, Wikidata-ს მიხედვით · {w} ნახსენებია ვიკიპედიის სტატიაში · {t} სადღაც ამ ქალაქში. რომელი სცენა სად გადაიღეს, ჩაწერილი არ არის." },
+  es:{ maps_back_all:"Todo el mapa", maps_legend4:"{c} varios lugares, el número dice cuántos · {s} lugar exacto, según Wikidata · {w} citado en un artículo de Wikipedia · {t} en algún punto de esta ciudad. Qué escena se rodó dónde, no consta." },
+  fr:{ maps_back_all:"Toute la carte", maps_legend4:"{c} plusieurs lieux, le nombre dit combien · {s} lieu exact, selon Wikidata · {w} cité dans un article de Wikipédia · {t} quelque part dans cette ville. Quelle scène a été tournée où, ce n’est pas noté." },
+  de:{ maps_back_all:"Die ganze Karte", maps_legend4:"{c} mehrere Orte, die Zahl sagt, wie viele · {s} genauer Ort, laut Wikidata · {w} in einem Wikipedia-Artikel erwähnt · {t} irgendwo in dieser Stadt. Welche Szene wo gedreht wurde, ist nicht erfasst." },
+  it:{ maps_back_all:"Tutta la mappa", maps_legend4:"{c} più luoghi, il numero dice quanti · {s} luogo esatto, secondo Wikidata · {w} citato in una voce di Wikipedia · {t} da qualche parte in questa città. Quale scena dove, non è registrato." },
+};
+Object.keys(_I18N_FIX_MAPBACK).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_FIX_MAPBACK[l]); });
 // Слайд карт в онбординге (23 окт; шесть остальных языков 24 окт, по утверждённым en/ru).
 const _I18N_FIX_OBMAP = {
   en:{ ob_map_title:"Where was it filmed", ob_map_body:"More than 30,000 filming places on a world map. Open a film to see where it was shot, or tap <span class=\"ob-geo\" role=\"img\" aria-label=\"Show where I am\"></span> to find what was filmed near you. The Odyssey alone was shot in six countries, from Iceland to Morocco." },
@@ -18422,8 +18437,9 @@ async function _mapsShow() {
     // Одно нажатие на всё: ищем в квадрате вокруг пальца (_mapsHit), а не ровно под ним.
     map.on('click', async e => {
       const f = _mapsHit(map, e.point);
-      if (!f) return;
-      if (f.layer.id !== 'clusters') { _mapsSelect(f.properties.i); return; }
+      // Тап мимо точек закрывает открытое - шаг назад, как крестик (разбор карты 29 окт, пункт 2).
+      if (!f) { if (_mapsSel != null || _mapsNearOn || _mapsCityOf != null) _mapsStepBack(); return; }
+      if (f.layer.id !== 'clusters') { if (f.properties.i !== _mapsSel) { _mapsPush(); _mapsSelect(f.properties.i); } return; }
       // СКОПЛЕНИЕ - ЦЕЛИКОМ, А НЕ НА ШАГ БЛИЖЕ. Шаг по зуму вёл к Лидсу за 11 нажатий
       // (7411 -> 3815 -> 685 -> ... -> 4), в среднем по 17 случайным местам за 7 (замер 28 окт).
       // Рамка по всем местам скопления - 7 и 4. Не мельче прежнего шага: иначе скопление,
@@ -18437,7 +18453,7 @@ async function _mapsShow() {
     map.on('mousemove', e => { map.getCanvas().style.cursor = _mapsHit(map, e.point) ? 'pointer' : ''; });
     _mapsIdle();
     if (_mapsPendingFocus) { const k = _mapsPendingFocus; _mapsPendingFocus = null; _mapsFocusFilm(k); }
-    if (_mapsPendingPlace != null) { const k = _mapsPendingPlace; _mapsPendingPlace = null; _mapsGoPlace(k); }
+    if (_mapsPendingPlace != null) { const k = _mapsPendingPlace; _mapsPendingPlace = null; _mapsGoPlace(k, true); }
   });
 }
 
@@ -18482,7 +18498,7 @@ window.addEventListener('resize', () => { _mapsFit(); });
 // Без выбранной точки: сколько всего и как пользоваться. "Мои" без просмотренных - объяснить,
 // а не показать пустой мир, который читается как поломка.
 function _mapsIdle() {
-  _mapsSel = null; _mapsNearOn = false;
+  _mapsSel = null; _mapsNearOn = false; _mapsCityOf = null;
   if (_map && _map.getLayer('pt-sel')) _map.setFilter('pt-sel', ['==', ['get', 'i'], -1]);
   const d = _mapsData; if (!d) return;
   if (_mapsFilm && d.f[_mapsFilm]) {
@@ -18492,21 +18508,24 @@ function _mapsIdle() {
       ${w ? `<span class="maps-badge">${escapeHtml(t('maps_per_wiki'))}</span>` : ''}</div>`;
     const backFilm = _mapsFilmFrom && _mapsFilmFrom.key === key
       ? `<button class="maps-back" onclick="_mapsBackToFilm()">${icon('arrow-left', 14)} ${escapeHtml(t('maps_back_film'))}</button>` : '';
-    _mapsSheet(`${backFilm}<div class="maps-head"><div class="maps-place" style="cursor:pointer" onclick="openDetail('${escapeJsAttr(key.slice(1))}','${type}')">
+    _mapsSheet(`${backFilm || _mapsBackHTML()}<div class="maps-head"><div class="maps-place" style="cursor:pointer" onclick="openDetail('${escapeJsAttr(key.slice(1))}','${type}')">
         <div class="maps-place-n">${escapeHtml(v[3])}</div>
         <div class="maps-place-m">${v[4] ? escapeHtml(String(v[4])) : ''}</div></div>
-        <button class="maps-x" onclick="_mapsShowAll()" aria-label="${escapeHtml(t('maps_all'))}">${icon('x', 18)}</button></div>
+        <button class="maps-x" onclick="_mapsPush();_mapsShowAll()" aria-label="${escapeHtml(t('maps_all'))}">${icon('x', 18)}</button></div>
       ${v[0].map(i => row(i, 0)).join('')}${v[1].map(i => row(i, 1)).join('')}
       ${(also => also.length ? `<div class="maps-more">${escapeHtml(t('maps_also'))}: ${also.map(escapeHtml).join(', ')}</div>` : '')(_mapsAlso(v))}`);
     return;
   }
-  _mapsSheet(`<div class="maps-hint">${escapeHtml(t('maps_stats').replace('{f}', Object.keys(d.f).length.toLocaleString()).replace('{p}', d.p.length.toLocaleString()))}<br>${escapeHtml(t('maps_hint'))}</div>${_mapsLegend()}`);
+  _mapsSheet(`${_mapsBackHTML()}<div class="maps-hint">${escapeHtml(t('maps_stats').replace('{f}', Object.keys(d.f).length.toLocaleString()).replace('{p}', d.p.length.toLocaleString()))}<br>${escapeHtml(t('maps_hint'))}</div>${_mapsLegend()}`);
 }
 // Один раз, на общем экране, а не под каждым местом: что значат точки и чего мы не знаем.
 // Строка «Какую сцену - неизвестно» стояла под каждым из 30 015 мест и была верна для всех:
 // сцен в данных нет ни у одного (проверено 11 окт), а фраза, верная всегда, ничего не говорит.
 function _mapsLegend() {
-  return `<div class="maps-legend">${escapeHtml(t('maps_legend')).replace('{s}', '<span class="maps-dot"></span>').replace('{w}', '<span class="maps-dot w"></span>')}</div>`;
+  // Все четыре знака карты, а не два: мягкий круг «где-то в городе» стоит у 15 550 мест и не
+  // объяснялся, а кольцо скопления путали с кольцом «по Википедии» (разбор карты, пункт 4).
+  return `<div class="maps-legend">${escapeHtml(t('maps_legend4')).replace('{c}', '<span class="maps-dot c"></span>').replace('{s}', '<span class="maps-dot"></span>')
+    .replace('{w}', '<span class="maps-dot w"></span>').replace('{t}', '<span class="maps-dot t"></span>')}</div>`;
 }
 
 function _mapsCatLabel(c) { return t('maps_cat_' + _mapsData.cats[c]) || _mapsData.cats[c]; }
@@ -18611,20 +18630,67 @@ function _mapsPosters() {
 // Кнопка отвечала только синей точкой. Теперь под картой - ближайшие места съёмок с расстоянием,
 // а если до «Где я» было открыто место или фильм, первой строкой - возврат туда. Координаты
 // считаются здесь же и никуда не уходят (privacy.html, раздел 2.4).
-let _mapsBack = null, _mapsNear = null, _mapsNearOn = false;
+let _mapsNear = null, _mapsNearOn = false;
 function _mapsBackCapture() {
-  if (_mapsNearOn || !_map) return;                 // повторное «Где я» не затирает исходную точку
-  const d = _mapsData;
-  const label = _mapsSel != null ? _placeName(_mapsSel) : (_mapsFilm && d && d.f[_mapsFilm]) ? d.f[_mapsFilm][3] : null;
-  _mapsBack = { sel: _mapsSel, film: _mapsFilm, label, center: _map.getCenter().toArray(), zoom: _map.getZoom() };
+  if (!_mapsNearOn) _mapsPush();                    // повторное «Где я» - не новый шаг
 }
-function _mapsGoBack() {
-  const b = _mapsBack; _mapsBack = null; _mapsNearOn = false;
-  if (!b || !_map) return _mapsIdle();
-  if (b.film) { _mapsFocusFilm(b.film); if (b.sel != null) _mapsSelect(b.sel); }
-  else if (b.sel != null) _mapsSelect(b.sel);
+
+// ПУТЬ НАЗАД НА КАРТЕ - ОДИН СТЕК (разбор карты 29 окт, пункты 1-2; root CLAUDE.md, «путь назад»).
+// Было пять отдельных кнопок «назад», и каждая помнила своё: место забывалось после фильма, список
+// города - после места, «Рядом» - после тапа по точке, а с общего вида после «Где я» возврата не
+// было вовсе. Теперь каждый шаг по карте кладёт сюда, где человек был, и одна кнопка над листом,
+// крестик места и тап по пустой карте возвращают ровно туда, вместе с кадром карты. Дно стека -
+// общий вид; из поиска дно - сама вкладка поиска.
+const _mapsStack = [];
+let _mapsCityOf = null;          // открыт список «Другие места» этого города
+function _mapsSnap() {
+  return { sel: _mapsSel, film: _mapsFilm, near: _mapsNearOn, city: _mapsCityOf,
+           center: _map ? _map.getCenter().toArray() : null, zoom: _map ? _map.getZoom() : null };
+}
+function _mapsPush() {
+  if (!_map || !_mapsData) return;
+  _mapsStack.push(_mapsSnap());
+  if (_mapsStack.length > 40) _mapsStack.shift();
+}
+function _mapsBackLabel(s) {
+  const d = _mapsData;
+  if (s.tab) return t('tab_' + s.tab) || t('tab_search');
+  if (s.near) return t('maps_near');
+  if (s.city != null) return _placeName(s.city);
+  if (s.sel != null) return _placeName(s.sel);
+  if (s.film && d.f[s.film]) return d.f[s.film][3];
+  return t('maps_back_all');
+}
+function _mapsBackHTML() {
+  const s = _mapsStack[_mapsStack.length - 1];
+  return s ? `<button class="maps-back" onclick="_mapsStepBack()">${icon('arrow-left', 14)} <span dir="auto">${escapeHtml(_mapsBackLabel(s))}</span></button>` : '';
+}
+function _mapsStepBack() {
+  const s = _mapsStack.pop();
+  if (!s) { _mapsIdle(); return; }
+  if (s.tab) { _mapsStack.length = 0; _mapsIdle(); switchTab(s.tab); return; }
+  if (s.film !== _mapsFilm) { _mapsFilm = s.film; _map?.getSource('places')?.setData(_mapsFeatures()); }
+  if (s.near && _mapsNear) _mapsNearShow();
+  else if (s.city != null) _mapsCityPlaces(s.city);
+  else if (s.sel != null) _mapsSelect(s.sel);
   else _mapsIdle();
-  if (!b.film) _map.easeTo({ center: b.center, zoom: b.zoom });
+  if (s.center && _map) _map.easeTo({ center: s.center, zoom: s.zoom });
+}
+// Самый известный фильм места - для строк списков: «Shubert Theatre · 140 m · 1» не говорило, что
+// там снимали, а у 20 963 из 30 015 мест фильм ровно один (разбор карты, пункт 3).
+function _mapsTopFilm(i) {
+  const d = _mapsData; let best = null;
+  for (const [k] of d.at[i] || []) if (d.f[k] && (!best || d.f[k][5] > d.f[best][5])) best = k;
+  return best ? d.f[best][3] : '';
+}
+// Район города. Обычно - по номеру Wikidata города, но у 63 городов район записан под другим
+// номером с тем же названием (Leeds Q39121 и район Leeds Q774015), и их 212 мест не числились за
+// городом. То же правило - в указателе городов (build-maps-data.py, build_cities).
+function _cityAdm(i) {
+  const d = _mapsData, pl = d.p[i];
+  const j = pl[6] ? d.admOfQ.get(pl[6]) : undefined;
+  if (j !== undefined) return j;
+  return pl[5] >= 0 && (d.adm[pl[5]] || [])[1] === pl[3] ? pl[5] : undefined;
 }
 function _distKm(lon1, lat1, lon2, lat2) {
   const r = Math.PI / 180, dLat = (lat2 - lat1) * r, dLon = (lon2 - lon1) * r;
@@ -18651,12 +18717,11 @@ function _mapsNearMe(lon, lat) {
 }
 function _mapsNearShow() {
   const n = _mapsNear, d = _mapsData; if (!n || !d) return;
-  _mapsNearOn = true; _mapsSel = null;
+  _mapsNearOn = true; _mapsSel = null; _mapsCityOf = null;
   if (_map && _map.getLayer('pt-sel')) _map.setFilter('pt-sel', ['==', ['get', 'i'], -1]);
-  const b = _mapsBack;
-  const back = b && b.label ? `<button class="maps-back" onclick="_mapsGoBack()">${icon('map-pin', 14)} ${escapeHtml(b.label)}</button>` : '';
-  const rows = n.list.map(([i, km]) => `<div class="maps-film" onclick="_mapsGoPlace(${i}, true)">
-      <span class="maps-film-t">${escapeHtml(_placeName(i))}</span><span class="maps-film-y">${escapeHtml(_mapsCatLabel(d.p[i][2]))} · ${escapeHtml(_distLabel(km))}</span>
+  const back = _mapsBackHTML();
+  const rows = n.list.map(([i, km]) => `<div class="maps-film" onclick="_mapsGoPlace(${i})">
+      <span class="maps-film-t">${escapeHtml(_placeName(i))}</span><span class="maps-film-y">${escapeHtml(_distLabel(km))} · ${escapeHtml(_mapsTopFilm(i))}</span>
       <span class="maps-badge" style="display:inline-flex;align-items:center;gap:4px">${icon('film', 11)} ${d.at[i].length}</span></div>`).join('');
   _mapsSheet(`${back}<div class="maps-place"><div class="maps-place-n">${escapeHtml(t('maps_near'))}</div></div>
     ${n.none ? `<div class="maps-note" style="font-style:normal">${escapeHtml(t('maps_near_none'))}</div>` : '<div style="height:6px"></div>'}${rows}`);
@@ -18667,10 +18732,10 @@ function _mapsNearShow() {
   }
 }
 
-function _mapsSelect(i, fromNear) {
+function _mapsSelect(i) {
   const d = _mapsData; if (!d) return;
   _mapsSel = i;
-  _mapsNearOn = false;
+  _mapsNearOn = false; _mapsCityOf = null;
   if (_map && _map.getLayer('pt-sel')) _map.setFilter('pt-sel', ['==', ['get', 'i'], i]);
   const [lon, lat, cat, name, iso] = d.p[i];
   _mapsRows = d.at[i].slice()
@@ -18678,15 +18743,12 @@ function _mapsSelect(i, fromNear) {
   _mapsShown = Math.min(_MAPS_STEP, _mapsRows.length);
   const shown = _mapsRows.slice(0, _mapsShown).map(_mapsFilmRow).join('');
   const more = _mapsMoreHTML();
-  const back = fromNear && _mapsNear
-    ? `<button class="maps-back" onclick="_mapsNearShow()">${icon('map-pin', 14)} ${escapeHtml(t('maps_near'))}</button>`
-    : _mapsFilm && d.f[_mapsFilm]
-    ? `<button class="maps-back" onclick="_mapsIdle()">${icon('map-pin', 14)} ${escapeHtml(d.f[_mapsFilm][3])}</button>` : '';
+  const back = _mapsBackHTML();
   // Другие места этого же города: у Багдада один фильм в самой точке города, а рядом кластер
   // из трёх мест - и человек не знал, что они тоже Багдад.
-  const ownAdm = d.cats[cat] === 'city' && d.p[i][6] ? d.admOfQ.get(d.p[i][6]) : undefined;
+  const ownAdm = d.cats[cat] === 'city' ? _cityAdm(i) : undefined;
   const others = ownAdm !== undefined ? (d.inAdm.get(ownAdm) || []).filter(j => j !== i) : [];
-  const cityRow = others.length ? `<button type="button" class="srch-line" onclick="_mapsCityPlaces(${i})">${icon('map-pin', 18)}<span dir="auto">${escapeHtml(t('maps_city_more').replace('{n}', () => others.length))}</span><span class="srch-chev">›</span></button>` : '';
+  const cityRow = others.length ? `<button type="button" class="srch-line" onclick="_mapsPush();_mapsCityPlaces(${i})">${icon('map-pin', 18)}<span dir="auto">${escapeHtml(t('maps_city_more').replace('{n}', () => others.length))}</span><span class="srch-chev">›</span></button>` : '';
   const q = d.p[i][6];
   const ios = (window.Capacitor?.getPlatform?.() === 'ios') || /iPhone|iPad|iPod/.test(navigator.userAgent)
     || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
@@ -18698,10 +18760,13 @@ function _mapsSelect(i, fromNear) {
                     : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
   const wiki = q ? `https://www.wikidata.org/wiki/Special:GoToLinkedPage/${_lang}wiki/Q${q}` : '';
   const ext = (href, ic, label) => `<button type="button" class="maps-onmap" data-href="${escapeHtml(href)}" onclick="_openExternal(this.dataset.href)">${icon(ic, 14)} ${escapeHtml(label)}</button>`;
-  _mapsSheet(`${back}<div id="maps-photo"></div><div class="maps-place">
+  // Крестик - тот же шаг назад, что кнопка над листом; фото - после названия, а не над ним: фото
+  // 16:9 первым сдвигало первый фильм к низу экрана (разбор карты, «упростить»).
+  _mapsSheet(`${back}<div class="maps-head"><div class="maps-place">
       <div class="maps-place-n" dir="auto">${escapeHtml(_placeName(i))}</div>
       <div class="maps-place-m">${escapeHtml(_placeLine(i))}</div>
-    </div>
+    </div><button class="maps-x" onclick="_mapsStepBack()" aria-label="${escapeHtml(t('close'))}">${icon('x', 18)}</button></div>
+    <div id="maps-photo"></div>
     <div class="maps-acts">${route ? ext(route, 'map-pin', t('maps_route')) : ''}${wiki ? ext(wiki, 'globe', t('maps_wiki')) : ''}</div>
     ${cityRow}
     <div style="height:6px"></div>
@@ -18739,14 +18804,17 @@ function _mapsPhoto(i) {
 
 // Все места внутри города - списком под картой и рамкой на карте.
 function _mapsCityPlaces(i) {
-  const d = _mapsData, j = d.admOfQ.get(d.p[i][6]);
+  const d = _mapsData, j = _cityAdm(i);
   const list = (d.inAdm.get(j) || []).filter(x => x !== i).sort((a, b) => d.at[b].length - d.at[a].length);
   if (!list.length) return;
+  _mapsSel = null; _mapsNearOn = false; _mapsCityOf = i;
+  if (_map && _map.getLayer('pt-sel')) _map.setFilter('pt-sel', ['==', ['get', 'i'], -1]);
   const pts = [i, ...list].map(x => d.p[x]);
   const lons = pts.map(p => p[0]), lats = pts.map(p => p[1]);
-  _mapsSheet(`<button class="maps-back" onclick="_mapsSelect(${i})">${icon('map-pin', 14)} ${escapeHtml(_placeName(i))}</button>
+  _mapsSheet(`${_mapsBackHTML()}<div class="maps-place"><div class="maps-place-n" dir="auto">${escapeHtml(_placeName(i))}</div>
+      <div class="maps-place-m">${escapeHtml(t('maps_city_more').replace('{n}', () => list.length))}</div></div><div style="height:6px"></div>
     ${list.map(x => `<div class="maps-film" onclick="_mapsGoPlace(${x})">
-      <span class="maps-film-t">${escapeHtml(_placeName(x))}</span><span class="maps-film-y">${escapeHtml(_mapsCatLabel(d.p[x][2]))}</span>
+      <span class="maps-film-t">${escapeHtml(_placeName(x))}</span><span class="maps-film-y">${escapeHtml(_mapsCatLabel(d.p[x][2]))} · ${escapeHtml(_mapsTopFilm(x))}</span>
       <span class="maps-badge" style="display:inline-flex;align-items:center;gap:4px">${icon('film', 11)} ${d.at[x].length}</span></div>`).join('')}`);
   _map.resize();            // карточка уже на месте и карта стала ниже: рамку считаем по новой высоте
   _map.fitBounds([[Math.min(...lons), Math.min(...lats)], [Math.max(...lons), Math.max(...lats)]], { padding: 50, maxZoom: 14 });
@@ -18766,7 +18834,8 @@ function _mapsFocusFilm(key) {
   const d = _mapsData, v = d.f[key]; if (!v) return;
   const pts = [...v[0], ...v[1]].map(i => d.p[i]);
   if (!pts.length) return;
-  // Режим одного фильма; выход - крестик в карточке под картой.
+  // Режим одного фильма; выход - крестик в карточке под картой, назад к фильму - своя кнопка.
+  _mapsStack.length = 0;
   _mapsFilm = key;
   _map.getSource('places').setData(_mapsFeatures());
   _mapsIdle();              // список мест фильма под картой - до рамки, чтобы она легла в уже низкую карту
@@ -18778,19 +18847,23 @@ function _mapsFocusFilm(key) {
   }
 }
 // Строка места в списке фильма: подлететь и открыть, что ещё там снимали.
-function _mapsGoPlace(i, fromNear) {
+function _mapsGoPlace(i, noPush) {
   const p = _mapsData.p[i], c = _mapsData.cats[p[2]];
-  _mapsSelect(i, fromNear);           // сначала карточка: карта станет ниже, и центр считается уже по ней
+  if (!noPush) _mapsPush();
+  _mapsSelect(i);           // сначала карточка: карта станет ниже, и центр считается уже по ней
   _map.easeTo({ center: [p[0], p[1]], zoom: c === 'region' ? 7 : c === 'city' ? 10 : 12 });
 }
 // Из поиска: открыть карту сразу на месте (городе).
 let _mapsPendingPlace = null;
 function _mapsOpenPlace(i) {
+  const from = _activeTab();
   switchTab('maps');
+  _mapsStack.length = 0;
+  if (from !== 'maps') _mapsStack.push({ tab: from });
   // Город из поиска - на всей карте, а не среди мест одного открытого раньше фильма (разбор карты
   // 29 окт, пункт 7): «На карте» -> «Назад к фильму» -> поиск «Rome» оставлял точки того фильма.
   if (_mapsFilm) { _mapsFilm = null; _mapsFilmFrom = null; _map?.getSource('places')?.setData(_mapsFeatures()); }
-  if (_map && _map.getSource && _map.getSource('places') && _mapsData) _mapsGoPlace(i);
+  if (_map && _map.getSource && _map.getSource('places') && _mapsData) _mapsGoPlace(i, true);
   else _mapsPendingPlace = i;
 }
 // ПУТЬ НАЗАД ИЗ «НА КАРТЕ» (дизайн-ревью, 23 окт; root CLAUDE.md, «путь назад»). Кнопка закрывала
