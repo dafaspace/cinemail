@@ -907,6 +907,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   border-radius: 10px;
   border: 1px solid var(--border);
 }
+.detail-plot-note { margin-top: 8px; font-size: 11px; line-height: 1.4; color: var(--muted); }
 .crew-label { display:flex; align-items:center; gap:6px; color: var(--muted); font-size: 11px; font-weight: 600; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
 .crew-val { color: #ddd; font-size: 13px; margin-bottom: 10px; }
 .awards-box {
@@ -3064,7 +3065,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.4-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.5-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -4912,16 +4913,18 @@ Object.keys(_I18N_FIX_UI).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I1
 // I18N-FIX-ANCHOR picksa
 // Набранное ровно известное название («Die Hard», «Scary Movie») - поиск фильма; подборка по его
 // словам ждёт этой строкой под «Похожее на» (15 окт).
-// privacy_updated - один раз тем, кто зарегистрировался до 19 окт (_privacyNotice).
+// privacy_upd - тихая отметка у ссылки на политику в окне аккаунта, пока её не открыли (_privacyNotice);
+// окно на 9 секунд при входе убрано по слову Дафы 29 окт. plot_in_en - под английским описанием,
+// когда на языке интерфейса его нет (tmdbDetail). Грузинские строки - на проверку носителю.
 const _I18N_FIX_PRIVACY = {
-  en:{ privacy_updated:"Privacy policy updated: picks no longer send your library to an AI, and feedback goes to the developer's Telegram. Details at the bottom of the avatar menu." },
-  ru:{ privacy_updated:"Политика конфиденциальности обновлена: подборки больше не отправляют библиотеку в ИИ, а отзывы идут в Telegram разработчика. Подробнее - внизу меню под аватаром." },
-  uk:{ privacy_updated:"Політику конфіденційності оновлено: добірки більше не надсилають бібліотеку в ШІ, а відгуки йдуть у Telegram розробника. Докладніше - внизу меню під аватаром." },
-  ka:{ privacy_updated:"კონფიდენციალურობის პოლიტიკა განახლდა: რჩევები ბიბლიოთეკას აღარ უგზავნის ხელოვნურ ინტელექტს, უკუკავშირი კი დეველოპერის Telegram-ში მიდის. დაწვრილებით - ავატარის მენიუს ბოლოში." },
-  es:{ privacy_updated:"Política de privacidad actualizada: las sugerencias ya no envían tu biblioteca a una IA y los comentarios llegan al Telegram del desarrollador. Detalles al final del menú del avatar." },
-  fr:{ privacy_updated:"Politique de confidentialité mise à jour : les suggestions n'envoient plus ta bibliothèque à une IA, et les retours vont sur le Telegram du développeur. Détails en bas du menu de l'avatar." },
-  de:{ privacy_updated:"Datenschutzerklärung aktualisiert: Tipps schicken deine Bibliothek nicht mehr an eine KI, und Feedback geht an den Telegram des Entwicklers. Details unten im Avatar-Menü." },
-  it:{ privacy_updated:"Informativa sulla privacy aggiornata: i consigli non inviano più la tua libreria a un'IA e i feedback arrivano al Telegram dello sviluppatore. Dettagli in fondo al menu dell'avatar." },
+  en:{ privacy_upd:"updated", plot_in_en:"No description in English yet." },
+  ru:{ privacy_upd:"обновлена", plot_in_en:"Описания на русском пока нет, показано английское." },
+  uk:{ privacy_upd:"оновлено", plot_in_en:"Опису українською поки немає, показано англійський." },
+  ka:{ privacy_upd:"განახლდა", plot_in_en:"ქართული აღწერა ჯერ არ არის, ნაჩვენებია ინგლისური." },
+  es:{ privacy_upd:"actualizada", plot_in_en:"Aún no hay descripción en español; se muestra la inglesa." },
+  fr:{ privacy_upd:"mise à jour", plot_in_en:"Pas encore de description en français ; voici l'anglaise." },
+  de:{ privacy_upd:"aktualisiert", plot_in_en:"Noch keine Beschreibung auf Deutsch, hier die englische." },
+  it:{ privacy_upd:"aggiornata", plot_in_en:"Non c'è ancora una descrizione in italiano, ecco quella inglese." },
 };
 Object.keys(_I18N_FIX_PRIVACY).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_FIX_PRIVACY[l]); });
 // Слайд карт в онбординге (23 окт; шесть остальных языков 24 окт, по утверждённым en/ru).
@@ -6143,18 +6146,33 @@ async function onSignedIn(user) {
   _pushSyncOnLogin(); // native-only, non-prompting: refresh push token if already granted
   _privacyNotice(user);
 }
-// ПОЛИТИКА ИЗМЕНИЛАСЬ - СКАЗАТЬ ОДИН РАЗ. privacy.html обещает уведомить в приложении о
-// существенных изменениях, и 19 окт они есть: подборки больше не отправляют библиотеку в ИИ, а
-// отзывы со скриншотом описаны как идущие в Telegram разработчика. Аккаунт, созданный позже, уже
-// получил новую политику при регистрации. Раз на устройство, без сети.
+// ПОЛИТИКА ИЗМЕНИЛАСЬ - СКАЗАТЬ, НЕ ПЕРЕБИВАЯ. privacy.html (раздел 12) обещает уведомить в
+// приложении о существенных изменениях, и 19 окт они есть. Было окно на 9 секунд при каждом
+// первом входе на устройстве, с непонятными людям словами про ИИ; Дафа 29 окт: не нужно. Теперь у
+// ссылки на политику в окне аккаунта стоит «обновлена 19 окт», пока человек её не откроет.
+// Аккаунт, созданный позже, уже получил новую политику при регистрации. Раз на устройство, без сети.
 const PRIVACY_VER = '2026-10-19';
+let _privacyMark = false;
 function _privacyNotice(user) {
   try {
-    if (localStorage.getItem('cm_privacy_seen') === PRIVACY_VER) return;
-    localStorage.setItem('cm_privacy_seen', PRIVACY_VER);
-    if (!user || !user.created_at || String(user.created_at).slice(0, 10) >= PRIVACY_VER) return;
-    setTimeout(() => showToast(t('privacy_updated'), false, 9000), 1500);
-  } catch (e) {}
+    _privacyMark = localStorage.getItem('cm_privacy_seen') !== PRIVACY_VER &&
+      !!(user && user.created_at && String(user.created_at).slice(0, 10) < PRIVACY_VER);
+  } catch (e) { _privacyMark = false; }
+}
+function _paintPrivacyMark() {
+  const box = document.querySelector('[data-i18n="about_privacy"]');
+  if (!box) return;
+  box.querySelector('.privacy-upd')?.remove();
+  if (!_privacyMark) return;
+  let when = PRIVACY_VER;
+  try { when = new Intl.DateTimeFormat(_lang, { day: 'numeric', month: 'short' }).format(new Date(PRIVACY_VER + 'T12:00:00')); } catch (e) {}
+  box.insertAdjacentHTML('beforeend', `<span class="privacy-upd" style="color:var(--muted)"> · ${escapeHtml(t('privacy_upd'))} ${escapeHtml(when)}</span>`);
+  const a = box.querySelector('a');
+  if (a) a.addEventListener('click', () => {
+    _privacyMark = false;
+    try { localStorage.setItem('cm_privacy_seen', PRIVACY_VER); } catch (e) {}
+    box.querySelector('.privacy-upd')?.remove();
+  }, { once: true });
 }
 
 // ── СМЕНА АККАУНТА: ОДИН СБРОС НА ВСЁ ───────────────────────────────────────
@@ -6974,6 +6992,14 @@ async function tmdbDetail(id, type) {
     if (altDetail.title || altDetail.name) { detail = altDetail; type = alt; }
   }
   const credits = await tmdbFetch(`/${type}/${id}/credits?language=${_tmdbLang()}`);
+  // ОПИСАНИЯ НА ЯЗЫКЕ ИНТЕРФЕЙСА НЕТ - у 9 из 15 свежих грузинских фильмов (29 окт), и карточка
+  // молчала. Берём английское и подписываем под ним, что на языке интерфейса его пока нет, чтобы
+  // это не выглядело ошибкой (Дафа, 29 окт). Лишний запрос - только у таких фильмов.
+  let plotLang = '';
+  if (!detail.overview && !/^en/.test(_tmdbLang())) {
+    const en = await tmdbFetch(`/${type}/${id}?language=en-US`);
+    if (en && en.overview) { detail.overview = en.overview; plotLang = 'en'; }
+  }
   // TMDB lists a person once PER JOB, so anyone credited twice arrives twice: Wes Anderson
   // is both "Screenplay" and "Story" on The Phoenician Scheme, and the card read
   // "Wes Anderson, Roman Coppola, Wes Anderson". v0.51.1 fixed exactly this - but only on
@@ -7005,7 +7031,7 @@ async function tmdbDetail(id, type) {
     Runtime: detail.runtime ? `${detail.runtime} min` : (detail.episode_run_time?.[0] ? `${detail.episode_run_time[0]} min/ep` : ""),
     RuntimeMin: detail.runtime || ((detail.episode_run_time?.[0] || 0) * (detail.number_of_episodes || 0)) || null,
     Rating: _ratingOf(detail),
-    Plot: detail.overview || "",
+    Plot: detail.overview || "", PlotLang: plotLang,
     Genre: (detail.genres||[]).map(g=>g.name).join(", "),
     Director: director, Cast: cast, Writers: writers, Composer: composer, Cinematographer: cinematographer,
     // Страны и языки - на языке интерфейса по коду, а не английские имена TMDB: в грузинской карточке
@@ -8410,7 +8436,7 @@ async function openDetail(id, type) {
           <div class="chips">${chips}</div>
         </div>
       </div>
-      ${d.Plot ? `<div class="detail-plot">${escapeHtml(d.Plot)}</div>` : ""}
+      ${d.Plot ? `<div class="detail-plot">${escapeHtml(d.Plot)}${d.PlotLang ? `<div class="detail-plot-note">${escapeHtml(t('plot_in_en'))}</div>` : ''}</div>` : ""}
       ${crew}${tvInfo}
       ${d.Country ? `<div style="margin-bottom:14px"><div class="crew-label" data-i18n="country_lang">${escapeHtml(t('country_lang'))}</div><div class="crew-val">${escapeHtml(d.Country)} · ${escapeHtml(d.Language)}</div></div>` : ""}
       <div id="where-to-watch">${_whereToWatchInner(d.WatchAll || {})}</div>
@@ -15835,6 +15861,7 @@ async function openAccount() {
 
   // Show modal immediately with whatever we have
   document.getElementById("account-overlay").style.display="flex";
+  _paintPrivacyMark();
   const sheet = document.getElementById("account-modal-sheet");
   if (sheet) sheet.scrollTop = 0;
 
@@ -18760,6 +18787,9 @@ function _mapsGoPlace(i, fromNear) {
 let _mapsPendingPlace = null;
 function _mapsOpenPlace(i) {
   switchTab('maps');
+  // Город из поиска - на всей карте, а не среди мест одного открытого раньше фильма (разбор карты
+  // 29 окт, пункт 7): «На карте» -> «Назад к фильму» -> поиск «Rome» оставлял точки того фильма.
+  if (_mapsFilm) { _mapsFilm = null; _mapsFilmFrom = null; _map?.getSource('places')?.setData(_mapsFeatures()); }
   if (_map && _map.getSource && _map.getSource('places') && _mapsData) _mapsGoPlace(i);
   else _mapsPendingPlace = i;
 }
