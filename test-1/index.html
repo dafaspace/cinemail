@@ -228,6 +228,12 @@ button {
   -webkit-appearance: none; appearance: none;
   text-box: trim-both cap alphabetic;   /* trims to cap height, so the ink is centred */
 }
+/* НИ ОДНО ОКНО НЕ ЕЗДИТ ВБОК (2 нояб, iPhone Дафы: окно аккаунта пружинило по горизонтали). На iOS
+   26.5 окно по ширине не вылезает ни на пиксель, поэтому правило ставится на все окна и на саму
+   страницу: горизонтальной прокрутки нет ни у кого. clip, а не hidden: не делает элемент
+   прокручиваемым и не трогает вертикаль. */
+html, body { overscroll-behavior-x: none; }
+html, body, .overlay, .modal, .modal-sheet, #account-modal-sheet, #inbox-list { overflow-x: clip; }
 /* An invisible 44x44 floor around any control that is visually smaller. Layout does
    not move: the pseudo-element is absolutely positioned and centred on the button, so
    a dense row keeps its spacing while every target becomes reachable.
@@ -454,6 +460,14 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   transition: border-color 0.2s;
 }
 .search-row input:focus { border-color: var(--primary-border); }
+/* Своя кнопка очистки: у Android она своя, у iPhone в Safari её нет (2 нояб). Родную прячем, чтобы
+   на Android не было двух. id в селекторе - чтобы перебить position:relative общего правила кнопок. */
+.search-field { position: relative; flex: 1; min-width: 0; display: flex; }
+.search-field input { width: 100%; padding-right: 40px; }
+#search-input::-webkit-search-cancel-button { -webkit-appearance: none; display: none; }
+#search-clear { position: absolute; right: 2px; top: 0; bottom: 0; margin: auto 0; width: 36px; height: 36px; padding: 0;
+  background: none; border: none; color: var(--muted); cursor: pointer; }
+#search-clear[hidden] { display: none; }
 .search-row input::placeholder { color: var(--muted); }
 
 /* ── Cards ──────────────────────────────────────────────────────────── */
@@ -765,7 +779,6 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .search-logo {
   width: 96px; height: 96px; margin: 0 auto 14px; display: block;
   cursor: pointer; -webkit-tap-highlight-color: transparent;
-  filter: drop-shadow(0 5px 14px rgba(0,0,0,0.4));
   transition: transform .12s ease; user-select: none; -webkit-user-select: none;
 }
 .search-logo:active { transform: scale(0.9); }
@@ -1195,6 +1208,8 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   background: rgba(245,197,24,0.04);
   border-color: var(--primary-border);
 }
+.inv-collapse { display: inline-flex; align-items: center; gap: 4px; margin: 6px 0 -4px auto; padding: 8px 2px; background: none; border: none; color: var(--muted); font-size: 12px; font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif; cursor: pointer; }
+.inv-thread { display: flex; flex-direction: column; }
 .inv-thread {
   margin-top: 10px;
   padding-top: 10px;
@@ -2184,7 +2199,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <!-- The mark itself, inline, not the opaque icon: drop-shadow traced the icon's square
            and the glow read as a rectangle behind the mark rather than light coming off it.
            Inline so the reel can turn on show and on tap (brand/web/logo-tap.html, 10 Oct). -->
-      <svg class="logo-tap pop" viewBox="0 0 1024 1024" role="img" aria-label="Cinemail" onclick="_bounceLogo(this)" style="width:108px;height:108px;margin-bottom:16px;cursor:pointer;-webkit-tap-highlight-color:transparent;filter:drop-shadow(0 0 26px rgba(245,197,24,0.28))"><defs>
+      <svg class="logo-tap pop" viewBox="0 0 1024 1024" role="img" aria-label="Cinemail" onclick="_bounceLogo(this)" style="width:108px;height:108px;margin-bottom:16px;cursor:pointer;-webkit-tap-highlight-color:transparent;background:radial-gradient(closest-side, rgba(245,197,24,0.20), rgba(245,197,24,0) 100%)"><defs>
     <clipPath id="ob-open"><path d="M-200 -200 H1224 V1224 H-200 Z M48.74 333.24 L1074.8 1114.97 L1074.8 1627.8 L48.74 1627.8 Z" clip-rule="evenodd"/></clipPath>
     <mask id="ob-back" maskUnits="userSpaceOnUse" x="-200" y="-200" width="1424" height="1424"><rect x="-200" y="-200" width="1424" height="1424" fill="#fff"/><circle cx="512" cy="430.8" r="253.12" fill="#000"/><path d="M188.74 448.3 Q188.74 439.9 197.14 446.3 L421.56 617.28 L188.74 805.81 Z" fill="#000" stroke="#000" stroke-width="42" stroke-linejoin="round" /><path d="M835.26 448.3 Q835.26 439.9 826.86 446.3 L602.44 617.28 L835.26 805.81 Z" fill="#000" stroke="#000" stroke-width="42" stroke-linejoin="round" /><path d="M188.74 805.81 L421.56 617.28 L512 686.18 L602.44 617.28 L835.26 805.81 L835.26 797.6 Q835.26 825.6 807.26 825.6 L216.74 825.6 Q188.74 825.6 188.74 797.6 Z" fill="#000" stroke="#000" stroke-width="42" stroke-linejoin="round" /><g clip-path="url(#ob-open)"><path d="M422.19 601.93 A389.06 389.06 0 0 1 958.36 568.63 L901.28 737.09 A317.52 317.52 0 0 0 450.52 708.56 Z" fill="#000" stroke="#000" stroke-width="42" stroke-linejoin="round" /></g></mask>
     <mask id="ob-flap" maskUnits="userSpaceOnUse" x="-200" y="-200" width="1424" height="1424"><rect x="-200" y="-200" width="1424" height="1424" fill="#fff"/><circle cx="512" cy="430.8" r="253.12" fill="#000"/><path d="M188.74 448.3 Q188.74 439.9 197.14 446.3 L421.56 617.28 L188.74 805.81 Z" fill="#000" stroke="#000" stroke-width="42" stroke-linejoin="round" /><path d="M835.26 448.3 Q835.26 439.9 826.86 446.3 L602.44 617.28 L835.26 805.81 Z" fill="#000" stroke="#000" stroke-width="42" stroke-linejoin="round" /><g clip-path="url(#ob-open)"><path d="M422.19 601.93 A389.06 389.06 0 0 1 958.36 568.63 L901.28 737.09 A317.52 317.52 0 0 0 450.52 708.56 Z" fill="#000" stroke="#000" stroke-width="42" stroke-linejoin="round" /></g></mask>
@@ -2506,7 +2521,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 
     <!-- Slide 9: Finale -->
     <div class="ob-slide" data-ob="finale">
-      <div id="ob-popcorn" style="font-size:60px;margin-bottom:18px;line-height:1;filter:drop-shadow(0 0 28px rgba(245,197,24,0.25));position:relative"><!-- Our own red-white box (variant C, Dafa 29 Oct), not the outline icon and not the system emoji: the emoji was a different picture on every platform. Drawn in the logo's language, black ink, #F0F0F0, gold rim; source and the other variants: docs/mockups/popcorn.html. --><svg viewBox="0 0 120 120" width="96" height="96" aria-hidden="true" style="display:block;margin:0 auto;overflow:visible"> <defs><clipPath id="clipobpc"><path d="M20 52 Q60 58 100 52 L85 113 Q60 118 35 113 Z"/></clipPath></defs> <circle cx="106" cy="26" r="6.5" fill="#000"/><circle cx="107.9" cy="28.4" r="5.1" fill="#000"/><circle cx="103.1" cy="27" r="4.6" fill="#000"/><circle cx="104.1" cy="23.6" r="5.1" fill="#000"/><circle cx="108.9" cy="25" r="4.6" fill="#000"/><circle cx="106" cy="26" r="4.6" fill="#F0F0F0"/><circle cx="107.9" cy="28.4" r="3.2" fill="#F0F0F0"/><circle cx="103.1" cy="27" r="2.7" fill="#F0F0F0"/><circle cx="104.1" cy="23.6" r="3.2" fill="#F0F0F0"/><circle cx="108.9" cy="25" r="2.7" fill="#F0F0F0"/><circle cx="104.8" cy="26.5" r="1.6" fill="#F8C43C" opacity=".75"/><circle cx="59.5" cy="11" r="8.3" fill="#000"/><circle cx="62.2" cy="14.3" r="6.4" fill="#000"/><circle cx="55.5" cy="12.3" r="5.6" fill="#000"/><circle cx="56.9" cy="7.7" r="6.4" fill="#000"/><circle cx="63.6" cy="9.7" r="5.6" fill="#000"/><circle cx="59.5" cy="11" r="6.4" fill="#F0F0F0"/><circle cx="62.2" cy="14.3" r="4.5" fill="#F0F0F0"/><circle cx="55.5" cy="12.3" r="3.7" fill="#F0F0F0"/><circle cx="56.9" cy="7.7" r="4.5" fill="#F0F0F0"/><circle cx="63.6" cy="9.7" r="3.7" fill="#F0F0F0"/><circle cx="48.4" cy="21.8" r="9.1" fill="#000"/><circle cx="47.3" cy="26.4" r="6.9" fill="#000"/><circle cx="44.4" cy="19.2" r="6.1" fill="#000"/><circle cx="49.4" cy="17.2" r="6.9" fill="#000"/><circle cx="52.3" cy="24.4" r="6.1" fill="#000"/><circle cx="48.4" cy="21.8" r="7.2" fill="#F0F0F0"/><circle cx="47.3" cy="26.4" r="5" fill="#F0F0F0"/><circle cx="44.4" cy="19.2" r="4.2" fill="#F0F0F0"/><circle cx="49.4" cy="17.2" r="5" fill="#F0F0F0"/><circle cx="52.3" cy="24.4" r="4.2" fill="#F0F0F0"/><circle cx="59.2" cy="18.6" r="9.1" fill="#000"/><circle cx="54.9" cy="20.7" r="6.9" fill="#000"/><circle cx="58.8" cy="13.9" r="6.1" fill="#000"/><circle cx="63.5" cy="16.6" r="6.9" fill="#000"/><circle cx="59.6" cy="23.4" r="6.1" fill="#000"/><circle cx="59.2" cy="18.6" r="7.2" fill="#F0F0F0"/><circle cx="54.9" cy="20.7" r="5" fill="#F0F0F0"/><circle cx="58.8" cy="13.9" r="4.2" fill="#F0F0F0"/><circle cx="63.5" cy="16.6" r="5" fill="#F0F0F0"/><circle cx="59.6" cy="23.4" r="4.2" fill="#F0F0F0"/><circle cx="57.4" cy="19.4" r="2.4" fill="#F8C43C" opacity=".75"/><circle cx="75" cy="20.4" r="9.1" fill="#000"/><circle cx="70.7" cy="18.3" r="6.9" fill="#000"/><circle cx="78.4" cy="17.2" r="6.1" fill="#000"/><circle cx="79.3" cy="22.5" r="6.9" fill="#000"/><circle cx="71.6" cy="23.7" r="6.1" fill="#000"/><circle cx="75" cy="20.4" r="7.2" fill="#F0F0F0"/><circle cx="70.7" cy="18.3" r="5" fill="#F0F0F0"/><circle cx="78.4" cy="17.2" r="4.2" fill="#F0F0F0"/><circle cx="79.3" cy="22.5" r="5" fill="#F0F0F0"/><circle cx="71.6" cy="23.7" r="4.2" fill="#F0F0F0"/><circle cx="34.8" cy="32.3" r="9.3" fill="#000"/><circle cx="33.8" cy="27.5" r="7.1" fill="#000"/><circle cx="39.6" cy="32.9" r="6.2" fill="#000"/><circle cx="35.8" cy="37" r="7.1" fill="#000"/><circle cx="30" cy="31.6" r="6.2" fill="#000"/><circle cx="34.8" cy="32.3" r="7.4" fill="#F0F0F0"/><circle cx="33.8" cy="27.5" r="5.2" fill="#F0F0F0"/><circle cx="39.6" cy="32.9" r="4.3" fill="#F0F0F0"/><circle cx="35.8" cy="37" r="5.2" fill="#F0F0F0"/><circle cx="30" cy="31.6" r="4.3" fill="#F0F0F0"/><circle cx="44.6" cy="29.1" r="9.3" fill="#000"/><circle cx="47.7" cy="25.3" r="7.1" fill="#000"/><circle cx="47.1" cy="33.3" r="6.2" fill="#000"/><circle cx="41.6" cy="32.9" r="7.1" fill="#000"/><circle cx="42.2" cy="24.9" r="6.2" fill="#000"/><circle cx="44.6" cy="29.1" r="7.4" fill="#F0F0F0"/><circle cx="47.7" cy="25.3" r="5.2" fill="#F0F0F0"/><circle cx="47.1" cy="33.3" r="4.3" fill="#F0F0F0"/><circle cx="41.6" cy="32.9" r="5.2" fill="#F0F0F0"/><circle cx="42.2" cy="24.9" r="4.3" fill="#F0F0F0"/><circle cx="42.8" cy="29.8" r="2.5" fill="#F8C43C" opacity=".75"/><circle cx="59.5" cy="30.9" r="9.3" fill="#000"/><circle cx="64.3" cy="31" r="7.1" fill="#000"/><circle cx="57.7" cy="35.5" r="6.2" fill="#000"/><circle cx="54.6" cy="30.8" r="7.1" fill="#000"/><circle cx="61.2" cy="26.3" r="6.2" fill="#000"/><circle cx="59.5" cy="30.9" r="7.4" fill="#F0F0F0"/><circle cx="64.3" cy="31" r="5.2" fill="#F0F0F0"/><circle cx="57.7" cy="35.5" r="4.3" fill="#F0F0F0"/><circle cx="54.6" cy="30.8" r="5.2" fill="#F0F0F0"/><circle cx="61.2" cy="26.3" r="4.3" fill="#F0F0F0"/><circle cx="74.3" cy="27.8" r="9.3" fill="#000"/><circle cx="77.2" cy="31.6" r="7.1" fill="#000"/><circle cx="69.6" cy="29.2" r="6.2" fill="#000"/><circle cx="71.3" cy="23.9" r="7.1" fill="#000"/><circle cx="78.9" cy="26.3" r="6.2" fill="#000"/><circle cx="74.3" cy="27.8" r="7.4" fill="#F0F0F0"/><circle cx="77.2" cy="31.6" r="5.2" fill="#F0F0F0"/><circle cx="69.6" cy="29.2" r="4.3" fill="#F0F0F0"/><circle cx="71.3" cy="23.9" r="5.2" fill="#F0F0F0"/><circle cx="78.9" cy="26.3" r="4.3" fill="#F0F0F0"/><circle cx="85.1" cy="29.6" r="9.3" fill="#000"/><circle cx="83.9" cy="34.3" r="7.1" fill="#000"/><circle cx="81.1" cy="26.8" r="6.2" fill="#000"/><circle cx="86.3" cy="24.8" r="7.1" fill="#000"/><circle cx="89.1" cy="32.3" r="6.2" fill="#000"/><circle cx="85.1" cy="29.6" r="7.4" fill="#F0F0F0"/><circle cx="83.9" cy="34.3" r="5.2" fill="#F0F0F0"/><circle cx="81.1" cy="26.8" r="4.3" fill="#F0F0F0"/><circle cx="86.3" cy="24.8" r="5.2" fill="#F0F0F0"/><circle cx="89.1" cy="32.3" r="4.3" fill="#F0F0F0"/><circle cx="83.3" cy="30.3" r="2.5" fill="#F8C43C" opacity=".75"/><circle cx="25.9" cy="41.4" r="9.5" fill="#000"/><circle cx="21.3" cy="43.4" r="7.2" fill="#000"/><circle cx="25.5" cy="36.3" r="6.3" fill="#000"/><circle cx="30.5" cy="39.3" r="7.2" fill="#000"/><circle cx="26.3" cy="46.4" r="6.3" fill="#000"/><circle cx="25.9" cy="41.4" r="7.6" fill="#F0F0F0"/><circle cx="21.3" cy="43.4" r="5.3" fill="#F0F0F0"/><circle cx="25.5" cy="36.3" r="4.4" fill="#F0F0F0"/><circle cx="30.5" cy="39.3" r="5.3" fill="#F0F0F0"/><circle cx="26.3" cy="46.4" r="4.4" fill="#F0F0F0"/><circle cx="35.8" cy="38.2" r="9.5" fill="#000"/><circle cx="31.3" cy="35.9" r="7.2" fill="#000"/><circle cx="39.4" cy="34.8" r="6.3" fill="#000"/><circle cx="40.2" cy="40.5" r="7.2" fill="#000"/><circle cx="32.1" cy="41.6" r="6.3" fill="#000"/><circle cx="35.8" cy="38.2" r="7.6" fill="#F0F0F0"/><circle cx="31.3" cy="35.9" r="5.3" fill="#F0F0F0"/><circle cx="39.4" cy="34.8" r="4.4" fill="#F0F0F0"/><circle cx="40.2" cy="40.5" r="5.3" fill="#F0F0F0"/><circle cx="32.1" cy="41.6" r="4.4" fill="#F0F0F0"/><circle cx="50.5" cy="40" r="9.5" fill="#000"/><circle cx="49.6" cy="35.1" r="7.2" fill="#000"/><circle cx="55.5" cy="40.8" r="6.3" fill="#000"/><circle cx="51.5" cy="44.9" r="7.2" fill="#000"/><circle cx="45.6" cy="39.2" r="6.3" fill="#000"/><circle cx="50.5" cy="40" r="7.6" fill="#F0F0F0"/><circle cx="49.6" cy="35.1" r="5.3" fill="#F0F0F0"/><circle cx="55.5" cy="40.8" r="4.4" fill="#F0F0F0"/><circle cx="51.5" cy="44.9" r="5.3" fill="#F0F0F0"/><circle cx="45.6" cy="39.2" r="4.4" fill="#F0F0F0"/><circle cx="48.6" cy="40.8" r="2.6" fill="#F8C43C" opacity=".75"/><circle cx="65.3" cy="41.8" r="9.5" fill="#000"/><circle cx="68.6" cy="38" r="7.2" fill="#000"/><circle cx="67.8" cy="46.2" r="6.3" fill="#000"/><circle cx="62.1" cy="45.6" r="7.2" fill="#000"/><circle cx="62.9" cy="37.4" r="6.3" fill="#000"/><circle cx="65.3" cy="41.8" r="7.6" fill="#F0F0F0"/><circle cx="68.6" cy="38" r="5.3" fill="#F0F0F0"/><circle cx="67.8" cy="46.2" r="4.4" fill="#F0F0F0"/><circle cx="62.1" cy="45.6" r="5.3" fill="#F0F0F0"/><circle cx="62.9" cy="37.4" r="4.4" fill="#F0F0F0"/><circle cx="75.2" cy="38.6" r="9.5" fill="#000"/><circle cx="80.2" cy="38.8" r="7.2" fill="#000"/><circle cx="73.3" cy="43.3" r="6.3" fill="#000"/><circle cx="70.2" cy="38.5" r="7.2" fill="#000"/><circle cx="77.1" cy="34" r="6.3" fill="#000"/><circle cx="75.2" cy="38.6" r="7.6" fill="#F0F0F0"/><circle cx="80.2" cy="38.8" r="5.3" fill="#F0F0F0"/><circle cx="73.3" cy="43.3" r="4.4" fill="#F0F0F0"/><circle cx="70.2" cy="38.5" r="5.3" fill="#F0F0F0"/><circle cx="77.1" cy="34" r="4.4" fill="#F0F0F0"/><circle cx="90" cy="40.5" r="9.5" fill="#000"/><circle cx="93" cy="44.5" r="7.2" fill="#000"/><circle cx="85.2" cy="41.9" r="6.3" fill="#000"/><circle cx="87" cy="36.4" r="7.2" fill="#000"/><circle cx="94.8" cy="39" r="6.3" fill="#000"/><circle cx="90" cy="40.5" r="7.6" fill="#F0F0F0"/><circle cx="93" cy="44.5" r="5.3" fill="#F0F0F0"/><circle cx="85.2" cy="41.9" r="4.4" fill="#F0F0F0"/><circle cx="87" cy="36.4" r="5.3" fill="#F0F0F0"/><circle cx="94.8" cy="39" r="4.4" fill="#F0F0F0"/><circle cx="88.1" cy="41.2" r="2.6" fill="#F8C43C" opacity=".75"/> <g clip-path="url(#clipobpc)"> <path d="M20 46 L31.42857142857143 46 L42.142857142857146 121 L35 121 Z" fill="#E0322F"/><path d="M31.42857142857143 46 L42.85714285714286 46 L49.285714285714285 121 L42.142857142857146 121 Z" fill="#F0F0F0"/><path d="M42.85714285714286 46 L54.285714285714285 46 L56.42857142857143 121 L49.285714285714285 121 Z" fill="#E0322F"/><path d="M54.285714285714285 46 L65.71428571428572 46 L63.57142857142857 121 L56.42857142857143 121 Z" fill="#F0F0F0"/><path d="M65.71428571428572 46 L77.14285714285714 46 L70.71428571428572 121 L63.57142857142857 121 Z" fill="#E0322F"/><path d="M77.14285714285714 46 L88.57142857142857 46 L77.85714285714286 121 L70.71428571428572 121 Z" fill="#F0F0F0"/><path d="M88.57142857142857 46 L100 46 L85 121 L77.85714285714286 121 Z" fill="#E0322F"/> <path d="M82 40 L120 40 L120 120 L72 120 Z" fill="#000" opacity=".16"/> <path d="M0 40 L30 40 L42 120 L0 120 Z" fill="#fff" opacity=".10"/> <path d="M18 51 Q60 56 102 51 L98.6 61 Q60 66 21.4 61 Z" fill="#F0B715"/> <path d="M24 59 Q60 64 96 59" fill="none" stroke="#D29E12" stroke-width="1.6"/> </g> <path d="M20 52 Q60 58 100 52 L85 113 Q60 118 35 113 Z" fill="none" stroke="#000" stroke-width="4.4" stroke-linejoin="round"/> <circle cx="32.8" cy="50.3" r="9.3" fill="#000"/><circle cx="31.5" cy="55" r="7.1" fill="#000"/><circle cx="28.8" cy="47.5" r="6.2" fill="#000"/><circle cx="34.1" cy="45.6" r="7.1" fill="#000"/><circle cx="36.8" cy="53.1" r="6.2" fill="#000"/><circle cx="32.8" cy="50.3" r="7.4" fill="#F0F0F0"/><circle cx="31.5" cy="55" r="5.2" fill="#F0F0F0"/><circle cx="28.8" cy="47.5" r="4.3" fill="#F0F0F0"/><circle cx="34.1" cy="45.6" r="5.2" fill="#F0F0F0"/><circle cx="36.8" cy="53.1" r="4.3" fill="#F0F0F0"/><circle cx="43.6" cy="51.4" r="9.3" fill="#000"/><circle cx="39.2" cy="53.3" r="7.1" fill="#000"/><circle cx="43.4" cy="46.5" r="6.2" fill="#000"/><circle cx="48.1" cy="49.4" r="7.1" fill="#000"/><circle cx="43.9" cy="56.2" r="6.2" fill="#000"/><circle cx="43.6" cy="51.4" r="7.4" fill="#F0F0F0"/><circle cx="39.2" cy="53.3" r="5.2" fill="#F0F0F0"/><circle cx="43.4" cy="46.5" r="4.3" fill="#F0F0F0"/><circle cx="48.1" cy="49.4" r="5.2" fill="#F0F0F0"/><circle cx="43.9" cy="56.2" r="4.3" fill="#F0F0F0"/><circle cx="60.5" cy="49.5" r="9.3" fill="#000"/><circle cx="56.1" cy="47.2" r="7.1" fill="#000"/><circle cx="64.1" cy="46.2" r="6.2" fill="#000"/><circle cx="64.8" cy="51.8" r="7.1" fill="#000"/><circle cx="56.8" cy="52.7" r="6.2" fill="#000"/><circle cx="60.5" cy="49.5" r="7.4" fill="#F0F0F0"/><circle cx="56.1" cy="47.2" r="5.2" fill="#F0F0F0"/><circle cx="64.1" cy="46.2" r="4.3" fill="#F0F0F0"/><circle cx="64.8" cy="51.8" r="5.2" fill="#F0F0F0"/><circle cx="56.8" cy="52.7" r="4.3" fill="#F0F0F0"/><circle cx="58.6" cy="50.2" r="2.5" fill="#F8C43C" opacity=".75"/><circle cx="77.3" cy="50.5" r="9.3" fill="#000"/><circle cx="76.4" cy="45.7" r="7.1" fill="#000"/><circle cx="82.1" cy="51.4" r="6.2" fill="#000"/><circle cx="78.1" cy="55.3" r="7.1" fill="#000"/><circle cx="72.4" cy="49.7" r="6.2" fill="#000"/><circle cx="77.3" cy="50.5" r="7.4" fill="#F0F0F0"/><circle cx="76.4" cy="45.7" r="5.2" fill="#F0F0F0"/><circle cx="82.1" cy="51.4" r="4.3" fill="#F0F0F0"/><circle cx="78.1" cy="55.3" r="5.2" fill="#F0F0F0"/><circle cx="72.4" cy="49.7" r="4.3" fill="#F0F0F0"/><circle cx="88.1" cy="48.6" r="9.3" fill="#000"/><circle cx="91.3" cy="45" r="7.1" fill="#000"/><circle cx="90.4" cy="52.9" r="6.2" fill="#000"/><circle cx="84.9" cy="52.3" r="7.1" fill="#000"/><circle cx="85.8" cy="44.4" r="6.2" fill="#000"/><circle cx="88.1" cy="48.6" r="7.4" fill="#F0F0F0"/><circle cx="91.3" cy="45" r="5.2" fill="#F0F0F0"/><circle cx="90.4" cy="52.9" r="4.3" fill="#F0F0F0"/><circle cx="84.9" cy="52.3" r="5.2" fill="#F0F0F0"/><circle cx="85.8" cy="44.4" r="4.3" fill="#F0F0F0"/> </svg></div>
+      <div id="ob-popcorn" style="font-size:60px;margin-bottom:18px;line-height:1;filter:drop-shadow(0 0 28px rgba(245,197,24,0.25));position:relative"><!-- Our own red-white box in the look of Android's popcorn emoji (Dafa, 2 Nov): no outlines, yellow kernels, emoji size, no kernel left in the air. Not the emoji itself: that is a different picture on every platform. Generator: docs/mockups/popcorn.html, variant B. --><svg viewBox="0 0 120 120" width="64" height="64" aria-hidden="true" style="display:block;margin:0 auto;overflow:visible"> <defs><clipPath id="clipobpc"><path d="M20 52 Q60 58 100 52 L85 113 Q60 118 35 113 Z"/></clipPath></defs> <circle cx="59.5" cy="11" r="6.4" fill="#FFE9A6"/><circle cx="62.2" cy="14.3" r="4.5" fill="#FFE9A6"/><circle cx="55.5" cy="12.3" r="3.7" fill="#FFE9A6"/><circle cx="56.9" cy="7.7" r="4.5" fill="#FFE9A6"/><circle cx="63.6" cy="9.7" r="3.7" fill="#FFE9A6"/><circle cx="61.8" cy="13.6" r="3.5" fill="#E8C062"/><circle cx="48.4" cy="21.8" r="7.2" fill="#FFE9A6"/><circle cx="47.3" cy="26.4" r="5" fill="#FFE9A6"/><circle cx="44.4" cy="19.2" r="4.2" fill="#FFE9A6"/><circle cx="49.4" cy="17.2" r="5" fill="#FFE9A6"/><circle cx="52.3" cy="24.4" r="4.2" fill="#FFE9A6"/><circle cx="50.9" cy="24.7" r="4" fill="#E8C062"/><circle cx="59.2" cy="18.6" r="7.2" fill="#FFE9A6"/><circle cx="54.9" cy="20.7" r="5" fill="#FFE9A6"/><circle cx="58.8" cy="13.9" r="4.2" fill="#FFE9A6"/><circle cx="63.5" cy="16.6" r="5" fill="#FFE9A6"/><circle cx="59.6" cy="23.4" r="4.2" fill="#FFE9A6"/><circle cx="61.7" cy="21.5" r="4" fill="#E8C062"/><circle cx="57.4" cy="19.4" r="2.4" fill="#F8C43C" opacity=".75"/><circle cx="75" cy="20.4" r="7.2" fill="#FFE9A6"/><circle cx="70.7" cy="18.3" r="5" fill="#FFE9A6"/><circle cx="78.4" cy="17.2" r="4.2" fill="#FFE9A6"/><circle cx="79.3" cy="22.5" r="5" fill="#FFE9A6"/><circle cx="71.6" cy="23.7" r="4.2" fill="#FFE9A6"/><circle cx="77.5" cy="23.3" r="4" fill="#E8C062"/><circle cx="34.8" cy="32.3" r="7.4" fill="#FFE9A6"/><circle cx="33.8" cy="27.5" r="5.2" fill="#FFE9A6"/><circle cx="39.6" cy="32.9" r="4.3" fill="#FFE9A6"/><circle cx="35.8" cy="37" r="5.2" fill="#FFE9A6"/><circle cx="30" cy="31.6" r="4.3" fill="#FFE9A6"/><circle cx="37.4" cy="35.2" r="4.1" fill="#E8C062"/><circle cx="44.6" cy="29.1" r="7.4" fill="#FFE9A6"/><circle cx="47.7" cy="25.3" r="5.2" fill="#FFE9A6"/><circle cx="47.1" cy="33.3" r="4.3" fill="#FFE9A6"/><circle cx="41.6" cy="32.9" r="5.2" fill="#FFE9A6"/><circle cx="42.2" cy="24.9" r="4.3" fill="#FFE9A6"/><circle cx="47.2" cy="32.1" r="4.1" fill="#E8C062"/><circle cx="42.8" cy="29.8" r="2.5" fill="#F8C43C" opacity=".75"/><circle cx="59.5" cy="30.9" r="7.4" fill="#FFE9A6"/><circle cx="64.3" cy="31" r="5.2" fill="#FFE9A6"/><circle cx="57.7" cy="35.5" r="4.3" fill="#FFE9A6"/><circle cx="54.6" cy="30.8" r="5.2" fill="#FFE9A6"/><circle cx="61.2" cy="26.3" r="4.3" fill="#FFE9A6"/><circle cx="62" cy="33.9" r="4.1" fill="#E8C062"/><circle cx="74.3" cy="27.8" r="7.4" fill="#FFE9A6"/><circle cx="77.2" cy="31.6" r="5.2" fill="#FFE9A6"/><circle cx="69.6" cy="29.2" r="4.3" fill="#FFE9A6"/><circle cx="71.3" cy="23.9" r="5.2" fill="#FFE9A6"/><circle cx="78.9" cy="26.3" r="4.3" fill="#FFE9A6"/><circle cx="76.8" cy="30.7" r="4.1" fill="#E8C062"/><circle cx="85.1" cy="29.6" r="7.4" fill="#FFE9A6"/><circle cx="83.9" cy="34.3" r="5.2" fill="#FFE9A6"/><circle cx="81.1" cy="26.8" r="4.3" fill="#FFE9A6"/><circle cx="86.3" cy="24.8" r="5.2" fill="#FFE9A6"/><circle cx="89.1" cy="32.3" r="4.3" fill="#FFE9A6"/><circle cx="87.7" cy="32.5" r="4.1" fill="#E8C062"/><circle cx="83.3" cy="30.3" r="2.5" fill="#F8C43C" opacity=".75"/><circle cx="25.9" cy="41.4" r="7.6" fill="#FFE9A6"/><circle cx="21.3" cy="43.4" r="5.3" fill="#FFE9A6"/><circle cx="25.5" cy="36.3" r="4.4" fill="#FFE9A6"/><circle cx="30.5" cy="39.3" r="5.3" fill="#FFE9A6"/><circle cx="26.3" cy="46.4" r="4.4" fill="#FFE9A6"/><circle cx="28.6" cy="44.4" r="4.2" fill="#E8C062"/><circle cx="35.8" cy="38.2" r="7.6" fill="#FFE9A6"/><circle cx="31.3" cy="35.9" r="5.3" fill="#FFE9A6"/><circle cx="39.4" cy="34.8" r="4.4" fill="#FFE9A6"/><circle cx="40.2" cy="40.5" r="5.3" fill="#FFE9A6"/><circle cx="32.1" cy="41.6" r="4.4" fill="#FFE9A6"/><circle cx="38.4" cy="41.2" r="4.2" fill="#E8C062"/><circle cx="50.5" cy="40" r="7.6" fill="#FFE9A6"/><circle cx="49.6" cy="35.1" r="5.3" fill="#FFE9A6"/><circle cx="55.5" cy="40.8" r="4.4" fill="#FFE9A6"/><circle cx="51.5" cy="44.9" r="5.3" fill="#FFE9A6"/><circle cx="45.6" cy="39.2" r="4.4" fill="#FFE9A6"/><circle cx="53.2" cy="43" r="4.2" fill="#E8C062"/><circle cx="48.6" cy="40.8" r="2.6" fill="#F8C43C" opacity=".75"/><circle cx="65.3" cy="41.8" r="7.6" fill="#FFE9A6"/><circle cx="68.6" cy="38" r="5.3" fill="#FFE9A6"/><circle cx="67.8" cy="46.2" r="4.4" fill="#FFE9A6"/><circle cx="62.1" cy="45.6" r="5.3" fill="#FFE9A6"/><circle cx="62.9" cy="37.4" r="4.4" fill="#FFE9A6"/><circle cx="68" cy="44.8" r="4.2" fill="#E8C062"/><circle cx="75.2" cy="38.6" r="7.6" fill="#FFE9A6"/><circle cx="80.2" cy="38.8" r="5.3" fill="#FFE9A6"/><circle cx="73.3" cy="43.3" r="4.4" fill="#FFE9A6"/><circle cx="70.2" cy="38.5" r="5.3" fill="#FFE9A6"/><circle cx="77.1" cy="34" r="4.4" fill="#FFE9A6"/><circle cx="77.9" cy="41.7" r="4.2" fill="#E8C062"/><circle cx="90" cy="40.5" r="7.6" fill="#FFE9A6"/><circle cx="93" cy="44.5" r="5.3" fill="#FFE9A6"/><circle cx="85.2" cy="41.9" r="4.4" fill="#FFE9A6"/><circle cx="87" cy="36.4" r="5.3" fill="#FFE9A6"/><circle cx="94.8" cy="39" r="4.4" fill="#FFE9A6"/><circle cx="92.7" cy="43.5" r="4.2" fill="#E8C062"/><circle cx="88.1" cy="41.2" r="2.6" fill="#F8C43C" opacity=".75"/> <g clip-path="url(#clipobpc)"> <path d="M20 46 L31.42857142857143 46 L42.142857142857146 121 L35 121 Z" fill="#E0322F"/><path d="M31.42857142857143 46 L42.85714285714286 46 L49.285714285714285 121 L42.142857142857146 121 Z" fill="#F0F0F0"/><path d="M42.85714285714286 46 L54.285714285714285 46 L56.42857142857143 121 L49.285714285714285 121 Z" fill="#E0322F"/><path d="M54.285714285714285 46 L65.71428571428572 46 L63.57142857142857 121 L56.42857142857143 121 Z" fill="#F0F0F0"/><path d="M65.71428571428572 46 L77.14285714285714 46 L70.71428571428572 121 L63.57142857142857 121 Z" fill="#E0322F"/><path d="M77.14285714285714 46 L88.57142857142857 46 L77.85714285714286 121 L70.71428571428572 121 Z" fill="#F0F0F0"/><path d="M88.57142857142857 46 L100 46 L85 121 L77.85714285714286 121 Z" fill="#E0322F"/> <path d="M82 40 L120 40 L120 120 L72 120 Z" fill="#000" opacity=".16"/> <path d="M0 40 L30 40 L42 120 L0 120 Z" fill="#fff" opacity=".10"/> <path d="M20 52 Q60 57 100 52 L99.2 57 Q60 62 20.8 57 Z" fill="#B5221F" opacity=".55"/> </g> <circle cx="32.8" cy="50.3" r="7.4" fill="#FFE9A6"/><circle cx="31.5" cy="55" r="5.2" fill="#FFE9A6"/><circle cx="28.8" cy="47.5" r="4.3" fill="#FFE9A6"/><circle cx="34.1" cy="45.6" r="5.2" fill="#FFE9A6"/><circle cx="36.8" cy="53.1" r="4.3" fill="#FFE9A6"/><circle cx="35.4" cy="53.2" r="4.1" fill="#E8C062"/><circle cx="43.6" cy="51.4" r="7.4" fill="#FFE9A6"/><circle cx="39.2" cy="53.3" r="5.2" fill="#FFE9A6"/><circle cx="43.4" cy="46.5" r="4.3" fill="#FFE9A6"/><circle cx="48.1" cy="49.4" r="5.2" fill="#FFE9A6"/><circle cx="43.9" cy="56.2" r="4.3" fill="#FFE9A6"/><circle cx="46.2" cy="54.3" r="4.1" fill="#E8C062"/><circle cx="60.5" cy="49.5" r="7.4" fill="#FFE9A6"/><circle cx="56.1" cy="47.2" r="5.2" fill="#FFE9A6"/><circle cx="64.1" cy="46.2" r="4.3" fill="#FFE9A6"/><circle cx="64.8" cy="51.8" r="5.2" fill="#FFE9A6"/><circle cx="56.8" cy="52.7" r="4.3" fill="#FFE9A6"/><circle cx="63" cy="52.4" r="4.1" fill="#E8C062"/><circle cx="58.6" cy="50.2" r="2.5" fill="#F8C43C" opacity=".75"/><circle cx="77.3" cy="50.5" r="7.4" fill="#FFE9A6"/><circle cx="76.4" cy="45.7" r="5.2" fill="#FFE9A6"/><circle cx="82.1" cy="51.4" r="4.3" fill="#FFE9A6"/><circle cx="78.1" cy="55.3" r="5.2" fill="#FFE9A6"/><circle cx="72.4" cy="49.7" r="4.3" fill="#FFE9A6"/><circle cx="79.8" cy="53.5" r="4.1" fill="#E8C062"/><circle cx="88.1" cy="48.6" r="7.4" fill="#FFE9A6"/><circle cx="91.3" cy="45" r="5.2" fill="#FFE9A6"/><circle cx="90.4" cy="52.9" r="4.3" fill="#FFE9A6"/><circle cx="84.9" cy="52.3" r="5.2" fill="#FFE9A6"/><circle cx="85.8" cy="44.4" r="4.3" fill="#FFE9A6"/><circle cx="90.7" cy="51.6" r="4.1" fill="#E8C062"/> </svg></div>
       <div class="ob-title" data-i18n="ob9_title">Showtime!</div>
       <div class="ob-body" data-i18n="ob9_body" style="margin-top:6px">All set. What are we waiting for? The movie won't watch itself!</div>
     </div>
@@ -2743,9 +2758,9 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
        решает, насколько точно совпало название. -->
   <div id="tab-search" class="tab-panel active">
     <div class="search-row">
-      <input id="search-input" type="search" dir="auto" enterkeyhint="search" autocomplete="off"
+      <span class="search-field"><input id="search-input" type="search" dir="auto" enterkeyhint="search" autocomplete="off"
         data-i18n-ph="search_ph" placeholder="A title, a person, a mood…"
-        onkeydown="if(event.key==='Enter'){event.preventDefault();doSearch()}">
+        onkeydown="if(event.key==='Enter'){event.preventDefault();doSearch()}" oninput="_searchClearSync()"><button type="button" id="search-clear" hidden onclick="_searchClear()"><span data-ic="x" data-ic-size="16"></span></button></span>
       <button class="btn btn-primary btn-sm" style="width:auto;min-width:104px" id="search-btn" onclick="doSearch()" data-i18n="search_btn">Search</button>
     </div>
     <div id="rec-suggest" style="display:none"></div>
@@ -3068,7 +3083,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.6-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.7-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -4942,6 +4957,18 @@ const _I18N_FIX_MAPBACK = {
   it:{ maps_back_all:"Tutta la mappa", maps_legend4:"{c} più luoghi, il numero dice quanti · {s} luogo esatto, secondo Wikidata · {w} citato in una voce di Wikipedia · {t} da qualche parte in questa città. Quale scena dove, non è registrato." },
 };
 Object.keys(_I18N_FIX_MAPBACK).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_FIX_MAPBACK[l]); });
+// Проверка на телефоне 2 нояб: свернуть переписку фильма, закрыть выбор аватара, очистить поиск.
+const _I18N_FIX_NOV2 = {
+  en:{ inv_collapse:"Collapse", av_done:"Done", search_clear:"Clear" },
+  ru:{ inv_collapse:"Свернуть", av_done:"Готово", search_clear:"Очистить" },
+  uk:{ inv_collapse:"Згорнути", av_done:"Готово", search_clear:"Очистити" },
+  ka:{ inv_collapse:"ჩაკეცვა", av_done:"მზადაა", search_clear:"გასუფთავება" },
+  es:{ inv_collapse:"Contraer", av_done:"Listo", search_clear:"Borrar" },
+  fr:{ inv_collapse:"Réduire", av_done:"OK", search_clear:"Effacer" },
+  de:{ inv_collapse:"Einklappen", av_done:"Fertig", search_clear:"Löschen" },
+  it:{ inv_collapse:"Comprimi", av_done:"Fatto", search_clear:"Cancella" },
+};
+Object.keys(_I18N_FIX_NOV2).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_FIX_NOV2[l]); });
 // Слайд карт в онбординге (23 окт; шесть остальных языков 24 окт, по утверждённым en/ru).
 const _I18N_FIX_OBMAP = {
   en:{ ob_map_title:"Where was it filmed", ob_map_body:"More than 30,000 filming places on a world map. Open a film to see where it was shot, or tap <span class=\"ob-geo\" role=\"img\" aria-label=\"Show where I am\"></span> to find what was filmed near you. The Odyssey alone was shot in six countries, from Iceland to Morocco." },
@@ -5033,11 +5060,33 @@ function _membersWord(n) {
   if (n10 >= 2 && n10 <= 4 && (n100 < 10 || n100 >= 20)) return forms[1];
   return forms[2];
 }
+function _searchClearSync() {
+  const inp = document.getElementById('search-input'), b = document.getElementById('search-clear');
+  if (!inp || !b) return;
+  b.hidden = !inp.value;
+  b.setAttribute('aria-label', t('search_clear'));
+}
+function _searchClear() {
+  const inp = document.getElementById('search-input'); if (!inp) return;
+  inp.value = '';
+  inp.dispatchEvent(new Event('input'));   // тот же путь, что стереть руками: домашний экран поиска
+  inp.focus();
+}
 // Replay the logo pop animation on tap (re-trigger by forcing reflow).
 function _bounceLogo(el) {
+  // ВЕБ-АНИМАЦИИ, А НЕ ПЕРЕЗАПУСК КЛАССА. На iPhone Дафы (2 нояб) прыжок шёл, а бобина внутри
+  // рисунка не крутилась; в Safari iOS 26.5 крутится. Перезапуск CSS-анимации у вложенного элемента
+  // SVG зависит от версии движка, а el.animate() запускает заново всегда. Тень логотипа теперь не
+  // фильтр (см. .logo-glow): анимация внутри рисунка под фильтром - второй подозреваемый.
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!el.animate) { el.classList.remove('pop'); void el.getBoundingClientRect(); el.classList.add('pop'); return; }
   el.classList.remove('pop');
-  void el.getBoundingClientRect();   // у <svg> нет offsetWidth, и прежний способ перезапуск не делал
-  el.classList.add('pop');
+  el.animate([
+    { transform: 'scale(1) rotate(0deg)' }, { transform: 'scale(1.18) rotate(-7deg)', offset: .2 },
+    { transform: 'scale(0.93) rotate(5deg)', offset: .45 }, { transform: 'scale(1.06) rotate(-2deg)', offset: .7 },
+    { transform: 'scale(1) rotate(0deg)' }], { duration: 600, easing: 'cubic-bezier(.34,1.56,.64,1)' });
+  const reel = el.querySelector('.spin');
+  if (reel) reel.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(360deg)' }], { duration: 1100, easing: 'cubic-bezier(.2,.7,.2,1)' });
 }
 function _listsWord(n) {
   const forms = ({
@@ -5441,6 +5490,11 @@ function setLang(l) {
   if (activeTab === "inbox") renderInbox();
   // Примеры рисуются кодом, data-i18n до них не достаёт.
   _searchHomeRefresh();
+  // Подписи самой карты (страны, города, улицы) и строка времени просмотра в аккаунте: обе
+  // рисовались один раз и оставались на прежнем языке (2 нояб).
+  try { if (typeof _map !== 'undefined' && _map) _mapsPaint(_map); } catch (e) {}
+  try { renderTimeStat(); } catch (e) {}
+  try { _searchClearSync(); } catch (e) {}
   // Названия мест - свой файл на язык; открытое место перерисовать на новом.
   try { if (typeof _mapsData !== 'undefined' && _mapsData) _mapsNamesLoad().then(() => { if (_mapsSel != null) _mapsSelect(_mapsSel); else _mapsIdle(); }); } catch (e) {}
 }
@@ -5519,7 +5573,7 @@ let _obPopcornPlayed = false;
 function _popcornPieceSVG(sz){
   // a bumpy cream-coloured popcorn kernel made of overlapping blobs
   return `<svg width="${sz}" height="${sz}" viewBox="0 0 24 24" style="display:block">
-    <g fill="#fff6df">
+    <g fill="#FFE9A6">
       <circle cx="9" cy="9.5" r="5.4"/><circle cx="15" cy="8.5" r="5"/>
       <circle cx="8.5" cy="15" r="5"/><circle cx="15.5" cy="15" r="5.4"/><circle cx="12" cy="12" r="5.6"/>
     </g>
@@ -7737,6 +7791,7 @@ function _srchCaption(m, c) {
 // ── Поиск ─────────────────────────────────────────────────────────────────────
 async function doSearch() {
   const inp = document.getElementById('search-input');
+  _searchClearSync();
   const el = document.getElementById('search-results');
   const raw = (inp?.value || '').trim();
   const gen = ++_srchGen;
@@ -7885,8 +7940,11 @@ async function _runQueryPicks(raw, c, showTitles, gen, free) {
   // и остаётся, даже когда нажатия кончились. Пример - бесплатно, и тот же запрос в этой сессии
   // тоже: ключ ложится в _picksSpent, как оплаченный.
   const key = 'q:' + _picksKey(c, raw);
-  if (free) _picksSpent.add(key);
-  const spent = free ? { ok: true } : await _spendPick(key);
+  // Тот же текст запроса в этой сессии тоже оплачен, даже если движок понял его чуть иначе.
+  const rawKey = 'r:' + String(raw).toLowerCase().replace(/\s+/g, ' ').trim();
+  if (free || _picksSpent.has(rawKey)) _picksSpent.add(key);
+  const spent = (free || _picksSpent.has(rawKey)) ? { ok: true } : await _spendPick(key);
+  if (spent.ok) _picksSpent.add(rawKey);
   if (gen !== _srchGen) return;
   if (!spent.ok) {
     const box = document.getElementById('srch-picks');
@@ -8142,7 +8200,9 @@ async function _searchMore() {
 // потому что их ответ приходит не из discover.
 function _picksKey(c, raw) {
   try {
-    return String(_planQuery(c)) + '|' + (c.person || '') + '|'
+    // Без языка: тот же запрос после смены языка - та же подборка, и второй раз она не списывается
+    // (2 нояб: «вернуть 60-х» после переключения языков стоило ещё одну).
+    return String(_planQuery(c)).replace(/(^|&)language=[^&]*/, '') + '|' + (c.person || '') + '|'
       + (c.curated || []).slice(0, 5).map(m => m.id).join(',');
   } catch (e) { return String(raw).toLowerCase().replace(/\s+/g, ' '); }
 }
@@ -8684,7 +8744,10 @@ function _renderAvatarPicker() {
     <div class="avatar-emoji-grid">${emojiHTML}</div>
     <div class="avatar-picker-label" data-i18n="av_color">Color</div>
     <div class="avatar-color-row">${colorHTML}</div>
-    <button id="avatar-clear-btn" onclick="clearAvatarEmoji()" style="margin-top:10px;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:2px 0;font-family:'DM Sans','Noto Sans Georgian',sans-serif">✕ ${t("av_remove_emoji")}</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px">
+      <button id="avatar-clear-btn" onclick="clearAvatarEmoji()" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:2px 0;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${icon('x', 12)} ${t("av_remove_emoji")}</button>
+      <button type="button" class="btn btn-primary btn-sm" style="width:auto" onclick="toggleAvatarPicker()">${escapeHtml(t('av_done'))}</button>
+    </div>
   `;
   _markAvatarPicker();
 }
@@ -15160,10 +15223,10 @@ function _renderChatDetail(partnerId) {
   );
 
   el.innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;padding:4px 0 14px">
+    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;row-gap:8px;padding:4px 0 14px">
       <button class="inv-chat-back" onclick="closeChat()">←</button>
       ${_avatarMarkup(_chatViewPartnerId, partnerName, 38)}
-      <div style="flex:1;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:18px;letter-spacing:1px">${escapeHtml(partnerName)}</div>
+      <div style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:18px;letter-spacing:1px">${escapeHtml(partnerName)}</div>
       <button onclick="reportConversation('${escapeJsAttr(partnerName)}','${escapeJsAttr(partnerId)}')" title="${t('report')}"
         style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:5px 10px;font-size:12px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:5px;flex-shrink:0">
         ${icon('triangle-alert',13)}${t('report')}</button>
@@ -15351,6 +15414,7 @@ function _renderInvThread(inv) {
         onkeydown="if(event.key==='Enter')sendInviteTextReply('${inv.id}')">
       <button class="inv-reply-send" onclick="sendInviteTextReply('${inv.id}')">↑</button>
     </div>
+    <button type="button" class="inv-collapse" onclick="toggleInviteThread('${inv.id}')">${icon('chevron-up', 14)} ${escapeHtml(t('inv_collapse'))}</button>
   </div>`;
 }
 
@@ -15390,6 +15454,7 @@ const ICONS = {
   "triangle-alert": '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" /><path d="M12 9v4" /><path d="M12 17h.01" />',
   "user": '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />',
   "users": '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><path d="M16 3.128a4 4 0 0 1 0 7.744" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><circle cx="9" cy="7" r="4" />',
+  "chevron-up": '<path d="m18 15-6-6-6 6" />',
   "x": '<path d="M18 6 6 18" /><path d="m6 6 12 12" />'
 };
 function icon(name, size = 16) {
@@ -15441,6 +15506,9 @@ function escapeHtml(s) {
   const SEL = 'button, .card, .list-row, .list-tab, .friend-row, .friend-pick-row, .list-check-row, .list-picker-opt, .inv-card, .stats-bar-row, .avatar-emoji-btn, .avatar-color-dot';
   const clear = () => document.querySelectorAll('.is-pressed').forEach(el => el.classList.remove('is-pressed'));
   document.addEventListener('pointerdown', (e) => {
+    // Поле ввода и переписка внутри карточки - не кнопка: фильтр яркости на родителе поля в Safari
+    // iOS - известный источник пропавшего курсора и текста, который появляется рывком (2 нояб).
+    if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable], .inv-thread')) return;
     const el = e.target.closest && e.target.closest(SEL);
     if (el && !el.disabled) el.classList.add('is-pressed');
   }, true);
@@ -16228,6 +16296,8 @@ function renderProfileStats(watched) {
 }
 function closeAccount(){
   const ov = document.getElementById("account-overlay");
+  // Выбор аватара закрывается вместе с окном: открытый в прошлый раз ждал при следующем входе (2 нояб).
+  document.getElementById('avatar-picker-wrap')?.classList.remove('open');
   ov.style.display="none";
   ov.scrollTop = 0;
 }
@@ -18183,7 +18253,8 @@ async function deleteFeedback(id) {
     showToast(t('err_could_not_delete') + _safeErr(e), true);
   }
 }
-function _fmtDT(iso){ if(!iso) return ""; try { return new Date(iso).toLocaleString(undefined,{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}); } catch(e){ return ""; } }
+// На языке интерфейса, а не телефона: в русском Cinemail стояло «02 Nov at 07:00» (2 нояб).
+function _fmtDT(iso){ if(!iso) return ""; try { return new Date(iso).toLocaleString(_tmdbLang(),{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}); } catch(e){ return ""; } }
 async function loadFeedbackReplies() {
   const el=document.getElementById("fb-replies");if(!el||!currentUser)return;
   try {
@@ -18935,8 +19006,41 @@ function _wrapBtnLabels(root) {
     span.className = 'bm-label';
     n.replaceWith(span);
     span.appendChild(n);
+    if (!_TEXT_BOX) _capNudge(span);
   }
 }
+// БРАУЗЕР БЕЗ text-box (Safari до 18.2, Chrome до 133): надпись центрируется по строке, и
+// заглавные встают выше середины - «Найти» и «Отметить просмотренным» на iPhone Дафы (2 нояб).
+// Тогда сдвигаем надпись на то, что даёт сам шрифт: середина строки минус середина заглавных,
+// по метрикам canvas. Один замер на шрифт и размер; где text-box есть, ничего не происходит.
+const _TEXT_BOX = !!(window.CSS && CSS.supports && CSS.supports('text-box', 'trim-both cap alphabetic'));
+const _capFix = new Map();
+function _capNudge(span) {
+  try {
+    const cs = getComputedStyle(span), size = parseFloat(cs.fontSize);
+    if (!size) return;
+    const key = [cs.fontStyle, cs.fontWeight, size, cs.fontFamily, cs.lineHeight, cs.textTransform].join('|');
+    let v = _capFix.get(key);
+    if (v === undefined) {
+      // Мерка - отдельная строка с тем же шрифтом вне экрана: где стоит базовая линия, говорит сама
+      // раскладка (метрики шрифта в canvas от неё расходятся), а высоту заглавных - canvas.
+      const ctx = _capFix.ctx || (_capFix.ctx = document.createElement('canvas').getContext('2d'));
+      ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${size}px ${cs.fontFamily}`;
+      const cap = ctx.measureText('H').actualBoundingBoxAscent;
+      const m = document.createElement('span'), probe = document.createElement('span');
+      m.style.cssText = `position:absolute;left:-9999px;top:0;visibility:hidden;display:inline-block;white-space:nowrap;font:${cs.fontStyle} ${cs.fontWeight} ${size}px ${cs.fontFamily};line-height:${cs.lineHeight}`;
+      probe.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
+      m.textContent = 'H'; m.appendChild(probe); document.body.appendChild(m);
+      const r = m.getBoundingClientRect(), base = probe.getBoundingClientRect().bottom;
+      m.remove();
+      v = cap > 0 && r.height ? Math.round(((r.top + r.bottom) / 2 - (base - cap / 2)) * 10) / 10 : 0;
+      _capFix.set(key, v);
+    }
+    if (v) { span.style.position = 'relative'; span.style.top = v + 'px'; }
+  } catch (e) {}
+}
+if (!_TEXT_BOX && document.fonts && document.fonts.ready)
+  document.fonts.ready.then(() => { _capFix.clear(); document.querySelectorAll('.bm-label').forEach(_capNudge); });
 (function () {
   const start = () => {
     _wrapBtnLabels(document.body);
