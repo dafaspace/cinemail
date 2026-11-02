@@ -1992,7 +1992,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 #lightbox-close {
   position: absolute; top: 8px; right: 8px;
   width: 32px; height: 32px; border-radius: 50%;
-  background: rgba(0,0,0,0.55); backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.55); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   border: 1px solid rgba(255,255,255,0.15);
   color: #fff; font-size: 18px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
@@ -3083,7 +3083,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.8-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.9-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -4969,6 +4969,18 @@ const _I18N_FIX_NOV2 = {
   it:{ inv_collapse:"Comprimi", av_done:"Fatto", search_clear:"Cancella" },
 };
 Object.keys(_I18N_FIX_NOV2).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_FIX_NOV2[l]); });
+// Уточнения подборки не списываются (2 нояб): строка над счётчиком подборок (_picksFreeHTML).
+const _I18N_FIX_PICKFREE = {
+  en:{ picks_refine_hint:"Refining these picks within the hour is free.", picks_free_refine:"A refinement of earlier picks: not counted.", picks_free_repeat:"Already searched this week: not counted." },
+  ru:{ picks_refine_hint:"Уточнять эту подборку в течение часа - бесплатно.", picks_free_refine:"Уточнение прежней подборки: не списано.", picks_free_repeat:"Этот запрос уже был на этой неделе: не списано." },
+  uk:{ picks_refine_hint:"Уточнювати цю добірку протягом години - безкоштовно.", picks_free_refine:"Уточнення попередньої добірки: не списано.", picks_free_repeat:"Цей запит уже був цього тижня: не списано." },
+  ka:{ picks_refine_hint:"ამ რჩევების დაზუსტება ერთი საათის განმავლობაში უფასოა.", picks_free_refine:"წინა რჩევების დაზუსტება: არ ჩაითვალა.", picks_free_repeat:"ეს მოთხოვნა ამ კვირაში უკვე იყო: არ ჩაითვალა." },
+  es:{ picks_refine_hint:"Afinar estas sugerencias durante la próxima hora es gratis.", picks_free_refine:"Ajuste de sugerencias anteriores: no cuenta.", picks_free_repeat:"Ya lo buscaste esta semana: no cuenta." },
+  fr:{ picks_refine_hint:"Affiner ces suggestions dans l'heure est gratuit.", picks_free_refine:"Précision de suggestions précédentes : non décomptée.", picks_free_repeat:"Déjà cherché cette semaine : non décompté." },
+  de:{ picks_refine_hint:"Diese Tipps innerhalb einer Stunde zu verfeinern ist kostenlos.", picks_free_refine:"Verfeinerung früherer Tipps: nicht gezählt.", picks_free_repeat:"Diese Woche schon gesucht: nicht gezählt." },
+  it:{ picks_refine_hint:"Affinare questi consigli entro un'ora è gratis.", picks_free_refine:"Affinamento di consigli precedenti: non conteggiato.", picks_free_repeat:"Già cercato questa settimana: non conteggiato." },
+};
+Object.keys(_I18N_FIX_PICKFREE).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_FIX_PICKFREE[l]); });
 // Слайд карт в онбординге (23 окт; шесть остальных языков 24 окт, по утверждённым en/ru).
 const _I18N_FIX_OBMAP = {
   en:{ ob_map_title:"Where was it filmed", ob_map_body:"More than 30,000 filming places on a world map. Open a film to see where it was shot, or tap <span class=\"ob-geo\" role=\"img\" aria-label=\"Show where I am\"></span> to find what was filmed near you. The Odyssey alone was shot in six countries, from Iceland to Morocco." },
@@ -6220,7 +6232,8 @@ async function onSignedIn(user) {
 // первом входе на устройстве, с непонятными людям словами про ИИ; Дафа 29 окт: не нужно. Теперь у
 // ссылки на политику в окне аккаунта стоит «обновлена 19 окт», пока человек её не откроет.
 // Аккаунт, созданный позже, уже получил новую политику при регистрации. Раз на устройство, без сети.
-const PRIVACY_VER = '2026-10-19';
+// 3 нояб: анонимный счётчик карточек без описания на языке интерфейса (_notePlotFallback).
+const PRIVACY_VER = '2026-11-03';
 let _privacyMark = false;
 function _privacyNotice(user) {
   try {
@@ -7820,8 +7833,23 @@ async function doSearch() {
     // Точное название, которое знает хоть кто-то: фильм "Horror" с двадцатью голосами не
     // должен заслонять хорроры.
     const strong = exact.filter(m => (m.votes || 0) >= 50).sort((a, b) => (b.votes || 0) - (a.votes || 0));
+    // ПОЧТИ НАБРАННОЕ ИЗВЕСТНОЕ НАЗВАНИЕ - ТОЖЕ ПОИСК ФИЛЬМА (Dafa, 3 нояб). Правила ниже ждут
+    // точного названия: «scary movies», «scary movie 1», «scary movi» точными не были, «scary»
+    // читалось ужасами, и выдача уходила в подборку - списывала нажатие и прятала «Очень страшное
+    // кино», которое TMDB нашёл по названию. Близко - начало названия или название с хвостом
+    // («s», номер), от 80% длины, или опечатка с тем же сходством. Только то, что знают все (от
+    // тысячи голосов), и только когда в запросе есть слово, которое движок не взял в «Понято»:
+    // «dinosaurs» прочитан целиком и остаётся подборкой, хотя «Dinosaur» есть.
+    const _near = (a, b) => !!a && !!b && a !== b && (((b.startsWith(a) || a.startsWith(b))
+      && Math.min(a.length, b.length) / Math.max(a.length, b.length) >= 0.8) || _similar(a, b) >= 0.8);
+    const nearAll = (strong.length || !tk) ? [] : titles.filter(m => (m.votes || 0) >= 50
+      && [m.Title, m.OrigTitle, m.EnTitle].some(x => _near(tk, _titleKey(x))))
+      .sort((a, b) => (b.votes || 0) - (a.votes || 0));
+    const looseWord = !!c && ((c.restToks || []).length > 0 || (c.toks || []).some((tok, i) =>
+      /[\p{L}\p{N}]/u.test(tok) && !(c.chips || []).some(ch => ch.toks.includes(i))));
+    const nearTitle = looseWord && nearAll.some(m => (m.votes || 0) >= 1000);
     // Непрочитанное движком - в журнал пополнения словаря; точное название - не пробел в нём (#113).
-    if (c && !strong.length) _noteMissingFrom(c);
+    if (c && !strong.length && !nearTitle) _noteMissingFrom(c);
     // Понял ли разбор что-то СВОЁ, кроме названия. Год при точном названии ("fargo 1996") и
     // тема из непонятого остатка, найденная в индексе TMDB, своим не считаются: это и было
     // название.
@@ -7868,20 +7896,25 @@ async function doSearch() {
     // и запускали подборку чешского или итальянского кино: на «прагу» один фильм, «Restore
     // Point», и списанное нажатие (проверка test-1, 15 окт). Фильмы, снятые в городе, - это карта,
     // а не кино этой страны. _cityFor отвечает, только когда в запросе нет ничего, кроме города.
-    const picksRun = !wholeTitle && !city && (wouldPick || (fullyRead && !famous && wouldPickBare));
+    const picksRun = !wholeTitle && !nearTitle && !city && (wouldPick || (fullyRead && !famous && wouldPickBare));
     // Известное название, а разбор понял слова: фильм сверху, подборка по словам - строкой.
-    const offerPicks = !picksRun && !city && fullTitle && !unreadWord && wouldPickBare && (c.chips || []).length > 0;
+    const offerPicks = !picksRun && !city && ((fullTitle && !unreadWord) || nearTitle) && wouldPickBare && (c.chips || []).length > 0;
     if (c) c.chips = (c.chips || []).slice().sort((a, b) => a.toks[0] - b.toks[0]);
 
     // Точные совпадения названия - первыми, самое известное сверху: «fargo» это «Фарго» 1996
     // года, а не сериал и не «Tales of Wells Fargo» в порядке популярности TMDB.
     // Ключ - тип и номер: фильм и сериал с одним id у TMDB разные (проверка кода 9 окт, #78).
+    // Почти совпавшие - следом за точными: «scary movie 1» начинается с «Scary Movie».
     const exactIds = new Set(exact.map(m => m.type + ':' + m.id));
+    const nearIds = new Set(nearAll.map(m => m.type + ':' + m.id));
     const ordered = [...exact.slice().sort((a, b) => (b.votes || 0) - (a.votes || 0)),
-                     ...titles.filter(m => !exactIds.has(m.type + ':' + m.id))];
-    const showTitles = picksRun ? strong.slice(0, 3) : ordered;
+                     ...nearAll.filter(m => !exactIds.has(m.type + ':' + m.id)),
+                     ...titles.filter(m => !exactIds.has(m.type + ':' + m.id) && !nearIds.has(m.type + ':' + m.id))];
+    // Подборка всё же идёт - найденное по названию над ней не пропадает.
+    const showTitles = picksRun ? (strong.length ? strong : nearAll).slice(0, 3) : ordered;
     const showPeople = picksRun ? people.filter(p => c.person && p.id === c.person).slice(0, 1) : people.slice(0, 3);
-    const like = !picksRun && strong.length ? strong[0] : null;
+    const titleFirst = strong.length > 0 || nearTitle;
+    const like = !picksRun ? (strong[0] || (nearTitle ? nearAll[0] : null)) : null;
 
     // Разбор упёрся в отказ TMDB и ничего не нашлось - так и сказать, а не «таких слов не знаю».
     if (_parseErr && !showTitles.length && !showPeople.length && !city) { el.innerHTML = _picksErrHTML(_parseErr); return; }
@@ -7904,12 +7937,12 @@ async function doSearch() {
     // Известное точное название важнее однофамильцев: на «fargo» сверху стояли Джеймс, Дре и
     // Джордж Фарго, а сам фильм начинался ниже экрана (проверка test-1, 11 окт). Человек
     // впереди, только когда названия такого нет или разбор понял именно его.
-    let html = (!picksRun && strong.length) ? titlesHTML : peopleHTML + cityHTML + titlesHTML;
+    let html = (!picksRun && titleFirst) ? titlesHTML : peopleHTML + cityHTML + titlesHTML;
     // Названия нашлись, а разбор отказал: подборки не будет, и это видно одной строкой.
     if (_parseErr) html += `<div class="srch-note" style="margin-top:12px">${escapeHtml(_picksErrLine(_parseErr))}</div>`;
     const offerHTML = offerPicks ? `<button type="button" class="srch-line" data-qpicks="1">${icon('search', 18)}<span dir="auto">${escapeHtml(t('search_as_words').replace('{w}', () => c.chips.map(ch => ch.label).join(', ')))}</span><span class="srch-chev">›</span></button>` : '';
     if (like) html += `<div id="srch-picks"><button type="button" class="srch-line" data-like="${escapeHtml(String(like.id))}" data-type="${like.type === 'tv' ? 'tv' : 'movie'}" data-title="${escapeHtml(like.Title)}">${icon('sparkles', 18)}<span dir="auto">${escapeHtml(t('search_like').replace('{title}', () => like.Title))}</span><span class="srch-chev">›</span></button>${offerHTML}</div>`;
-    if (!picksRun && strong.length) html += peopleHTML + cityHTML;
+    if (!picksRun && titleFirst) html += peopleHTML + cityHTML;
     if (picksRun) html += `<div id="srch-picks">${_srchSect(t('search_picks'))}${_srchGot(c)}${loadingHTML(randQuote(), false)}</div>`;
     if (undo) html = `<button type="button" class="srch-line" data-undo="${escapeHtml(undo.raw)}">${icon('undo-2', 18)}<span dir="auto">${escapeHtml(t('search_undo_drop').replace('{w}', () => undo.label))}</span><span class="srch-chev">›</span></button>` + html;
     el.innerHTML = html;
@@ -7940,11 +7973,21 @@ async function _runQueryPicks(raw, c, showTitles, gen, free) {
   // и остаётся, даже когда нажатия кончились. Пример - бесплатно, и тот же запрос в этой сессии
   // тоже: ключ ложится в _picksSpent, как оплаченный.
   const key = 'q:' + _picksKey(c, raw);
-  // Тот же текст запроса в этой сессии тоже оплачен, даже если движок понял его чуть иначе.
+  // Тот же текст запроса на этой неделе тоже оплачен, даже если движок понял его чуть иначе.
   const rawKey = 'r:' + String(raw).toLowerCase().replace(/\s+/g, ' ').trim();
-  if (free || _picksSpent.has(rawKey)) _picksSpent.add(key);
-  const spent = (free || _picksSpent.has(rawKey)) ? { ok: true } : await _spendPick(key);
-  if (spent.ok) _picksSpent.add(rawKey);
+  // Уточнение оплаченной подборки (_pickChainJoin) не списывается.
+  let spent, freeWhy = null, paidNow = false;
+  if (free) spent = { ok: true };
+  else if (_picksPaid(key) || _picksPaid(rawKey)) { spent = { ok: true }; freeWhy = 'repeat'; }
+  else if (_pickChainJoin(_pickFacets(c))) { spent = { ok: true }; freeWhy = 'refine'; }
+  else {
+    // Цепочка открывается до ответа сервера: второй, похожий запрос, набранный, пока идёт
+    // первое списание, - уже уточнение, а не второе списание.
+    const chain = _pickChainStart(_pickFacets(c));
+    spent = await _spendPick(key);
+    if (spent.ok) paidNow = chain != null; else _pickChainDrop(chain);
+  }
+  if (spent.ok) { _picksMark(key); _picksMark(rawKey); }
   if (gen !== _srchGen) return;
   if (!spent.ok) {
     const box = document.getElementById('srch-picks');
@@ -7960,7 +8003,7 @@ async function _runQueryPicks(raw, c, showTitles, gen, free) {
   // среди найденного по названию выше (проверка кода 9 окт, #78, остаток в подборках).
   const lib = _libraryKeys(), shownIds = new Set(showTitles.map(x => _libKey(x.id, x.type)));
   const usable = list.filter(m => !lib.ids.has(_libKey(m.tmdbID || m.id, m.type)) && !lib.titles.has(lib.norm(m.Title)) && !shownIds.has(_libKey(m.id, m.type)));
-  _srch = { q: raw, c, buf: usable, shown: 0, press: 0, read, kind: 'q', gen,
+  _srch = { q: raw, c, buf: usable, shown: 0, press: 0, read, kind: 'q', gen, freeWhy, paidNow,
             seen: new Set([...usable.map(m => _libKey(m.id, m.type)), ...shownIds]), done: _searchWrapped };
   _renderPicks(true);
 }
@@ -8153,7 +8196,7 @@ function _renderPicks(first) {
   else if (s.shown > _SRCH_STEP) t2 = `<div class="srch-end">${escapeHtml(t('search_end'))}</div>`;
   // Счётчик стоит под выдачей всегда, а не только под первой порцией: после «Ещё» он пропадал,
   // и проверить, что «Ещё» нажатий не тратит, было не по чему (проверка test-1, 11 окт).
-  t2 += _picksLeftHTML();
+  t2 += _picksFreeHTML(s) + _picksLeftHTML();
   // Короткая выдача без ослабления: предложить снять один кусок, и сказать какой. Не после
   // отказа TMDB: коротка она из-за лимита, а не из-за запроса (#108).
   if (first && c && s.buf.length < _SRCH_STEP && !(c.relaxed || []).length && !c.refused) {
@@ -8212,6 +8255,7 @@ async function _searchLike(id, type, title) {
   if (!box) return;
   const gen = _srchGen;
   const spent = await _spendPick('like:' + type + id);
+  const freeWhy = spent.repeat ? 'repeat' : null;
   if (!spent.ok) { box.innerHTML = _srchSect(t('search_like').replace('{title}', () => title)) + _picksOutHTML(); return; }
   box.innerHTML = _srchSect(t('search_like').replace('{title}', () => title)) + loadingHTML(randQuote(), false);
   try {
@@ -8228,7 +8272,7 @@ async function _searchLike(id, type, title) {
     await _enrichWhy(list, null);
     if (gen !== _srchGen) return;
     list.slice(0, 7).forEach(m => { m._enr = true; });
-    _srch = { q: null, c: null, buf: list, shown: 0, press: 0, kind: 'like', title, gen, seen: new Set(list.map(m => _libKey(m.id, m.type))), done: true };
+    _srch = { q: null, c: null, buf: list, shown: 0, press: 0, kind: 'like', title, gen, freeWhy, seen: new Set(list.map(m => _libKey(m.id, m.type))), done: true };
     _renderPicks(true);
   } catch (e) {
     if (gen !== _srchGen) return;
@@ -8398,6 +8442,29 @@ function _countWord(n, base) {
   return t(base + 's');
 }
 
+// СКОЛЬКО РАЗ КАРТОЧКУ ОТКРЫВАЮТ БЕЗ ОПИСАНИЯ НА ЯЗЫКЕ ИНТЕРФЕЙСА (Dafa, 2 нояб): чтобы знать,
+// каким фильмам и языкам перевод описания нужен людям, а не угадывать. На сервер уходят только
+// номер фильма, тип и язык, месяц ставит сервер; ни аккаунта, ни устройства - строка в базе это
+// счётчик на фильм, язык и месяц (docs/plot-fallback-stats-2026-11-03.sql). С одного устройства
+// фильм считается раз в месяц: важно, скольким людям не хватило описания, а не сколько раз один
+// человек открыл ту же карточку. Сбой карточке не мешает никогда.
+function _notePlotFallback(id, type) {
+  const typ = type === 'tv' ? 'tv' : 'movie', lang = _lang;
+  const mk = 'cm_plotmiss:' + new Date().toISOString().slice(0, 7), k = typ + ':' + id + ':' + lang;
+  try {
+    for (const old of Object.keys(localStorage))
+      if (old.startsWith('cm_plotmiss:') && old !== mk) localStorage.removeItem(old);
+    const seen = JSON.parse(localStorage.getItem(mk) || '[]');
+    if (seen.includes(k)) return;
+    seen.push(k);
+    localStorage.setItem(mk, JSON.stringify(seen.slice(-500)));
+  } catch (e) {}
+  try {
+    sbClient.rpc('note_plot_fallback', { p_id: Number(id), p_type: typ, p_lang: lang })
+      .then(r => { if (r && r.error) console.warn('[plot-stats]', r.error.message); }, () => {});
+  } catch (e) {}
+}
+
 async function openDetail(id, type) {
   const gen = ++_detailGen;
   _currentModal = { type: 'detail', id, mediaType: type };
@@ -8406,6 +8473,7 @@ async function openDetail(id, type) {
   try {
     const d = await tmdbDetail(id, type || "movie");
     if (gen !== _detailGen) return;            // открыли другой фильм или закрыли окно (#75)
+    if (d.PlotLang) _notePlotFallback(d.tmdbID, d.type);
     // Тип - тот, что TMDB подтвердил (d.type), а не только номер: у фильма и сериала с одним id
     // разные строки в библиотеке (проверка кода 9 окт, #78).
     const status = getEntryStatus(id, d.type);
@@ -9889,8 +9957,80 @@ function _spendLocal(k = _picksWeekKey()) {
 // списывали две подборки из десяти (проверка кода 9 окт, #109). Идущее списание по ключу
 // отдаётся второму вызову как есть.
 const _picksPending = new Map();
+// ── ПОДБОРКА - ОДНА ТЕМА, УТОЧНЕНИЯ НЕ СПИСЫВАЮТСЯ (Dafa, 2 нояб) ──
+// «вестерн 60-х», потом «вестерн 70-х», «итальянский вестерн», «вернуть 60-х» - одна подборка, а не
+// четыре. Списывается первая; следующие, где осталось хоть одно понятое условие из уже оплаченной
+// цепочки (жанр, страна, десятилетие, человек, тема, движение), в течение часа от оплаты не
+// списываются. Час - от оплаты, а не от последнего уточнения: предел остаётся пределом, десять тем
+// в неделю (что ушло в прод бесплатным, назад не забрать). Тот же запрос - бесплатно всю неделю.
+// Оплаченное - в хранилище, а не только в памяти вкладки: iPhone перезапускает свёрнутое
+// приложение, и после этого тот же запрос списывался снова.
+const _PICK_CHAIN_MS = 60 * 60 * 1000;
+const _picksMemKey = () => _picksWeekKey().replace('cm_picks_w:', 'cm_picks_m:');
+function _picksMem() {
+  const k = _picksMemKey();
+  try {
+    for (const old of Object.keys(localStorage))                  // прошлые недели не копим
+      if (old.startsWith('cm_picks_m:') && old !== k) localStorage.removeItem(old);
+    const o = JSON.parse(localStorage.getItem(k) || 'null');
+    if (o && Array.isArray(o.keys) && Array.isArray(o.chains)) return o;
+  } catch (e) {}
+  return { keys: [], chains: [] };
+}
+function _picksMemSave(o) {
+  try { localStorage.setItem(_picksMemKey(), JSON.stringify({ keys: o.keys.slice(-300), chains: o.chains.slice(-30) })); } catch (e) {}
+}
+const _picksPaid = key => !!key && (_picksSpent.has(key) || _picksMem().keys.includes(key));
+function _picksMark(key) {
+  if (!key) return;
+  _picksSpent.add(key);
+  const o = _picksMem();
+  if (!o.keys.includes(key)) { o.keys.push(key); _picksMemSave(o); }
+}
+// Понятые условия запроса - то, по чему видно, что тема та же. Оценка («шедевры»), свежесть и
+// исключённый жанр сюда не входят: они бывают у любой темы и похожими запросы не делают.
+// Год считается своим десятилетием: «вестерн 1965» - уточнение «вестерна 60-х».
+function _pickFacets(c) {
+  if (!c) return [];
+  const f = (c.genreIds || []).map(g => 'g' + g);
+  if (c.movement) f.push('m' + (c.movement.c || '') + ((c.movement.y || [])[0] || ''));
+  const dec = c.decade || (c.year ? Math.floor(c.year / 10) * 10 : 0);
+  if (dec) f.push('d' + dec);
+  if (c.country) f.push('c' + c.country);
+  if (c.person) f.push('p' + c.person);
+  (c.subjKeys || []).forEach(k => f.push('s' + k));
+  (c.keywords || []).slice(0, 6).forEach(k => f.push('k' + k));
+  return [...new Set(f)];
+}
+function _pickChainsNow(o, now) {
+  o.chains = o.chains.filter(ch => ch && Array.isArray(ch.f) && now - ch.t >= 0 && now - ch.t < _PICK_CHAIN_MS);
+  return o.chains;
+}
+// Уточнение: есть общее условие с цепочкой, оплаченной меньше часа назад. Условия уточнения
+// ложатся в цепочку: «вестерн 60-х» -> «вестерн 70-х» -> «фантастика 70-х» - одна череда.
+function _pickChainJoin(f) {
+  if (!f.length) return false;
+  const o = _picksMem(), ch = _pickChainsNow(o, Date.now()).find(ch => f.some(x => ch.f.includes(x)));
+  if (!ch) return false;
+  ch.f = [...new Set([...ch.f, ...f])].slice(0, 60);
+  _picksMemSave(o);
+  return true;
+}
+function _pickChainStart(f) {
+  if (!f.length) return null;
+  const o = _picksMem(), t = Date.now();
+  _pickChainsNow(o, t).push({ t, f });
+  _picksMemSave(o);
+  return t;
+}
+function _pickChainDrop(t) {
+  if (t == null) return;
+  const o = _picksMem();
+  o.chains = o.chains.filter(ch => ch.t !== t);
+  _picksMemSave(o);
+}
 function _spendPick(key) {
-  if (key && _picksSpent.has(key)) return Promise.resolve({ ok: true });
+  if (key && _picksPaid(key)) return Promise.resolve({ ok: true, repeat: true });
   if (key && _picksPending.has(key)) return _picksPending.get(key);
   const run = _spendPickNow(key);
   if (key) {
@@ -9923,11 +10063,18 @@ async function _spendPickNow(key) {
   if (out.remaining !== undefined) rem = out.remaining;
   if (acct !== _acctGen) return out;                               // нажатие прежнего аккаунта
   if (rem !== undefined) _picksRemaining = rem;
-  if (out.ok && key) _picksSpent.add(key);
+  if (out.ok && key) _picksMark(key);
   return out;
 }
 const _picksLeftHTML = () => _picksRemaining === null ? ''
   : `<div class="srch-end">${escapeHtml(t('search_picks_left').replace('{n}', () => _picksRemaining))}</div>`;
+// Над счётчиком - почему эта подборка не списана, или что уточнять её можно бесплатно: без этой
+// строки человек боится нажать ещё раз и не видит, что правило сработало.
+function _picksFreeHTML(s) {
+  const k = !s ? '' : s.freeWhy === 'refine' ? 'picks_free_refine' : s.freeWhy === 'repeat' ? 'picks_free_repeat'
+    : s.paidNow ? 'picks_refine_hint' : '';
+  return k ? `<div class="srch-end">${escapeHtml(t(k))}</div>` : '';
+}
 const _picksOutHTML = () => `<div class="srch-note">${escapeHtml(t('picks_exhausted'))}</div>`;
 // ОТКАЗ СЕРВЕРА - НЕ ОТСУТСТВИЕ ФИЛЬМА, И КОД ОШИБКИ - НЕ ТЕКСТ ДЛЯ ЧЕЛОВЕКА. Поиск показывал
 // на дневном лимите строку импорта («запусти тот же файл завтра»), а любой другой сбой - сырым
@@ -12134,6 +12281,7 @@ async function _constraintsFor(q) {
     notGenreIds: notGenres || [], negLeft: negLeft || [],
     // Что тема подразумевает, даже если её саму TMDB не найдёт (см. _SUBJECTS, pref и adult).
     subjPref: [...new Set(subjects.flatMap(x => String(x.pref || '').split(',').filter(Boolean)))],
+    subjKeys: [...new Set(subjects.map(x => x.k))],   // тема одна и та же - уточнение (_pickFacets)
     adult: subjects.some(x => x.adult),
     matched: false, movement: null, person: null, decade: null, country: null,
     keywords: [], genreIds: [], genreAnd: false, curated: null, pins: 0,
