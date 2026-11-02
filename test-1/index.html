@@ -244,6 +244,10 @@ html, body, .overlay, .modal, .modal-sheet, #account-modal-sheet, #inbox-list { 
    Bebas сидели на 1.0-1.8px выше центра (замер 12 окт вместе с Tunemail). Правило то же, что в
    Tunemail, байт в байт; span ставит _wrapBtnLabels сам, в том числе в кнопках из шаблонов. */
 .bm-label { text-box: trim-both cap alphabetic; }
+/* НАДПИСЬ ИЗ ОДНИХ СТРОЧНЫХ - ПО ВЫСОТЕ СТРОЧНЫХ. По заглавным «вестерн» и «scary» в «Понято» сидели
+   на 1.3px ниже середины (iPhone Дафы, 3 нояб; замер в Chrome тот же): заглавной, по которой
+   центрировали, в слове нет. Где есть заглавная или цифра, остаётся cap - «Найти» так и стоит. */
+.bm-label.lc { text-box: trim-both ex alphabetic; }
 button:not(.av-glyph) { position: relative; }
 /* A link with an onclick and no href is a control, not a link - the eight of them are
    the auth actions and the modal escapes - and it needs the same 44px floor the buttons
@@ -3083,7 +3087,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.9-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.10-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -19154,8 +19158,16 @@ function _wrapBtnLabels(root) {
     span.className = 'bm-label';
     n.replaceWith(span);
     span.appendChild(n);
+    if (_lcLabel(span)) span.classList.add('lc');
     if (!_TEXT_BOX) _capNudge(span);
   }
+}
+// Одни строчные: есть строчная буква, нет заглавной и цифры, и капителью её не пишут. Грузинский не
+// в счёт: у мхедрули своя высота букв, и «x» латинского шрифта её не меряет.
+function _lcLabel(span) {
+  const s = span.textContent || '';
+  if (!/\p{Ll}/u.test(s) || /[\p{Lu}\p{Lt}\p{N}\p{Script=Georgian}]/u.test(s)) return false;
+  try { return getComputedStyle(span).textTransform !== 'uppercase'; } catch (e) { return true; }
 }
 // БРАУЗЕР БЕЗ text-box (Safari до 18.2, Chrome до 133): надпись центрируется по строке, и
 // заглавные встают выше середины - «Найти» и «Отметить просмотренным» на iPhone Дафы (2 нояб).
@@ -19167,14 +19179,16 @@ function _capNudge(span) {
   try {
     const cs = getComputedStyle(span), size = parseFloat(cs.fontSize);
     if (!size) return;
-    const key = [cs.fontStyle, cs.fontWeight, size, cs.fontFamily, cs.lineHeight, cs.textTransform].join('|');
+    // Надпись из одних строчных центрируется по высоте строчных, а не заглавных (.bm-label.lc).
+    const lc = span.classList.contains('lc');
+    const key = [cs.fontStyle, cs.fontWeight, size, cs.fontFamily, cs.lineHeight, cs.textTransform, lc].join('|');
     let v = _capFix.get(key);
     if (v === undefined) {
       // Мерка - отдельная строка с тем же шрифтом вне экрана: где стоит базовая линия, говорит сама
       // раскладка (метрики шрифта в canvas от неё расходятся), а высоту заглавных - canvas.
       const ctx = _capFix.ctx || (_capFix.ctx = document.createElement('canvas').getContext('2d'));
       ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${size}px ${cs.fontFamily}`;
-      const cap = ctx.measureText('H').actualBoundingBoxAscent;
+      const cap = ctx.measureText(lc ? 'x' : 'H').actualBoundingBoxAscent;
       const m = document.createElement('span'), probe = document.createElement('span');
       m.style.cssText = `position:absolute;left:-9999px;top:0;visibility:hidden;display:inline-block;white-space:nowrap;font:${cs.fontStyle} ${cs.fontWeight} ${size}px ${cs.fontFamily};line-height:${cs.lineHeight}`;
       probe.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
