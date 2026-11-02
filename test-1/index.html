@@ -2128,7 +2128,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .maps-legend { margin-top: 10px; font-size: 12px; line-height: 1.6; color: var(--muted); }
 .maps-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #F5C518; vertical-align: -1px; margin-right: 3px; }
 .maps-dot.w { background: none; border: 2px solid #F5C518; box-sizing: border-box; }
-.maps-dot.c { width: 13px; height: 13px; background: rgba(245,197,24,0.18); border: 1.5px solid #F5C518; box-sizing: border-box; vertical-align: -2px; }
+.maps-dot.c { font: 700 8px/10px 'DM Sans', sans-serif; color: #F5C518; text-align: center; width: 13px; height: 13px; background: rgba(245,197,24,0.18); border: 1.5px solid #F5C518; box-sizing: border-box; vertical-align: -2px; }
 .maps-dot.t { width: 13px; height: 13px; background: rgba(245,197,24,0.10); border: 1px solid rgba(245,197,24,0.6); box-sizing: border-box; vertical-align: -2px; }
 .maps-more-btn { width: 100%; min-height: 44px; margin-top: 4px; border-radius: 12px; border: 1px solid var(--border); background: none;
   color: var(--text); font: 15px 'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif; letter-spacing: 1px; text-indent: 1px; cursor: pointer; }
@@ -3083,7 +3083,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.7-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.8-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -18587,7 +18587,7 @@ function _mapsIdle() {
       ${(also => also.length ? `<div class="maps-more">${escapeHtml(t('maps_also'))}: ${also.map(escapeHtml).join(', ')}</div>` : '')(_mapsAlso(v))}`);
     return;
   }
-  _mapsSheet(`${_mapsBackHTML()}<div class="maps-hint">${escapeHtml(t('maps_stats').replace('{f}', Object.keys(d.f).length.toLocaleString()).replace('{p}', d.p.length.toLocaleString()))}<br>${escapeHtml(t('maps_hint'))}</div>${_mapsLegend()}`);
+  _mapsSheet(`${_mapsBackHTML()}<div class="maps-hint">${escapeHtml(t('maps_stats').replace('{f}', Object.keys(d.f).length.toLocaleString(_tmdbLang())).replace('{p}', d.p.length.toLocaleString(_tmdbLang())))}<br>${escapeHtml(t('maps_hint'))}</div>${_mapsLegend()}`);
 }
 // Один раз, на общем экране, а не под каждым местом: что значат точки и чего мы не знаем.
 // Строка «Какую сцену - неизвестно» стояла под каждым из 30 015 мест и была верна для всех:
@@ -18595,7 +18595,7 @@ function _mapsIdle() {
 function _mapsLegend() {
   // Все четыре знака карты, а не два: мягкий круг «где-то в городе» стоит у 15 550 мест и не
   // объяснялся, а кольцо скопления путали с кольцом «по Википедии» (разбор карты, пункт 4).
-  return `<div class="maps-legend">${escapeHtml(t('maps_legend4')).replace('{c}', '<span class="maps-dot c"></span>').replace('{s}', '<span class="maps-dot"></span>')
+  return `<div class="maps-legend">${escapeHtml(t('maps_legend4')).replace('{c}', '<span class="maps-dot c">3</span>').replace('{s}', '<span class="maps-dot"></span>')
     .replace('{w}', '<span class="maps-dot w"></span>').replace('{t}', '<span class="maps-dot t"></span>')}</div>`;
 }
 
