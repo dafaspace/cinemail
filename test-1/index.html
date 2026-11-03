@@ -2178,6 +2178,15 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   .btn-modal-secondary, .btn-modal-add-watched, .btn-modal-save, .btn-modal-plan, .acc-avatar, .acc-stat-val,
   .inv-chat-avatar, .friend-avatar-sm, .list-chip, .ob-title, .srch-surprise, .srch-sect, .srch-got-l, .srch-more,
   .maps-place-n, .maps-more-btn, [style*="--font-display"]) { font-stretch: 62.5% !important; }
+/* Кириллица заголовочным шрифтом - заглавными (Дафа, 3 нояб 2026, вариант В): у Bebas Neue строчных
+   нет, по-английски эти места всегда заглавные, а у Sofia Sans строчные настоящие. Только ru и uk:
+   грузинский заглавными стал бы мтаврули. Высоту букв выравнивает size-adjust в partners.css. */
+:is(:lang(ru), :lang(uk)) :is(.auth-logo, .auth-card h2, .form-group label, .btn, .topbar-logo,
+  .avatar-btn, .tab-btn, .section-title, .card-title, .btn-watchlist, .btn-watched, .btn-share-card, .badge-watched,
+  .hist-title, .empty-state-title, .modal-title, .sheet-label, .sheet-title, .add-label, .btn-modal-primary,
+  .btn-modal-secondary, .btn-modal-add-watched, .btn-modal-save, .btn-modal-plan, .acc-avatar, .acc-stat-val,
+  .inv-chat-avatar, .friend-avatar-sm, .list-chip, .ob-title, .srch-surprise, .srch-sect, .srch-got-l, .srch-more,
+  .maps-place-n, .maps-more-btn, [style*="--font-display"]) { text-transform: uppercase; }
 </style>
 </head>
 <body>
@@ -3110,7 +3119,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.11-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.12-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -19217,18 +19226,21 @@ function _capNudge(span) {
     if (!size) return;
     // Надпись из одних строчных центрируется по высоте строчных, а не заглавных (.bm-label.lc).
     const lc = span.classList.contains('lc');
-    const key = [cs.fontStyle, cs.fontWeight, size, cs.fontFamily, cs.lineHeight, cs.textTransform, lc].join('|');
+    // Кириллицу рисует партнёр (Geist, Sofia Sans) со своей высотой букв, и мерить её латинской H
+    // нельзя: Safari до 17 не знает size-adjust, и заглавные Sofia там на 6% ниже, чем у Bebas.
+    const ch = /[Ѐ-ԯ]/.test(span.textContent || '') ? (lc ? 'х' : 'Н') : (lc ? 'x' : 'H');
+    const key = [cs.fontStyle, cs.fontWeight, size, cs.fontFamily, cs.lineHeight, cs.textTransform, ch].join('|');
     let v = _capFix.get(key);
     if (v === undefined) {
       // Мерка - отдельная строка с тем же шрифтом вне экрана: где стоит базовая линия, говорит сама
       // раскладка (метрики шрифта в canvas от неё расходятся), а высоту заглавных - canvas.
       const ctx = _capFix.ctx || (_capFix.ctx = document.createElement('canvas').getContext('2d'));
       ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${size}px ${cs.fontFamily}`;
-      const cap = ctx.measureText(lc ? 'x' : 'H').actualBoundingBoxAscent;
+      const cap = ctx.measureText(ch).actualBoundingBoxAscent;
       const m = document.createElement('span'), probe = document.createElement('span');
       m.style.cssText = `position:absolute;left:-9999px;top:0;visibility:hidden;display:inline-block;white-space:nowrap;font:${cs.fontStyle} ${cs.fontWeight} ${size}px ${cs.fontFamily};line-height:${cs.lineHeight}`;
       probe.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
-      m.textContent = 'H'; m.appendChild(probe); document.body.appendChild(m);
+      m.textContent = ch; m.appendChild(probe); document.body.appendChild(m);
       const r = m.getBoundingClientRect(), base = probe.getBoundingClientRect().bottom;
       m.remove();
       v = cap > 0 && r.height ? Math.round(((r.top + r.bottom) / 2 - (base - cap / 2)) * 10) / 10 : 0;

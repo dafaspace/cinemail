@@ -10,6 +10,12 @@
  * All OFL; the licences sit beside the files. Self-hosted, from Google Fonts'
  * own subsets, each with its unicode-range kept, so a Latin page downloads
  * none of these files.
+ *
+ * size-adjust 106.9% on Sofia Sans Extra Condensed only: its caps are 65.5 at
+ * 100px against Bebas Neue's 70.0, so Cyrillic labels sat 1.5px low in the
+ * same button (Cinemail measured). 70.0/65.5 brings them level. Dafa, 3 Nov 2026,
+ * option C in _Tastebook/tokens.json: size-adjust here, plus uppercase
+ * display type under :lang(ru) and :lang(uk) in each app's own CSS.
  */
 
 @font-face {
@@ -58,6 +64,7 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
+  size-adjust: 106.9%;
   src: url('sofia-sans-extra-condensed-cyrillic-ext-700.woff2') format('woff2');
   unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
 }
@@ -66,6 +73,7 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
+  size-adjust: 106.9%;
   src: url('sofia-sans-extra-condensed-cyrillic-700.woff2') format('woff2');
   unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
