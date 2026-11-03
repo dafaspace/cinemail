@@ -46,7 +46,11 @@
 <script src="/qr.js?v=0.52.0"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- Партнёры DM Sans и Bebas Neue для кириллицы, грузинского, иврита и японского: свои файлы,
+     байт в байт как в Tunemail. У каждого unicode-range, так что латинская страница не качает
+     ни одного. Японский CSS (206 КБ) подключает _loadJapaneseFaces, только для японского интерфейса. -->
+<link href="/fonts/partners/partners.css" rel="stylesheet">
 <style>
 /* ── Reset ─────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -54,6 +58,9 @@ html, body { height: 100%; overflow-x: clip; overscroll-behavior-x: none; }
 
 /* ── CSS Variables ──────────────────────────────────────────────────── */
 :root {
+  /* Общие для семейства -mail (_HQ, 3 нояб 2026): текст и заголовки, с партнёрами по письменностям. */
+  --font-text:       'DM Sans', 'Geist', 'Noto Sans Georgian', 'IBM Plex Sans Hebrew', 'Noto Sans JP', system-ui;
+  --font-display:    'Bebas Neue', 'Sofia Sans Extra Condensed', 'Noto Sans Georgian', 'IBM Plex Sans Hebrew', 'Noto Sans JP', system-ui;
   --bg:              #0d0d1a;
   --surface:         #13131f;
   --surface2:        #1a1a2e;
@@ -95,7 +102,7 @@ html, body { height: 100%; overflow-x: clip; overscroll-behavior-x: none; }
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
+  font-family: var(--font-text);
   font-size: 14px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -121,7 +128,7 @@ body {
 }
 
 .auth-logo {
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 42px;
   letter-spacing: 2px;
   margin-bottom: 8px;
@@ -147,7 +154,7 @@ body {
 }
 
 .auth-card h2 {
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 22px;
   letter-spacing: 1px;
   margin-bottom: 20px;
@@ -158,7 +165,7 @@ body {
 .form-group { margin-bottom: 14px; }
 .form-group label {
   display: block;
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 13px;
   letter-spacing: 0.8px;
   color: var(--muted);
@@ -177,7 +184,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
-  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
+  font-family: var(--font-text);
   font-size: 14px;
   padding: 10px 12px;
   outline: none;
@@ -197,7 +204,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   letter-spacing: 1px;
   border-radius: 8px;
   border: none;
@@ -353,7 +360,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   height: calc(52px + env(safe-area-inset-top));
 }
 .topbar-logo {
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 24px;
   letter-spacing: 2px;
 }
@@ -388,7 +395,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   background-clip: content-box;
   border: none;
   color: #111;
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 15px;
   cursor: pointer;
   display: flex;
@@ -416,7 +423,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   border-bottom: 2px solid transparent;
   color: var(--muted);
   cursor: pointer;
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 12px;
   letter-spacing: 0.6px;
   margin-bottom: -1px;
@@ -440,7 +447,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   margin-bottom: 14px;
 }
 .section-title {
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 18px;
   letter-spacing: 1px;
 }
@@ -459,7 +466,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   color: var(--text);
   font-size: 15px;
   padding: 11px 14px;
-  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
+  font-family: var(--font-text);
   outline: none;
   transition: border-color 0.2s;
 }
@@ -519,7 +526,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 /* ── Card body ──────────────────────────────────────────────────────── */
 .card-body { flex: 1; min-width: 0; }
 .card-title {
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 16px;
   letter-spacing: 0.5px;
   line-height: 1.2;
@@ -537,7 +544,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   background: transparent;
   color: #aaa;
   font-size: 11px;
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   letter-spacing: 1px;
   cursor: pointer;
   transition: all 0.15s;
@@ -566,7 +573,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   border: 1px solid var(--accent-border);
   color: var(--accent-text);
   font-size: 10px;
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   letter-spacing: 1px;
   cursor: pointer;
   transition: all 0.15s;
@@ -582,7 +589,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   padding: 2px 7px;
   color: var(--primary);
   font-size: 10px;
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   letter-spacing: 0.5px;
 }
 .badge-plan { color: #888; font-size: 11px; }
@@ -596,7 +603,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   border: 1px solid var(--border);
   color: var(--muted);
   font-size: 12px;
-  font-family: 'DM Sans', 'Noto Sans Georgian', -apple-system, sans-serif;
+  font-family: var(--font-text);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s;
@@ -639,7 +646,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   background: transparent;
   color: var(--muted);
   font-size: 12px;
-  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
+  font-family: var(--font-text);
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -671,7 +678,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .hist-card.plan { border-color: rgba(255,255,255,0.05); opacity: 0.92; }
 
 .hist-top { display: flex; justify-content: space-between; align-items: flex-start; }
-.hist-title { font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; font-size: 15px; letter-spacing: 0.5px; }
+.hist-title { font-family: var(--font-display); font-size: 15px; letter-spacing: 0.5px; }
 .hist-meta { color: var(--muted); font-size: 10px; }
 .hist-del {
   background: none; border: none; color: var(--muted);
@@ -802,7 +809,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 @keyframes reel-turn { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .logo-tap.pop, .logo-tap.pop .spin { animation: none; } }
 .empty-state-title {
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 18px;
   letter-spacing: 1px;
   color: var(--text);
@@ -855,7 +862,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   border-bottom: 1px solid var(--border);
 }
 .modal-title {
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 22px;
   letter-spacing: 0.5px;
   line-height: 1.15;
@@ -881,14 +888,14 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 
 /* ── Modal sheet label ──────────────────────────────────────────────── */
 .sheet-label {
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 12px;
   letter-spacing: 2px;
   margin-bottom: 4px;
   color: var(--muted);
 }
 .sheet-title {
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 19px;
   margin-bottom: 14px;
   line-height: 1.2;
@@ -899,7 +906,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   margin-bottom: 5px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
 }
 
 /* ── Chips ──────────────────────────────────────────────────────────── */
@@ -947,7 +954,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .btn-modal-primary, .btn-modal-secondary { min-height: 44px;
   width: 100%; padding: 13px; border-radius: 11px;
   background: transparent; color: var(--text); border: 1px solid var(--border);
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 16px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.15s;
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
 }
@@ -971,7 +978,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   color: #f87171 !important; background: rgba(248,113,113,0.12);
   border: 1px solid rgba(248,113,113,0.45); border-radius: 7px;
   font-size: 11px !important; font-weight: 600; letter-spacing: 0.3px;
-  padding: 4px 9px !important; line-height: 1; font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
+  padding: 4px 9px !important; line-height: 1; font-family: var(--font-text);
 }
 /* One-time coach bubble (first-run hint pointing at the action icons) */
 .coach-bubble {
@@ -988,7 +995,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .coach-got {
   margin-top: 2px; width: 100%; padding: 7px; border-radius: 8px;
   background: transparent; border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent); color: var(--accent-text);
-  font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
+  font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font-text);
   transition: background 0.15s;
 }
 .coach-got:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); }
@@ -1003,26 +1010,26 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   flex: 1; min-width: 80px; padding: 10px;
   border-radius: 9px; background: rgba(255,255,255,0.05);
   border: 1px solid var(--border); color: var(--muted);
-  cursor: pointer; font-size: 13px; font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
+  cursor: pointer; font-size: 13px; font-family: var(--font-text);
 }
 .btn-modal-add-watched {
   flex: 2; padding: 10px; border-radius: 9px;
   background: transparent; border: 1px solid var(--primary-border);
-  color: #888; font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  color: #888; font-family: var(--font-display);
   font-size: 14px; letter-spacing: 1px; cursor: pointer; transition: all 0.15s;
 }
 .btn-modal-add-watched:hover { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); }
 .btn-modal-save { min-height: 44px;
   flex: 2; padding: 10px; border-radius: 9px;
   background: var(--primary); border: none;
-  color: #111; font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  color: #111; font-family: var(--font-display);
   font-size: 15px; letter-spacing: 1px; cursor: pointer;
 }
 .btn-modal-save:hover { background: var(--primary-dark); }
 .btn-modal-plan {
   flex: 2; padding: 10px; border-radius: 9px;
   background: transparent; border: 1px solid rgba(255,255,255,0.2);
-  color: #aaa; font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  color: #aaa; font-family: var(--font-display);
   font-size: 14px; letter-spacing: 1px; cursor: pointer;
 }
 .btn-modal-plan:hover { border-color: rgba(255,255,255,0.4); color: var(--text); }
@@ -1061,7 +1068,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   padding: 4px 8px;
   border-radius: 8px;
   color: var(--muted);
-  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
+  font-family: var(--font-text);
   font-size: 13px;
   transition: color 0.15s, background 0.15s;
 }
@@ -1129,7 +1136,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   border-radius: 8px;
   color: var(--text);
   font-size: 13px;
-  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
+  font-family: var(--font-text);
   padding: 9px 16px;
   white-space: nowrap;
   /* 10000, not 500. It WAS 500 - the same as every auth screen - and at equal z-index the
@@ -1178,7 +1185,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 32px;
   color: #111;
   margin: 0 auto 12px;
@@ -1191,7 +1198,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
-.acc-stat-val { font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; font-size: 24px; color: var(--primary); }
+.acc-stat-val { font-family: var(--font-display); font-size: 24px; color: var(--primary); }
 .acc-stat-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
 .hb-heart { color: var(--primary); display: inline-block; animation: heartbeat 1s ease-in-out infinite; }
 @keyframes heartbeat { 0%,100%{transform:scale(1);} 15%{transform:scale(1.3);} 30%{transform:scale(1);} 45%{transform:scale(1.2);} }
@@ -1212,7 +1219,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   background: rgba(245,197,24,0.04);
   border-color: var(--primary-border);
 }
-.inv-collapse { display: inline-flex; align-items: center; gap: 4px; margin: 6px 0 -4px auto; padding: 8px 2px; background: none; border: none; color: var(--muted); font-size: 12px; font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif; cursor: pointer; }
+.inv-collapse { display: inline-flex; align-items: center; gap: 4px; margin: 6px 0 -4px auto; padding: 8px 2px; background: none; border: none; color: var(--muted); font-size: 12px; font-family: var(--font-text); cursor: pointer; }
 .inv-thread { display: flex; flex-direction: column; }
 .inv-thread {
   margin-top: 10px;
@@ -1276,7 +1283,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
-  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
+  font-family: var(--font-text);
   font-size: 13px;
   padding: 7px 10px;
   outline: none;
@@ -1316,7 +1323,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   background: var(--accent-soft);
   border: 1px solid var(--accent-border);
   color: var(--accent-text);
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 20px;
   display: flex;
   align-items: center;
@@ -1350,7 +1357,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   background: var(--accent-soft);
   border: 1px solid var(--accent-border);
   color: var(--accent-text);
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 15px;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
@@ -1423,7 +1430,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   background: transparent;
   color: var(--muted);
   font-size: 12px;
-  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
+  font-family: var(--font-text);
   cursor: pointer;
   transition: all 0.15s;
   white-space: nowrap;
@@ -1461,7 +1468,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   border: 1px solid rgba(255,255,255,0.25);
   color: var(--text);
   font-size: 12px;
-  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
+  font-family: var(--font-text);
   padding: 6px 14px;
   white-space: nowrap;
   box-shadow: 0 6px 20px rgba(0,0,0,0.5);
@@ -1562,7 +1569,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   transition: all 0.15s;
   white-space: nowrap;
   flex-shrink: 0;
-  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
+  font-family: var(--font-text);
 }
 @media (hover: hover) {
   .list-tab:not(.active):hover { color: var(--text); border-color: rgba(255,255,255,0.25); }
@@ -1581,7 +1588,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .list-chip {
   display: inline-flex; align-items: center;
   padding: 2px 8px; border-radius: 4px;
-  font-size: 10px; font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; letter-spacing: 0.5px;
+  font-size: 10px; font-family: var(--font-display); letter-spacing: 0.5px;
   background: color-mix(in srgb, var(--accent) 12%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
   color: var(--accent-text); white-space: nowrap;
 }
@@ -1592,7 +1599,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   border-radius: 10px; color: var(--text);
   padding: 12px 14px; cursor: pointer;
   transition: background 0.15s; margin-bottom: 8px;
-  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif; display: block;
+  font-family: var(--font-text); display: block;
 }
 @media (hover: hover) { .list-picker-opt:hover { background: rgba(255,255,255,0.08); } }
 
@@ -1609,7 +1616,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   background: rgba(255,255,255,0.04);
   border: 1px solid var(--border);
   color: var(--text);
-  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif;
+  font-family: var(--font-text);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -1688,7 +1695,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   align-items: center; justify-content: center; padding: 24px 28px 190px; gap: 4px;
 }
 .ob-title {
-  font-family: 'Bebas Neue', 'Oswald', 'Noto Sans Georgian', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 30px; letter-spacing: 1.5px; color: var(--text);
   margin-bottom: 4px; line-height: 1.1; text-align: center;
 }
@@ -1728,14 +1735,14 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   background: none; border: 1px solid var(--border); border-radius: 9px;
   color: var(--muted); font-size: 14px; cursor: pointer;
   width: 112px; flex-shrink: 0; padding: 10px 0; text-align: center;
-  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif; transition: all 0.15s;
+  font-family: var(--font-text); transition: all 0.15s;
 }
 .ob-btn-skip:hover { border-color: var(--primary-border); color: var(--text); }
 .ob-btn-next { min-height: 44px;
   flex: 1; padding: 14px; border-radius: 14px; border: none;
   background: var(--accent); color: var(--on-accent);
   font-size: 15px; font-weight: 600; cursor: pointer;
-  font-family: 'DM Sans', 'Noto Sans Georgian', sans-serif; transition: opacity 0.15s;
+  font-family: var(--font-text); transition: opacity 0.15s;
 }
 .ob-btn-next:active { opacity: 0.8; }
 /* ── Mock UI elements ────────────────────────────────────────────── */
@@ -1878,7 +1885,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .lang-btn {
   padding:5px 12px; border-radius:20px; border:1px solid var(--border);
   background:none; color:var(--muted); font-size:12px; cursor:pointer;
-  font-family:'DM Sans','Noto Sans Georgian',sans-serif; transition:all 0.15s;
+  font-family:var(--font-text); transition:all 0.15s;
 }
 .lang-btn.active { background:var(--accent-soft); border-color:var(--accent-border); color:var(--accent-text); font-weight:600; }
 
@@ -2073,29 +2080,29 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .srch-try { font-size: 12px; color: var(--muted); margin: 0 2px 8px; }
 .srch-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .srch-chip { min-height: 36px; padding: 0 13px; border-radius: 999px; border: 1px solid var(--border);
-  background: var(--surface); color: var(--text); font: 13px 'DM Sans','Noto Sans Georgian',sans-serif; cursor: pointer; }
+  background: var(--surface); color: var(--text); font: 13px var(--font-text); cursor: pointer; }
 .srch-surprise { width: 100%; gap: 8px; margin-top: 12px; padding: 13px; border-radius: 11px;
   background: color-mix(in srgb, var(--primary) 8%, transparent); border: 1px solid color-mix(in srgb, var(--primary) 50%, transparent);
-  color: var(--primary); font: 16px 'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif; letter-spacing: 1.2px; text-indent: 1.2px; cursor: pointer; }
+  color: var(--primary); font: 16px var(--font-display); letter-spacing: 1.2px; text-indent: 1.2px; cursor: pointer; }
 .srch-surprise svg { width: 16px; height: 16px; }
-.srch-sect { font: 14px 'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif; letter-spacing: 1px; color: var(--muted); margin: 18px 2px 9px; }
+.srch-sect { font: 14px var(--font-display); letter-spacing: 1px; color: var(--muted); margin: 18px 2px 9px; }
 .srch-sect:first-child { margin-top: 2px; }
 /* «Понято»: что из запроса пошло в дело. Крестик снимает кусок и перезапускает поиск. */
 .srch-got { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 2px 0 6px; }
-.srch-got-l { font: 13px 'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif; letter-spacing: .8px; color: var(--muted); margin-right: 2px; }
+.srch-got-l { font: 13px var(--font-display); letter-spacing: .8px; color: var(--muted); margin-right: 2px; }
 .srch-tok { gap: 4px; min-height: 30px; padding: 0 6px 0 11px; border-radius: 999px; background: var(--primary-soft, rgba(245,197,24,.1));
-  border: 1px solid var(--primary-border); color: var(--primary); font: 13px 'DM Sans','Noto Sans Georgian',sans-serif; cursor: pointer; }
+  border: 1px solid var(--primary-border); color: var(--primary); font: 13px var(--font-text); cursor: pointer; }
 .srch-tok svg { width: 14px; height: 14px; opacity: .75; }
 .srch-skip { font-size: 12px; color: var(--muted); margin: 0 2px 8px; }
 .srch-note { font-size: 13px; line-height: 1.45; color: var(--text); margin: 4px 2px 10px; }
 .srch-note span { color: var(--muted); }
 .srch-line { width: 100%; justify-content: flex-start; gap: 10px; min-height: 46px; padding: 0 12px; margin-top: 9px;
   border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text);
-  font: 14px 'DM Sans','Noto Sans Georgian',sans-serif; cursor: pointer; text-align: left; }
+  font: 14px var(--font-text); cursor: pointer; text-align: left; }
 .srch-line svg { width: 18px; height: 18px; color: var(--primary); flex: none; }
 .srch-line .srch-chev { margin-left: auto; color: var(--muted); }
 .srch-more { width: 100%; min-height: 44px; margin-top: 10px; border-radius: 12px; border: 1px solid var(--border); background: none;
-  color: var(--text); font: 15px 'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif; letter-spacing: 1px; text-indent: 1px; cursor: pointer; }
+  color: var(--text); font: 15px var(--font-display); letter-spacing: 1px; text-indent: 1px; cursor: pointer; }
 .srch-end { font-size: 12px; color: var(--muted); text-align: center; padding: 12px 0 2px; }
 #rec-suggest{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 10px}
 #rec-suggest .sug{display:inline-flex;align-items:center;justify-content:center;
@@ -2117,7 +2124,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .maps-sheet { flex: 0 0 auto; max-height: 45%; overflow-y: auto; overscroll-behavior: contain; padding: 12px 14px 4px; }
 #tab-maps.has-place .maps-sheet { flex: 1 1 0; max-height: none; }
 .maps-hint { color: var(--muted); font-size: 13px; line-height: 1.5; }
-.maps-place-n { font-family: 'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif; font-size: 22px; letter-spacing: .4px; line-height: 1.1; }
+.maps-place-n { font-family: var(--font-display); font-size: 22px; letter-spacing: .4px; line-height: 1.1; }
 .maps-place-m { color: var(--muted); font-size: 12px; margin-top: 3px; }
 .maps-note { color: var(--muted); font-size: 12px; font-style: italic; margin: 8px 0 4px; }
 .maps-film { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 6px 2px; border-bottom: 1px solid var(--border); cursor: pointer; }
@@ -2132,10 +2139,10 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .maps-legend { margin-top: 10px; font-size: 12px; line-height: 1.6; color: var(--muted); }
 .maps-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #F5C518; vertical-align: -1px; margin-right: 3px; }
 .maps-dot.w { background: none; border: 2px solid #F5C518; box-sizing: border-box; }
-.maps-dot.c { font: 700 8px/10px 'DM Sans', sans-serif; color: #F5C518; text-align: center; width: 13px; height: 13px; background: rgba(245,197,24,0.18); border: 1.5px solid #F5C518; box-sizing: border-box; vertical-align: -2px; }
+.maps-dot.c { font: 700 8px/10px var(--font-text); color: #F5C518; text-align: center; width: 13px; height: 13px; background: rgba(245,197,24,0.18); border: 1.5px solid #F5C518; box-sizing: border-box; vertical-align: -2px; }
 .maps-dot.t { width: 13px; height: 13px; background: rgba(245,197,24,0.10); border: 1px solid rgba(245,197,24,0.6); box-sizing: border-box; vertical-align: -2px; }
 .maps-more-btn { width: 100%; min-height: 44px; margin-top: 4px; border-radius: 12px; border: 1px solid var(--border); background: none;
-  color: var(--text); font: 15px 'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif; letter-spacing: 1px; text-indent: 1px; cursor: pointer; }
+  color: var(--text); font: 15px var(--font-display); letter-spacing: 1px; text-indent: 1px; cursor: pointer; }
 .maps-film-y { color: var(--muted); font-size: 12px; }
 .maps-badge { margin-left: auto; font-size: 10px; color: var(--muted); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; white-space: nowrap; }
 .maps-more { color: var(--muted); font-size: 12px; padding: 10px 2px; }
@@ -2144,9 +2151,9 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .maps-x { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 44px; height: 44px; margin: -8px -10px 0 auto;
           border: none; background: none; color: var(--muted); cursor: pointer; }
 .maps-back { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0; margin: -10px 0 2px; border: none; background: none;
-             color: var(--primary); font: 500 13px 'DM Sans','Noto Sans Georgian',sans-serif; cursor: pointer; line-height: 1; }
+             color: var(--primary); font: 500 13px var(--font-text); cursor: pointer; line-height: 1; }
 .maps-onmap { display: inline-flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; min-height: 44px; padding: 0 14px;
-              border-radius: 10px; border: 1px solid var(--border); background: none; color: var(--text); font: 500 12px 'DM Sans','Noto Sans Georgian',sans-serif; cursor: pointer; }
+              border-radius: 10px; border: 1px solid var(--border); background: none; color: var(--text); font: 500 12px var(--font-text); cursor: pointer; }
 .maplibregl-ctrl-attrib { font-size: 9px !important; background: rgba(13,13,26,.7) !important; color: #8a8a96 !important; }
 .maplibregl-ctrl-attrib a { color: #8a8a96 !important; }
 /* Кнопка «Где я» в цветах приложения и с полным пальцевым размером: у MapLibre она 29 px. */
@@ -2155,6 +2162,22 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 .maps-map .maplibregl-ctrl-geolocate .maplibregl-ctrl-icon { filter: invert(1) brightness(1.4); }
 .maps-map .maplibregl-ctrl-geolocate-active .maplibregl-ctrl-icon,
 .maps-map .maplibregl-ctrl-geolocate-background .maplibregl-ctrl-icon { filter: none; }
+/* Заголовочный шрифт там, где у Bebas Neue нет букв: грузинский, иврит и японский идут жирным 700,
+   грузинский ещё и сжатым до 62.5% (так их подобрал _Tastebook, 3 нояб 2026). !important - потому
+   что у части заголовков вес задан прямо в style, а у Bebas всё равно один вес. font-synthesis: none
+   не даёт латинице Bebas в тех же строках получить поддельный жирный. */
+:is(:lang(ka), :lang(he), :lang(ja)) :is(.auth-logo, .auth-card h2, .form-group label, .btn, .topbar-logo,
+  .avatar-btn, .tab-btn, .section-title, .card-title, .btn-watchlist, .btn-watched, .btn-share-card, .badge-watched,
+  .hist-title, .empty-state-title, .modal-title, .sheet-label, .sheet-title, .add-label, .btn-modal-primary,
+  .btn-modal-secondary, .btn-modal-add-watched, .btn-modal-save, .btn-modal-plan, .acc-avatar, .acc-stat-val,
+  .inv-chat-avatar, .friend-avatar-sm, .list-chip, .ob-title, .srch-surprise, .srch-sect, .srch-got-l, .srch-more,
+  .maps-place-n, .maps-more-btn, [style*="--font-display"]) { font-weight: 700 !important; font-synthesis: none; }
+:lang(ka) :is(.auth-logo, .auth-card h2, .form-group label, .btn, .topbar-logo,
+  .avatar-btn, .tab-btn, .section-title, .card-title, .btn-watchlist, .btn-watched, .btn-share-card, .badge-watched,
+  .hist-title, .empty-state-title, .modal-title, .sheet-label, .sheet-title, .add-label, .btn-modal-primary,
+  .btn-modal-secondary, .btn-modal-add-watched, .btn-modal-save, .btn-modal-plan, .acc-avatar, .acc-stat-val,
+  .inv-chat-avatar, .friend-avatar-sm, .list-chip, .ob-title, .srch-surprise, .srch-sect, .srch-got-l, .srch-more,
+  .maps-place-n, .maps-more-btn, [style*="--font-display"]) { font-stretch: 62.5% !important; }
 </style>
 </head>
 <body>
@@ -2590,7 +2613,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     <div class="auth-logo"><span>CINE</span>MAIL</div>
     <div class="auth-tagline" data-i18n="auth_tagline" data-i18n-html="1">Track films.<br>Get personal picks.<br>Share with friends.</div>
     <div class="auth-card">
-      <button onclick="showScreen('signin')" data-i18n="back" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:16px;padding:0;display:flex;align-items:center;gap:5px;font-family:'DM Sans','Noto Sans Georgian',sans-serif">← Back</button>
+      <button onclick="showScreen('signin')" data-i18n="back" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:16px;padding:0;display:flex;align-items:center;gap:5px;font-family:var(--font-text)">← Back</button>
       <h2 data-i18n="sign_up_title">Create Account</h2>
       <div id="signup-error" class="error-msg"></div>
       <div class="form-group">
@@ -2625,7 +2648,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   <div class="auth-wrap">
     <div class="auth-card" style="text-align:center">
       <div style="margin-bottom:16px;color:var(--muted)"><span data-ic="inbox" data-ic-size="48"></span></div>
-      <div data-i18n="check_inbox_title" style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:26px;letter-spacing:1px;margin-bottom:10px">Check Your Inbox</div>
+      <div data-i18n="check_inbox_title" style="font-family:var(--font-display);font-size:26px;letter-spacing:1px;margin-bottom:10px">Check Your Inbox</div>
       <p id="check-email-msg" data-i18n="email_sent" data-i18n-html="1" style="color:var(--muted);font-size:14px;line-height:1.7;margin-bottom:24px">
         We sent a confirmation link to your email.<br>Click it to activate your account.
       </p>
@@ -2643,7 +2666,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
     <img src="/cinemail-icon-512.png" alt="Cinemail" style="width:80px;height:80px;border-radius:19px;margin:0 auto 14px;display:block;filter:drop-shadow(0 0 24px rgba(245,197,24,0.18))">
     <div class="auth-logo"><span>CINE</span>MAIL</div>
     <div class="auth-card">
-      <button onclick="showScreen('signin')" data-i18n="back" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:16px;padding:0;display:flex;align-items:center;gap:5px;font-family:'DM Sans','Noto Sans Georgian',sans-serif">← Back</button>
+      <button onclick="showScreen('signin')" data-i18n="back" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:16px;padding:0;display:flex;align-items:center;gap:5px;font-family:var(--font-text)">← Back</button>
       <h2 data-i18n="forgot_title">Reset Password</h2>
       <div id="forgot-error" class="error-msg"></div>
       <p data-i18n="forgot_sub" style="color:var(--muted);font-size:13px;line-height:1.6;margin:0 0 16px">Enter your email - we'll send a reset link.</p>
@@ -2745,7 +2768,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   <!-- Guest banner (hidden for real users) -->
   <div id="guest-banner" style="display:none;background:linear-gradient(90deg,color-mix(in srgb, var(--accent) 14%, transparent),color-mix(in srgb, var(--accent) 8%, transparent));border-bottom:1px solid color-mix(in srgb, var(--accent) 22%, transparent);padding:21px 16px;align-items:center;justify-content:space-between;gap:12px">
     <span id="guest-banner-text" style="font-size:13px;color:var(--accent-text)" data-i18n="guest_banner">You're browsing as guest</span>
-    <button onclick="showGuestConvertModal()" data-i18n="guest_join_btn" style="padding:6px 16px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif;white-space:nowrap;flex-shrink:0">Join Cinemail</button>
+    <button onclick="showGuestConvertModal()" data-i18n="guest_join_btn" style="padding:6px 16px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-text);white-space:nowrap;flex-shrink:0">Join Cinemail</button>
   </div>
 
   <!-- Tab bar -->
@@ -2797,7 +2820,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <button class="srch-surprise" onclick="surpriseMe()"><span data-ic="sparkles"></span><span class="bm-label" data-i18n="surprise_btn">Surprise me</span></button>
       <div id="picks-hint" style="display:none;margin-top:12px;padding:11px 13px;background:rgba(245,197,24,0.07);border:1px solid rgba(245,197,24,0.22);border-radius:10px;font-size:12px;line-height:1.5;color:var(--text)">
         <div data-i18n="picks_random_hint" style="margin-bottom:9px;color:#cfcfcf">Without watched films, picks are random. Mark 5-10 films as Watched and they become personal to your taste.</div>
-        <button onclick="dismissPicksHint()" data-i18n="picks_hint_got" style="padding:5px 14px;border-radius:8px;background:rgba(245,197,24,0.15);border:1px solid rgba(245,197,24,0.3);color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">Got it</button>
+        <button onclick="dismissPicksHint()" data-i18n="picks_hint_got" style="padding:5px 14px;border-radius:8px;background:rgba(245,197,24,0.15);border:1px solid rgba(245,197,24,0.3);color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-text)">Got it</button>
       </div>
     </div>
     <div id="search-results"></div>
@@ -2832,7 +2855,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <div class="add-label" data-i18n="friends_lbl" style="margin-top:0">Friends</div>
       <div id="friends-section" style="margin-bottom:12px;min-height:20px"></div>
 
-      <button onclick="toggleAppInvite()" id="app-invite-btn" style="width:100%;padding:9px;border-radius:9px;background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.3);color:var(--primary);font-size:13px;font-weight:600;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;margin-bottom:10px;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:7px"><span data-ic="users" data-ic-size="15"></span><span data-i18n="invite_to_app">Invite friends to Cinemail</span></button>
+      <button onclick="toggleAppInvite()" id="app-invite-btn" style="width:100%;padding:9px;border-radius:9px;background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.3);color:var(--primary);font-size:13px;font-weight:600;font-family:var(--font-text);cursor:pointer;margin-bottom:10px;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:7px"><span data-ic="users" data-ic-size="15"></span><span data-i18n="invite_to_app">Invite friends to Cinemail</span></button>
       <div id="app-invite-panel" style="display:none;margin-bottom:16px;padding:12px;background:rgba(245,197,24,0.05);border:1px solid rgba(245,197,24,0.18);border-radius:10px;text-align:center"></div>
       <!-- tab_inbox, not a new key: the tab is already called this in all eight languages -->
       <div class="add-label" data-i18n="tab_inbox" style="margin-top:4px">Inbox</div>
@@ -2889,7 +2912,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
           <span class="star">★</span>
         </div>
         <div class="add-label" data-i18n="notes">Notes</div>
-        <textarea id="add-note" data-i18n-ph="note_ph" placeholder="What did you think?" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+        <textarea id="add-note" data-i18n-ph="note_ph" placeholder="What did you think?" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:var(--font-text);outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       </div>
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" onclick="closeAdd()" data-i18n="cancel">Cancel</button>
@@ -2914,7 +2937,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <span class="star">★</span>
       </div>
       <div class="add-label" data-i18n="notes">Notes</div>
-      <textarea id="edit-note" data-i18n-ph="note_ph" placeholder="What did you think?" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      <textarea id="edit-note" data-i18n-ph="note_ph" placeholder="What did you think?" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:var(--font-text);outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" onclick="closeEdit()" data-i18n="cancel">Cancel</button>
         <button class="btn-modal-save" id="edit-confirm-btn" onclick="confirmEdit()" data-i18n="save">Save</button>
@@ -2932,15 +2955,15 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <div class="add-label" data-i18n="send_to">Send to</div>
       <div id="share-friends-list" style="margin-bottom:12px;max-height:170px;overflow-y:auto"></div>
       <div class="add-label" data-i18n="msg_opt">Message (optional)</div>
-      <textarea id="share-message" data-i18n-ph="share_msg_ph" placeholder="Why you'd love this…" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:55px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--accent-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      <textarea id="share-message" data-i18n-ph="share_msg_ph" placeholder="Why you'd love this…" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:55px;font-family:var(--font-text);outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--accent-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       <div style="display:flex;gap:9px">
         <button class="btn-modal-close" onclick="closeShare()" data-i18n="cancel">Cancel</button>
-        <button id="share-confirm-btn" onclick="confirmShare()" style="flex:2;padding:10px;border-radius:9px;background:var(--accent);border:none;color:var(--on-accent);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer" data-i18n="send_btn">Send</button>
+        <button id="share-confirm-btn" onclick="confirmShare()" style="flex:2;padding:10px;border-radius:9px;background:var(--accent);border:none;color:var(--on-accent);font-family:var(--font-display);font-size:15px;letter-spacing:1px;cursor:pointer" data-i18n="send_btn">Send</button>
       </div>
       <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">
         <div class="add-label" data-i18n="share_outside_lbl">Not on Cinemail?</div>
         <p style="color:var(--muted);font-size:12px;margin:0 0 10px;line-height:1.5" data-i18n="share_outside_hint">Send a link anyone can open - your message goes with it.</p>
-        <button onclick="shareFromModal()" style="width:100%;padding:10px;border-radius:9px;background:none;border:1px solid var(--border);color:var(--text);font-size:13px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px"><span data-ic="link" data-ic-size="15"></span><span data-i18n="share_outside_btn">Copy a link to send anywhere</span></button>
+        <button onclick="shareFromModal()" style="width:100%;padding:10px;border-radius:9px;background:none;border:1px solid var(--border);color:var(--text);font-size:13px;cursor:pointer;font-family:var(--font-text);display:flex;align-items:center;justify-content:center;gap:7px"><span data-ic="link" data-ic-size="15"></span><span data-i18n="share_outside_btn">Copy a link to send anywhere</span></button>
       </div>
     </div>
   </div>
@@ -2964,14 +2987,14 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
           <div class="avatar-edit-badge"><span data-ic="pencil" data-ic-size="11"></span></div>
         </div>
         <div id="avatar-picker-wrap" class="avatar-picker-wrap"></div>
-        <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:24px;letter-spacing:0.5px;color:var(--text)" id="acc-name-display" data-i18n="default_user">User</div>
+        <div style="font-family:var(--font-display);font-size:24px;letter-spacing:0.5px;color:var(--text)" id="acc-name-display" data-i18n="default_user">User</div>
         <div style="font-size:13px;color:#aaa;margin-top:2px" id="acc-email-display"></div>
       </div>
 
       <!-- Guest card (shown only in guest mode) -->
       <div id="acc-guest-card" style="display:none;text-align:center;padding:0 0 8px">
         <p style="color:var(--muted);font-size:13px;line-height:1.55;margin-bottom:18px" data-i18n="guest_save_sub">Keep your films safe across devices and share them with friends - free forever.</p>
-        <button onclick="closeAccount();showGuestConvertModal()" data-i18n="guest_join_btn" style="width:100%;padding:12px;border-radius:10px;background:var(--accent);border:none;color:var(--on-accent);font-size:15px;font-weight:600;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;margin-bottom:8px">Join Cinemail</button>
+        <button onclick="closeAccount();showGuestConvertModal()" data-i18n="guest_join_btn" style="width:100%;padding:12px;border-radius:10px;background:var(--accent);border:none;color:var(--on-accent);font-size:15px;font-weight:600;font-family:var(--font-text);cursor:pointer;margin-bottom:8px">Join Cinemail</button>
       </div>
 
       <!-- Member-only block: stats, name, backup, friends (hidden for guests) -->
@@ -2996,7 +3019,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <div class="add-label" id="acc-name-lbl" data-i18n="display_name_lbl">Display Name</div>
       <div id="acc-name-row" style="display:flex;gap:8px;margin-bottom:24px">
         <input type="text" id="acc-name-input" data-i18n-ph="display_name" placeholder="Your name"
-          style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:14px;padding:10px 12px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;transition:border-color .2s"
+          style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:14px;padding:10px 12px;font-family:var(--font-text);outline:none;transition:border-color .2s"
           onfocus="this.style.borderColor='var(--primary-border)'"
           onblur="this.style.borderColor='var(--border)'">
         <button class="btn-modal-save" id="btn-save-name" onclick="saveDisplayName()" style="flex:none;min-width:120px;padding:10px 18px;font-size:14px" data-i18n="save">Save</button>
@@ -3020,12 +3043,12 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <!-- This used to live in the title attribute above, where a phone never shows it - there
            is no hover on a touch screen, so the one instruction mobile users need was visible
            only on desktop. Found when an Android user could not get past IMDb's app intercept. -->
-      <button onclick="var e=document.getElementById('imdb-hint');e.hidden=!e.hidden" data-i18n="imdb_how" style="display:block;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:4px 0 0;text-align:left;text-decoration:underline;font-family:'DM Sans','Noto Sans Georgian',sans-serif">How to export from IMDb</button>
+      <button onclick="var e=document.getElementById('imdb-hint');e.hidden=!e.hidden" data-i18n="imdb_how" style="display:block;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:4px 0 0;text-align:left;text-decoration:underline;font-family:var(--font-text)">How to export from IMDb</button>
       <div id="imdb-hint" hidden data-i18n="imdb_hint" data-i18n-html="1" style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:6px;padding:8px 10px;border:1px solid rgba(255,255,255,0.08);border-radius:8px"></div>
-      <button onclick="backupExportJSON()" data-i18n="backup_json_nerd" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:4px 0 0;margin-top:2px;text-decoration:underline;font-family:'DM Sans','Noto Sans Georgian',sans-serif">JSON backup (advanced)</button>
+      <button onclick="backupExportJSON()" data-i18n="backup_json_nerd" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:4px 0 0;margin-top:2px;text-decoration:underline;font-family:var(--font-text)">JSON backup (advanced)</button>
       <div id="backup-status" style="display:none;font-size:11px;line-height:1.45;margin-top:8px"></div>
       <div id="btn-backfill-crew-row" style="display:none;margin-top:8px">
-        <button id="btn-backfill-crew" onclick="backfillCrewData()" data-i18n="backfill_crew" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:4px 0;text-decoration:underline;font-family:'DM Sans','Noto Sans Georgian',sans-serif">Update film details</button>
+        <button id="btn-backfill-crew" onclick="backfillCrewData()" data-i18n="backfill_crew" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:4px 0;text-decoration:underline;font-family:var(--font-text)">Update film details</button>
       </div>
 
       <!-- Friends moved out of here and into the Inbox tab. This is an app for sending
@@ -3045,7 +3068,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <button class="lang-btn" data-lang="ka" onclick="setLang('ka')">KA</button>
       </div>
 
-      <button onclick="replayOnboarding()" style="width:100%;padding:9px;border-radius:9px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;margin-bottom:14px;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:7px" onmouseover="this.style.borderColor='var(--accent-border)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"><span data-ic="film" data-ic-size="14"></span><span data-i18n="replay_onboarding">Replay Welcome Tour</span></button>
+      <button onclick="replayOnboarding()" style="width:100%;padding:9px;border-radius:9px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;font-family:var(--font-text);cursor:pointer;margin-bottom:14px;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:7px" onmouseover="this.style.borderColor='var(--accent-border)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"><span data-ic="film" data-ic-size="14"></span><span data-i18n="replay_onboarding">Replay Welcome Tour</span></button>
 
       <div id="acc-blocked-list" style="display:none;margin-bottom:14px"></div>
 
@@ -3087,7 +3110,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.10-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.11-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -3125,7 +3148,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   <div style="padding:20px;width:100%;display:flex;justify-content:center" onclick="event.stopPropagation()">
     <div class="modal-sheet" style="max-width:360px" onclick="event.stopPropagation()">
       <div class="modal-handle"></div>
-      <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:19px;letter-spacing:0.5px;margin-bottom:14px;color:var(--text)" data-i18n="list_picker_title">Add to List</div>
+      <div style="font-family:var(--font-display);font-size:19px;letter-spacing:0.5px;margin-bottom:14px;color:var(--text)" data-i18n="list_picker_title">Add to List</div>
       <div id="list-picker-options"></div>
       <button class="btn-modal-close" onclick="closeListPicker()" style="margin-top:4px" data-i18n="cancel">Cancel</button>
     </div>
@@ -3139,21 +3162,21 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <button onclick="closeFeedback()" aria-label="Close" style="position:absolute;top:12px;right:12px;z-index:5;width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--muted);font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--primary-border)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'"><span data-ic="x" data-ic-size="18"></span></button>
 
       <div style="flex-shrink:0;">
-        <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;color:#F5C518;font-size:12px;letter-spacing:2px;margin-bottom:3px" data-i18n="fb_heading">FEEDBACK</div>
-        <div id="fb-title" style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:19px;margin-bottom:14px;line-height:1.2" data-i18n="fb_sub">Share a thought or report a bug</div>
+        <div style="font-family:var(--font-display);color:#F5C518;font-size:12px;letter-spacing:2px;margin-bottom:3px" data-i18n="fb_heading">FEEDBACK</div>
+        <div id="fb-title" style="font-family:var(--font-display);font-size:19px;margin-bottom:14px;line-height:1.2" data-i18n="fb_sub">Share a thought or report a bug</div>
         <div class="add-label" id="fb-type-label" data-i18n="fb_type">Type</div>
         <div id="fb-type-row" style="display:flex;gap:8px;margin-bottom:14px">
-          <button id="fb-type-bug" onclick="setFbType('bug')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px"><span data-ic="bug" data-ic-size="13"></span><span data-i18n="fb_t_bug">Bug</span></button>
-          <button id="fb-type-idea" onclick="setFbType('idea')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px"><span data-ic="lightbulb" data-ic-size="13"></span><span data-i18n="fb_t_idea">Idea</span></button>
-          <button id="fb-type-other" onclick="setFbType('other')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px"><span data-ic="message-circle" data-ic-size="13"></span><span data-i18n="fb_t_other">Other</span></button>
+          <button id="fb-type-bug" onclick="setFbType('bug')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:var(--font-text);font-size:12px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px"><span data-ic="bug" data-ic-size="13"></span><span data-i18n="fb_t_bug">Bug</span></button>
+          <button id="fb-type-idea" onclick="setFbType('idea')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:var(--font-text);font-size:12px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px"><span data-ic="lightbulb" data-ic-size="13"></span><span data-i18n="fb_t_idea">Idea</span></button>
+          <button id="fb-type-other" onclick="setFbType('other')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:var(--font-text);font-size:12px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px"><span data-ic="message-circle" data-ic-size="13"></span><span data-i18n="fb_t_other">Other</span></button>
         </div>
         <div class="add-label" data-i18n="fb_message_lbl">Message</div>
-        <textarea id="fb-message" placeholder="Tell me what's on your mind..." data-i18n-ph="ph_feedback" style="min-height:70px;margin-bottom:10px;width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:13px;padding:10px 12px;outline:none;resize:vertical;transition:border-color .2s"></textarea>
+        <textarea id="fb-message" placeholder="Tell me what's on your mind..." data-i18n-ph="ph_feedback" style="min-height:70px;margin-bottom:10px;width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-text);font-size:13px;padding:10px 12px;outline:none;resize:vertical;transition:border-color .2s"></textarea>
 
         <!-- Screenshot attach -->
         <input type="file" id="fb-screenshot" accept="image/*" style="display:none" onchange="onFbScreenshotPicked(event)">
         <div id="fb-attach-row" style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-          <button id="fb-attach-btn" onclick="document.getElementById('fb-screenshot').click()" style="display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:'DM Sans','Noto Sans Georgian',sans-serif;font-size:12px;cursor:pointer;transition:all .15s">
+          <button id="fb-attach-btn" onclick="document.getElementById('fb-screenshot').click()" style="display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:var(--font-text);font-size:12px;cursor:pointer;transition:all .15s">
             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             <span id="fb-attach-lbl" data-i18n="fb_attach">Attach screenshot</span>
           </button>
@@ -5420,7 +5443,7 @@ function _guestToSignIn() {
   const ov = document.createElement('div');
   ov.id = 'guest-signin-overlay';
   ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
-  const btn = 'min-height:44px;padding:12px;border-radius:10px;font-size:14px;font-family:\'DM Sans\',\'Noto Sans Georgian\',sans-serif;cursor:pointer';
+  const btn = 'min-height:44px;padding:12px;border-radius:10px;font-size:14px;font-family:var(--font-text);cursor:pointer';
   ov.innerHTML = `
     <div style="background:#1a1a2a;border-radius:16px;padding:28px 24px;max-width:340px;width:100%;text-align:center">
       <div style="margin-bottom:12px;color:var(--amber,#FBBF24);display:flex;justify-content:center">${icon('triangle-alert', 26)}</div>
@@ -5525,6 +5548,15 @@ function _applyI18nElement(container) {
   container.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
 }
 
+// Японские начертания: 206 КБ правил на 240 срезов, нужны только японскому интерфейсу (так же в
+// Tunemail). Японское название фильма в другом интерфейсе рисует системный шрифт: на Android это
+// тот же Noto, на iPhone - Hiragino.
+function _loadJapaneseFaces() {
+  if (document.documentElement.lang !== 'ja' || document.getElementById('jp-faces')) return;
+  const l = document.createElement('link');
+  l.id = 'jp-faces'; l.rel = 'stylesheet'; l.href = '/fonts/partners/partners-jp.css';
+  document.head.appendChild(l);
+}
 function _applyI18n() {
   // Язык документа - тот же, что у текста (проверка кода 9 окт, #125). <html lang="en">
   // зашит в разметке и раньше не менялся никогда: VoiceOver и TalkBack выбирают голос по
@@ -5533,6 +5565,7 @@ function _applyI18n() {
   // поэтому одной строки здесь хватает на оба пути. Язык без словаря t() показывает
   // по-английски - и lang тогда тоже en.
   document.documentElement.lang = I18N[_lang] ? _lang : 'en';
+  _loadJapaneseFaces();
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
     const v = t(key);
@@ -6468,10 +6501,10 @@ function confirmDeleteAccount() {
       <label for="del-confirm-input" style="display:block;text-align:left;font-size:11px;color:var(--muted);margin-bottom:6px">${_delConfirmLabel()}</label>
       <input id="del-confirm-input" type="text" autocomplete="off" autocapitalize="none" spellcheck="false"
              placeholder="${escapeHtml(_delConfirmWord())}" oninput="_delConfirmCheck()"
-             style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:11px;color:var(--text);font-size:14px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;margin-bottom:16px">` : ''}
+             style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:11px;color:var(--text);font-size:14px;font-family:var(--font-text);margin-bottom:16px">` : ''}
       <div style="display:flex;flex-direction:column;gap:12px">
-        <button id="del-confirm-btn" ${_delConfirmWord() ? 'disabled' : ''} onclick="deleteAccount()" style="background:#c93b3b;border:none;color:#fff;font-size:14px;font-weight:700;font-family:'DM Sans','Noto Sans Georgian',sans-serif;padding:12px;border-radius:10px;cursor:pointer;opacity:${_delConfirmWord() ? '.4' : '1'};pointer-events:${_delConfirmWord() ? 'none' : 'auto'};transition:opacity .15s">${t('del_acct_confirm')}</button>
-        <button onclick="document.getElementById('delete-account-overlay').remove();openAccount();" style="background:none;border:1px solid rgba(255,255,255,0.12);color:var(--muted);font-size:14px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;padding:11px;border-radius:10px;cursor:pointer">${t('cancel')}</button>
+        <button id="del-confirm-btn" ${_delConfirmWord() ? 'disabled' : ''} onclick="deleteAccount()" style="background:#c93b3b;border:none;color:#fff;font-size:14px;font-weight:700;font-family:var(--font-text);padding:12px;border-radius:10px;cursor:pointer;opacity:${_delConfirmWord() ? '.4' : '1'};pointer-events:${_delConfirmWord() ? 'none' : 'auto'};transition:opacity .15s">${t('del_acct_confirm')}</button>
+        <button onclick="document.getElementById('delete-account-overlay').remove();openAccount();" style="background:none;border:1px solid rgba(255,255,255,0.12);color:var(--muted);font-size:14px;font-family:var(--font-text);padding:11px;border-radius:10px;cursor:pointer">${t('cancel')}</button>
       </div>
     </div>
   `;
@@ -6890,7 +6923,7 @@ function _whereToWatchInner(wp) {
   const logos = (data.flatrate || []).map(p =>
     `<img src="https://image.tmdb.org/t/p/w92${p.logo_path}" alt="${(p.provider_name||'').replace(/"/g,'')}" title="${(p.provider_name||'').replace(/"/g,'')}" style="width:34px;height:34px;border-radius:8px;display:block" loading="lazy">`
   ).join('');
-  const sel = `<select onchange="_setWatchRegion(this.value)" style="background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px;padding:2px 4px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer">${regions.map(c => `<option value="${c}" ${c===region?'selected':''}>${c}</option>`).join('')}</select>`;
+  const sel = `<select onchange="_setWatchRegion(this.value)" style="background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px;padding:2px 4px;font-family:var(--font-text);cursor:pointer">${regions.map(c => `<option value="${c}" ${c===region?'selected':''}>${c}</option>`).join('')}</select>`;
   // Ссылка - в data-атрибут через escapeHtml, а не JSON внутрь onclick: апостроф в адресе
   // обрывал бы атрибут так же, как в кнопках «Поделиться».
   const open = data.link ? `data-href="${escapeHtml(data.link)}" onclick="window.open(this.dataset.href,'_blank','noopener')"` : '';
@@ -8592,7 +8625,7 @@ async function openDetail(id, type) {
       ${watchedStatusLine}
       ${checklistSection}
       <div class="modal-actions">${actionBtns}</div>
-      <button onclick="shareFilmLink('${escapeJsAttr(id)}','${escapeJsAttr(d.type)}')" style="width:100%;margin-top:10px;padding:11px;border-radius:11px;background:none;border:1px solid var(--border);color:var(--text);font-size:13px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px">${icon('link', 15)}<span>${escapeHtml(t('share_outside_btn'))}</span></button>`;
+      <button onclick="shareFilmLink('${escapeJsAttr(id)}','${escapeJsAttr(d.type)}')" style="width:100%;margin-top:10px;padding:11px;border-radius:11px;background:none;border:1px solid var(--border);color:var(--text);font-size:13px;cursor:pointer;font-family:var(--font-text);display:flex;align-items:center;justify-content:center;gap:7px">${icon('link', 15)}<span>${escapeHtml(t('share_outside_btn'))}</span></button>`;
     window._detailMovie = d;
     // Ссылка наружу и места съёмок - по d.type, а не по запрошенному type: tmdbDetail сам
     // переходит на сериал, когда фильма с таким id нет, и ссылка вела на чужой фильм с тем же
@@ -8817,7 +8850,7 @@ function _renderAvatarPicker() {
     <div class="avatar-picker-label" data-i18n="av_color">Color</div>
     <div class="avatar-color-row">${colorHTML}</div>
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px">
-      <button id="avatar-clear-btn" onclick="clearAvatarEmoji()" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:2px 0;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${icon('x', 12)} ${t("av_remove_emoji")}</button>
+      <button id="avatar-clear-btn" onclick="clearAvatarEmoji()" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:2px 0;font-family:var(--font-text)">${icon('x', 12)} ${t("av_remove_emoji")}</button>
       <button type="button" class="btn btn-primary btn-sm" style="width:auto" onclick="toggleAvatarPicker()">${escapeHtml(t('av_done'))}</button>
     </div>
   `;
@@ -9493,7 +9526,7 @@ function renderHistory() {
     filtered = watchHistory.filter(h => h.listId === _activeListId);
   }
   if (!watchHistory.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">${icon('list-checks', 28)}</div><div class="empty-state-title">${t('empty_list_title')}</div><p>${t('empty_list_sub')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">${icon('list-checks', 28)}</div><div class="empty-state-title">${t('empty_list_title')}</div><p>${t('empty_list_sub')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;font-family:var(--font-text);cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
     return;
   }
   if (!filtered.length) {
@@ -9502,9 +9535,9 @@ function renderHistory() {
     if (isWatchedTab) {
       emptyMsg = `<div class="empty-state"><div class="empty-state-icon">${icon('popcorn', 28)}</div><div class="empty-state-title">${t('nothing_yet')}</div><p>${t('mark_seen')}</p></div>`;
     } else if (activeList) {
-      emptyMsg = `<div class="empty-state"><div class="empty-state-icon">${icon('film',34)}</div><div class="empty-state-title">${escapeHtml(activeList.name)}</div><p>${t('empty_shared_sub')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
+      emptyMsg = `<div class="empty-state"><div class="empty-state-icon">${icon('film',34)}</div><div class="empty-state-title">${escapeHtml(activeList.name)}</div><p>${t('empty_shared_sub')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;font-family:var(--font-text);cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
     } else {
-      emptyMsg = `<div class="empty-state"><div class="empty-state-icon">${icon('list-checks', 28)}</div><div class="empty-state-title">${t('nothing_yet')}</div><p>${t('save_to_list')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
+      emptyMsg = `<div class="empty-state"><div class="empty-state-icon">${icon('list-checks', 28)}</div><div class="empty-state-title">${t('nothing_yet')}</div><p>${t('save_to_list')}</p><button onclick="switchTab('search')" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;font-family:var(--font-text);cursor:pointer;font-weight:600">${t('empty_list_btn')}</button></div>`;
     }
     el.innerHTML = emptyMsg;
     return;
@@ -10123,7 +10156,7 @@ async function surpriseMeEngine() {
       <div class="empty-state-icon">${icon('sparkles', 28)}</div>
       <div class="empty-state-title">${escapeHtml(t('surprise_need_title'))}</div>
       <p>${escapeHtml(t('surprise_need_sub').replace('{n}', seen).replace('{need}', () => SURPRISE_MIN_WATCHED))}</p>
-      <button onclick="document.getElementById('search-input').focus()" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;font-weight:600">${escapeHtml(t('empty_list_btn'))}</button>
+      <button onclick="document.getElementById('search-input').focus()" style="margin-top:12px;padding:9px 22px;border-radius:20px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;font-family:var(--font-text);cursor:pointer;font-weight:600">${escapeHtml(t('empty_list_btn'))}</button>
     </div>`;
     return;
   }
@@ -13130,7 +13163,7 @@ function renderFriendsSection() {
       html += `<div class="friend-row">
         ${_avatarMarkup(f.user_id, name, 36)}
         <div style="flex:1;font-size:13px">${escapeHtml(name)} <span style="color:var(--muted);font-size:11px">${t('friend_wants')}</span></div>
-        <button onclick="respondFriendRequest('${f.id}','accepted')" style="background:var(--accent);border:none;color:var(--on-accent);border-radius:6px;padding:4px 10px;font-size:11px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${t('accept')}</button>
+        <button onclick="respondFriendRequest('${f.id}','accepted')" style="background:var(--accent);border:none;color:var(--on-accent);border-radius:6px;padding:4px 10px;font-size:11px;font-family:var(--font-display);letter-spacing:1px;cursor:pointer">${t('accept')}</button>
         <button onclick="respondFriendRequest('${f.id}','declined')" style="background:none;border:1px solid rgba(255,255,255,0.15);color:var(--muted);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;margin-left:4px">✕</button>
       </div>`;
     }
@@ -13162,7 +13195,7 @@ function renderFriendsSection() {
       </div>
       <input type="text" id="friend-filter-input" value="${(_friendFilter||'').replace(/"/g,'&quot;')}" placeholder="${t('filter_friends')}"
         oninput="_friendFilter=this.value;renderFriendsSection()"
-        style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:13px;padding:7px 12px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;margin-bottom:8px;box-sizing:border-box">`;
+        style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:13px;padding:7px 12px;font-family:var(--font-text);outline:none;margin-bottom:8px;box-sizing:border-box">`;
     }
     html += `<div${many ? ' style="max-height:248px;overflow-y:auto;margin:-2px;padding:2px"' : ''}>`;
     for (const f of shown) {
@@ -13171,7 +13204,7 @@ function renderFriendsSection() {
         // Confirm row
         html += `<div class="friend-row" style="background:rgba(248,113,113,0.06);border-radius:8px;padding:8px 10px;gap:8px">
           <div style="flex:1;font-size:12px;color:#f87171"><strong>${escapeHtml(name)}</strong> ${t('friend_remove_suffix')}</div>
-          <button onclick="event.stopPropagation();deleteFriendConfirmed('${fid}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${t('list_remove')}</button>
+          <button onclick="event.stopPropagation();deleteFriendConfirmed('${fid}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:var(--font-display);letter-spacing:1px;cursor:pointer">${t('list_remove')}</button>
           <button onclick="event.stopPropagation();_friendDeleteConfirmFid=null;renderFriendsSection()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#aaa;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer">${t('cancel')}</button>
         </div>`;
       } else {
@@ -13533,11 +13566,11 @@ function renderListTabs() {
   if (_listTabCreating) {
     // Подсказка из t(): поле рисуется после _applyI18n, и data-i18n-ph его уже не переводит.
     html += `<input id="list-tab-input" type="text" placeholder="${escapeHtml(t('ph_list_name'))}" data-i18n-ph="ph_list_name"
-      style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--text);font-size:12px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none;width:110px;flex-shrink:0"
+      style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--text);font-size:12px;font-family:var(--font-text);outline:none;width:110px;flex-shrink:0"
       enterkeyhint="done"
       onkeydown="if(event.key==='Enter'){event.preventDefault();_confirmNewListTab()}if(event.key==='Escape')_cancelNewListTab()"
       onblur="_blurNewListTab()">
-    <button onclick="_confirmNewListTab()" style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px;flex-shrink:0">${t("create")}</button>`;
+    <button onclick="_confirmNewListTab()" style="padding:5px 10px;border-radius:20px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--accent-text);font-size:11px;cursor:pointer;font-family:var(--font-display);letter-spacing:0.5px;flex-shrink:0">${t("create")}</button>`;
   } else {
     html += `<button class="list-tab-add" onclick="_startNewListTab()">${t('new_list_tab')}</button>`;
   }
@@ -13887,7 +13920,7 @@ function renderListManageStrip() {
     el.innerHTML = `
       <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(248,113,113,0.06);border-radius:10px;border:1px solid rgba(248,113,113,0.15)">
         <span style="flex:1;font-size:12px;color:#f87171">${isOwner ? t('list_delete') : t('list_leave')} <strong>${escapeHtml(list.name)}</strong>?</span>
-        <button onclick="confirmListDelete('${escapeJsAttr(list.id)}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${isOwner ? t('list_delete') : t('list_leave')}</button>
+        <button onclick="confirmListDelete('${escapeJsAttr(list.id)}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:var(--font-display);letter-spacing:1px;cursor:pointer">${isOwner ? t('list_delete') : t('list_leave')}</button>
         <button onclick="_listManageMode=null;renderListManageStrip()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#aaa;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer">${t('cancel')}</button>
       </div>`;
     return;
@@ -13897,9 +13930,9 @@ function renderListManageStrip() {
     el.innerHTML = `
       <div style="display:flex;gap:8px;align-items:center">
         <input id="list-rename-input" type="text" value="${escapeHtml(list.name)}"
-          style="flex:1;padding:7px 12px;border-radius:9px;border:1px solid var(--accent-border);background:color-mix(in srgb, var(--accent) 8%, transparent);color:var(--text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none"
+          style="flex:1;padding:7px 12px;border-radius:9px;border:1px solid var(--accent-border);background:color-mix(in srgb, var(--accent) 8%, transparent);color:var(--text);font-size:13px;font-family:var(--font-text);outline:none"
           onkeydown="if(event.key==='Enter')renameList('${escapeJsAttr(list.id)}');if(event.key==='Escape'){_listManageMode=null;renderListManageStrip();}">
-        <button onclick="renameList('${escapeJsAttr(list.id)}')" style="padding:7px 14px;border-radius:9px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${t('save')}</button>
+        <button onclick="renameList('${escapeJsAttr(list.id)}')" style="padding:7px 14px;border-radius:9px;background:var(--accent);border:none;color:var(--on-accent);font-size:13px;cursor:pointer;font-family:var(--font-text)">${t('save')}</button>
         <button onclick="_listManageMode=null;renderListManageStrip()" style="padding:7px 10px;border-radius:9px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;cursor:pointer">✕</button>
       </div>`;
     setTimeout(() => { const i = document.getElementById('list-rename-input'); if(i){i.focus();i.select();} }, 50);
@@ -13921,7 +13954,7 @@ function renderListManageStrip() {
         ${friends.length ? `<div style="font-size:11px;color:var(--muted);margin-bottom:6px">${t('list_select_friend')}</div>` + friends.map(f => {
           const fi = _friendInfo(f);
           return `<button data-uid="${escapeHtml(fi.id)}" data-name="${escapeHtml(fi.name)}" onclick="_doInviteToList('${escapeJsAttr(list.id)}',this)"
-            style="display:block;width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;padding:8px 12px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif;margin-bottom:4px">${escapeHtml(fi.name)}</button>`;
+            style="display:block;width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;padding:8px 12px;cursor:pointer;font-family:var(--font-text);margin-bottom:4px">${escapeHtml(fi.name)}</button>`;
         }).join('') : `<div style="font-size:12px;color:var(--muted);padding:4px 0">${t(_friendsCache.length ? 'list_all_friends_in' : 'no_friends_share')}</div>`}
         <!-- Ссылка-приглашение - тот же вход в список, что и друг из Cinemail, только для любого.
              До 11 окт она была отдельной кнопкой Link рядом с Share и читалась как «поделиться
@@ -13965,15 +13998,15 @@ function renderListManageStrip() {
   el.innerHTML = `
     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
       ${isOwner ? `<button onclick="_listManageMode='rename';renderListManageStrip()"
-        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:none;color:#888;font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${t('list_rename')}</button>` : ''}
+        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:none;color:#888;font-size:11px;cursor:pointer;font-family:var(--font-text)">${t('list_rename')}</button>` : ''}
       ${isOwner ? `<button onclick="_listManageMode='invite';renderListManageStrip()"
-        style="padding:4px 12px;border-radius:20px;border:1px solid var(--accent-border);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">+ ${t('list_invite')}</button>` : ''}
+        style="padding:4px 12px;border-radius:20px;border:1px solid var(--accent-border);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:var(--font-text)">+ ${t('list_invite')}</button>` : ''}
       <button onclick="shareListOutward('${escapeJsAttr(list.id)}')"
-        style="padding:4px 12px;border-radius:20px;border:1px solid var(--accent-border);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif;display:inline-flex;align-items:center;gap:5px">${icon('send',12)} ${t('list_share_out')}</button>
+        style="padding:4px 12px;border-radius:20px;border:1px solid var(--accent-border);background:none;color:var(--accent-text);font-size:11px;cursor:pointer;font-family:var(--font-text);display:inline-flex;align-items:center;gap:5px">${icon('send',12)} ${t('list_share_out')}</button>
       <button onclick="_listManageMode='confirm-delete';renderListManageStrip()"
-        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--muted);font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${isOwner ? t('list_delete') : t('list_leave')}</button>
+        style="padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--muted);font-size:11px;cursor:pointer;font-family:var(--font-text)">${isOwner ? t('list_delete') : t('list_leave')}</button>
       ${list.memberCount > 0 ? `<button onclick="_listManageMode='members';renderListManageStrip()"
-        style="padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);background:none;color:var(--muted);font-size:11px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">
+        style="padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);background:none;color:var(--muted);font-size:11px;cursor:pointer;font-family:var(--font-text)">
         ${icon('users',13)} ${list.memberCount} ${_membersWord(list.memberCount)}
       </button>` : ''}
     </div>`;
@@ -13997,7 +14030,7 @@ function renderListsSection() {
     if (_listDeleteConfirmId === list.id) {
       html += `<div class="list-row" style="background:rgba(248,113,113,0.06);border-radius:8px;padding:8px 10px;gap:8px">
         <div style="flex:1;font-size:12px;color:#f87171">${isOwner ? t('list_delete') : t('list_leave')} <strong>${escapeHtml(list.name)}</strong>?</div>
-        <button onclick="confirmListDelete('${list.id}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:1px;cursor:pointer">${isOwner ? t('list_delete') : t('list_leave')}</button>
+        <button onclick="confirmListDelete('${list.id}')" style="background:#f87171;border:none;color:#111;border-radius:6px;padding:5px 12px;font-size:11px;font-family:var(--font-display);letter-spacing:1px;cursor:pointer">${isOwner ? t('list_delete') : t('list_leave')}</button>
         <button onclick="_listDeleteConfirmId=null;renderListsSection()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#aaa;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer">${t('cancel')}</button>
       </div>`;
     } else if (_listInviteTargetId === list.id) {
@@ -14013,7 +14046,7 @@ function renderListsSection() {
           const nm = escapeJsAttr(fi.name);
           const ln = escapeJsAttr(list.name);
           return `<button onclick="event.stopPropagation();inviteToList('${list.id}','${fi.id}','${nm}','${ln}')"
-            style="width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;padding:7px 10px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif;margin-bottom:4px">${escapeHtml(fi.name)}</button>`;
+            style="width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;padding:7px 10px;cursor:pointer;font-family:var(--font-text);margin-bottom:4px">${escapeHtml(fi.name)}</button>`;
         }).join('') : `<div style="font-size:12px;color:var(--muted)">${t('add_friends_first')}</div>`}
       </div>`;
     } else {
@@ -14023,7 +14056,7 @@ function renderListsSection() {
           <div style="font-size:11px;color:var(--muted)">${sub}</div>
         </div>
         ${isOwner ? `<button onclick="event.stopPropagation();_listInviteTargetId='${list.id}';_listDeleteConfirmId=null;renderListsSection()"
-          style="background:none;border:1px solid var(--accent-border);color:var(--accent-text);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">+ ${t('list_invite')}</button>` : ''}
+          style="background:none;border:1px solid var(--accent-border);color:var(--accent-text);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:var(--font-display);letter-spacing:0.5px">+ ${t('list_invite')}</button>` : ''}
         <button onclick="event.stopPropagation();_listDeleteConfirmId='${list.id}';_listInviteTargetId=null;renderListsSection()"
           style="background:none;border:none;color:var(--muted);font-size:18px;line-height:1;cursor:pointer;padding:6px 8px;margin:-6px -4px" title="${isOwner ? t('list_delete') : t('list_leave')}">${isOwner ? '×' : '↩'}</button>
       </div>`;
@@ -14168,9 +14201,9 @@ async function toggleAppInvite() {
     <div style="font-size:11px;color:var(--muted);margin-bottom:10px">${t('invite_connect_hint')}</div>
     <div style="display:flex;gap:8px">
       <button data-act="share"
-        style="flex:2;padding:9px;border-radius:8px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;font-weight:600">${t('share_invite')}</button>
+        style="flex:2;padding:9px;border-radius:8px;background:var(--primary);border:none;color:#111;font-family:var(--font-display);font-size:13px;letter-spacing:1px;cursor:pointer;font-weight:600">${t('share_invite')}</button>
       <button data-act="copy"
-        style="flex:1;padding:9px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${t('copy')}</button>
+        style="flex:1;padding:9px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;font-family:var(--font-text)">${t('copy')}</button>
     </div>`;
   _wireShareButtons(panel, url, msg);
   panel.style.display = 'block';
@@ -14562,7 +14595,7 @@ function _askFriendLink(name) {
     const ov = document.createElement('div');
     ov.id = 'friend-link-overlay';
     ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
-    const btn = 'min-height:44px;padding:12px;border-radius:10px;font-size:14px;font-family:\'DM Sans\',\'Noto Sans Georgian\',sans-serif;cursor:pointer';
+    const btn = 'min-height:44px;padding:12px;border-radius:10px;font-size:14px;font-family:var(--font-text);cursor:pointer';
     const nm = () => name;
     ov.innerHTML = `
       <div style="background:#1a1a2a;border-radius:16px;padding:28px 24px;max-width:340px;width:100%;text-align:center">
@@ -14618,9 +14651,9 @@ async function _loadInviteLink(listId) {
       <div style="font-size:10px;color:var(--muted);margin-bottom:10px">${t('invite_valid_48')}</div>
       <div style="display:flex;gap:8px">
         <button data-act="share"
-          style="flex:2;padding:9px;border-radius:8px;background:var(--accent);border:none;color:var(--on-accent);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer">${t('list_invite_send')}</button>
+          style="flex:2;padding:9px;border-radius:8px;background:var(--accent);border:none;color:var(--on-accent);font-family:var(--font-display);font-size:13px;letter-spacing:1px;cursor:pointer">${t('list_invite_send')}</button>
         <button data-act="copy"
-          style="flex:1;padding:9px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${t('copy')}</button>
+          style="flex:1;padding:9px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text);font-size:12px;cursor:pointer;font-family:var(--font-text)">${t('copy')}</button>
       </div>`;
     _wireShareButtons(el, url, msg);
   } catch(e) { if (el) el.innerHTML = `<div style="font-size:12px;color:#f87171">${escapeHtml(e.message)}</div>`; }
@@ -14685,11 +14718,11 @@ function _showJoinConfirm(token, listId, listName) {
   const safeName = escapeJsAttr(listName);
   ov.innerHTML = `<div style="background:var(--surface2);border-radius:18px;padding:26px 22px;max-width:320px;width:100%;text-align:center">
     <div style="margin-bottom:12px;color:var(--muted)">${icon('list-checks', 32)}</div>
-    <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:22px;margin-bottom:6px">${t('join_list_q')} "${escapeHtml(listName)}"?</div>
+    <div style="font-family:var(--font-display);font-size:22px;margin-bottom:6px">${t('join_list_q')} "${escapeHtml(listName)}"?</div>
     <div style="font-size:13px;color:var(--muted);margin-bottom:22px">${t('join_invited_sub')}</div>
     <div style="display:flex;gap:10px">
       <button onclick="_confirmJoin('${encodeURIComponent(token)}','${listId}','${safeName}')"
-        style="flex:1;padding:13px;border-radius:10px;background:var(--accent);border:none;color:var(--on-accent);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:16px;cursor:pointer;letter-spacing:1px">${t('inv_join_list')}</button>
+        style="flex:1;padding:13px;border-radius:10px;background:var(--accent);border:none;color:var(--on-accent);font-family:var(--font-display);font-size:16px;cursor:pointer;letter-spacing:1px">${t('inv_join_list')}</button>
       <button onclick="document.getElementById('join-confirm-overlay').remove()"
         style="flex:1;padding:13px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--muted);font-size:14px;cursor:pointer">${t('inv_decline')}</button>
     </div>
@@ -14750,7 +14783,7 @@ async function _listInviteSearch(query, listId) {
     // закрывала только '"', а '<' и '&' и id списка шли в атрибут как есть.
     res.innerHTML = hits.map(u =>
       `<button data-uid="${escapeHtml(u.id)}" data-name="${escapeHtml(u.display_name||u.email||'?')}" onclick="_doInviteToList('${escapeJsAttr(listId)}',this)"
-        style="display:block;width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;padding:8px 12px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif;margin-bottom:4px">${escapeHtml(u.display_name||u.email||'?')}</button>`
+        style="display:block;width:100%;text-align:left;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;padding:8px 12px;cursor:pointer;font-family:var(--font-text);margin-bottom:4px">${escapeHtml(u.display_name||u.email||'?')}</button>`
     ).join('');
   } catch(e) {
     // Say that the search broke. Blanking the box made a broken RPC look like an empty
@@ -14884,7 +14917,7 @@ function openListPicker(movie, status, callback = null) {
   if (opts) opts.innerHTML = `
     <button class="list-picker-opt" style="${isPersonalActive && !callback ? activeStyle : ''}" onclick="_onListPicked(null)">
       <div style="display:flex;align-items:center;gap:6px">
-        <div style="font-size:14px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">${escapeHtml(_personalListName())}</div>
+        <div style="font-size:14px;font-family:var(--font-display);letter-spacing:0.5px">${escapeHtml(_personalListName())}</div>
         ${isPersonalActive && !callback ? '<span style="font-size:10px;color:var(--accent-text);background:color-mix(in srgb, var(--accent) 8%, transparent);padding:1px 7px;border-radius:10px">'+t('tag_active')+'</span>' : ''}
       </div>
       <div style="font-size:11px;color:var(--muted);margin-top:2px">${t("lbl_personal")}</div>
@@ -14893,7 +14926,7 @@ function openListPicker(movie, status, callback = null) {
       const isActive = !callback && _activeListId === l.id;
       return `<button class="list-picker-opt" style="${isActive ? activeStyle : ''}" onclick="_onListPicked('${l.id}')">
         <div style="display:flex;align-items:center;gap:6px">
-          <div style="font-size:14px;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">${escapeHtml(l.name)}</div>
+          <div style="font-size:14px;font-family:var(--font-display);letter-spacing:0.5px">${escapeHtml(l.name)}</div>
           ${isActive ? '<span style="font-size:10px;color:var(--accent-text);background:color-mix(in srgb, var(--accent) 8%, transparent);padding:1px 7px;border-radius:10px">'+t('tag_active')+'</span>' : ''}
         </div>
         <div style="font-size:11px;color:var(--muted);margin-top:2px">${l.memberCount ? l.memberCount + ' ' + _membersWord(l.memberCount) : t(l.role === 'owner' ? 'role_owner' : 'role_member')}</div>
@@ -14913,9 +14946,9 @@ function _renderListPickerNewRow() {
     row.innerHTML = `
       <div style="display:flex;gap:6px">
         <input id="list-picker-new-input" type="text" placeholder="${escapeHtml(t('ph_new_list'))}" data-i18n-ph="ph_new_list" maxlength="40"
-          style="flex:1;padding:9px 11px;border-radius:8px;border:1px solid var(--accent-border);background:color-mix(in srgb, var(--accent) 8%, transparent);color:var(--text);font-size:13px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;outline:none"
+          style="flex:1;padding:9px 11px;border-radius:8px;border:1px solid var(--accent-border);background:color-mix(in srgb, var(--accent) 8%, transparent);color:var(--text);font-size:13px;font-family:var(--font-text);outline:none"
           onkeydown="if(event.key==='Enter')_createListFromPicker();if(event.key==='Escape'){_listPickerNewMode=false;_renderListPickerNewRow()}">
-        <button onclick="_createListFromPicker()" style="padding:9px 14px;border-radius:8px;border:none;background:var(--accent);color:var(--on-accent);font-size:12px;cursor:pointer;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;letter-spacing:0.5px">${t("create")}</button>
+        <button onclick="_createListFromPicker()" style="padding:9px 14px;border-radius:8px;border:none;background:var(--accent);color:var(--on-accent);font-size:12px;cursor:pointer;font-family:var(--font-display);letter-spacing:0.5px">${t("create")}</button>
       </div>`;
     setTimeout(() => document.getElementById('list-picker-new-input')?.focus(), 30);
   } else {
@@ -15378,12 +15411,12 @@ function _renderChatDetail(partnerId) {
     <div style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;row-gap:8px;padding:4px 0 14px">
       <button class="inv-chat-back" onclick="closeChat()">←</button>
       ${_avatarMarkup(_chatViewPartnerId, partnerName, 38)}
-      <div style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:18px;letter-spacing:1px">${escapeHtml(partnerName)}</div>
+      <div style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--font-display);font-size:18px;letter-spacing:1px">${escapeHtml(partnerName)}</div>
       <button onclick="reportConversation('${escapeJsAttr(partnerName)}','${escapeJsAttr(partnerId)}')" title="${t('report')}"
-        style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:5px 10px;font-size:12px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:5px;flex-shrink:0">
+        style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:5px 10px;font-size:12px;font-family:var(--font-text);cursor:pointer;display:inline-flex;align-items:center;gap:5px;flex-shrink:0">
         ${icon('triangle-alert',13)}${t('report')}</button>
       <button onclick="confirmBlockUser('${escapeJsAttr(_chatViewPartnerId)}','${escapeJsAttr(partnerName)}')" title="${t('block')}"
-        style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:5px 10px;font-size:12px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:5px;margin-left:6px">
+        style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:5px 10px;font-size:12px;font-family:var(--font-text);cursor:pointer;display:inline-flex;align-items:center;gap:5px;margin-left:6px">
         ${icon('x',13)}${t('block')}</button>
     </div>
     <div class="card-list">${sorted.map(inv => _renderInvCard(inv)).join("")}</div>`;
@@ -15479,11 +15512,11 @@ function _renderListInvCard(inv) {
     <div style="display:flex;gap:11px;align-items:center">
       <div style="width:46px;height:66px;border-radius:10px;background:var(--accent-soft);border:1px solid color-mix(in srgb, var(--accent) 25%, transparent);display:flex;align-items:center;justify-content:center;flex-shrink:0">${icon('list-checks', 22)}</div>
       <div style="flex:1;min-width:0">
-        <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;line-height:1.2">${escapeHtml(inv.title || t('inv_list_fallback'))}</div>
+        <div style="font-family:var(--font-display);font-size:15px;line-height:1.2">${escapeHtml(inv.title || t('inv_list_fallback'))}</div>
         <div style="font-size:11px;margin-top:3px">${statusLine}</div>
         ${isPending ? `<div style="display:flex;gap:8px;margin-top:8px;position:relative;z-index:2" onclick="event.stopPropagation()">
-          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','accepted')" style="padding:6px 14px;border-radius:6px;background:var(--accent);border:none;color:var(--on-accent);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">${t('inv_join_list')}</button>
-          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','declined')" style="padding:6px 14px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--muted);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">✕ ${t('inv_decline')}</button>
+          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','accepted')" style="padding:6px 14px;border-radius:6px;background:var(--accent);border:none;color:var(--on-accent);font-family:var(--font-display);font-size:12px;cursor:pointer;letter-spacing:1px">${t('inv_join_list')}</button>
+          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','declined')" style="padding:6px 14px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--muted);font-family:var(--font-display);font-size:12px;cursor:pointer;letter-spacing:1px">✕ ${t('inv_decline')}</button>
         </div>` : ''}
       </div>
       <button onclick="event.stopPropagation();_armDeleteInvite('${inv.id}', this)" class="hist-del" style="flex-shrink:0;padding:6px 8px;align-self:flex-start;margin-top:2px">${icon('x', 16)}</button>
@@ -15517,7 +15550,7 @@ function _renderInvCard(inv) {
       <div style="flex:1;min-width:0">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
           <div>
-            <div style="font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:15px;line-height:1.2">${escapeHtml(inv.title)}${inv.year ? ` (${inv.year})` : ""}</div>
+            <div style="font-family:var(--font-display);font-size:15px;line-height:1.2">${escapeHtml(inv.title)}${inv.year ? ` (${inv.year})` : ""}</div>
             <div style="font-size:11px;margin-top:2px;display:flex;align-items:center;flex-wrap:wrap;gap:2px">
               ${isReceived ? _receivedStatusHTML(inv) : _sentStatusHTML(inv)}
               ${msgBadge}
@@ -15528,8 +15561,8 @@ function _renderInvCard(inv) {
         </div>
         ${inv.message ? `<div style="color:#aaa;font-size:12px;font-style:italic;margin-top:4px">"${escapeHtml(inv.message)}"</div>` : ""}
         ${isPending ? `<div style="display:flex;gap:8px;margin-top:8px;position:relative;z-index:2" onclick="event.stopPropagation()">
-          <button onclick="event.stopPropagation();acceptFilmInvite('${inv.id}')" style="padding:6px 14px;border-radius:6px;background:var(--primary);border:none;color:#111;font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">+ ${t('inv_add_to_list')}</button>
-          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','declined')" style="padding:6px 14px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--muted);font-family:'Bebas Neue', 'Oswald','Noto Sans Georgian',-apple-system,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px">✕ ${t('inv_decline')}</button>
+          <button onclick="event.stopPropagation();acceptFilmInvite('${inv.id}')" style="padding:6px 14px;border-radius:6px;background:var(--primary);border:none;color:#111;font-family:var(--font-display);font-size:12px;cursor:pointer;letter-spacing:1px">+ ${t('inv_add_to_list')}</button>
+          <button onclick="event.stopPropagation();respondInviteById('${inv.id}','declined')" style="padding:6px 14px;border-radius:6px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--muted);font-family:var(--font-display);font-size:12px;cursor:pointer;letter-spacing:1px">✕ ${t('inv_decline')}</button>
         </div>` : ""}
       </div>
     </div>
@@ -17434,7 +17467,7 @@ const ImportProgress = {
     ov.id = 'import-progress-overlay';
     ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9998;display:flex;align-items:center;justify-content:center;padding:24px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)';
     ov.innerHTML = `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:18px;padding:24px 22px;max-width:320px;width:100%;text-align:center">
-      <div id="ip-title" style="font-family:'Bebas Neue','Oswald','Noto Sans Georgian',sans-serif;font-size:20px;letter-spacing:1px;margin-bottom:10px">${escapeHtml(title)}</div>
+      <div id="ip-title" style="font-family:var(--font-display);font-size:20px;letter-spacing:1px;margin-bottom:10px">${escapeHtml(title)}</div>
       <div id="ip-msg" style="font-size:13px;color:var(--muted);line-height:1.5"></div>
       <div id="ip-barwrap" style="height:6px;background:rgba(255,255,255,0.08);border-radius:4px;margin-top:16px;margin-bottom:4px;position:relative;display:none">
         <div id="ip-bar" style="height:100%;width:0%;background:var(--primary);border-radius:4px;transition:width .2s ease"></div>
@@ -17446,10 +17479,10 @@ const ImportProgress = {
         </div>
       </div>
       <div id="ip-actions" style="margin-top:18px;display:none">
-        <button onclick="ImportProgress.close()" style="width:100%;padding:11px;border-radius:10px;background:var(--accent);border:none;color:var(--on-accent);font-size:14px;font-family:'DM Sans','Noto Sans Georgian',sans-serif;cursor:pointer">${escapeHtml(t('got_it'))}</button>
+        <button onclick="ImportProgress.close()" style="width:100%;padding:11px;border-radius:10px;background:var(--accent);border:none;color:var(--on-accent);font-size:14px;font-family:var(--font-text);cursor:pointer">${escapeHtml(t('got_it'))}</button>
       </div>
       <div id="ip-cancel-wrap" style="margin-top:14px">
-        <button onclick="ImportProgress.cancel()" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline;font-family:'DM Sans','Noto Sans Georgian',sans-serif">${escapeHtml(t('cancel'))}</button>
+        <button onclick="ImportProgress.cancel()" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline;font-family:var(--font-text)">${escapeHtml(t('cancel'))}</button>
       </div>
     </div>`;
     document.body.appendChild(ov);
@@ -17820,7 +17853,7 @@ async function _renderBannerPNG(subtitle) {
     }
     ctx.textBaseline = 'alphabetic';
     try { ctx.letterSpacing = '2px'; } catch(e) {}
-    ctx.font = '46px "Bebas Neue", "Oswald", sans-serif';
+    ctx.font = '46px "Bebas Neue", sans-serif';
     ctx.fillStyle = '#F5C518';     // CINE — brand gold
     ctx.fillText('CINE', textX, baseline);
     const cineW = ctx.measureText('CINE').width;
@@ -17828,7 +17861,10 @@ async function _renderBannerPNG(subtitle) {
     ctx.fillText('MAIL', textX + cineW + 2, baseline);
     if (subtitle) {
       try { ctx.letterSpacing = '0px'; } catch(e) {}
-      ctx.font = '15px "DM Sans", -apple-system, sans-serif';
+      // Канвас не понимает var(): набор --font-text выписан целиком. Партнёра грузим до рисования,
+      // иначе подпись на русском или грузинском легла бы системным шрифтом.
+      ctx.font = '15px "DM Sans", "Geist", "Noto Sans Georgian", "IBM Plex Sans Hebrew", "Noto Sans JP", system-ui';
+      try { await document.fonts.load(ctx.font, subtitle); } catch(e) {}
       ctx.fillStyle = '#C9C9D2';   // the app's own muted grey; #E9DEFB was a lilac tint left over from the purple banner
       ctx.fillText(subtitle, textX, 68);
     }
@@ -18447,7 +18483,7 @@ async function loadFeedbackReplies() {
     el.style.display="block";
     el.innerHTML=`<div style="color:var(--muted);font-size:12px;padding:8px 0;text-align:center">
       ${t("fb_history_failed")} &nbsp;
-      <button onclick="loadFeedbackReplies()" style="background:none;border:1px solid var(--border);color:var(--muted);font-size:11px;padding:3px 8px;border-radius:6px;cursor:pointer;font-family:'DM Sans','Noto Sans Georgian',sans-serif">↺ ${t("retry")}</button>
+      <button onclick="loadFeedbackReplies()" style="background:none;border:1px solid var(--border);color:var(--muted);font-size:11px;padding:3px 8px;border-radius:6px;cursor:pointer;font-family:var(--font-text)">↺ ${t("retry")}</button>
     </div>`;
   }
 }

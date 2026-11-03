@@ -1,0 +1,71 @@
+/* Partner faces for scripts DM Sans and Bebas Neue do not cover.
+ *
+ * Shared with Cinemail: this block must stay byte-identical in both -mail apps
+ * (portfolio CLAUDE.md, "fonts must not vary"). Ask the other app's session
+ * before changing anything here.
+ *
+ * Chosen by _Tastebook and approved by Dafa on 3 Nov 2026 (_Tastebook/rounds/
+ * type/partners.html): Geist for Cyrillic text, Sofia Sans Extra Condensed 700
+ * for Cyrillic headings, Noto Sans Georgian, IBM Plex Sans Hebrew, Noto Sans JP.
+ * All OFL; the licences sit beside the files. Self-hosted, from Google Fonts'
+ * own subsets, each with its unicode-range kept, so a Latin page downloads
+ * none of these files.
+ */
+
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('geist-cyrillic-ext-300-700.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('geist-cyrillic-300-700.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'IBM Plex Sans Hebrew';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('ibm-plex-sans-hebrew-hebrew-400.woff2') format('woff2');
+  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+@font-face {
+  font-family: 'IBM Plex Sans Hebrew';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('ibm-plex-sans-hebrew-hebrew-700.woff2') format('woff2');
+  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+@font-face {
+  font-family: 'Noto Sans Georgian';
+  font-style: normal;
+  font-weight: 400 700;
+  font-stretch: 62.5% 100%;
+  font-display: swap;
+  src: url('noto-sans-georgian-georgian-400-700.woff2') format('woff2');
+  unicode-range: U+0589, U+10A0-10FF, U+1C90-1CBA, U+1CBD-1CBF, U+205A, U+2D00-2D2F, U+2E31;
+}
+@font-face {
+  font-family: 'Sofia Sans Extra Condensed';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('sofia-sans-extra-condensed-cyrillic-ext-700.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Extra Condensed';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('sofia-sans-extra-condensed-cyrillic-700.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
