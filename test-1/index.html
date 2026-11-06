@@ -484,13 +484,16 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 /* ── Cards ──────────────────────────────────────────────────────────── */
 .card-list { display: flex; flex-direction: column; gap: 9px; }
 
+/* СТРОКА В ПОЛТОРА РАЗА НИЖЕ (Dafa, 6 нояб: в выдаче поиска строка слишком высокая). Высоту
+   задавал не постер, а три кнопки столбиком: 95px из 119 (замер на test-1, 375px). Кнопки
+   встали в ряд, постер 40x60 вместо 56x80, поля 8/10: строка 78px. */
 .card {
   background: rgba(255,255,255,0.04);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 11px;
+  padding: 8px 10px;
   display: flex;
-  gap: 11px;
+  gap: 10px;
   cursor: default;
   transition: border-color 0.15s, background 0.15s;
 }
@@ -530,12 +533,16 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   font-size: 16px;
   letter-spacing: 0.5px;
   line-height: 1.2;
+  /* Колонка текста стала уже (кнопки в ряд): длинное название - две строки и многоточие. */
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .card-meta { color: var(--muted); font-size: 11px; margin-top: 2px; }
 .card-hint { color: var(--muted); font-size: 11px; margin-top: 5px; }
 
 /* ── Card action buttons ────────────────────────────────────────────── */
-.card-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; margin-left: 6px; align-items: flex-end; }
+/* В ряд. Кнопка 32px шириной, промежуток 12: шаг 44, и 44px-полы соседних кнопок не налезают
+   друг на друга (столбиком с шагом 34 налезали на 10px). */
+.card-actions { display: flex; flex-direction: row; gap: 12px; flex-shrink: 0; margin-left: 4px; align-items: center; }
 
 .btn-watchlist, .btn-watched {
   height: 24px;
@@ -1000,12 +1007,14 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 }
 .coach-got:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); }
 .coach-arrow {
-  position: absolute; right: -10px;
-  width: 10px; height: 20px;
+  position: absolute;
+  width: 20px; height: 10px;
   display: flex; align-items: center; justify-content: center;
-  transform: translateY(-50%);
+  transform: translateX(-50%);
 }
-@keyframes coach-in { from { opacity: 0; transform: translateX(6px); } to { opacity: 1; transform: none; } }
+.coach-arrow.up { top: -10px; }
+.coach-arrow.down { bottom: -10px; }
+@keyframes coach-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 .btn-modal-close { min-height: 44px;
   flex: 1; min-width: 80px; padding: 10px;
   border-radius: 9px; background: rgba(255,255,255,0.05);
@@ -3127,7 +3136,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.13-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.14-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -7301,19 +7310,20 @@ function _maybeShowSearchCoach() {
       `<div class="coach-row">${_icoShare()}<span>${t('act_share')}</span></div>` +
       `<button class="coach-got">${t('picks_hint_got')}</button>`;
     document.body.appendChild(bub);
+    // Кнопки стоят в ряд (6 нояб), поэтому облако - под ними, а клювы смотрят вверх, на каждую.
+    // Не помещается снизу - встаёт над рядом, клювами вниз.
     const bw = bub.offsetWidth, bh = bub.offsetHeight;
-    let left = r.left - bw - 14;
-    if (left < 8) left = 8;
-    let top = Math.max(8, Math.min(r.top + r.height / 2 - bh / 2, window.innerHeight - bh - 8));
+    const below = r.bottom + 12 + bh <= window.innerHeight - 8;
+    const left = Math.max(8, Math.min(r.right - bw, window.innerWidth - bw - 8));
+    const top = below ? r.bottom + 12 : Math.max(8, r.top - 12 - bh);
     bub.style.left = left + 'px';
     bub.style.top = top + 'px';
-    // One beak per action button, each aligned to that button's vertical center
     target.querySelectorAll('.act-btn-ico').forEach(btn => {
       const br = btn.getBoundingClientRect();
       const arrow = document.createElement('span');
-      arrow.className = 'coach-arrow';
-      arrow.style.top = Math.max(10, Math.min(br.top + br.height / 2 - top, bh - 10)) + 'px';
-      arrow.innerHTML = '<svg width="8" height="14" viewBox="0 0 8 14" xmlns="http://www.w3.org/2000/svg"><polygon points="0,0 8,7 0,14" style="fill:color-mix(in srgb, var(--accent) 90%, transparent)"/></svg>';
+      arrow.className = 'coach-arrow ' + (below ? 'up' : 'down');
+      arrow.style.left = Math.max(10, Math.min(br.left + br.width / 2 - left, bw - 10)) + 'px';
+      arrow.innerHTML = `<svg width="14" height="8" viewBox="0 0 14 8" xmlns="http://www.w3.org/2000/svg"><polygon points="${below ? '0,8 7,0 14,8' : '0,0 7,8 14,0'}" style="fill:color-mix(in srgb, var(--accent) 90%, transparent)"/></svg>`;
       bub.appendChild(arrow);
     });
     const dismiss = () => {
@@ -7664,8 +7674,8 @@ function movieCardHTML(m, why) {
   return `
     <div>
       <div class="card" data-card-tmdb="${escapeHtml(String(m.tmdbID || m.id || ''))}" style="border-radius:${topRadius};align-items:center">
-        <div onclick="${idVal ? `openDetail('${escapeJsAttr(idVal)}','${escapeJsAttr(typeVal)}')` : ''}" style="display:flex;gap:11px;flex:1;min-width:0;cursor:${idVal?'pointer':'default'}">
-          ${posterHTML(m.Poster, m.Title)}
+        <div onclick="${idVal ? `openDetail('${escapeJsAttr(idVal)}','${escapeJsAttr(typeVal)}')` : ''}" style="display:flex;gap:10px;flex:1;min-width:0;cursor:${idVal?'pointer':'default'}">
+          ${posterHTML(m.Poster, m.Title, 40, 60)}
           <div class="card-body">
             <div class="card-title">${escapeHtml(m.Title||"")}</div>
             <div class="card-meta">${escapeHtml(String(m.Year||""))}${rating}${genre}${mediaTag}</div>
@@ -9166,15 +9176,15 @@ async function openPerson(name, personId) {
           const role = r.character || r.job || "";
           return `
           <div class="card" style="align-items:center">
-            <div onclick="_transitionToDetail('${escapeJsAttr(m.tmdbID)}','${escapeJsAttr(m.type)}')" style="display:flex;gap:11px;flex:1;min-width:0;cursor:pointer">
-              ${posterHTML(m.Poster, m.Title, 56, 80, true)}
+            <div onclick="_transitionToDetail('${escapeJsAttr(m.tmdbID)}','${escapeJsAttr(m.type)}')" style="display:flex;gap:10px;flex:1;min-width:0;cursor:pointer">
+              ${posterHTML(m.Poster, m.Title, 40, 60, true)}
               <div class="card-body">
                 <div class="card-title">${escapeHtml(m.Title || "")}</div>
                 <div class="card-meta">${m.Year}${m.Rating ? ` · ★ ${m.Rating}` : ""}${m.type === "tv" ? " · TV" : ""}</div>
                 ${role ? `<div style="color:var(--muted);font-size:11px;margin-top:2px;font-style:italic">${escapeHtml(role)}</div>` : ""}
               </div>
             </div>
-            <div data-person-act="${escapeHtml(m.tmdbID)}" data-type="${m.type === 'tv' ? 'tv' : 'movie'}" data-key="${key}" style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;margin-left:6px;align-items:stretch">${_personActsHTML(key, status)}</div>
+            <div class="card-actions" data-person-act="${escapeHtml(m.tmdbID)}" data-type="${m.type === 'tv' ? 'tv' : 'movie'}" data-key="${key}">${_personActsHTML(key, status)}</div>
           </div>`;
         }).join("")}
       </div>
