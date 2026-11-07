@@ -240,6 +240,10 @@ button {
    страницу: горизонтальной прокрутки нет ни у кого. clip, а не hidden: не делает элемент
    прокручиваемым и не трогает вертикаль. */
 html, body { overscroll-behavior-x: none; }
+/* НИКАКОГО СИНЕГО КВАДРАТА ПРИ НАЖАТИИ (Dafa, Android, 7 нояб). Это подсветка касания Chrome на
+   Android, которая мигала поверх кнопки до нашей. Ответ на нажатие уже даёт .is-pressed (ниже),
+   поэтому системная подсветка лишняя. Свойство наследуется, так что одно правило покрывает всё. */
+html { -webkit-tap-highlight-color: transparent; }
 html, body, .overlay, .modal, .modal-sheet, #account-modal-sheet, #inbox-list { overflow-x: clip; }
 /* An invisible 44x44 floor around any control that is visually smaller. Layout does
    not move: the pseudo-element is absolutely positioned and centred on the button, so
@@ -542,7 +546,10 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 /* ── Card action buttons ────────────────────────────────────────────── */
 /* В ряд. Кнопка 32px шириной, промежуток 12: шаг 44, и 44px-полы соседних кнопок не налезают
    друг на друга (столбиком с шагом 34 налезали на 10px). */
-.card-actions { display: flex; flex-direction: row; gap: 12px; flex-shrink: 0; margin-left: 4px; align-items: center; }
+/* К ВЕРХНЕМУ ПРАВОМУ УГЛУ (Dafa, Android, 7 нояб). По центру ряд ездил вместе с высотой строки:
+   название в одну строку и в две ставило кнопки на разную высоту, и столбец под пальцем ломался.
+   Сверху они стоят на одной линии с верхом постера в каждой строке. */
+.card-actions { display: flex; flex-direction: row; gap: 12px; flex-shrink: 0; margin-left: 4px; align-items: center; align-self: flex-start; }
 
 .btn-watchlist, .btn-watched {
   height: 24px;
@@ -3136,7 +3143,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.14-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.15-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -7921,12 +7928,30 @@ async function doSearch() {
     // «dinosaurs» прочитан целиком и остаётся подборкой, хотя «Dinosaur» есть.
     const _near = (a, b) => !!a && !!b && a !== b && (((b.startsWith(a) || a.startsWith(b))
       && Math.min(a.length, b.length) / Math.max(a.length, b.length) >= 0.8) || _similar(a, b) >= 0.8);
+    // КУСОК ИЗВЕСТНОГО НАЗВАНИЯ - ТОЖЕ ПОИСК ФИЛЬМА (Dafa, Android, 7 нояб). «eternal sunshine» и
+    // «spotless mind» уходили в подборку и списывали нажатие: правило выше ждёт 80% длины, а здесь
+    // 16 знаков из 37 и вовсе середина названия. TMDB фильм находил, подборка его прятала. По-русски
+    // «вечное сияние» находилось только потому, что разбор не понял в нём ни слова. Теперь близко и
+    // так: два слова подряд или больше, целыми словами внутри названия, которое знают все.
+    const _words = x => String(x || '').toLowerCase().normalize('NFD').replace(/\p{M}/gu, '')
+      .split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+    const qw = _words(title);
+    const _inside = x => {
+      const w = _words(x);
+      if (qw.length < 2 || w.length <= qw.length) return false;
+      for (let i = 0; i + qw.length <= w.length; i++) if (qw.every((q, j) => w[i + j] === q)) return true;
+      return false;
+    };
     const nearAll = (strong.length || !tk) ? [] : titles.filter(m => (m.votes || 0) >= 50
-      && [m.Title, m.OrigTitle, m.EnTitle].some(x => _near(tk, _titleKey(x))))
+      && [m.Title, m.OrigTitle, m.EnTitle].some(x => _near(tk, _titleKey(x)) || ((m.votes || 0) >= 1000 && _inside(x))))
       .sort((a, b) => (b.votes || 0) - (a.votes || 0));
     const looseWord = !!c && ((c.restToks || []).length > 0 || (c.toks || []).some((tok, i) =>
       /[\p{L}\p{N}]/u.test(tok) && !(c.chips || []).some(ch => ch.toks.includes(i))));
-    const nearTitle = looseWord && nearAll.some(m => (m.votes || 0) >= 1000);
+    // Тема, которую нашёл только нечёткий индекс TMDB по непрочитанному остатку (kwTrusted false),
+    // словарём не прочитана: «eternal sunshine» стал такой темой, потому что у TMDB есть тег с
+    // названием фильма. Известному названию она уступает так же, как непрочитанное слово.
+    const weakRead = !!c && (c.keywords || []).length > 0 && c.kwTrusted === false;
+    const nearTitle = (looseWord || weakRead) && nearAll.some(m => (m.votes || 0) >= 1000);
     // Непрочитанное движком - в журнал пополнения словаря; точное название - не пробел в нём (#113).
     if (c && !strong.length && !nearTitle) _noteMissingFrom(c);
     // Понял ли разбор что-то СВОЁ, кроме названия. Год при точном названии ("fargo 1996") и
