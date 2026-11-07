@@ -8011,8 +8011,13 @@ async function doSearch() {
     // Почти совпавшие - следом за точными: «scary movie 1» начинается с «Scary Movie».
     const exactIds = new Set(exact.map(m => m.type + ':' + m.id));
     const nearIds = new Set(nearAll.map(m => m.type + ':' + m.id));
-    const ordered = [...exact.slice().sort((a, b) => (b.votes || 0) - (a.votes || 0)),
+    // Точное название, которого почти никто не знает (меньше 50 голосов), встаёт ПОСЛЕ известного
+    // близкого: на «eternal sunshine» четыре фильма с ровно таким названием и 0-2 голосами стояли
+    // выше «Eternal Sunshine of the Spotless Mind» с 16 956 (Dafa, Android, 7 нояб).
+    const exactSorted = exact.slice().sort((a, b) => (b.votes || 0) - (a.votes || 0));
+    const ordered = [...exactSorted.filter(m => (m.votes || 0) >= 50),
                      ...nearAll.filter(m => !exactIds.has(m.type + ':' + m.id)),
+                     ...exactSorted.filter(m => (m.votes || 0) < 50),
                      ...titles.filter(m => !exactIds.has(m.type + ':' + m.id) && !nearIds.has(m.type + ':' + m.id))];
     // Подборка всё же идёт - найденное по названию над ней не пропадает.
     const showTitles = picksRun ? (strong.length ? strong : nearAll).slice(0, 3) : ordered;
