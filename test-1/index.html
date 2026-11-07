@@ -860,6 +860,14 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   width: 100%;
   max-width: 380px;
   animation: slideUp 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+  /* НЕ ВЫШЕ ЭКРАНА (Dafa, iPhone, 7 нояб). Окно «Поделиться» прижато к низу, и всё, что не
+     помещалось, уходило ВВЕРХ, где прокрутки нет: название фильма оставалось за краем, а попытка
+     промотать к нему пружинила обратно на первого друга. Теперь окно не выше видимой части экрана
+     (минус 20px поля сверху и снизу) и прокручивается само. Окна со своей высотой её сохраняют. */
+  max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .modal-handle {
@@ -1994,8 +2002,13 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   cursor: zoom-out;
 }
 #lightbox-overlay.visible { opacity: 1; }
+/* РАЗМЕР ИЗВЕСТЕН С ПЕРВОГО КАДРА (Dafa, iPhone, 7 нояб). Рамка подстраивалась под картинку, а
+   большая картинка ещё грузилась: рамка была крошечной посреди экрана, и крестик закрытия, который
+   стоит в её углу, мигал посередине, пока постер не вырастал. Теперь рамка сразу 2:3 нужного
+   размера, а пока грузится большая картинка, в ней видна маленькая, уже загруженная в карточке. */
 #lightbox-img {
-  max-width: min(85vw, 340px);
+  width: min(85vw, 340px, calc(85vh * 2 / 3));
+  aspect-ratio: 2 / 3;
   max-height: 85vh;
   border-radius: 12px;
   object-fit: contain;
@@ -2080,6 +2093,14 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
    problem. The blanket button::after floor used elsewhere does not reach this one.
    Height comes from min-height, not from padding, so the glyph and label do not move. */
 .feedback-btn { min-height: 44px; min-width: 44px; justify-content: center; }
+/* ПОДПИСЬ В ОДНУ СТРОКУ ИЛИ НИКАК (Dafa, iPhone, текст 125%, 7 нояб). При 125% страница ~300px
+   шириной, «Обратная связь» переносилась на две строки по центру, и конвертик оказывался в 8px от
+   логотипа и в 16-28px от своей подписи. В одну строку при 300px она не помещается: аватар уходит
+   за правое поле (замер). Уже 360px - только конвертик; подпись остаётся для экранного диктора. */
+.fb-label { white-space: nowrap; }
+@media (max-width: 359px) {
+  .fb-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+}
 /* The logo is 12px tall, so the link around it needs a hit floor like every other
    control. Width is left to the image rather than stretched across the panel: a 270px
    invisible target beside other links is how neighbours start catching each other's taps. */
@@ -2789,7 +2810,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
             <polyline points="2,4 12,13 22,4"/>
           </svg>
         </span>
-        <span style="color:var(--muted);line-height:1" data-i18n="feedback">Feedback</span>
+        <span class="fb-label" style="color:var(--muted);line-height:1" data-i18n="feedback">Feedback</span>
       </button>
       <button class="avatar-btn" id="btn-avatar" onclick="openAccount()" title="Account">U</button>
     </div>
@@ -3143,7 +3164,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.15-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.16-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -8172,7 +8193,15 @@ async function _didYouMean(q) {
     if (seen.has(k)) continue;
     seen.add(k);
     const names = [x.title, x.name, x.original_title, x.original_name].filter(Boolean);
-    const score = Math.max(...names.map(nm => _similar(key, _titleKey(nm))));
+    // ОПЕЧАТКА В НАЧАЛЕ ИЗВЕСТНОГО НАЗВАНИЯ (Dafa, iPhone, 7 нояб): «вечеое сияние» предлагало
+    // «Вечное сияние» 1989 года, но не «Вечное сияние чистого разума», потому что целиком длинное
+    // название с набранным не похоже. У фильма, который знают все (от тысячи голосов), сравнивается
+    // и начало названия той же длины, что набрано.
+    const pre = (x.vote_count || 0) >= 1000 ? Math.max(0, ...names.map(nm => {
+      const tk = _titleKey(nm);
+      return tk.length > key.length ? _similar(key, tk.slice(0, key.length)) : 0;
+    })) : 0;
+    const score = Math.max(pre, ...names.map(nm => _similar(key, _titleKey(nm))));
     if (score >= 0.75 && score < 1)
       out.push({ title: x.title || x.name, year: (x.release_date || x.first_air_date || '').slice(0, 4), score, votes: x.vote_count || 0 });
   }
@@ -9027,7 +9056,13 @@ function openLightbox(url, title) {
   const ov = document.getElementById("lightbox-overlay");
   const img = document.getElementById("lightbox-img");
   const ttl = document.getElementById("lightbox-title");
-  img.src = hiRes;
+  img.src = url;
+  img.dataset.want = hiRes;
+  if (hiRes !== url) {
+    const hi = new Image();
+    hi.onload = () => { if (img.dataset.want === hiRes) img.src = hiRes; };
+    hi.src = hiRes;
+  }
   ttl.textContent = title || "";
   ov.style.display = "flex";
   requestAnimationFrame(() => { requestAnimationFrame(() => { ov.classList.add("visible"); }); });
