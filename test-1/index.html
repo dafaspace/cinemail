@@ -3164,7 +3164,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.16-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.17-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -7368,6 +7368,9 @@ function _maybeShowSearchCoach() {
 }
 
 // ── UI helpers ────────────────────────────────────────────────────────────────
+// lightbox - только в карточке фильма (Dafa, 7 нояб). В строках списков нажатие на постер открывает
+// карточку, как и нажатие на строку: постер 40x60 уже 44px и как отдельная цель мелок, а в
+// библиотеке и фильмографии он один открывал увеличенный постер, в поиске - карточку.
 function posterHTML(src, title, w=56, h=80, lightbox=false) {
   const s = `width:${w}px;height:${h}px;flex-shrink:0;border-radius:8px;overflow:hidden;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:22px`;
   if (src && src !== "N/A") {
@@ -8106,33 +8109,57 @@ async function _runQueryPicks(raw, c, showTitles, gen, free) {
   // Тот же текст запроса на этой неделе тоже оплачен, даже если движок понял его чуть иначе.
   const rawKey = 'r:' + String(raw).toLowerCase().replace(/\s+/g, ' ').trim();
   // Уточнение оплаченной подборки (_pickChainJoin) не списывается.
-  let spent, freeWhy = null, paidNow = false;
+  // СНАЧАЛА ПОДБОР, ПОТОМ СПИСАНИЕ (Dafa, 7 нояб). Подборка, которой пришлось снять ВСЁ понятое
+  // («eternal sunshine»: «Nothing has all of it. Closest, without…» и «История игрушек 5»), к
+  // запросу отношения не имеет, а нажатие списывалось ещё до подбора. Теперь платный подбор
+  // идёт первым, а списывается, только если от запроса что-то осталось. Ничего не осталось -
+  // экран «По этому ничего нет», нажатие цело. Известно, что нажатий ноль, - подбор не нужен,
+  // сервер скажет это сразу.
+  let spent, freeWhy = null, paidNow = false, chain = null, toPay = false;
+  const outHTML = () => _srchSect(t('search_picks')) + _srchGot(c) + _picksOutHTML();
   if (free) spent = { ok: true };
   else if (_picksPaid(key) || _picksPaid(rawKey)) { spent = { ok: true }; freeWhy = 'repeat'; }
   else if (_pickChainJoin(_pickFacets(c))) { spent = { ok: true }; freeWhy = 'refine'; }
+  else if (_picksRemaining === 0) spent = await _spendPick(key);
   else {
-    // Цепочка открывается до ответа сервера: второй, похожий запрос, набранный, пока идёт
-    // первое списание, - уже уточнение, а не второе списание.
-    const chain = _pickChainStart(_pickFacets(c));
-    spent = await _spendPick(key);
-    if (spent.ok) paidNow = chain != null; else _pickChainDrop(chain);
+    // Цепочка открывается до подбора и списания: второй, похожий запрос, набранный, пока идёт
+    // первый, - уже уточнение, а не второе списание.
+    chain = _pickChainStart(_pickFacets(c));
+    toPay = true;
+    spent = { ok: true };
   }
-  if (spent.ok) { _picksMark(key); _picksMark(rawKey); }
-  if (gen !== _srchGen) return;
+  if (gen !== _srchGen) { if (toPay) _pickChainDrop(chain); return; }
   if (!spent.ok) {
     const box = document.getElementById('srch-picks');
-    if (box) box.innerHTML = _srchSect(t('search_picks')) + _srchGot(c) + _picksOutHTML();
+    if (box) box.innerHTML = outHTML();
     return;
   }
-  const list = await _searchByQuery(raw, 0, c);
-  if (gen !== _srchGen) return;
+  let list;
+  try { list = await _searchByQuery(raw, 0, c); }
+  catch (e) { if (toPay) _pickChainDrop(chain); throw e; }
+  if (gen !== _srchGen) { if (toPay) _pickChainDrop(chain); return; }
+  const none = _srchAllDropped(c, list);
+  if (toPay) {
+    if (none) _pickChainDrop(chain);
+    else {
+      spent = await _spendPick(key);
+      if (spent.ok) paidNow = chain != null; else _pickChainDrop(chain);
+      if (gen !== _srchGen) return;
+      if (!spent.ok) {
+        const box = document.getElementById('srch-picks');
+        if (box) box.innerHTML = outHTML();
+        return;
+      }
+    }
+  }
+  if (!none) { _picksMark(key); _picksMark(rawKey); }
   const read = list._read || null;
   list.slice(0, 7).forEach(m => { m._enr = true; });
   list.forEach(m => { m._relaxed = m._strict ? [] : (c.relaxed || []).slice(); });
   // По номеру И типу (_libKey): фильм 100 не прячется из-за сериала 100 в библиотеке или
   // среди найденного по названию выше (проверка кода 9 окт, #78, остаток в подборках).
   const lib = _libraryKeys(), shownIds = new Set(showTitles.map(x => _libKey(x.id, x.type)));
-  const usable = list.filter(m => !lib.ids.has(_libKey(m.tmdbID || m.id, m.type)) && !lib.titles.has(lib.norm(m.Title)) && !shownIds.has(_libKey(m.id, m.type)));
+  const usable = none ? [] : list.filter(m => !lib.ids.has(_libKey(m.tmdbID || m.id, m.type)) && !lib.titles.has(lib.norm(m.Title)) && !shownIds.has(_libKey(m.id, m.type)));
   _srch = { q: raw, c, buf: usable, shown: 0, press: 0, read, kind: 'q', gen, freeWhy, paidNow,
             seen: new Set([...usable.map(m => _libKey(m.id, m.type)), ...shownIds]), done: _searchWrapped };
   _renderPicks(true);
@@ -8283,6 +8310,16 @@ function _srchDropCandidates(c, n) {
   return out;
 }
 const _srchWithoutLine = (c, k) => `<button type="button" class="srch-line" data-drop="${k}">${icon('search', 18)}<span dir="auto">${escapeHtml(t('search_without').replace('{w}', () => c.chips[k].label))}</span><span class="srch-chev">›</span></button>`;
+
+// Снято ВСЁ, что понято, и ничего не подошло целиком: выдача - просто популярное, к запросу не
+// относится (_runQueryPicks её не показывает и не списывает). Человек при этом не снимается никогда
+// ('allButPerson' оставляет его фильмы), поэтому такая выдача - не «всё снято».
+function _srchAllDropped(c, list) {
+  const r = new Set((c && c.relaxed) || []);
+  const chips = (c && c.chips) || [];
+  if (!r.size || !chips.length || r.has('allButPerson') || (list || []).some(m => m._strict)) return false;
+  return chips.every(ch => (r.has('subject') && ch.kind === 'subject') || (r.has('genre') && ch.kind === 'genre'));
+}
 
 // Что пришлось снять, словами человека. strict - над ослабленным уже стоит то, что подошло
 // целиком, и фраза говорит "только это", а не "ничего".
@@ -9243,7 +9280,7 @@ async function openPerson(name, personId) {
           return `
           <div class="card" style="align-items:center">
             <div onclick="_transitionToDetail('${escapeJsAttr(m.tmdbID)}','${escapeJsAttr(m.type)}')" style="display:flex;gap:10px;flex:1;min-width:0;cursor:pointer">
-              ${posterHTML(m.Poster, m.Title, 40, 60, true)}
+              ${posterHTML(m.Poster, m.Title, 40, 60)}
               <div class="card-body">
                 <div class="card-title">${escapeHtml(m.Title || "")}</div>
                 <div class="card-meta">${m.Year}${m.Rating ? ` · ★ ${m.Rating}` : ""}${m.type === "tv" ? " · TV" : ""}</div>
@@ -9718,7 +9755,7 @@ function renderHistory() {
         return `
         <div class="hist-card ${opStatus==='plan'?'plan':''}" data-movie-id="${item.id}" onclick="${item.tmdbID?`openDetail('${escapeJsAttr(item.tmdbID)}','${escapeJsAttr(item.mediaType||"movie")}')`:''}">
           <div style="display:flex;gap:11px;width:100%">
-            <div class="hist-poster">${item.poster&&item.poster!=="N/A"?`<img src="${escapeHtml(item.poster)}" alt="" class="poster-zoomable" onclick="event.stopPropagation();openLightbox('${escapeJsAttr(item.poster)}','${escapeJsAttr(item.title)}${item.year?' ('+escapeJsAttr(item.year)+')':''}')" onerror="this.parentNode.innerHTML=icon('film',26)"`+`>`:icon('film',22)}</div>
+            <div class="hist-poster">${item.poster&&item.poster!=="N/A"?`<img src="${escapeHtml(item.poster)}" alt="" onerror="this.parentNode.innerHTML=icon('film',26)"`+`>`:icon('film',22)}</div>
             <div style="flex:1;min-width:0">
               <div class="hist-title">${escapeHtml(item.title)}</div>
               <div class="hist-meta">${escapeHtml(item.year ?? '')} · ${escapeHtml(item.date ?? '')}</div>
