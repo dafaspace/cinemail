@@ -380,6 +380,14 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
      own 44, so the space you see is 3px wider than the number here. */
   gap: 24px;
 }
+/* ОЧЕНЬ УЗКИЙ ЭКРАН (Dafa, iPhone, текст 150%, 7 нояб): аватар уходил за правый край. На 250px шапка
+   помещается (замер), значит, у Дафы уже, как при увеличенном масштабе дисплея: 320 / 1.5 = 213.
+   Шапке нужно 32 (поля) + 84 (логотип) + 44 + 24 + 44 = 228. Уже 240px промежуток 12 (полы касания
+   по-прежнему не налезают) и логотип 20px: 202, помещается от 210. */
+@media (max-width: 239px) {
+  .topbar-actions { gap: 12px; }
+  .topbar-logo { font-size: 20px; letter-spacing: 1.5px; }
+}
 
 /* ── Avatar button — yellow as requested ───────────────────────────── */
 .avatar-btn {
@@ -860,15 +868,21 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   width: 100%;
   max-width: 380px;
   animation: slideUp 0.25s cubic-bezier(0.32, 0.72, 0, 1);
-  /* НЕ ВЫШЕ ЭКРАНА (Dafa, iPhone, 7 нояб). Окно «Поделиться» прижато к низу, и всё, что не
-     помещалось, уходило ВВЕРХ, где прокрутки нет: название фильма оставалось за краем, а попытка
-     промотать к нему пружинила обратно на первого друга. Теперь окно не выше видимой части экрана
-     (минус 20px поля сверху и снизу) и прокручивается само. Окна со своей высотой её сохраняют. */
-  max-height: calc(100vh - 40px);
-  max-height: calc(100dvh - 40px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  overflow-y: auto;
-  overscroll-behavior: contain;
 }
+/* ОКНО ВЫШЕ ЭКРАНА ПРОКРУЧИВАЕТСЯ ВМЕСТЕ С ФОНОМ (Dafa, iPhone, 7 нояб). Окно «Поделиться» прижато к
+   низу, и всё, что не помещалось, уходило ВВЕРХ, где прокрутки нет: название фильма оставалось за
+   краем, попытка промотать к нему пружинила обратно на первого друга.
+   v0.71.16 сделала прокручиваемым само окно, и после этого все три окна из кнопок строки при
+   открытии дёргались вверх-вниз (iPhone). Само окно в этот момент едет анимацией slideUp, и
+   прокручиваемый блок под анимацией - единственное, что та сборка поменяла во всех трёх. Замерить в
+   спрятанной панели браузера нельзя: анимации там не идут. Поэтому прокрутка теперь у фона, а окно
+   снова просто едет.
+   Как это работает: auto-отступ сверху у обёртки прижимает окно к низу, пока места хватает. Когда
+   окно выше экрана, отступ становится нулём, окно встаёт от верха, лишнее уходит вниз, и фон его
+   прокручивает. У окна по центру (обратная связь) auto и снизу. */
+.overlay:has(> div > .modal-sheet) { overflow-y: auto; overscroll-behavior: contain; }
+.overlay > div:has(> .modal-sheet) { margin-top: auto; }
+.overlay[style*="align-items:center"] > div:has(> .modal-sheet) { margin-bottom: auto; }
 
 .modal-handle {
   width: 36px; height: 4px;
@@ -890,6 +904,9 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   line-height: 1.15;
   color: var(--text);
 }
+/* Длинное название в карточке заходило под крестик закрытия (Dafa, iPhone, 7 нояб). Замер на 375px:
+   правый край названия 351, крестик начинается с 325. Место под крестик - 36px справа. */
+#detail-content .modal-title { padding-inline-end: 36px; }
 .modal-close {
   background: transparent;
   border: 1px solid rgba(255,255,255,0.2);
@@ -3164,7 +3181,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.17-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.18-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
