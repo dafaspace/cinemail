@@ -1647,11 +1647,12 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 /* ── Backup section ─────────────────────────────────────────────────── */
 .backup-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 10px;
 }
 .btn-backup { min-height: 44px;
-  flex: 1;
+  flex: 1 1 auto;   /* по ширине надписи и с переносом ряда: при 250px «Download / Restore» вылезали (#146) */
   padding: 9px 10px;
   border-radius: 9px;
   background: rgba(255,255,255,0.04);
@@ -1664,6 +1665,35 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   transition: background 0.15s, border-color 0.15s;
 }
 .btn-backup:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); }
+/* Подписи-ссылки под кнопками копии. Каждая сама высотой 44px, поэтому её зона нажатия
+   (button::after) совпадает с её рамкой и не накрывает соседа. Было: подписи по 12px одна под
+   другой, и 44-пиксельная зона «JSON backup» целиком накрывала «How to export from IMDb» -
+   нажатие на подсказку собирало JSON-копию (обзор 9 нояб, #141). Ряд переносится, а не
+   выезжает за край при 150% (#146). */
+.backup-links { display: flex; flex-wrap: wrap; column-gap: 18px; margin-top: 4px; }
+.backup-link { min-height: 44px; padding: 0; background: none; border: none; color: var(--muted);
+  font-size: 11px; font-family: var(--font-text); cursor: pointer; text-decoration: underline;
+  text-align: start; justify-content: flex-start; min-width: 0; overflow-wrap: anywhere; }
+
+/* Тип отзыва - сегментный переключатель, перенесён из Tunemail (решение G, 8 нояб): выбор вида -
+   одна группа, мельче и текстовым шрифтом, а «Отмена» и «Отправить» внизу - решение, в полный рост.
+   Отличие от Tunemail одно: группа переносится. Три кнопки по flex:1 при 150% текста на iPhone SE
+   (250px) вылезали за лист на 12-54px, и лист ездил вбок (обзор 9 нояб, #146). При переносе ряды
+   идут через 10px: зона нажатия 44px на кнопке 34px выступает на 5px и не налезает на соседний ряд. */
+.fb-types {
+  display: flex; flex-wrap: wrap; gap: 10px 0; margin-bottom: 14px;
+  border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 3px;
+}
+.fb-type-btn {
+  position: relative;
+  flex: 1 1 auto; min-height: 34px; padding: 0 8px; gap: 6px;
+  border-radius: 7px; border: none;
+  background: transparent; color: #aaa;
+  font-family: var(--font-text); font-size: 12.5px;
+  cursor: pointer; transition: background 0.15s, color 0.15s;
+}
+.fb-type-btn::after { left: 0; right: 0; width: auto; min-width: 0; transform: translateY(-50%); }
+.fb-type-btn.on { background: var(--primary-soft); color: var(--primary); }
 
 /* ── Feedback reply card ────────────────────────────────────────────── */
 .fb-reply-card {
@@ -1922,9 +1952,12 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 }
 
 /* ── Language toggle ─────────────────────────────────────────────────────────── */
-.lang-toggle { display:flex; gap:6px; }
+/* Чип 32px и ряды через 12px: 44-пиксельная зона нажатия (button::after) выступает на 6px сверху
+   и снизу и кончается ровно у соседнего ряда. Было 20px через 6px, и при переносе (250px, iPhone
+   SE со 150% текста) нижняя половина чипа отдавала нажатие чипу под ним: EN -> RU, DE -> KA. */
+.lang-toggle { display:flex; gap:12px 6px; }
 .lang-btn {
-  padding:5px 12px; border-radius:20px; border:1px solid var(--border);
+  min-height:32px; padding:5px 12px; border-radius:20px; border:1px solid var(--border);
   background:none; color:var(--muted); font-size:12px; cursor:pointer;
   font-family:var(--font-text); transition:all 0.15s;
 }
@@ -3085,12 +3118,15 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
            from actually live. It is the most personal thing the app makes; it does not
            belong between the watch-time counter and the Display Name input. -->
       <div class="add-label" id="acc-name-lbl" data-i18n="display_name_lbl">Display Name</div>
-      <div id="acc-name-row" style="display:flex;gap:8px;margin-bottom:24px">
+      <!-- Ряд переносится: у поля не было min-width:0, и при 150% текста на iPhone SE (250px) Save
+           уходил на 92px за лист, а лист начинал ездить вбок (обзор 9 нояб, #142; телефон Дафы).
+           Поле берёт почти весь запас (999 к 1), а Save, оставшись один на строке, растягивается. -->
+      <div id="acc-name-row" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px">
         <input type="text" id="acc-name-input" data-i18n-ph="display_name" placeholder="Your name"
-          style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:14px;padding:10px 12px;font-family:var(--font-text);outline:none;transition:border-color .2s"
+          style="flex:999 1 140px;min-width:0;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:14px;padding:10px 12px;font-family:var(--font-text);outline:none;transition:border-color .2s"
           onfocus="this.style.borderColor='var(--primary-border)'"
           onblur="this.style.borderColor='var(--border)'">
-        <button class="btn-modal-save" id="btn-save-name" onclick="saveDisplayName()" style="flex:none;min-width:120px;padding:10px 18px;font-size:14px" data-i18n="save">Save</button>
+        <button class="btn-modal-save" id="btn-save-name" onclick="saveDisplayName()" style="flex:1 0 auto;min-width:120px;padding:10px 18px;font-size:14px" data-i18n="save">Save</button>
       </div>
       <div id="notif-row" style="display:none">
         <div class="add-label" data-i18n="notif_lbl" style="margin-top:4px">Notifications</div>
@@ -3111,12 +3147,14 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       <!-- This used to live in the title attribute above, where a phone never shows it - there
            is no hover on a touch screen, so the one instruction mobile users need was visible
            only on desktop. Found when an Android user could not get past IMDb's app intercept. -->
-      <button onclick="var e=document.getElementById('imdb-hint');e.hidden=!e.hidden" data-i18n="imdb_how" style="display:block;background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:4px 0 0;text-align:left;text-decoration:underline;font-family:var(--font-text)">How to export from IMDb</button>
-      <div id="imdb-hint" hidden data-i18n="imdb_hint" data-i18n-html="1" style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:6px;padding:8px 10px;border:1px solid rgba(255,255,255,0.08);border-radius:8px"></div>
-      <button onclick="backupExportJSON()" data-i18n="backup_json_nerd" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:4px 0 0;margin-top:2px;text-decoration:underline;font-family:var(--font-text)">JSON backup (advanced)</button>
+      <div class="backup-links">
+        <button class="backup-link" onclick="var e=document.getElementById('imdb-hint');e.hidden=!e.hidden;this.setAttribute('aria-expanded',String(!e.hidden))" aria-expanded="false" aria-controls="imdb-hint" data-i18n="imdb_how">How to export from IMDb</button>
+        <button class="backup-link" onclick="backupExportJSON()" data-i18n="backup_json_nerd">JSON backup (advanced)</button>
+      </div>
+      <div id="imdb-hint" hidden data-i18n="imdb_hint" data-i18n-html="1" style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:2px;padding:8px 10px;border:1px solid rgba(255,255,255,0.08);border-radius:8px"></div>
       <div id="backup-status" style="display:none;font-size:11px;line-height:1.45;margin-top:8px"></div>
-      <div id="btn-backfill-crew-row" style="display:none;margin-top:8px">
-        <button id="btn-backfill-crew" onclick="backfillCrewData()" data-i18n="backfill_crew" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:4px 0;text-decoration:underline;font-family:var(--font-text)">Update film details</button>
+      <div id="btn-backfill-crew-row" style="display:none">
+        <button id="btn-backfill-crew" class="backup-link" onclick="backfillCrewData()" data-i18n="backfill_crew">Update film details</button>
       </div>
 
       <!-- Friends moved out of here and into the Inbox tab. This is an app for sending
@@ -3181,7 +3219,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.18-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.19-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -3236,10 +3274,10 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="font-family:var(--font-display);color:#F5C518;font-size:12px;letter-spacing:2px;margin-bottom:3px" data-i18n="fb_heading">FEEDBACK</div>
         <div id="fb-title" style="font-family:var(--font-display);font-size:19px;margin-bottom:14px;line-height:1.2" data-i18n="fb_sub">Share a thought or report a bug</div>
         <div class="add-label" id="fb-type-label" data-i18n="fb_type">Type</div>
-        <div id="fb-type-row" style="display:flex;gap:8px;margin-bottom:14px">
-          <button id="fb-type-bug" onclick="setFbType('bug')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:var(--font-text);font-size:12px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px"><span data-ic="bug" data-ic-size="13"></span><span data-i18n="fb_t_bug">Bug</span></button>
-          <button id="fb-type-idea" onclick="setFbType('idea')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:var(--font-text);font-size:12px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px"><span data-ic="lightbulb" data-ic-size="13"></span><span data-i18n="fb_t_idea">Idea</span></button>
-          <button id="fb-type-other" onclick="setFbType('other')" style="flex:1;padding:7px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:#aaa;font-family:var(--font-text);font-size:12px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px"><span data-ic="message-circle" data-ic-size="13"></span><span data-i18n="fb_t_other">Other</span></button>
+        <div id="fb-type-row" class="fb-types" role="group" aria-labelledby="fb-type-label">
+          <button id="fb-type-bug" onclick="setFbType('bug')" class="fb-type-btn" aria-pressed="false"><span data-ic="bug" data-ic-size="13"></span><span data-i18n="fb_t_bug">Bug</span></button>
+          <button id="fb-type-idea" onclick="setFbType('idea')" class="fb-type-btn" aria-pressed="false"><span data-ic="lightbulb" data-ic-size="13"></span><span data-i18n="fb_t_idea">Idea</span></button>
+          <button id="fb-type-other" onclick="setFbType('other')" class="fb-type-btn" aria-pressed="false"><span data-ic="message-circle" data-ic-size="13"></span><span data-i18n="fb_t_other">Other</span></button>
         </div>
         <div class="add-label" data-i18n="fb_message_lbl">Message</div>
         <textarea id="fb-message" placeholder="Tell me what's on your mind..." data-i18n-ph="ph_feedback" style="min-height:70px;margin-bottom:10px;width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-text);font-size:13px;padding:10px 12px;outline:none;resize:vertical;transition:border-color .2s"></textarea>
@@ -6624,8 +6662,10 @@ async function deleteAccount() {
     // feedback screenshot sitting in the bucket, still fetchable. Deleting the row from
     // storage.objects in SQL is also not enough on Supabase - it does not necessarily
     // remove the backing file - so the removal goes through the storage API, which does.
-    // Failure here must not block the account deletion itself, so it is reported and the
-    // SQL function sweeps up anything left behind.
+    // Failure here must not block the account deletion itself, so it is only reported. The
+    // SQL function no longer sweeps storage.objects: Supabase rejects a DELETE there that
+    // does not come through the Storage API, and that rejection rolled back the whole
+    // account deletion (review 9 Nov, #115; docs/db-2026-11-09/1-order-and-delete.sql).
     try {
       const dir = currentUser.id;
       const { data: files } = await sbClient.storage.from('feedback-screenshots').list(dir, { limit: 1000 });
@@ -10429,7 +10469,10 @@ const _MOODS = [
   { id:'tense',   g:'53',             terms:'tense напряж напруж spannungsgeladen =teso =tesa tendu =tenso =tensa დაძაბულ' },
   { id:'violent',  g:'28,80,53',     terms:'violent brutal bloody gory gore жесток кровав брутальн насили жорстк кривав gewalttatig violento sanglant sangriento sanguinoso' },
   { id:'uplifting', g:'18,35,10751', terms:'uplifting inspiring inspirational вдохновля мотивир воодушев надихаюч inspirierend ispirante inspirant inspirador' },
-  { id:'real',    g:'99,36',          terms:'true real documentary реальн документ истинн wahr vero vrai real realism realismo realismus' },
+  // БЕЗ «true», «real», «реальн», «wahr», «vero», «vrai» (обзор 9 нояб, #79): латинская приставка с
+  // хвостом в две буквы делала из «really» настроение, а «true love» и «реально страшный» добавляли
+  // документалки и историю. Истории по реальным событиям читает предмет «based on true story».
+  { id:'real',    g:'99,36',          terms:'documentary документ realism realismo realismus realist реалист реаліст რეალისტ realistico realistisch' },
 ];
 // GENRE WORDS, and this layer is the one that matters most in practice.
 //
@@ -10747,7 +10790,7 @@ const _SUBJECTS = [
   { k:"black and white", terms:"black_and_white черно_белое черно_белый черно_белые черно_белом чорно_біле schwarzweiss schwarz_weiss bianco_e_nero noir_et_blanc blanco_y_negro შავ_თეთრ" },
   { k:"world war ii", pref:"10752", terms:"world_war_ii world_war_2 ww2 wwii вторая_мировая второй_мировой великая_отечественная друга_світова zweiter_weltkrieg seconda_guerra_mondiale seconde_guerre_mondiale segunda_guerra_mundial მეორე_მსოფლიო" },
   { k:"cold war", terms:"cold_war холодная_война холодной_войны холодна_війна kalter_krieg guerra_fredda guerre_froide guerra_fria ცივი_ომ" },
-  { k:"based on true story", terms:"true_story based_on_true реальные_события реальных_событиях реальных_событий реальна_історія реальних_подіях wahre_geschichte storia_vera histoire_vraie historia_real" },
+  { k:"based on true story", terms:"true_story true_stories based_on_true реальные_события реальных_событиях реальных_событий реальная_история реальные_истории реальна_історія реальних_подіях реальними_подіями wahre_geschichte wahre_begebenheit storia_vera storie_vere histoire_vraie faits_reels historia_real hechos_reales" },
   { k:"new year's eve", terms:"new_year новый_год новогодн новорічн silvester capodanno nouvel_an ano_nuevo ახალი_წელ" },
   { k:"mental illness", pref:"18", terms:"mental_illness психическ психиатр психічн psychische_krankheit malattia_mentale maladie_mentale enfermedad_mental расстройств розлад" },
   { k:"ancient rome", pref:"36", terms:"ancient_rome древний_рим древнем_риме древнего_рима стародавній_рим antikes_rom antica_roma rome_antique antigua_roma ძველი_რომ" },
@@ -11063,7 +11106,13 @@ function _decadeKeys() {
   if (_decadeKeysCache) return _decadeKeysCache;
   const out = [];
   for (const d of _DECADES) {
-    for (const term of d.t.split(' ')) if (term) out.push([term, d.y]);
+    for (const term of d.t.split(' ')) if (term) {
+      out.push([term, d.y]);
+      // Полный год с украинским или грузинским хвостом: «1990-ті», «1990-тих», «1990-იანები».
+      // Были только «90-ті» и «90-იან», а украинский чип десятилетия пишет полный год (#90).
+      const m = term.match(/^\d0(ті|тих|იან)$/);
+      if (m) out.push([String(d.y) + m[1], d.y]);
+    }
   }
   out.sort((a, b) => b[0].length - a[0].length);
   _decadeKeysCache = out;
@@ -11128,12 +11177,41 @@ function _yearFrom(flatQ, rawQ) {
 // после 2000» был один фильм, «Девять королев» (проверка новыми запросами, 19 окт). after - со
 // следующего года, since - с этого, before - до этого, until - по этот включительно. Между словом и
 // годом допускается одно связующее («de», «года», «the»); грузинское стоит после года.
+// «from» здесь больше нет (обзор 9 нояб, #84): «movies from 1999» по-английски почти всегда
+// значит «вышедшие в 1999-м», а читалось как «с 1999 по сегодня». «from 2000 to 2010» - диапазон,
+// его читает _yearRangeFrom. range - слова диапазона: нужны только для того, чтобы съесть их
+// вместе с годами, у _yearSideFrom такой стороны нет.
 const _YEAR_SIDE = {
   after: 'after post после позже після апрес apres despues dopo nach',
-  since: 'since from с со від з depuis desde seit ab dal dai',
+  since: 'since с со від з depuis desde seit ab dal dai',
   before: 'before pre до раньше перед avant antes vor',
   until: 'until till по hasta bis fino jusqu',
+  range: 'between from to through thru между між zwischen entre tra fra al au',
 };
+// ДИАПАЗОН ЛЕТ (обзор 9 нояб, #85): «2010-2015», «с 2000 по 2010», «between 2000 and 2010»,
+// «von 2000 bis 2010», «2000-დან 2010-მდე». Раньше брался первый год, второй показывался
+// понятым и выбрасывался. Два года и между ними тире или слово диапазона; «и», «and», «und»,
+// «y», «e», «et» - только после «между», «between» и родни: «фильмы 2000 и 2010» - это два года.
+function _yearRangeFrom(rawQ) {
+  const s = String(rawQ || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').normalize('NFC');
+  const ys = [...s.matchAll(/(18[89]\d|19\d\d|20\d\d)/g)]
+    .filter(m => !/\d/.test(s[m.index - 1] || '') && !/\d/.test(s[m.index + 4] || ''));
+  if (ys.length < 2) return null;
+  const a = Number(ys[0][0]), b = Number(ys[1][0]);
+  if (!(b > a && b - a <= 150)) return null;
+  const glue = new Set(['года', 'году', 'г', 'року', 'р', 'year', 'წლიდან', 'წლამდე', 'il', 'el', 'l', 'the', 'de']);
+  const mid = s.slice(ys[0].index + 4, ys[1].index).replace(/^-?დან/, ' დან ')
+    .split(/[^\p{L}\p{N}\u2011\u2013\u2014-]+/u).filter(w => w && !glue.has(w));
+  const before = s.slice(0, ys[0].index).split(/[^\p{L}\p{N}]+/u).filter(Boolean).slice(-2);
+  const between = before.some(w => ['between', 'между', 'між', 'zwischen', 'entre', 'tra', 'fra'].includes(w));
+  const OPEN = ['to', 'till', 'until', 'through', 'thru', 'по', 'до', 'bis', 'a', 'al', 'au', 'hasta', 'fino', 'jusqu', 'jusquen', 'დან'];
+  const AND = ['and', 'и', 'і', 'та', 'und', 'y', 'e', 'et'];
+  const ok = (mid.length === 0 && /^\s*[-\u2011\u2013\u2014]\s*$/.test(s.slice(ys[0].index + 4, ys[1].index)))
+    || (mid.length === 1 && /^[-\u2011\u2013\u2014]$/.test(mid[0]))
+    || (mid.length >= 1 && mid.length <= 2 && mid.every(w => OPEN.includes(w) || /^[-\u2011\u2013\u2014]$/.test(w)))
+    || (between && mid.length === 1 && AND.includes(mid[0]));
+  return ok ? [a, b] : null;
+}
 function _yearSideFrom(rawQ, y) {
   const toks = String(rawQ || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^\p{L}\p{N}]+/gu, ' ').trim().split(' ');
@@ -11173,9 +11251,13 @@ const _QSTOP = ('про про about with films film movie movies кино фи�
   'quiero ver recomiend recomiénd mejor veux voir recommand meilleur möchte mochte sehen empfiehl beste ' +
   'voglio vedere consiglia miglior მინდა ნახვა საუკეთესო ' +
   // Связки из живых запросов, которые «Не учтено» называло зря (третий круг, 14 окт).
-  'see tonight мне хотелось хочется чего').split(' ').filter(Boolean);
+  'see tonight мне хотелось хочется чего ' +
+  // Усилители (обзор 9 нояб, #79): «really» читалось настроением «реальное», а «реально страшный»
+  // добавлял документалки. Не «tres»: по-испански это «три».
+  'really very реально очень дуже справді wirklich sehr davvero molto vraiment muy').split(' ').filter(Boolean);
 
 function _splitQuery(q) {
+  _teachShowForms();            // формы чипов - триггеры своих строк (#89), один раз
   const _decSfx = new Set();   // хвосты десятилетия, набранные отдельным словом («60 х»): кусок «Понято» у них общий с числом
   const _sideW = new Set();    // слова стороны от года («после», «después»): кусок «Понято» у них общий с годом
   // Ударения в латинице снимаются при сравнении: человек пишет "sueño" и "rêve", таблица -
@@ -11258,7 +11340,9 @@ function _splitQuery(q) {
   };
   const _partHit = (w, part) => part.length < 4 ? w === part
     : (w === part || _pfxHit(w, part) || (_stem(w).length >= 4 && _stem(w) === _stem(part)));
-  const _TABLES = [[_MOODS, 'genre'], [_GENRE_WORDS, 'genre'], [_SUBJECTS, 'subject'], [_COUNTRIES, 'country']];
+  // _QUALITY здесь с 9 нояб (обзор, #89): без него фразы оценки - «hidden gem», «obras maestras»,
+  // «sous-estimé», «незаслуженно забытые» - не читались вовсе, хотя стояли в таблице.
+  const _TABLES = [[_MOODS, 'genre'], [_GENRE_WORDS, 'genre'], [_SUBJECTS, 'subject'], [_COUNTRIES, 'country'], [_QUALITY, 'quality']];
   // ДЛИННОЕ СОВПАДЕНИЕ ВАЖНЕЕ КОРОТКОГО и между таблицами. Проверка кода 9 окт, #94: "neon noir"
   // и "неоновый нуар" отдавали нуар 40-х по второму слову, и кураторский список neon noir по
   // собственному имени был недостижим. Движение, все слова которого лежат внутри более длинной
@@ -11425,7 +11509,9 @@ function _splitQuery(q) {
   });
   const decade = _decadeFrom(flat, q);
   const year = _yearFrom(flat, q);
-  const yearSide = year ? _yearSideFrom(q, year) : null;
+  const _range = year ? _yearRangeFrom(q) : null;
+  const yearSide = year ? (_range && _range[0] === year ? 'range' : _yearSideFrom(q, year)) : null;
+  const yearTo = yearSide === 'range' ? _range[1] : null;
   // A decade word has done its job and must not go on to the keyword search as if it were a
   // subject: "японский хоррор восьмидесятых" left "восьмидесятых" in the remainder, which then
   // went to TMDB's English-only keyword index and coloured the "why" with a word nobody asked
@@ -11552,7 +11638,7 @@ function _splitQuery(q) {
   const restToks = toks.map((tk, i) => tk.w.some(w => _restSet.has(w)) && !tk.w.some(w => _mset.has(w)) ? i : -1).filter(i => i >= 0);
   return { movements, moods, genres, subjects, countries, quality, decade, year, subject: rest,
            subjectAll, notGenres: [...new Set(notGenres)], negLeft,
-           recent, recentIfPerson, upcoming, yearSide, toks: toks.map(tk => tk.s), chips, restToks, rowWords,
+           recent, recentIfPerson, upcoming, yearSide, yearTo, toks: toks.map(tk => tk.s), chips, restToks, rowWords,
            // Слова, которые мы ДЕЙСТВИТЕЛЬНО поняли. Считались давно и наружу не
            // отдавались, а именно они - честный ответ на вопрос "что ты прочитал".
            matchedWords: [...matchedWords].sort((a, b) => words.indexOf(a) - words.indexOf(b)) };
@@ -12333,8 +12419,11 @@ function _voteFloor(c) {
   // дата, так что ненадёжная оценка выдачу не поднимает. Порог лишь отсеивает пустое.
   if (c.recent)   return 100;
   if (c.movement) return 30;    // страна и десятилетие уже прижаты
-  // Год у́же десятилетия и сужает не меньше.
-  const hard = ((c.decade || c.year) ? 1 : 0) + (c.country ? 1 : 0) + (c.keyword ? 1 : 0);
+  // Год у́же десятилетия и сужает не меньше. Открытое окно («после 2000») не сужает ничего,
+  // а диапазон сужает, пока он не шире десятилетия (#91).
+  const _w = _yearWindow(c);
+  const _narrowYears = !!_w && _w[0] != null && _w[1] != null && _w[1] - _w[0] <= 10;
+  const hard = (_narrowYears ? 1 : 0) + (c.country ? 1 : 0) + (c.keyword ? 1 : 0);
   // ПОРОГ БЫЛ НИЗКИМ КАК СТРАХОВКА ОТ ПУСТОТЫ, А СТРАХОВКА ТЕПЕРЬ ДРУГАЯ.
   //
   // 150 и 300 стояли не потому, что при ста пятидесяти голосах средняя оценка
@@ -12349,10 +12438,28 @@ function _voteFloor(c) {
   // средняя оценка перестаёт быть шумом.
   if (hard >= 2) return 300;
   if (c.keyword)  return 700;   // тема сужает, но не оправдывает хвост
-  if (c.decade || c.year) return 200;
+  if (_narrowYears) return 200;
   if (c.country)  return 400;
   if (c.genreAnd) return 500;   // два названных жанра пересекаются - это уже узко
   return 1000;                  // голый жанр или настроение не прижимают ничего
+}
+
+// ОКНО ЛЕТ ИЗ УСЛОВИЙ, ОДНО НА ВСЕХ: [с, по] включительно, null у края - открыто. Сторона года
+// жила только в плане discover, а фильмография, полка и порог голосов брали ровно год: «nolan
+// after 2010» отдавало один Inception, «мрачное кино после 2000» урезало полку до 2000-го, а
+// «после 2000» считалось таким же узким, как один год (обзор 9 нояб, #91). Диапазон «2010-2015»
+// - сторона 'range' с yearTo (#85).
+function _yearWindow(c) {
+  if (c.decade) return [c.decade, c.decade + 9];
+  if (!c.year) return null;
+  switch (c.yearSide) {
+    case 'after':  return [c.year + 1, null];
+    case 'since':  return [c.year, null];
+    case 'before': return [null, c.year - 1];
+    case 'until':  return [null, c.year];
+    case 'range':  return [c.year, c.yearTo || c.year];
+    default:       return [c.year, c.year];
+  }
 }
 
 // План запроса отдельно от его выполнения: так его можно проверить тестом, не трогая сеть.
@@ -12377,10 +12484,9 @@ function _planQuery(c) {
   // порядок от новых. Порознь - каждое своё.
   if (c.year && !c.movement && !c.decade && c.yearSide) {
     const today = new Date().toISOString().slice(0, 10);
-    if (c.yearSide === 'after' || c.yearSide === 'since') {
-      p.set('primary_release_date.gte', (c.yearSide === 'after' ? c.year + 1 : c.year) + '-01-01');
-      p.set('primary_release_date.lte', today);
-    } else p.set('primary_release_date.lte', (c.yearSide === 'before' ? c.year - 1 : c.year) + '-12-31');
+    const [from, to] = _yearWindow(c);
+    if (from) p.set('primary_release_date.gte', from + '-01-01');
+    p.set('primary_release_date.lte', to ? (to + '-12-31' < today ? to + '-12-31' : today) : today);
   } else if (c.year && !c.movement && !c.decade) {
     p.set('primary_release_date.gte', c.year + '-01-01');
     // "Новинки 2026" - вышедшее, а не анонсированное: при пороге свежести в 100 голосов
@@ -12470,7 +12576,7 @@ function _planQuery(c) {
 // тестом, не трогая сеть, и порядок веток перестаёт влиять на результат.
 async function _constraintsFor(q) {
   const { movements, moods, genres, subjects, countries, decade, year, subject, matchedWords,
-          recent, recentIfPerson, upcoming, yearSide, toks, chips, restToks, quality, subjectAll, notGenres, negLeft, rowWords } = _splitQuery(q);
+          recent, recentIfPerson, upcoming, yearSide, yearTo, toks, chips, restToks, quality, subjectAll, notGenres, negLeft, rowWords } = _splitQuery(q);
   const c = {
     // Набранное - функцией, а не строкой: «$&» в запросе иначе подставляло бы сам шаблон.
     why: t('why_for_query').replace('{q}', () => q), matchedWords,
@@ -12506,6 +12612,7 @@ async function _constraintsFor(q) {
   // Точный год свежесть НЕ отключает: окно даёт год, сортировку - свежесть.
   c.year = (!decade && !movements.length) ? (year || null) : null;
   c.yearSide = c.year ? (yearSide || null) : null;
+  c.yearTo = c.yearSide === 'range' ? yearTo : null;   // диапазон «2010-2015» (#85)
   if (c.year) c.matched = true;
   // Год, который ещё не начался («новинки 2027»): вышедшего нет, есть объявленное.
   c.future = !!(c.year && !c.yearSide && c.year > new Date().getFullYear());
@@ -12562,7 +12669,9 @@ async function _constraintsFor(q) {
     // Оценочные слова (шедевр, недооценённое, блокбастер - с 11 окт) полке так же неизвестны:
     // «недооценённое мрачное» отдавало ту же полку знаменитого мрачного кино.
     const _pinned = c.person || c.country || c.movement || c.recent || c.quality;
-    const _years = c.decade ? [c.decade, c.decade + 9] : c.year ? [c.year, c.year] : null;
+    // Сторона года - и на полке (#91): «после 2000» - с 2001 по сегодня, а не один 2000-й.
+    const _yw = _yearWindow(c);
+    const _years = _yw ? [_yw[0] ?? 0, _yw[1] ?? 9999] : null;
     // Второй предмет полке тоже неизвестен. Цикл отвечал полкой первого предмета, у которого она
     // есть, и остальные пропадали: «мрачное кино про шахматы» отдавало общую полку мрачного кино,
     // а «Понято» показывало шахматы прочитанными (проверка кода 9 окт, #101). Полка отвечает,
@@ -12894,9 +13003,17 @@ async function _personFilms(c) {
     if (want.size && ![...want].some(x => g.includes(x))) return false;
     if ((c.notGenreIds || []).some(x => g.includes(x))) return false;      // "без ужасов" (#95)
     const y = Number((film.release_date || '').slice(0, 4));
-    if (c.decade && (!y || y < c.decade || y > c.decade + 9)) return false;
-    // Названный год - такое же условие, как десятилетие; молча его терять нельзя (#107).
-    if (c.year && y !== c.year) return false;
+    // Названный год - такое же условие, как десятилетие; молча его терять нельзя (#107). И со
+    // своей стороной: «nolan after 2010» отдавало только Inception (обзор 9 нояб, #91).
+    const yw = _yearWindow(c);
+    if (yw && (!y || (yw[0] != null && y < yw[0]) || (yw[1] != null && y > yw[1]))) return false;
+    // Оценочное слово - то же условие, что в плане discover (_planQuery), по тем же числам:
+    // «недооценённые фильмы Спилберга» отдавали его самые высокооценённые (#91).
+    const va = film.vote_average || 0, vc = film.vote_count || 0;
+    if (c.quality === 'masterpiece' && (va < 8 || vc < 1000)) return false;
+    if (c.quality === 'underrated' && (va < 7 || vc < 100 || vc > 1500)) return false;
+    if (c.quality === 'classic' && !yw && !c.recent && y > 1979) return false;
+    if (c.quality === 'blockbuster' && vc < 3000) return false;
     return true;
   });
   if (!out.length) return null;                 // вызывающий отступит к простому списку
@@ -13655,8 +13772,10 @@ function _saveListOrder(ids) {
   // Persist to DB for cross-device sync
   const validIds = ids.filter(Boolean);
   if (sbClient && validIds.length) {
+    // .then с двумя обработчиками, не .catch: у построителя запроса supabase-js есть только
+    // then, и .catch бросал TypeError до отправки, так что порядок не уходил в базу (обзор 9 нояб, #37).
     sbClient.rpc('update_list_order', { list_ids: validIds, orders: validIds.map((_, i) => i) })
-      .catch(e => console.error('[list-order]', e));
+      .then(r => { if (r && r.error) console.error('[list-order]', r.error.message); }, e => console.error('[list-order]', e));
   }
 }
 function _applyListOrder(lists) {
@@ -13983,8 +14102,9 @@ function _movieDragStart(e, card) {
 
     // Persist to DB (syncs across devices)
     if (sbClient && numIds.length) {
+      // .then, не .catch: см. _saveListOrder (обзор 9 нояб, #36).
       sbClient.rpc('update_movie_order', { movie_ids: numIds, orders: numIds.map((_, i) => i) })
-        .catch(err => console.error('[movie-order]', err));
+        .then(r => { if (r && r.error) console.error('[movie-order]', r.error.message); }, err => console.error('[movie-order]', err));
     }
   }
 
@@ -14731,6 +14851,15 @@ async function checkPendingFriendInvite() {
     // правки базы её принимает владелец ссылки, - но отправлялась она сама, без вопроса. А
     // ?friend= стоит в каждой расшаренной карточке фильма и списка: кто прислал ссылку, получал
     // заявку от открывшего и принимал её сам. Теперь сначала вопрос; «Отмена» - заявки нет.
+    // Уже друзья, или заявка уже есть в любую сторону: вопрос не задаётся. Каждая ссылка /f/
+    // несёт &friend=<отправитель>, и друг получал «Добавить Анну в друзья?» при каждой ссылке
+    // от Анны, а «Отправить» ничего не делало и молчало (обзор 9 нояб, #38). uuid проверяется
+    // до того, как попасть в фильтр запроса: он пришёл из адреса.
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(inviterId)) { await _clearInviteMeta(); return; }
+    const { data: rel } = await sbClient.from('friendships').select('status')
+      .or(`and(user_id.eq.${currentUser.id},friend_id.eq.${inviterId}),and(user_id.eq.${inviterId},friend_id.eq.${currentUser.id})`)
+      .limit(1);
+    if (rel && rel.length) { await _clearInviteMeta(); return; }
     let inviterName = '';
     try {
       const { data: pr } = await sbClient.from('profiles').select('display_name').eq('id', inviterId).maybeSingle();
@@ -14757,12 +14886,14 @@ function _askFriendLink(name) {
     ov.id = 'friend-link-overlay';
     ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
     const btn = 'min-height:44px;padding:12px;border-radius:10px;font-size:14px;font-family:var(--font-text);cursor:pointer';
+    // Функция замены возвращает строку. Было () => nm, где nm сама функция, и replace печатал
+    // её исходник: «Add () => name as a friend?» на всех языках (обзор 9 нояб, #35).
     const nm = () => name;
     ov.innerHTML = `
       <div style="background:#1a1a2a;border-radius:16px;padding:28px 24px;max-width:340px;width:100%;text-align:center">
         <div style="margin-bottom:12px;color:var(--accent-text);display:flex;justify-content:center">${icon('users', 26)}</div>
-        <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:10px">${escapeHtml(t('friend_link_q').replace('{name}', () => nm))}</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:22px">${escapeHtml(t('friend_link_sub').replace('{name}', () => nm))}</div>
+        <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:10px">${escapeHtml(t('friend_link_q').replace('{name}', nm))}</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:22px">${escapeHtml(t('friend_link_sub').replace('{name}', nm))}</div>
         <div style="display:flex;flex-direction:column;gap:12px">
           <button data-a="yes" style="${btn};background:var(--accent);border:none;color:var(--on-accent);font-weight:700">${escapeHtml(t('friend_link_yes'))}</button>
           <button data-a="no" style="${btn};background:none;border:1px solid rgba(255,255,255,0.12);color:var(--muted)">${escapeHtml(t('cancel'))}</button>
@@ -18496,12 +18627,13 @@ async function checkFeedbackBadge() {
 }
 function closeFeedback(){document.getElementById("feedback-overlay").style.display="none";}
 function setFbType(type) {
-  _fbType=type;
-  ["bug","idea","other","report"].forEach(t=>{
-    const btn=document.getElementById("fb-type-"+t);if(!btn)return;
-    btn.style.background=t===type?"var(--primary-soft)":"transparent";
-    btn.style.borderColor=t===type?"var(--primary)":"rgba(255,255,255,0.15)";
-    btn.style.color=t===type?"var(--primary)":"#aaa";
+  _fbType = type;
+  // Класс и aria-pressed, как в Tunemail: вид держит .fb-type-btn.on, а не стили в строке.
+  ['bug', 'idea', 'other', 'report'].forEach(t => {
+    const btn = document.getElementById('fb-type-' + t);
+    if (!btn) return;
+    btn.classList.toggle('on', t === type);
+    btn.setAttribute('aria-pressed', String(t === type));
   });
 }
 async function submitFeedback() {
@@ -20041,7 +20173,7 @@ const _SHOW = {
     "cry":{en:"to cry",ru:"поплакать",uk:"поплакати",ka:"ასატირებელი",es:"para llorar",fr:"pour pleurer",de:"zum Weinen",it:"da piangere"},
     "scary":{en:"scary",ru:"страшное",uk:"страшне",ka:"საშინელი",es:"de miedo",fr:"effrayant",de:"gruselig",it:"spaventoso"},
     "funny":{en:"funny",ru:"смешное",uk:"смішне",ka:"სასაცილო",es:"divertido",fr:"drôle",de:"lustig",it:"divertente"},
-    "real":{en:"true story",ru:"по реальным событиям",uk:"за реальними подіями",ka:"რეალური ამბავი",es:"hechos reales",fr:"faits réels",de:"wahre Begebenheit",it:"storia vera"},
+    "real":{en:"realistic",ru:"реалистичное",uk:"реалістичне",ka:"რეალისტური",es:"realista",fr:"réaliste",de:"realistisch",it:"realistico"},
   },
   // Страны и группы стран. Ключ - код из таблицы, включая составные ("CZ,SK"):
   // человек пишет "чехословацкая новая волна", а не два кода, и группа для него
@@ -20135,6 +20267,40 @@ function _showWord(kind, key) {
   return r[(_lang || 'en').slice(0, 2)] || r.en || null;
 }
 
+// ЧИП, КОТОРЫЙ ДВИЖОК НЕ ЧИТАЕТ, ХУЖЕ ОТСУТСТВИЯ ЧИПА (обзор 9 нояб, #89). Показ и разбор жили
+// в двух словарях, и их никто не сверял: из форм _SHOW движок не читал обратно ka 163 из 284,
+// uk 117, it 87, fr 71, es 64, de 53, ru 15, en 10. Человек нажимал «вампіри», и запрос
+// уходил в «Не учтено». Поэтому каждая форма показа один раз, при загрузке, становится
+// триггером своей же строки: однословная - точным словом, многословная - фразой через «_», у
+// движения - словом без пробелов, как остальные его термины. Добавляется только то, чего в
+// строке ещё нет; основы и пороги приставки остаются прежними.
+var _showTaught = false;   // var: _splitQuery может позвать раньше, чем исполнится эта строка
+function _teachShowForms() {
+  if (_showTaught) return;
+  _showTaught = true;
+  const TABLES = { subject: [_SUBJECTS, r => r.k], mood: [_MOODS, r => r.id], country: [_COUNTRIES, r => r.c],
+                   quality: [_QUALITY, r => r.id], movement: [_MOVEMENTS, r => String(r.t || '').split(' ')[0]] };
+  for (const [kind, [tbl, keyOf]] of Object.entries(TABLES)) {
+    const forms = _SHOW[kind] || {};
+    for (const row of tbl || []) {
+      const show = forms[keyOf(row)];
+      if (!show) continue;
+      const field = kind === 'movement' ? 't' : (row.terms != null ? 'terms' : 't');
+      const have = new Set(String(row[field] || '').split(' '));
+      for (const form of Object.values(show)) {
+        // Свёртка ударений - та же, что _fold в _splitQuery: термины движений ищутся в запросе,
+        // уже свёрнутом («cinéma» там «cinema»).
+        const n = _qNorm(form).normalize('NFD').replace(/([a-z])[\u0300-\u036f]+/g, '$1').normalize('NFC');
+        if (!n) continue;
+        // Однословная форма - точным словом («=»), а не основой: основа «заговор» ловила «заговорил»,
+        // «музыка» - «музыканта» (корпус поиска). Чипу нужна ровно его форма.
+        const term = kind === 'movement' ? n.replace(/ /g, '') : n.includes(' ') ? n.split(' ').join('_') : '=' + n;
+        if (term.length > 2 && !have.has(term)) { have.add(term); row[field] = String(row[field] || '') + ' ' + term; }
+      }
+    }
+  }
+}
+
 // ПОДСКАЗЫВАЕМ ТО, У ЧЕГО ЕСТЬ ФОРМА ДЛЯ ПОКАЗА. ЭТО НЕ ВЕСЬ СЛОВАРЬ.
 //
 // Первая попытка брала слова прямо из таблиц движка - и упёрлась в то, что таблицы
@@ -20197,7 +20363,12 @@ function _suggestIndex() {
     (_GENRE_WORDS || []).forEach(g => {
       const name = (_sugGenres || []).find(x => (g.terms || '').split(/\s+/)
         .some(w => _qNorm(x).startsWith(_qNorm(w).slice(0, 5))));
-      add(name || (g.terms || '').split(' ')[0], g.terms, g);
+      // На чип - только то, что движок прочитает обратно этим же жанром (обзор 9 нояб, #89):
+      // русское название TMDB «История» не читается, а сделать его триггером нельзя - оно
+      // сломало бы «историю игрушек» и «историю любви». Тогда форма из _SHOW.genre, иначе
+      // английский термин строки.
+      const reads = s => { try { return _splitQuery(s).genres.includes(g); } catch (e) { return false; } };
+      add([name, _showWord('genre', g.g)].filter(Boolean).find(reads) || (g.terms || '').split(' ')[0], g.terms, g);
     });
     (_DECADES || []).forEach(d => add(_decadeShow(d.y), d.t, d));
   } catch (e) { /* словарь не собрался - остаются люди */ }
@@ -20215,7 +20386,9 @@ function _suggestIndex() {
 
 // Десятилетие на языке интерфейса, без словаря.
 function _decadeShow(y) {
-  const sfx = { ru: '-е', uk: '-і', en: 's', de: 'er' }[(_lang || 'en').slice(0, 2)];
+  // uk «-ті», не «-і»: «1990-і» движок читает как один 1990 год, и чип десятилетия давал фильмы
+  // одного года (обзор 9 нояб, #90). «1990-ті» - обычная украинская форма, и она читается.
+  const sfx = { ru: '-е', uk: '-ті', en: 's', de: 'er' }[(_lang || 'en').slice(0, 2)];
   return String(y) + (sfx === undefined ? 's' : sfx);
 }
 
@@ -20439,11 +20612,28 @@ async function surpriseMe() { return surpriseMeEngine(); }
 
   const shownEl = (id) => { const e = document.getElementById(id);
                             return !!e && getComputedStyle(e).display !== 'none'; };
+  // ОТКАТ АСИНХРОННЫЙ, ЗАПИСЬ СИНХРОННАЯ (обзор 9 нояб, #1). history.back() только ставит
+  // переход в очередь, а pushState пишет сразу. Код, который закрывает одно окно и в том же
+  // такте открывает другое (карточка -> «На карте», Join Cinemail у гостя, удаление
+  // аккаунта), ставил новую запись раньше, чем доходил откат, и откат уносил уже её: история
+  // стояла в корне, а в stack висел уровень, и «назад» уводило из приложения. Поэтому запись,
+  // сделанная, пока наш откат в пути, ждёт его popstate. Таймер - на случай, когда popstate
+  // не придёт вовсе (откат с первой записи), иначе записи копились бы бесконечно.
+  let backs = 0;          // наши history.back()/go(), чей popstate ещё не пришёл
+  const waiting = [];     // записи, отложенные до этих popstate
+  let flushTimer = 0;
+  const flush = () => { clearTimeout(flushTimer); flushTimer = 0; backs = 0;
+                        while (waiting.length) history.pushState(waiting.shift(), ''); };
+  const writeState = (st) => {
+    if (backs > 0) { waiting.push(st); if (!flushTimer) flushTimer = setTimeout(flush, 600); }
+    else history.pushState(st, '');
+  };
+  const goBack = (n) => { backs++; if (n > 1) history.go(-n); else history.back(); };
   const push = (name, close) => { stack.push({ name, close });
-                                  history.pushState({ cm: name, d: stack.length }, ''); };
+                                  writeState({ cm: name, d: stack.length }); };
   const drop = (name) => { const i = stack.map(x => x.name).lastIndexOf(name);
                            if (i < 0) return false;
-                           stack.splice(i, 1); ignore++; history.back(); return true; };
+                           stack.splice(i, 1); ignore++; goBack(1); return true; };
 
   // ── Простые оверлеи: открылся - записали, закрыли - откатили ───────────────
   const SIMPLE = [
@@ -20527,9 +20717,16 @@ async function surpriseMe() { return surpriseMeEngine(); }
 
     // Крестик делает ровно то же, что системная кнопка, и через тот же путь -
     // иначе два способа закрыть один экран разойдутся, и история переживёт окно.
+    // Шаг делается сразу, как его сделал бы popstate (closing взведён так же), а откат истории
+    // помечен своим: иначе запись, поставленная в том же такте, оказалась бы в stack выше
+    // 'modal', и пришедший popstate закрыл бы её вместо карточки (обзор 9 нояб, #1).
     window.navModalBack = function () {
       if (closing || chain === 0) return rawNavBack.apply(this, arguments);
-      history.back();
+      const i = stack.map(x => x.name).lastIndexOf('modal');
+      if (i >= 0) stack.splice(i, 1);
+      ignore++; goBack(1);
+      closing = true;
+      try { stepBack(); } finally { closing = false; }
     };
 
     // Тап по фону закрывает всю цепочку, значит и записи снимаются все сразу.
@@ -20546,7 +20743,7 @@ async function surpriseMe() { return surpriseMeEngine(); }
           }
           // history.go(-n) отдаёт ОДИН popstate на весь прыжок, а не n штук:
           // измерено в браузере, а не взято из головы.
-          ignore++; history.go(-n);
+          ignore++; goBack(n);
         }
         return r;
       };
@@ -20568,11 +20765,11 @@ async function surpriseMe() { return surpriseMeEngine(); }
       if (n !== 'search' && !armed && _tab && _tab.style.display !== 'none') {
         armed = true;
         stack.unshift({ name: 'tab', close: () => { armed = false; rawSwitch('search'); } });
-        history.pushState({ cm: 'tab' }, '');
+        writeState({ cm: 'tab' });
       } else if (n === 'search' && armed) {
         armed = false;
         const i = stack.map(x => x.name).lastIndexOf('tab');
-        if (i >= 0) { stack.splice(i, 1); ignore++; history.back(); }
+        if (i >= 0) { stack.splice(i, 1); ignore++; goBack(1); }
       }
       return r;
     };
@@ -20635,6 +20832,9 @@ async function surpriseMe() { return surpriseMeEngine(); }
     'shared-list-overlay':    () => document.getElementById('shared-list-overlay')?.remove(),
     'block-overlay':          () => document.getElementById('block-overlay')?.remove(),
     'guest-signin-overlay':   () => document.getElementById('guest-signin-overlay')?.remove(),
+    // «Назад» = «Отмена», через её же кнопку: так разрешается и ожидание _askFriendLink.
+    // Без записи системная «назад» на Android закрывала приложение (обзор 9 нояб, #41).
+    'friend-link-overlay':    () => document.querySelector('#friend-link-overlay button[data-a="no"]')?.click(),
   };
   try {
     new MutationObserver(muts => {
@@ -20649,6 +20849,8 @@ async function surpriseMe() { return surpriseMeEngine(); }
   } catch (e) {}
 
   window.addEventListener('popstate', () => {
+    // Дошёл последний наш откат: отложенные записи встают на его место.
+    if (backs > 0 && --backs === 0) flush();
     if (ignore > 0) { ignore--; return; }
     const top = stack.pop();
     if (!top) return;               // уровней больше нет - пусть уходит, это и есть выход
