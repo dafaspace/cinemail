@@ -44,9 +44,22 @@
      Bump this with the release; sw.js precaches the same URL. -->
 <script src="/emoji.js?v=0.53.3"></script>
 <script src="/qr.js?v=0.52.0"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- Латиница DM Sans и Bebas Neue - свои файлы, байт в байт как в Tunemail (fonts/), а не Google Fonts:
+     каждый запуск отдавал Google адрес человека, а политика его не называла (обзор 9 нояб, #120). -->
+<style>
+@font-face { font-family: 'Bebas Neue'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url('/fonts/bebas-neue-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'Bebas Neue'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url('/fonts/bebas-neue-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'DM Sans'; font-style: normal; font-weight: 300 600; font-display: swap;
+  src: url('/fonts/dm-sans-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'DM Sans'; font-style: normal; font-weight: 300 600; font-display: swap;
+  src: url('/fonts/dm-sans-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+</style>
 <!-- Партнёры DM Sans и Bebas Neue для кириллицы, грузинского, иврита и японского: свои файлы,
      байт в байт как в Tunemail. У каждого unicode-range, так что латинская страница не качает
      ни одного. Японский CSS (206 КБ) подключает _loadJapaneseFaces, только для японского интерфейса. -->
@@ -3276,7 +3289,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.21-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.22-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -3337,7 +3350,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
           <button id="fb-type-other" onclick="setFbType('other')" class="fb-type-btn" aria-pressed="false"><span data-ic="message-circle" data-ic-size="13"></span><span data-i18n="fb_t_other">Other</span></button>
         </div>
         <div class="add-label" data-i18n="fb_message_lbl">Message</div>
-        <textarea id="fb-message" placeholder="Tell me what's on your mind..." data-i18n-ph="ph_feedback" style="min-height:70px;margin-bottom:10px;width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-text);font-size:13px;padding:10px 12px;outline:none;resize:vertical;transition:border-color .2s"></textarea>
+        <textarea id="fb-message" maxlength="3500" placeholder="Tell me what's on your mind..." data-i18n-ph="ph_feedback" style="min-height:70px;margin-bottom:10px;width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-text);font-size:13px;padding:10px 12px;outline:none;resize:vertical;transition:border-color .2s"></textarea>
 
         <!-- Screenshot attach -->
         <input type="file" id="fb-screenshot" accept="image/*" style="display:none" onchange="onFbScreenshotPicked(event)">
@@ -16185,7 +16198,7 @@ function _renderInvCard(inv) {
       <div style="flex:1;min-width:0">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
           <div>
-            <div style="font-family:var(--font-display);font-size:15px;line-height:1.2">${escapeHtml(inv.title)}${inv.year ? ` (${inv.year})` : ""}</div>
+            <div style="font-family:var(--font-display);font-size:15px;line-height:1.2">${escapeHtml(inv.title)}${inv.year ? ` (${escapeHtml(String(inv.year))})` : ""}</div>
             <div style="font-size:11px;margin-top:2px;display:flex;align-items:center;flex-wrap:wrap;gap:2px">
               ${isReceived ? _receivedStatusHTML(inv) : _sentStatusHTML(inv)}
               ${msgBadge}
@@ -18728,8 +18741,8 @@ async function backupImportXLSX() {
   const setLabel = (txt) => setStatus(txt); // keep call-sites below tidy
   let run = null;
   try {
-    // Let the user pick either an .xlsx or a legacy .csv.
-    const file = await _pickBackupFile(".xlsx,.csv");
+    // Let the user pick an .xlsx, the JSON backup (#119: both pages promise it restores), or a legacy .csv.
+    const file = await _pickBackupFile(".xlsx,.json,.csv");
     // Замок и выключенные кнопки - когда файл уже выбран: окно выбора, которое так и не
     // ответило, оставляло обе кнопки серыми до перезагрузки (#37).
     run = ImportProgress.begin();
@@ -18742,6 +18755,34 @@ async function backupImportXLSX() {
       // Legacy CSV path - parse via the same RFC 4180 reader the old button used.
       const text = await file.text();
       rows = _parseCSV(text);
+    } else if (/\.json$/i.test(file.name)) {
+      // JSON-КОПИЯ ВОССТАНАВЛИВАЕТСЯ (#119). «JSON backup (advanced)» писал файл, а прочесть его было
+      // нечем, хотя политика и поддержка обещают, что восстанавливаются обе копии. Строки в нём - строки
+      // базы как есть; список у строки - номер, и он переводится в имя по разделу lists, дальше путь тот
+      // же, что у Excel: имя -> список в этом аккаунте.
+      let data = null;
+      try { data = JSON.parse(await file.text()); } catch (e) {}
+      if (!data || data.app !== 'cinemail' || !Array.isArray(data.watchlist)) { showToast(t('toast_no_valid_entries'), true); return; }
+      const me = data.user && data.user.id, names = {}, owners = new Set();
+      (data.lists || []).forEach(l => {
+        if (!l || !l.id || !l.name) return;
+        const nm = String(l.name).trim(); names[l.id] = nm; listNamesFromBackup.push(nm);
+        (me && l.owner_id && l.owner_id !== me ? memberOnly : owners).add(nm.toLowerCase());
+      });
+      owners.forEach(k => memberOnly.delete(k));
+      hasListCol = true;
+      rows = data.watchlist
+        .filter(r => r && (!me || !r.user_id || r.user_id === me))   // только свои строки, как в самой копии
+        .map(r => ({
+          imdb_id: String(r.imdb_id || '').trim(), title: String(r.title || '').trim(), year: String(r.year || '').trim(),
+          media_type: r.media_type || 'movie', status: r.status || 'watched',
+          list_name: r.list_id ? (names[r.list_id] || '') : '',
+          stars: Number(r.stars) || 0, comment: r.comment || '',
+          director: r.director || '', composer: r.composer || '', cinematographer: r.cinematographer || '', actors: r.actors || '',
+          runtime: Number(r.runtime) > 0 ? Number(r.runtime) : null, poster: r.poster || '',
+          added_at: r.created_at || '', watched_at: /^\d{4}-\d{2}-\d{2}/.test(String(r.watched_at || '')) ? String(r.watched_at).slice(0, 10) : null,
+        }))
+        .filter(r => r.imdb_id && r.title);
     } else {
       await _loadExcelJS();
       const buf = await file.arrayBuffer();
@@ -18829,6 +18870,17 @@ async function backupImportXLSX() {
       }
     }
 
+    // ЗНАЧЕНИЯ ИЗ ТАБЛИЦЫ ПРИВОДЯТСЯ (#25). Лист Read me приглашает править файл, а приложение сравнивает
+    // строго: «Watched» с заглавной (так пишет клавиатура в Numbers) выпадал и из «Просмотренного», и из
+    // списка, «TV» делал сериал фильмом с чужим номером, оценка 8 по десятибалльной привычке шла как есть.
+    rows.forEach(r => {
+      const st = String(r.status || '').trim().toLowerCase();
+      r.status = st === 'plan' ? 'plan' : 'watched';
+      r.media_type = String(r.media_type || '').trim().toLowerCase() === 'tv' ? 'tv' : 'movie';
+      let v = Number(r.stars) || 0;
+      if (v > 5 && v <= 10) v = Math.round(v) / 2;      // десятибалльная - в нашу пятибалльную
+      r.stars = Math.max(0, Math.min(5, Math.round(v * 2) / 2));
+    });
     if (!rows.length) { showToast(t('toast_no_valid_entries'), true); return; }
 
     // Recreate lists and map their names → ids, then reattach films by name.
@@ -19341,7 +19393,7 @@ async function _mapsShow() {
   try { [ml] = await Promise.all([_loadMapLibre(), _loadMapsData()]); }
   catch (e) { _mapsSheet(`<div class="maps-hint">${escapeHtml(t('maps_failed'))}</div>`); return; }
   // Карта меняет высоту, когда открывается карточка места: MapLibre сам этого не видит.
-  if ('ResizeObserver' in window) new ResizeObserver(() => { if (_map) _map.resize(); }).observe(box);
+  if ('ResizeObserver' in window && !box._ro) { box._ro = new ResizeObserver(() => { if (_map) _map.resize(); }); box._ro.observe(box); }
   const map = _map = new ml.Map({ container: box, style: MAPS_STYLE, center: [10, 30], zoom: 1.3,
                                   attributionControl: { compact: true }, dragRotate: false, pitchWithRotate: false,
                                   // Палец за нажатие чуть сдвигается. MapLibre по умолчанию считает
@@ -19364,7 +19416,23 @@ async function _mapsShow() {
   box.addEventListener('click', e => { if (e.target.closest('.maplibregl-ctrl-geolocate')) _mapsBackCapture(); }, true);
   geo.on('geolocate', pos => _mapsNearMe(pos.coords.longitude, pos.coords.latitude));
   map.on('style.load', () => _mapsPaint(map));
+  // БЕЗ СЕТИ КАРТА НЕ ВИСИТ НА «ЗАГРУЖАЮ» (#102). 'load' приходит, только когда пришёл стиль с
+  // tiles.openfreemap.org; не пришёл - не приходит никогда, а экземпляр уже создан, и следующий заход
+  // делал только resize(). Теперь ошибка до загрузки или 20 секунд без неё снимают карту и пишут
+  // maps_failed («открой вкладку снова»), и следующий заход строит её заново.
+  let _mapLoaded = false, _errTimer = 0;
+  const _mapFail = () => {
+    if (_mapLoaded || _map !== map) return;
+    clearTimeout(_loadTimer); clearTimeout(_errTimer);
+    try { map.remove(); } catch (e) {}
+    _map = null;
+    _mapsSheet(`<div class="maps-hint">${escapeHtml(t('maps_failed'))}</div>`);
+  };
+  const _loadTimer = setTimeout(_mapFail, 20000);
+  // Ошибка одного тайла до загрузки ещё не провал: даём стилю шесть секунд догрузиться.
+  map.on('error', () => { if (!_mapLoaded && !_errTimer) _errTimer = setTimeout(_mapFail, 6000); });
   map.on('load', () => {
+    _mapLoaded = true; clearTimeout(_loadTimer); clearTimeout(_errTimer);
     map.addSource('places', { type: 'geojson', data: _mapsFeatures(), cluster: true, clusterRadius: 42, clusterMaxZoom: 11,
                               clusterProperties: { n: ['+', ['+', ['get', 'ns'], ['get', 'nw']]] } });
     map.addLayer({ id: 'clusters', type: 'circle', source: 'places', filter: ['has', 'point_count'],
@@ -19708,7 +19776,11 @@ function _mapsSelect(i) {
   // В листе поверх приложения - веб-карта Google: ссылка Apple сразу увела бы в приложение Карты.
   const route = isTown ? '' : (ios && !_inAppBrowser()) ? `https://maps.apple.com/?daddr=${lat},${lon}`
                     : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
-  const wiki = q ? `https://www.wikidata.org/wiki/Special:GoToLinkedPage/${_lang}wiki/Q${q}` : '';
+  // Статья на языке интерфейса, иначе английская, иначе страница элемента Wikidata (#103): прямая
+  // ссылка GoToLinkedPage вела на страницу ошибки у мест без статьи на этом языке - у грузинского
+  // около 80% нажатий. Wikidata Hub (Toolforge, Викимедиа) делает этот выбор сам; проверено 10 нояб:
+  // Q1180427 без kawiki - en, Q24639408 без статей - wikidata.org/wiki/Q24639408.
+  const wiki = q ? `https://hub.toolforge.org/Q${q}?lang=${_lang === 'en' ? 'en' : _lang + ',en'}` : '';
   const ext = (href, ic, label) => `<button type="button" class="maps-onmap" data-href="${escapeHtml(href)}" onclick="_openExternal(this.dataset.href)">${icon(ic, 14)} ${escapeHtml(label)}</button>`;
   // Крестик - тот же шаг назад, что кнопка над листом; фото - после названия, а не над ним: фото
   // 16:9 первым сдвигало первый фильм к низу экрана (разбор карты, «упростить»).
@@ -19779,13 +19851,15 @@ function _mapsShowAll() {
 
 // Из карточки фильма: открыть вкладку и показать места этого фильма.
 let _mapsPendingFocus = null;
-function _mapsFocusFilm(key) {
+function _mapsFocusFilm(key, keepPath) {
   if (!_map || !_map.getSource('places')) { _mapsPendingFocus = key; return; }
   const d = _mapsData, v = d.f[key]; if (!v) return;
   const pts = [...v[0], ...v[1]].map(i => d.p[i]);
   if (!pts.length) return;
   // Режим одного фильма; выход - крестик в карточке под картой, назад к фильму - своя кнопка.
-  _mapsStack.length = 0;
+  // Фильм, открытый из места на самой карте, оставляет это место в пути назад (#105): стек
+  // очищался всегда, и после «На карте» Лиссабон, с которого пришли, пропадал вместе с кадром.
+  if (keepPath) _mapsPush(); else _mapsStack.length = 0;
   _mapsFilm = key;
   _map.getSource('places').setData(_mapsFeatures());
   _mapsIdle();              // список мест фильма под картой - до рамки, чтобы она легла в уже низкую карту
@@ -19822,10 +19896,11 @@ function _mapsOpenPlace(i) {
 let _mapsFilmFrom = null;
 const _activeTab = () => ["search", "history", "maps", "inbox"].find(n => document.getElementById("tab-btn-" + n)?.classList.contains("active")) || "search";
 function _mapsOpenFilm(key) {
-  _mapsFilmFrom = { key, tab: _activeTab() };
+  const from = _activeTab();
+  _mapsFilmFrom = { key, tab: from };
   closeDetail();
   switchTab('maps');
-  _mapsFocusFilm(key);
+  _mapsFocusFilm(key, from === 'maps');
 }
 function _mapsBackToFilm() {
   const f = _mapsFilmFrom; if (!f) return;
@@ -20130,9 +20205,9 @@ const _SB_OPTS = { global: { fetch: _guardedFetch } };
     window.history.replaceState({},"",window.location.pathname);
     sbClient=window.supabase.createClient(SB_URL,SB_KEY,_SB_OPTS);
     const {data,error}=await sbClient.auth.verifyOtp({token_hash:tokenHash,type});
-    if(error){showScreen("signin");showSignInError("Confirmation failed: "+error.message);return;}
-    if(type==="recovery"){ showScreen("reset"); _applyI18n(); return; } // password reset → set new password
-    if(data.user){await onSignedIn(data.user);return;}
+    if(error){showScreen("signin");showSignInError(t('err_link_expired'));console.warn('[verifyOtp]', error.message);_applyI18n();_startAuthListener();return;}
+    if(type==="recovery"){ showScreen("reset"); _applyI18n(); _startAuthListener(); return; } // password reset → set new password
+    if(data.user){ try { await onSignedIn(data.user); } catch (e) { console.error('[start] onSignedIn', e); } _startAuthListener(); return; }
   }
   sbClient=window.supabase.createClient(SB_URL,SB_KEY,_SB_OPTS);
   // Capture a shared film link BEFORE the session resolves: onSignedIn runs the
@@ -20178,9 +20253,11 @@ const _SB_OPTS = { global: { fetch: _guardedFetch } };
     if (_authErrCode) { window.history.replaceState({},"",window.location.pathname); if (_authErrDesc) console.warn("[auth link]", _authErrCode, _authErrDesc); }
     const _signing = onSignedIn(session.user);   // приложение показывается синхронно, в начале
     if (_authErrCode) showToast(t('link_used'));
-    await _signing;
+    // Сбой загрузки не должен оставить приложение без слушателя входа (#4): отказ onSignedIn
+    // обрывал остаток запуска, и onAuthStateChange не ставился до перезапуска.
+    try { await _signing; } catch (e) { console.error('[start] onSignedIn', e); }
   }
-  else if(_offlineUser && !isRecoveryLink){ await onSignedIn(_offlineUser); }
+  else if(_offlineUser && !isRecoveryLink){ try { await onSignedIn(_offlineUser); } catch (e) { console.error('[start] onSignedIn', e); } }
   else if(isRecoveryLink){
     // Came from a link and there is no session: refused, spent or expired. It used to land on
     // a bare sign-in screen with no explanation - or, when the URL carried an error rather
@@ -20199,7 +20276,21 @@ const _SB_OPTS = { global: { fetch: _guardedFetch } };
   _applyI18n(); // apply stored language preference to static elements
   _paintIcons(); // swap data-ic placeholders for real vector glyphs
   _paintMockAvatar(); // the tour's mock account avatar, drawn from the real sprite
-  sbClient.auth.onAuthStateChange(async(event,session)=>{
+  _startAuthListener();
+  // СЛУШАТЕЛЬ ВХОДА СТАВИТСЯ НА ЛЮБОМ ПУТИ ЗАПУСКА (#4), в том числе после ссылки подтверждения,
+  // которая раньше выходила из запуска раньше и не ставила его вовсе. Уведомления, которые supabase-js
+  // разослал до подписки, теряются - среди них SIGNED_OUT из _removeSession, когда обновление токена
+  // отклонено, пока шла медленная загрузка. Поэтому после подписки - сверка: человек в приложении, а
+  // сессии нет ни в клиенте, ни в хранилище устройства - это и есть пропущенный выход.
+  function _startAuthListener() {
+    if (_startAuthListener.on) return;
+    _startAuthListener.on = true;
+    sbClient.auth.onAuthStateChange(_authHandler);
+    if (currentUser) sbClient.auth.getSession().then(({ data }) => {
+      if (currentUser && !(data && data.session) && !_storedSessionUser()) _authHandler('SIGNED_OUT', null);
+    }).catch(() => {});
+  }
+  async function _authHandler(event,session){
     if(event==="SIGNED_IN"&&session){
       // Distinguish a genuine sign-in (new user / first time) from a token-refresh re-fire.
       // Supabase fires SIGNED_IN on token refresh too, which would otherwise wipe currentUser
@@ -20246,7 +20337,7 @@ const _SB_OPTS = { global: { fetch: _guardedFetch } };
     // здесь только показывался экран входа, а библиотека, списки и входящие прежнего
     // человека оставались в памяти до следующего входа - и доставались ему.
     else if(event==="SIGNED_OUT"){_resetAccountState(currentUser && currentUser.id, { wipeLocal: true });showScreen("signin");document.getElementById("main-app").style.display="none";}
-  });
+  }
 })();
 
 // Refresh data when tab becomes visible again (browser pauses intervals in background)
