@@ -1698,6 +1698,12 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
    другой, и 44-пиксельная зона «JSON backup» целиком накрывала «How to export from IMDb» -
    нажатие на подсказку собирало JSON-копию (обзор 9 нояб, #141). Ряд переносится, а не
    выезжает за край при 150% (#146). */
+.wd-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; }
+.wd-input { flex: 1 1 140px; min-width: 0; min-height: 44px; box-sizing: border-box; padding: 0 10px;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px;
+  color: #ddd; font: inherit; font-size: 13px; color-scheme: dark; }
+.wd-clear { flex: 0 0 auto; min-height: 44px; padding: 0 12px; background: none; border: 1px solid var(--border);
+  border-radius: 8px; color: var(--muted); font-size: 12px; cursor: pointer; }
 .backup-links { display: flex; flex-wrap: wrap; column-gap: 18px; margin-top: 4px; }
 .backup-link { min-height: 44px; padding: 0; background: none; border: none; color: var(--muted);
   font-size: 11px; font-family: var(--font-text); cursor: pointer; text-decoration: underline;
@@ -3053,6 +3059,8 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
           <span class="star">★</span>
           <span class="star">★</span>
         </div>
+        <div class="add-label" data-i18n="wd_label">Watched on</div>
+        <div class="wd-row"><input type="date" id="add-watched-at" class="wd-input"><button type="button" class="wd-clear" onclick="document.getElementById('add-watched-at').value=''" data-i18n="wd_clear">No date</button></div>
         <div class="add-label" data-i18n="notes">Notes</div>
         <textarea id="add-note" data-i18n-ph="note_ph" placeholder="What did you think?" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:var(--font-text);outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
       </div>
@@ -3077,6 +3085,10 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <span class="star">★</span>
         <span class="star">★</span>
         <span class="star">★</span>
+      </div>
+      <div id="edit-wd-block">
+        <div class="add-label" data-i18n="wd_label">Watched on</div>
+        <div class="wd-row"><input type="date" id="edit-watched-at" class="wd-input"><button type="button" class="wd-clear" onclick="document.getElementById('edit-watched-at').value=''" data-i18n="wd_clear">No date</button></div>
       </div>
       <div class="add-label" data-i18n="notes">Notes</div>
       <textarea id="edit-note" data-i18n-ph="note_ph" placeholder="What did you think?" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#ddd;font-size:13px;padding:9px 11px;resize:vertical;min-height:65px;font-family:var(--font-text);outline:none;margin-bottom:18px;transition:border-color .2s" onfocus="this.style.borderColor='var(--primary-border)'" onblur="this.style.borderColor='var(--border)'"></textarea>
@@ -3264,7 +3276,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.20-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.21-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -4918,17 +4930,17 @@ Object.keys(_I18N_IMDB_HINT).forEach(l => { if (I18N[l]) Object.assign(I18N[l], 
 // Letterboxd's steps, visible like IMDb's (#147), and the avatar's spoken name. Letterboxd's own menu
 // words stay English in every language: its site has no other.
 const _I18N_LB_HINT = {
-  en:{ backup_lists_missing:"Not created: {names}. Their films went to your personal list.", acct_btn:"Account", lb_how:"How to export from Letterboxd", lb_hint:"Export lives on the Letterboxd website: letterboxd.com → Settings → Data → Export Your Data.<br>You get a .zip. Open it (on iPhone: tap it in Files) and pick <b>watched.csv</b> or <b>ratings.csv</b> here.<br><b>watchlist.csv</b> is your watchlist - import it as a separate file." },
-  ru:{ backup_lists_missing:"Не создано: {names}. Их фильмы легли в личный список.", acct_btn:"Аккаунт", lb_how:"Как выгрузить из Letterboxd", lb_hint:"Выгрузка есть на сайте Letterboxd: letterboxd.com → Settings → Data → Export Your Data.<br>Придёт файл .zip. Открой его (на iPhone - нажми на него в «Файлах») и выбери здесь <b>watched.csv</b> или <b>ratings.csv</b>.<br><b>watchlist.csv</b> - это список к просмотру, его импортируй отдельным файлом." },
-  uk:{ backup_lists_missing:"Не створено: {names}. Їхні фільми лягли в особистий список.", acct_btn:"Акаунт", lb_how:"Як вивантажити з Letterboxd", lb_hint:"Вивантаження є на сайті Letterboxd: letterboxd.com → Settings → Data → Export Your Data.<br>Прийде файл .zip. Відкрий його (на iPhone - натисни на нього у «Файлах») і вибери тут <b>watched.csv</b> або <b>ratings.csv</b>.<br><b>watchlist.csv</b> - це список до перегляду, імпортуй його окремим файлом." },
-  ka:{ backup_lists_missing:"ვერ შეიქმნა: {names}. მათი ფილმები პირად სიაში მოხვდა.", acct_btn:"ანგარიში", lb_how:"როგორ გადმოვწეროთ Letterboxd-იდან", lb_hint:"ექსპორტი Letterboxd-ის საიტზეა: letterboxd.com → Settings → Data → Export Your Data.<br>მიიღებ .zip ფაილს. გახსენი (iPhone-ზე დააჭირე მას „ფაილებში“) და აქ აირჩიე <b>watched.csv</b> ან <b>ratings.csv</b>.<br><b>watchlist.csv</b> შენი სანახავი სიაა - ის ცალკე ფაილად შემოიტანე." },
-  es:{ backup_lists_missing:"No se crearon: {names}. Sus películas fueron a tu lista personal.", acct_btn:"Cuenta", lb_how:"Cómo exportar desde Letterboxd", lb_hint:"La exportación está en la web de Letterboxd: letterboxd.com → Settings → Data → Export Your Data.<br>Recibes un .zip. Ábrelo (en iPhone: tócalo en Archivos) y elige aquí <b>watched.csv</b> o <b>ratings.csv</b>.<br><b>watchlist.csv</b> es tu lista: impórtala como un archivo aparte." },
-  fr:{ backup_lists_missing:"Non créées : {names}. Leurs films sont allés dans ta liste personnelle.", acct_btn:"Compte", lb_how:"Comment exporter depuis Letterboxd", lb_hint:"L'export se fait sur le site Letterboxd : letterboxd.com → Settings → Data → Export Your Data.<br>Tu reçois un .zip. Ouvre-le (sur iPhone : touche-le dans Fichiers) et choisis ici <b>watched.csv</b> ou <b>ratings.csv</b>.<br><b>watchlist.csv</b>, c'est ta liste : importe-la comme un fichier à part." },
-  de:{ backup_lists_missing:"Nicht angelegt: {names}. Ihre Filme sind in deiner persönlichen Liste.", acct_btn:"Konto", lb_how:"So exportierst du aus Letterboxd", lb_hint:"Den Export gibt es auf der Letterboxd-Website: letterboxd.com → Settings → Data → Export Your Data.<br>Du bekommst eine .zip-Datei. Öffne sie (auf dem iPhone: in Dateien antippen) und wähle hier <b>watched.csv</b> oder <b>ratings.csv</b>.<br><b>watchlist.csv</b> ist deine Watchlist - importiere sie als eigene Datei." },
-  it:{ backup_lists_missing:"Non create: {names}. I loro film sono finiti nella tua lista personale.", acct_btn:"Account", lb_how:"Come esportare da Letterboxd", lb_hint:"L'esportazione è sul sito di Letterboxd: letterboxd.com → Settings → Data → Export Your Data.<br>Ricevi un file .zip. Aprilo (su iPhone: toccalo in File) e scegli qui <b>watched.csv</b> o <b>ratings.csv</b>.<br><b>watchlist.csv</b> è la tua watchlist: importala come file a parte." },
-  pt:{ backup_lists_missing:"Não criadas: {names}. Os filmes delas foram para a sua lista pessoal.", acct_btn:"Conta", lb_how:"Como exportar do Letterboxd", lb_hint:"A exportação fica no site do Letterboxd: letterboxd.com → Settings → Data → Export Your Data.<br>Você recebe um .zip. Abra-o (no iPhone: toque nele no app Arquivos) e escolha aqui <b>watched.csv</b> ou <b>ratings.csv</b>.<br><b>watchlist.csv</b> é a sua lista para ver: importe-a como um arquivo separado." },
-  tr:{ backup_lists_missing:"Oluşturulamadı: {names}. Filmleri kişisel listene eklendi.", acct_btn:"Hesap", lb_how:"Letterboxd'dan nasıl dışa aktarılır", lb_hint:"Dışa aktarma Letterboxd web sitesinde: letterboxd.com → Settings → Data → Export Your Data.<br>Bir .zip dosyası gelir. Onu aç (iPhone'da Dosyalar'da üzerine dokun) ve burada <b>watched.csv</b> ya da <b>ratings.csv</b> seç.<br><b>watchlist.csv</b> izleme listendir - onu ayrı bir dosya olarak içe aktar." },
-  ja:{ backup_lists_missing:"作成できませんでした: {names}。その映画は個人リストに入りました。", acct_btn:"アカウント", lb_how:"Letterboxdからの書き出し方法", lb_hint:"書き出しはLetterboxdのウェブサイトで行います: letterboxd.com → Settings → Data → Export Your Data。<br>.zipファイルが届きます。開いて（iPhoneでは「ファイル」でタップ）、ここで<b>watched.csv</b>または<b>ratings.csv</b>を選んでください。<br><b>watchlist.csv</b>は観たいリストです。別のファイルとして読み込んでください。" },
+  en:{ wd_label:"Watched on", wd_clear:"No date", backup_lists_missing:"Not created: {names}. Their films went to your personal list.", acct_btn:"Account", lb_how:"How to export from Letterboxd", lb_hint:"Export lives on the Letterboxd website: letterboxd.com → Settings → Data → Export Your Data.<br>You get a .zip. Open it (on iPhone: tap it in Files) and pick <b>watched.csv</b> or <b>ratings.csv</b> here.<br><b>watchlist.csv</b> is your watchlist - import it as a separate file." },
+  ru:{ wd_label:"Дата просмотра", wd_clear:"Без даты", backup_lists_missing:"Не создано: {names}. Их фильмы легли в личный список.", acct_btn:"Аккаунт", lb_how:"Как выгрузить из Letterboxd", lb_hint:"Выгрузка есть на сайте Letterboxd: letterboxd.com → Settings → Data → Export Your Data.<br>Придёт файл .zip. Открой его (на iPhone - нажми на него в «Файлах») и выбери здесь <b>watched.csv</b> или <b>ratings.csv</b>.<br><b>watchlist.csv</b> - это список к просмотру, его импортируй отдельным файлом." },
+  uk:{ wd_label:"Дата перегляду", wd_clear:"Без дати", backup_lists_missing:"Не створено: {names}. Їхні фільми лягли в особистий список.", acct_btn:"Акаунт", lb_how:"Як вивантажити з Letterboxd", lb_hint:"Вивантаження є на сайті Letterboxd: letterboxd.com → Settings → Data → Export Your Data.<br>Прийде файл .zip. Відкрий його (на iPhone - натисни на нього у «Файлах») і вибери тут <b>watched.csv</b> або <b>ratings.csv</b>.<br><b>watchlist.csv</b> - це список до перегляду, імпортуй його окремим файлом." },
+  ka:{ wd_label:"ნახვის თარიღი", wd_clear:"თარიღის გარეშე", backup_lists_missing:"ვერ შეიქმნა: {names}. მათი ფილმები პირად სიაში მოხვდა.", acct_btn:"ანგარიში", lb_how:"როგორ გადმოვწეროთ Letterboxd-იდან", lb_hint:"ექსპორტი Letterboxd-ის საიტზეა: letterboxd.com → Settings → Data → Export Your Data.<br>მიიღებ .zip ფაილს. გახსენი (iPhone-ზე დააჭირე მას „ფაილებში“) და აქ აირჩიე <b>watched.csv</b> ან <b>ratings.csv</b>.<br><b>watchlist.csv</b> შენი სანახავი სიაა - ის ცალკე ფაილად შემოიტანე." },
+  es:{ wd_label:"Visto el", wd_clear:"Sin fecha", backup_lists_missing:"No se crearon: {names}. Sus películas fueron a tu lista personal.", acct_btn:"Cuenta", lb_how:"Cómo exportar desde Letterboxd", lb_hint:"La exportación está en la web de Letterboxd: letterboxd.com → Settings → Data → Export Your Data.<br>Recibes un .zip. Ábrelo (en iPhone: tócalo en Archivos) y elige aquí <b>watched.csv</b> o <b>ratings.csv</b>.<br><b>watchlist.csv</b> es tu lista: impórtala como un archivo aparte." },
+  fr:{ wd_label:"Vu le", wd_clear:"Sans date", backup_lists_missing:"Non créées : {names}. Leurs films sont allés dans ta liste personnelle.", acct_btn:"Compte", lb_how:"Comment exporter depuis Letterboxd", lb_hint:"L'export se fait sur le site Letterboxd : letterboxd.com → Settings → Data → Export Your Data.<br>Tu reçois un .zip. Ouvre-le (sur iPhone : touche-le dans Fichiers) et choisis ici <b>watched.csv</b> ou <b>ratings.csv</b>.<br><b>watchlist.csv</b>, c'est ta liste : importe-la comme un fichier à part." },
+  de:{ wd_label:"Gesehen am", wd_clear:"Ohne Datum", backup_lists_missing:"Nicht angelegt: {names}. Ihre Filme sind in deiner persönlichen Liste.", acct_btn:"Konto", lb_how:"So exportierst du aus Letterboxd", lb_hint:"Den Export gibt es auf der Letterboxd-Website: letterboxd.com → Settings → Data → Export Your Data.<br>Du bekommst eine .zip-Datei. Öffne sie (auf dem iPhone: in Dateien antippen) und wähle hier <b>watched.csv</b> oder <b>ratings.csv</b>.<br><b>watchlist.csv</b> ist deine Watchlist - importiere sie als eigene Datei." },
+  it:{ wd_label:"Visto il", wd_clear:"Senza data", backup_lists_missing:"Non create: {names}. I loro film sono finiti nella tua lista personale.", acct_btn:"Account", lb_how:"Come esportare da Letterboxd", lb_hint:"L'esportazione è sul sito di Letterboxd: letterboxd.com → Settings → Data → Export Your Data.<br>Ricevi un file .zip. Aprilo (su iPhone: toccalo in File) e scegli qui <b>watched.csv</b> o <b>ratings.csv</b>.<br><b>watchlist.csv</b> è la tua watchlist: importala come file a parte." },
+  pt:{ wd_label:"Assistido em", wd_clear:"Sem data", backup_lists_missing:"Não criadas: {names}. Os filmes delas foram para a sua lista pessoal.", acct_btn:"Conta", lb_how:"Como exportar do Letterboxd", lb_hint:"A exportação fica no site do Letterboxd: letterboxd.com → Settings → Data → Export Your Data.<br>Você recebe um .zip. Abra-o (no iPhone: toque nele no app Arquivos) e escolha aqui <b>watched.csv</b> ou <b>ratings.csv</b>.<br><b>watchlist.csv</b> é a sua lista para ver: importe-a como um arquivo separado." },
+  tr:{ wd_label:"İzlenme tarihi", wd_clear:"Tarihsiz", backup_lists_missing:"Oluşturulamadı: {names}. Filmleri kişisel listene eklendi.", acct_btn:"Hesap", lb_how:"Letterboxd'dan nasıl dışa aktarılır", lb_hint:"Dışa aktarma Letterboxd web sitesinde: letterboxd.com → Settings → Data → Export Your Data.<br>Bir .zip dosyası gelir. Onu aç (iPhone'da Dosyalar'da üzerine dokun) ve burada <b>watched.csv</b> ya da <b>ratings.csv</b> seç.<br><b>watchlist.csv</b> izleme listendir - onu ayrı bir dosya olarak içe aktar." },
+  ja:{ wd_label:"観た日", wd_clear:"日付なし", backup_lists_missing:"作成できませんでした: {names}。その映画は個人リストに入りました。", acct_btn:"アカウント", lb_how:"Letterboxdからの書き出し方法", lb_hint:"書き出しはLetterboxdのウェブサイトで行います: letterboxd.com → Settings → Data → Export Your Data。<br>.zipファイルが届きます。開いて（iPhoneでは「ファイル」でタップ）、ここで<b>watched.csv</b>または<b>ratings.csv</b>を選んでください。<br><b>watchlist.csv</b>は観たいリストです。別のファイルとして読み込んでください。" },
 };
 function _toggleHint(btn, id) {
   const e = document.getElementById(id);
@@ -6992,6 +7004,9 @@ function _rowToEntry(r) {
     date: new Date(r.created_at).toLocaleDateString("en-GB"),
     // Для порядка «Просмотренного»: date выше - строка для показа, по ней не отсортировать (#28).
     createdAt: r.created_at || null,
+    // Дата просмотра (Дафа, 10 нояб): отдельно от даты строки. Пусто - неизвестна; прошлые строки и
+    // «Date Rated» из IMDb датой просмотра не считаются.
+    watchedAt: r.watched_at || null,
     listId: r.list_id || null,
     addedBy: r.user_id || null,
     sortOrder: r.sort_order ?? null
@@ -7013,11 +7028,27 @@ function _watchlistPayload(entry) {
   };
   // Optional: preserve original add date on backup restore (otherwise Supabase defaults to NOW())
   if (entry.addedAt) payload.created_at = entry.addedAt;
+  if (entry.watchedAt !== undefined && !_noWatchedAt) payload.watched_at = entry.watchedAt || null;
   return payload;
+}
+// Колонка watched_at появляется миграцией docs/db-2026-11-10/3-watched-at.sql. Пока её нет, запись с
+// ней PostgREST отклоняет целиком («Could not find the 'watched_at' column»), и сборка не должна
+// ждать миграции: такая запись повторяется без даты, и до перезагрузки дата больше не шлётся.
+let _noWatchedAt = false;
+const _todayISO = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+async function _wlWrite(path, opts) {
+  try { return await sbFetch(path, opts); }
+  catch (e) {
+    if (!/watched_at/.test(String(e && e.message)) || !opts.body || !opts.body.includes('watched_at')) throw e;
+    _noWatchedAt = true;
+    const strip = o => { if (o && typeof o === 'object') delete o.watched_at; return o; };
+    const body = JSON.parse(opts.body);
+    return await sbFetch(path, { ...opts, body: JSON.stringify(Array.isArray(body) ? body.map(strip) : strip(body)) });
+  }
 }
 // Обе записи возвращают затронутые строки (return=representation), а не только отсутствие ошибки.
 async function saveEntryToDB(entry) {
-  return await sbFetch("watchlist", { method: "POST", prefer: "return=representation", body: JSON.stringify(_watchlistPayload(entry)) });
+  return await _wlWrite("watchlist", { method: "POST", prefer: "return=representation", body: JSON.stringify(_watchlistPayload(entry)) });
 }
 // НОЛЬ ЗАТРОНУТЫХ СТРОК - НЕ УСПЕХ. RLS разрешает удалять только свои строки, и PostgREST на
 // DELETE или PATCH чужой (или уже удалённой) строки отвечает 204/200 без ошибки. Крестик на
@@ -7031,7 +7062,8 @@ async function deleteEntryFromDB(id) {
   return _changedRows(await sbFetch(`watchlist?id=eq.${id}`, { method: "DELETE", prefer: "return=representation" }));
 }
 async function updateEntryInDB(id, fields) {
-  return _changedRows(await sbFetch(`watchlist?id=eq.${id}`, { method: "PATCH", prefer: "return=representation", body: JSON.stringify(fields) }));
+  if (_noWatchedAt && 'watched_at' in fields) { fields = { ...fields }; delete fields.watched_at; }
+  return _changedRows(await _wlWrite(`watchlist?id=eq.${id}`, { method: "PATCH", prefer: "return=representation", body: JSON.stringify(fields) }));
 }
 
 // ── TMDB ──────────────────────────────────────────────────────────────────────
@@ -9526,6 +9558,9 @@ function openAdd(movie, status, listId) {
   document.getElementById("add-modal-label").textContent = status === "plan" ? `${t('add_modal_list')}${listLabel}` : t('add_modal_seen');
   document.getElementById("add-stars-section").style.display = status === "plan" ? "none" : "block";
   document.getElementById("add-note").value = "";
+  // «Посмотрел» ставит сегодняшний день; его можно поправить или стереть (Дафа, 10 нояб).
+  const _wd = document.getElementById("add-watched-at");
+  if (_wd) { _wd.value = _todayISO(); _wd.max = _todayISO(); }
   _wireStars();
   renderStars(0);
   document.getElementById("add-overlay").style.display = "flex";
@@ -9640,6 +9675,7 @@ async function confirmAdd() {
       if (currentAddStatus === "watched") {
         fields.stars = currentStars;
         fields.comment = document.getElementById("add-note").value;
+        fields.watched_at = document.getElementById("add-watched-at").value || null;
         // This used to also write `fields.list_id = null`, described as the film "moving" to the
         // global Watched view. It was not a move, it was a deletion: the row stopped recording
         // which list the film belonged to, nothing else held that fact, and no undo existed.
@@ -9676,6 +9712,7 @@ async function confirmAdd() {
         stars: currentAddStatus==="plan"?0:currentStars,
         comment: currentAddStatus==="plan"?"":document.getElementById("add-note").value,
         status: currentAddStatus, mediaType: m.type||m.mediaType||"movie",
+        watchedAt: currentAddStatus === "watched" ? (document.getElementById("add-watched-at").value || null) : undefined,
         composer: composer||null, director: director||null,
         cinematographer: cinematographer||null,
         actors: actors||null,
@@ -9746,6 +9783,9 @@ function openEdit(id) {
   currentEditId = id; currentEditStars = item.stars || 0;
   document.getElementById("edit-movie-title").textContent = `${item.title} (${item.year})`;
   document.getElementById("edit-note").value = item.comment || "";
+  const _wdb = document.getElementById("edit-wd-block"), _wd = document.getElementById("edit-watched-at");
+  if (_wdb) _wdb.style.display = item.status === 'watched' ? '' : 'none';
+  if (_wd) { _wd.value = item.watchedAt || ''; _wd.max = _todayISO(); }
   _wireStars();
   renderEditStars(currentEditStars);
   document.getElementById("edit-overlay").style.display = "flex";
@@ -9758,7 +9798,10 @@ async function confirmEdit() {
   btn.textContent = t('backup_saving'); btn.disabled = true;   // не английский литерал (как в confirmAdd)
   let written;
   try {
-    written = await updateEntryInDB(currentEditId, { stars: currentEditStars, comment: document.getElementById("edit-note").value });
+    const _f = { stars: currentEditStars, comment: document.getElementById("edit-note").value };
+    const _it = watchHistory.find(h => h.id === currentEditId);
+    if (_it && _it.status === 'watched') _f.watched_at = document.getElementById("edit-watched-at").value || null;
+    written = await updateEntryInDB(currentEditId, _f);
   } catch(e) {
     alert(t('err_could_not_save') + e.message);
     // Как в confirmAdd: перечитать базу. Если строки там больше нет (удалена на другом
@@ -17271,9 +17314,10 @@ async function applyBackupData(rows, onProgress, opts = {}) {
     const k = _insKey(e), prev = _insAt.get(k);
     if (!prev) { _insAt.set(k, e); toInsert.push(e); return; }
     skipped++;
-    if (String(e.addedAt || '') >= String(prev.addedAt || '')) {
+    if (String(e.watchedAt || e.addedAt || '') >= String(prev.watchedAt || prev.addedAt || '')) {
       if (e.stars > 0) prev.stars = e.stars;
       if (e.addedAt) prev.addedAt = e.addedAt;
+      if (e.watchedAt) prev.watchedAt = e.watchedAt;
     }
     if (!prev.comment && e.comment) prev.comment = e.comment;
   };
@@ -17300,7 +17344,8 @@ async function applyBackupData(rows, onProgress, opts = {}) {
         actors: r.actors || "",
         runtime: r.runtime || null,
         listId: r.list_id || null,    // preserve list membership (works for same-account restore)
-        addedAt: r.added_at || null   // preserve original add date — true round-trip
+        addedAt: r.added_at || null,  // preserve original add date — true round-trip
+        watchedAt: r.watched_at || undefined
       });
     }
   }
@@ -17344,7 +17389,7 @@ async function applyBackupData(rows, onProgress, opts = {}) {
     try {
       // return=minimal, not representation: the response for 100 rows is otherwise ~100x
       // bigger than it needs to be, and every byte of it is another chance to be cut off.
-      await sbFetch("watchlist", { method: "POST", prefer: "return=minimal", body: JSON.stringify(chunk.map(_watchlistPayload)) });
+      await _wlWrite("watchlist", { method: "POST", prefer: "return=minimal", body: JSON.stringify(chunk.map(_watchlistPayload)) });
       added += chunk.length;
       done += chunk.length; onProgress?.(done, total);
     } catch (e) {
@@ -17378,6 +17423,7 @@ async function applyBackupData(rows, onProgress, opts = {}) {
     if (r.cinematographer) patch.cinematographer = r.cinematographer;
     if (r.actors)          patch.actors          = r.actors;
     if (r.added_at)        patch.created_at      = r.added_at;
+    if (r.watched_at)      patch.watched_at      = r.watched_at;
     try { await updateEntryInDB(id, patch); _updatedIds.add(id); }
     catch(e) { failed++; }
     tick();
@@ -17762,11 +17808,13 @@ function _parseLetterboxdRows(text, fileName) {
   const isWatchlist = /watchlist/i.test(fileName || "");
   return recs.map(r => {
     const rt = parseFloat(r['Rating']);
-    // Дата просмотра из файла (#27): у diary.csv - Watched Date, у остальных файлов выгрузки -
-    // Date (когда отмечено). Без неё 600 фильмов дневника за восемь лет датировались днём импорта.
-    const date = String(r['Watched Date'] || r['Date'] || '').trim();
+    // Даты из файла (#27): Date - когда отмечено на Letterboxd, она становится датой строки; Watched
+    // Date есть только у diary.csv, и только она - дата просмотра (Дафа, 10 нояб). Без них 600 фильмов
+    // дневника за восемь лет датировались днём импорта.
+    const iso = v => { const d = String(v || '').trim(); return /^\d{4}-\d{2}-\d{2}/.test(d) ? d.slice(0, 10) : null; };
     return {
-      added_at: /^\d{4}-\d{2}-\d{2}/.test(date) ? date.slice(0, 10) : null,
+      added_at: iso(r['Date']),
+      watched_at: isWatchlist ? null : iso(r['Watched Date']),
       title: (r['Name'] || "").trim(),
       year: String(r['Year'] || "").trim().slice(0, 4),
       stars: Number.isFinite(rt) ? Math.max(0, Math.min(5, rt)) : 0,
@@ -18624,16 +18672,17 @@ async function backupExportXLSX() {
       { header: "Rating", width: 10 }, { header: "Comment", width: 42 }, { header: "Director", width: 24 },
       { header: "Cinematographer", width: 24 }, { header: "Composer", width: 24 }, { header: "Actors", width: 34 },
       { header: "Runtime", width: 12 }, { header: "Poster", width: 42 }, { header: "Added At", width: 22 },
+      { header: "Watched On", width: 14 },
     ];
     for (const r of rows) {
       wsFilms.addRow([
         r.imdb_id, r.title, r.year, r.media_type || "movie",
         r.status || "watched", (r.list_id && listNameById[r.list_id]) ? listNameById[r.list_id] : "",
         r.stars || 0, r.comment || "", r.director || "", r.cinematographer || "", r.composer || "",
-        r.actors || "", r.runtime || "", r.poster || "", r.created_at || ""
+        r.actors || "", r.runtime || "", r.poster || "", r.created_at || "", r.watched_at || ""
       ]);
     }
-    styleDataSheet(wsFilms, 15);
+    styleDataSheet(wsFilms, 16);
 
     // Sheet 2 — Lists (your lists and your role in each)
     const wsLists = wb.addWorksheet("Lists");
@@ -18756,7 +18805,8 @@ async function backupImportXLSX() {
           actors: String(fget(row, 'actors') || ""),
           runtime: Number.isFinite(rt) && rt > 0 ? rt : null,
           poster: String(fget(row, 'poster') || ""),
-          added_at: String(fget(row, 'added_at') || "")
+          added_at: String(fget(row, 'added_at') || ""),
+          watched_at: /^\d{4}-\d{2}-\d{2}/.test(String(fget(row, 'watched_on') || '')) ? String(fget(row, 'watched_on')).slice(0, 10) : null
         });
       });
       // Optional Lists sheet — so we recreate even empty lists, not just ones
