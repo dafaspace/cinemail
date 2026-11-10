@@ -7,9 +7,15 @@
   <meta name="theme-color" content="#0d0d1a">
   <title>Privacy Policy - Cinemail</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- DM Sans from cinemail.app itself (fonts/, the same files as the app), not Google Fonts. -->
+  <style>
+    @font-face { font-family: 'DM Sans'; font-style: normal; font-weight: 300 600; font-display: swap;
+      src: url('/fonts/dm-sans-latin-ext.woff2') format('woff2');
+      unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+    @font-face { font-family: 'DM Sans'; font-style: normal; font-weight: 300 600; font-display: swap;
+      src: url('/fonts/dm-sans-latin.woff2') format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  </style>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -154,7 +160,7 @@
     </nav>
 
     <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: 3 November 2026</p>
+    <p class="updated">Last updated: 10 November 2026</p>
 
     <div class="intro">
       Cinemail is built by one independent developer who cares deeply about user privacy. This policy explains, in plain language, what data the app collects, why, and what your rights are. No legalese, no dark patterns.
@@ -174,6 +180,13 @@
       <li>Password (stored securely as a hash via Supabase Auth; we never see your plain password)</li>
       <li>Optional display name</li>
     </ul>
+    <p>
+      <strong>Start without an account</strong> also creates a real account, only without an email or
+      password. Its films, ratings, notes and lists are stored on our server exactly like everyone
+      else's, and they stay there until you delete the account (section 7). Only the device that made
+      it can open it: without an email there is no way to sign in to it from anywhere else. Adding an
+      email keeps everything and makes it a normal account.
+    </p>
 
     <h3>2.2 Content you create</h3>
     <p>When you use Cinemail, we store the data you generate:</p>
@@ -195,7 +208,7 @@
       It carries a snapshot of the film or list at the moment you created it, together
       with your display name, and anyone holding the link can open it without a Cinemail
       account. It does not update afterwards - anything you add later is not in it - and
-      you can delete the link at any time, which stops it working immediately.
+      it keeps working until you delete your account, which deletes the link with everything else.
     </p>
 
     <h3>2.3 Technical data</h3>
@@ -215,7 +228,11 @@
 
     <h3>2.4 What we do <em>not</em> collect</h3>
     <ul>
-      <li>No third-party analytics (no Google Analytics, no Facebook Pixel, no Mixpanel, nothing)</li>
+      <li>No analytics in the app, and no Google Analytics, Facebook Pixel or Mixpanel anywhere. The website
+        cinemail.app - the web version of the app and pages like this one - carries
+        <a href="https://www.cloudflare.com/web-analytics/" target="_blank" rel="noopener">Cloudflare Web Analytics</a>:
+        a counter of page views without cookies, which sees the page, the site you came from, your country and
+        browser, and nothing that links them to your account. The iOS and Android apps do not carry it.</li>
       <li>No advertising IDs, no tracking SDKs</li>
       <li>No location data. The map's "where am I" button asks your phone or browser for your position only when you tap it, shows it as a dot on the map, and stops there: the position is not sent to us or stored anywhere</li>
       <li>No contacts, photos or files beyond what you explicitly upload</li>
@@ -237,12 +254,21 @@
 
     <h3>4.1 Supabase</h3>
     <p>
-      Your account, watchlist and lists are stored in <a href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase</a>, a managed PostgreSQL service. Servers are located in the EU (Frankfurt) at the time of writing. Supabase acts as our data processor under standard contractual terms.
+      Your account, watchlist and lists are stored in <a href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase</a>, a managed PostgreSQL service. Servers are located in Singapore (AWS region ap-southeast-1) at the time of writing. Supabase acts as our data processor under standard contractual terms.
     </p>
 
     <h3>4.2 Cloudflare</h3>
     <p>
       API requests (TMDB film data, and the count of picks you used this week) are proxied through a <a href="https://www.cloudflare.com/privacy/" target="_blank" rel="noopener">Cloudflare Worker</a> for security and rate-limiting. Cloudflare may temporarily process request metadata at the edge.
+    </p>
+
+    <h3>4.3 Backups (pCloud)</h3>
+    <p>
+      Every night a copy of the database and of the feedback screenshots is made, so that nothing is
+      lost if Supabase fails. Each copy is encrypted (with <a href="https://age-encryption.org" target="_blank" rel="noopener">age</a>)
+      before it leaves the developer's computer, and only the developer holds the key. The encrypted
+      copies are stored with <a href="https://www.pcloud.com/privacy_policy.html" target="_blank" rel="noopener">pCloud</a>;
+      fourteen nightly copies are kept and older ones are deleted.
     </p>
 
     <h2>5. Third-party services</h2>
@@ -259,15 +285,28 @@
 
     <h3>5.3 Feedback</h3>
     <p>
-      When you send feedback, its text, your display name and an attached screenshot are forwarded to the developer's private <a href="https://telegram.org/privacy" target="_blank" rel="noopener">Telegram</a> chat, so it is read quickly; a reply written there comes back to you inside the app. The screenshot itself stays in the private storage described in 2.2; Telegram receives it through a link that works for five minutes.
+      When you send feedback, its text, your display name and an attached screenshot are forwarded to the developer's private <a href="https://telegram.org/privacy" target="_blank" rel="noopener">Telegram</a> chat, so it is read quickly; a reply written there comes back to you inside the app. The screenshot itself stays in the private storage described in 2.2, and Telegram fetches it through a link that works for five minutes - but Telegram then keeps its own copy in that chat, as it does with the text. Deleting your account does not reach into Telegram: write to us and those messages are deleted by hand.
     </p>
 
-    <h3>5.4 Music links</h3>
+    <h3>5.4 Email</h3>
+    <p>
+      The emails that confirm your address, sign you in or reset your password are sent through
+      <a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener">Resend</a>, which receives your
+      email address and the message for that purpose only.
+    </p>
+
+    <h3>5.5 Fonts</h3>
+    <p>
+      The fonts are served from cinemail.app itself. Neither the app nor these pages load Google Fonts or any
+      other font service.
+    </p>
+
+    <h3>5.6 Music links</h3>
     <p>
       Soundtrack buttons open external services (Spotify, Apple Music, YouTube Music). These platforms have their own privacy policies; we never share your data with them - the link opens with only the search term.
     </p>
 
-    <h3>5.5 Maps</h3>
+    <h3>5.7 Maps</h3>
     <p>
       The map is drawn by <a href="https://maplibre.org" target="_blank" rel="noopener">MapLibre</a>, which runs inside the app. The map background comes from <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> (data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors): like any online map, it receives a request for each part of the world you look at, with your IP address, but nothing about your account. Photos of filming places load from <a href="https://commons.wikimedia.org" target="_blank" rel="noopener">Wikimedia Commons</a> the same way. The filming places themselves are part of the app and need no request at all.
     </p>
@@ -294,11 +333,12 @@
 
     <h2>8. Data retention</h2>
     <p>
-      We keep your account data for as long as your account exists. Deleting your account removes it from the live database at once, in a single transaction - not marked inactive, not queued. Anonymised backups may be retained for up to 30 days after that for disaster recovery, then permanently deleted.
+      We keep your account data for as long as your account exists. Deleting your account removes it from the live database at once, in a single transaction - not marked inactive, not queued. The encrypted nightly backups (4.3) still hold it until the last copy made before the deletion is replaced: at most fourteen days. Nobody restores a deleted account from them.
     </p>
     <p>
       Feedback messages and their screenshots are deleted with your account, along with
-      everything else. An earlier version of this policy said feedback might be kept
+      everything else - except the copy in the developer's Telegram chat (5.3), which is deleted by
+      hand when you ask. An earlier version of this policy said feedback might be kept
       indefinitely for product records; that was never what the code did, and the wording
       has been corrected to match it.
     </p>
@@ -315,7 +355,7 @@
 
     <h2>11. International transfers</h2>
     <p>
-      If you use Cinemail from outside the EU, your data may be transferred to servers in the EU (Supabase, Frankfurt) or routed through Cloudflare's global network. We rely on Standard Contractual Clauses and the providers' compliance frameworks to safeguard those transfers.
+      If you use Cinemail from outside the EU, your data may be transferred to servers in Singapore (Supabase) or routed through Cloudflare's global network. We rely on Standard Contractual Clauses and the providers' compliance frameworks to safeguard those transfers.
     </p>
 
     <h2>12. Changes to this policy</h2>

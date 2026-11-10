@@ -7,9 +7,15 @@
   <meta name="theme-color" content="#0d0d1a">
   <title>Support - Cinemail</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- DM Sans from cinemail.app itself (fonts/, the same files as the app), not Google Fonts. -->
+  <style>
+    @font-face { font-family: 'DM Sans'; font-style: normal; font-weight: 300 600; font-display: swap;
+      src: url('/fonts/dm-sans-latin-ext.woff2') format('woff2');
+      unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+    @font-face { font-family: 'DM Sans'; font-style: normal; font-weight: 300 600; font-display: swap;
+      src: url('/fonts/dm-sans-latin.woff2') format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  </style>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -188,15 +194,27 @@
     <p>
       You can do it yourself, immediately, without asking me:
     </p>
+    <p>
+      <strong>Without the app:</strong> email <a href="mailto:support@dafaspace.com">support@dafaspace.com</a>
+      from the address your account uses and ask for it to be deleted. I delete it by hand within
+      30 days, usually the same week, and write back when it is done. You do not need to install
+      anything or sign in.
+    </p>
+    <p><strong>In the app:</strong></p>
     <ol>
       <li>Tap your avatar, top right.</li>
       <li>Scroll to the bottom and choose <strong>Delete my account</strong>.</li>
       <li>Confirm.</li>
     </ol>
     <p>
-      Your films, ratings, notes, lists, friendships and the messages you sent are deleted
-      together with the account, in one step. Nothing is kept behind a "deactivated" flag.
-      If the button ever fails, email me and I will do it by hand.
+      Your films, ratings, notes, lists, share links, friendships and the messages you sent are
+      deleted together with the account, in one step. Nothing is kept behind a "deactivated" flag.
+      Two things outlive it for a while: the encrypted nightly backups hold it for at most fourteen
+      days, and feedback you sent stays in my Telegram chat until you ask me to delete it there too.
+    </p>
+    <p>
+      A guest account (<strong>Start without an account</strong>) has no email, so it can only be
+      deleted from inside the app on the device that made it.
     </p>
 
     <h2>Take your data with you</h2>
@@ -260,9 +278,10 @@
 
     <h3>My films did not sync to another device</h3>
     <p>
-      Sync needs an account. If you started with <strong>Start without an account</strong>,
-      everything lives on that one device until you join - and joining keeps what you already
-      have. If you are signed in on both and still see a difference, email me.
+      Sync needs an email. If you started with <strong>Start without an account</strong>, your
+      films are stored on our server, but only this device can open them, because there is no
+      email to sign in with anywhere else. Adding an email under your avatar keeps everything and
+      lets you sign in on other devices. If you are signed in on both and still see a difference, email me.
     </p>
 
     <h3>Does it work offline?</h3>
@@ -275,7 +294,8 @@
     <p>
       What is collected, why, and where it is stored is set out in the
       <a href="https://cinemail.app/privacy.html">Privacy Policy</a>. Short version: no ads, no
-      analytics, no trackers, nothing sold.
+      trackers and no analytics in the app, nothing sold. The website counts page views with
+      Cloudflare Web Analytics, without cookies.
     </p>
 
     <footer>
