@@ -114,7 +114,10 @@ body {
   margin: 0 auto;
   min-height: 100vh;
   position: relative;
-  overflow-x: hidden;
+  /* clip, not hidden (#129): hidden turns overflow-y into auto, #app becomes a scroll box
+     that never scrolls itself, and the sticky topbar and tabbar stuck to it instead of the
+     screen, so both scrolled away with the list. */
+  overflow-x: clip;
 }
 
 /* ── Auth Screens ───────────────────────────────────────────────────── */
@@ -124,7 +127,8 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px 20px;
+  /* The status bar overlays the web view in the store build (#131): the icon sat under the clock. */
+  padding: calc(24px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom));
 }
 
 .auth-logo {
@@ -310,7 +314,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 
 .btn-accent {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);   /* never white on --accent: 2.98:1 (#133) */
   width: 100%;
 }
 .btn-accent:hover { background: color-mix(in srgb, var(--accent) 85%, transparent); }
@@ -424,7 +428,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   border-bottom: 1px solid var(--border);
   background: var(--bg);
   position: sticky;
-  top: 52px;
+  top: calc(52px + env(safe-area-inset-top));   /* the topbar's own height, inset included */
   z-index: 99;
 }
 .tab-btn {
@@ -558,6 +562,13 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
    название в одну строку и в две ставило кнопки на разную высоту, и столбец под пальцем ломался.
    Сверху они стоят на одной линии с верхом постера в каждой строке. */
 .card-actions { display: flex; flex-direction: row; gap: 12px; flex-shrink: 0; margin-left: 4px; align-items: center; align-self: flex-start; }
+/* УЗКИЙ ЭКРАН (#126): при 250px (Safari, текст 150%) ряд из трёх кнопок оставлял названию 16px, при
+   320px 86. Уже 330px кнопки уходят второй строкой под текст, и название получает всю ширину. */
+@media (max-width: 330px) {
+  .card:has(> .card-actions) { flex-wrap: wrap; row-gap: 8px; }
+  .card:has(> .card-actions) > div:first-child { flex: 1 1 100% !important; }   /* у строки flex:1 в инлайне */
+  .card > .card-actions { margin-left: 50px; }
+}
 
 .btn-watchlist, .btn-watched {
   height: 24px;
@@ -857,9 +868,18 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   max-width: 480px;
   max-height: 88vh;
   overflow-y: auto;
+  overscroll-behavior: contain;   /* the end of the card's scroll no longer moves the page under it (#136) */
   padding: 0 0 32px;
   animation: slideUp 0.25s cubic-bezier(0.32, 0.72, 0, 1);
 }
+/* КРЕСТИК НЕ УЕЗЖАЕТ (#136): он стоял absolute внутри прокручиваемого окна и уезжал вместе с
+   содержимым, длинную карточку снизу закрыть было нечем. Липкая строка нулевой высоты держит его у
+   верха окна; кружок под ним, чтобы он читался поверх текста. */
+.modal-top { position: sticky; top: 0; height: 0; z-index: 2; }
+.modal-x { position: absolute; top: 12px; right: 10px; width: 36px; height: 36px; padding: 0; border: none; border-radius: 50%;
+  background: color-mix(in srgb, var(--surface) 82%, transparent); color: var(--muted); cursor: pointer; }
+.modal.dragging { animation: none; transition: none; }
+.modal.settling { transition: transform 0.22s cubic-bezier(0.32, 0.72, 0, 1); }
 .modal-sheet {
   background: var(--surface);
   border: 1px solid rgba(245,197,24,0.15);
@@ -1169,7 +1189,6 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 /* ── Toast ──────────────────────────────────────────────────────────── */
 #toast {
   position: fixed;
-  bottom: 24px;
   left: 50%;
   transform: translateX(-50%) translateY(20px);
   background: var(--surface2);
@@ -1179,7 +1198,16 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   font-size: 13px;
   font-family: var(--font-text);
   padding: 9px 16px;
-  white-space: nowrap;
+  /* ДЛИННЫЙ ТОСТ ПЕРЕНОСИТСЯ (#53, #127): nowrap без предела ширины при left:50% и translateX(-50%)
+     выносил фразу за оба края, и от «Allow location in the browser or phone settings» оставалась
+     середина. Короткий тост остаётся одной строкой: max-content, но не шире экрана без полей. */
+  white-space: normal;
+  width: max-content;
+  max-width: min(440px, calc(100vw - 32px));
+  box-sizing: border-box;
+  text-align: center;
+  line-height: 1.4;
+  bottom: calc(24px + env(safe-area-inset-bottom));
   /* 10000, not 500. It WAS 500 - the same as every auth screen - and at equal z-index the
      later element in the document paints on top. #toast is at line ~2043 and all five auth
      screens are at 2343-2451, so every toast shown on sign-in, sign-up, check-email, forgot
@@ -1763,8 +1791,21 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 }
 .ob-slide {
   min-width: 100vw; width: 100vw; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; padding: 24px 28px 190px; gap: 4px;
+  /* МАЛЕНЬКИЙ ЭКРАН (#128, #143): слайд не прокручивался, снизу всегда стояло 190px при нижнем блоке
+     около 120, а макет с overflow:hidden молча сжимался (его min-height в колонке - ноль). На SE
+     срезало 27-43px макета, при 150% карточка карты получала высоту 0, а заголовок уходил выше экрана.
+     Теперь макет не сжимается, резерв снизу равен нижнему блоку, а то, что не влезло, прокручивается.
+     Центр - auto-отступами у первого и последнего ребёнка: пока места хватает, они центрируют, а когда
+     не хватает, становятся нулём, и лишнее уходит вниз, под прокрутку, а не выше экрана. */
+  align-items: center; justify-content: flex-start;
+  padding: calc(24px + env(safe-area-inset-top)) 28px calc(110px + max(28px, env(safe-area-inset-bottom)));
+  gap: 4px; overflow-y: auto; overscroll-behavior: contain; box-sizing: border-box; height: 100%;
 }
+.ob-slide > :first-child { margin-top: auto; }
+.ob-slide > :last-child { margin-bottom: auto; }
+.ob-slide > * { flex-shrink: 0; }
+/* Короткий экран (SE в Safari, текст 150%): знак поменьше, чтобы третий ряд языков не уходил под точки. */
+@media (max-height: 560px) { .ob-slide > svg.logo-tap { width: 72px !important; height: 72px !important; margin-bottom: 8px !important; } }
 .ob-title {
   font-family: var(--font-display);
   font-size: 30px; letter-spacing: 1.5px; color: var(--text);
@@ -2310,7 +2351,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 <div id="app">
 
 <!-- ── Toast ──────────────────────────────────────────────────────────── -->
-<div id="toast"></div>
+<div id="toast" role="status" aria-live="polite"></div>
 
 <!-- ══════════════════════════════════════════════════════════════
      ONBOARDING
@@ -2853,7 +2894,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
   <div class="topbar">
     <div class="topbar-logo"><span>CINE</span>MAIL</div>
     <div class="topbar-actions">
-      <button class="feedback-btn" id="btn-open-feedback" onclick="openFeedback()" title="Feedback">
+      <button class="feedback-btn" id="btn-open-feedback" onclick="openFeedback()" data-i18n-aria="feedback" aria-label="Feedback">
         <span id="feedback-icon-wrap">
           <svg id="feedback-icon" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="2" y="4" width="20" height="16" rx="2"/>
@@ -2862,7 +2903,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         </span>
         <span class="fb-label" style="color:var(--muted);line-height:1" data-i18n="feedback">Feedback</span>
       </button>
-      <button class="avatar-btn" id="btn-avatar" onclick="openAccount()" title="Account">U</button>
+      <button class="avatar-btn" id="btn-avatar" onclick="openAccount()" data-i18n-aria="acct_btn" aria-label="Account">U</button>
     </div>
   </div>
 
@@ -2973,8 +3014,8 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 <!-- Detail Modal -->
 <div id="detail-overlay" class="overlay" style="display:none" onclick="closeDetail()">
   <div class="modal" onclick="event.stopPropagation()" style="position:relative">
+    <div class="modal-top"><button class="modal-x" onclick="navModalBack()" data-i18n-aria="close" aria-label="Close"><span data-ic="x" data-ic-size="20"></span></button></div>
     <div class="modal-handle"></div>
-    <button onclick="navModalBack()" style="position:absolute;top:18px;right:14px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:6px;z-index:1"><span data-ic="x" data-ic-size="20"></span></button>
     <div id="detail-content" class="modal-body"></div>
   </div>
 </div>
@@ -2982,7 +3023,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
 <!-- Person Modal -->
 <div id="person-overlay" class="overlay" style="display:none" onclick="closePerson()">
   <div class="modal" onclick="event.stopPropagation()" style="position:relative">
-    <button onclick="navModalBack()" style="position:absolute;top:18px;right:14px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:6px;z-index:1"><span data-ic="x" data-ic-size="20"></span></button>
+    <div class="modal-top"><button class="modal-x" onclick="navModalBack()" data-i18n-aria="close" aria-label="Close"><span data-ic="x" data-ic-size="20"></span></button></div>
     <div class="modal-handle"></div>
     <div id="person-content" class="modal-body"></div>
   </div>
@@ -3137,20 +3178,24 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
       </div>
       <div class="add-label" data-i18n="backup_lbl" style="margin-top:4px">Backup</div>
       <div class="backup-row">
-        <button class="btn-backup" onclick="backupExportXLSX()" data-i18n="backup_btn_download" title="Download an Excel (.xlsx) backup — films, lists and members">↓ Download</button>
-        <button class="btn-backup" onclick="backupImportXLSX()" data-i18n="backup_btn_restore" title="Restore from an Excel (.xlsx) backup or legacy .csv">↑ Restore</button>
+        <button class="btn-backup" onclick="backupExportXLSX()" data-i18n="backup_btn_download">↓ Download</button>
+        <button class="btn-backup" onclick="backupImportXLSX()" data-i18n="backup_btn_restore">↑ Restore</button>
         <input type="file" id="backup-import-input" accept=".xlsx,.csv" style="display:none">
       </div>
       <div class="backup-hint" data-i18n="backup_hint" style="font-size:11px;color:var(--muted);line-height:1.4;margin-top:6px">Save an Excel backup of your lists, or restore them from a backup file.</div>
-      <button class="btn-backup" onclick="backupImportLetterboxd()" data-i18n="lb_import_btn" title="Coming from Letterboxd? On Letterboxd: Settings → Data → Export Your Data, unzip, then pick a .csv (e.g. watched.csv or ratings.csv)." style="width:100%;margin-top:8px">↑ Import from Letterboxd</button>
-      <button class="btn-backup" onclick="backupImportIMDb()" data-i18n="imdb_import_btn" title="Coming from IMDb? Export lives on the IMDb website, not in the app. Tap &quot;How to export from IMDb&quot; below for the steps." style="width:100%;margin-top:8px">↑ Import from IMDb</button>
+      <button class="btn-backup" onclick="backupImportLetterboxd()" data-i18n="lb_import_btn" style="width:100%;margin-top:8px">↑ Import from Letterboxd</button>
+      <button class="btn-backup" onclick="backupImportIMDb()" data-i18n="imdb_import_btn" style="width:100%;margin-top:8px">↑ Import from IMDb</button>
       <!-- This used to live in the title attribute above, where a phone never shows it - there
            is no hover on a touch screen, so the one instruction mobile users need was visible
            only on desktop. Found when an Android user could not get past IMDb's app intercept. -->
+      <!-- Letterboxd's steps lived only in a title too (#147), so a phone never showed them, and the
+           titles in this block were English in every language. -->
       <div class="backup-links">
-        <button class="backup-link" onclick="var e=document.getElementById('imdb-hint');e.hidden=!e.hidden;this.setAttribute('aria-expanded',String(!e.hidden))" aria-expanded="false" aria-controls="imdb-hint" data-i18n="imdb_how">How to export from IMDb</button>
+        <button class="backup-link" onclick="_toggleHint(this,'lb-hint')" aria-expanded="false" aria-controls="lb-hint" data-i18n="lb_how">How to export from Letterboxd</button>
+        <button class="backup-link" onclick="_toggleHint(this,'imdb-hint')" aria-expanded="false" aria-controls="imdb-hint" data-i18n="imdb_how">How to export from IMDb</button>
         <button class="backup-link" onclick="backupExportJSON()" data-i18n="backup_json_nerd">JSON backup (advanced)</button>
       </div>
+      <div id="lb-hint" hidden data-i18n="lb_hint" data-i18n-html="1" style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:2px;margin-bottom:6px;padding:8px 10px;border:1px solid rgba(255,255,255,0.08);border-radius:8px"></div>
       <div id="imdb-hint" hidden data-i18n="imdb_hint" data-i18n-html="1" style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:2px;padding:8px 10px;border:1px solid rgba(255,255,255,0.08);border-radius:8px"></div>
       <div id="backup-status" style="display:none;font-size:11px;line-height:1.45;margin-top:8px"></div>
       <div id="btn-backfill-crew-row" style="display:none">
@@ -3219,7 +3264,7 @@ button.is-pressed, .avatar-emoji-btn.is-pressed, .avatar-color-dot.is-pressed { 
         <div style="margin-top:6px" data-i18n="about_privacy" data-i18n-html="1">
           <a href="https://cinemail.app/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none">Privacy Policy</a>
         </div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.19-test</span></div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)">Cinemail <span id="app-version">v0.71.20-test</span></div>
       </div>
 
       <!-- The footer was: [Close] [Sign Out] side by side, then Delete account under them.
@@ -4870,6 +4915,27 @@ const _I18N_IMDB_HINT = {
   it:{ imdb_how:"Come esportare da IMDb", imdb_hint:"L'esportazione esiste solo sul sito IMDb - l'app non ce l'ha.<br><b>iPhone:</b> apri imdb.com in Safari, poi aA → Richiedi sito desktop.<br><b>Android:</b> digita imdb.com nella barra degli indirizzi di Chrome. Non toccare un link: un link apre l'app IMDb. Se salta comunque all'app: Impostazioni → App → IMDb → Apri per impostazione predefinita → disattiva i link supportati.<br>Poi accedi → Your Ratings → Export, e lo stesso per Your Watchlist. Entrambi i file compaiono su imdb.com/exports.<br><b>I file sono due, quindi importa due volte</b>: prima i voti, poi la watchlist." },
 };
 Object.keys(_I18N_IMDB_HINT).forEach(l => { if (I18N[l]) Object.assign(I18N[l], _I18N_IMDB_HINT[l]); });
+// Letterboxd's steps, visible like IMDb's (#147), and the avatar's spoken name. Letterboxd's own menu
+// words stay English in every language: its site has no other.
+const _I18N_LB_HINT = {
+  en:{ backup_lists_missing:"Not created: {names}. Their films went to your personal list.", acct_btn:"Account", lb_how:"How to export from Letterboxd", lb_hint:"Export lives on the Letterboxd website: letterboxd.com → Settings → Data → Export Your Data.<br>You get a .zip. Open it (on iPhone: tap it in Files) and pick <b>watched.csv</b> or <b>ratings.csv</b> here.<br><b>watchlist.csv</b> is your watchlist - import it as a separate file." },
+  ru:{ backup_lists_missing:"Не создано: {names}. Их фильмы легли в личный список.", acct_btn:"Аккаунт", lb_how:"Как выгрузить из Letterboxd", lb_hint:"Выгрузка есть на сайте Letterboxd: letterboxd.com → Settings → Data → Export Your Data.<br>Придёт файл .zip. Открой его (на iPhone - нажми на него в «Файлах») и выбери здесь <b>watched.csv</b> или <b>ratings.csv</b>.<br><b>watchlist.csv</b> - это список к просмотру, его импортируй отдельным файлом." },
+  uk:{ backup_lists_missing:"Не створено: {names}. Їхні фільми лягли в особистий список.", acct_btn:"Акаунт", lb_how:"Як вивантажити з Letterboxd", lb_hint:"Вивантаження є на сайті Letterboxd: letterboxd.com → Settings → Data → Export Your Data.<br>Прийде файл .zip. Відкрий його (на iPhone - натисни на нього у «Файлах») і вибери тут <b>watched.csv</b> або <b>ratings.csv</b>.<br><b>watchlist.csv</b> - це список до перегляду, імпортуй його окремим файлом." },
+  ka:{ backup_lists_missing:"ვერ შეიქმნა: {names}. მათი ფილმები პირად სიაში მოხვდა.", acct_btn:"ანგარიში", lb_how:"როგორ გადმოვწეროთ Letterboxd-იდან", lb_hint:"ექსპორტი Letterboxd-ის საიტზეა: letterboxd.com → Settings → Data → Export Your Data.<br>მიიღებ .zip ფაილს. გახსენი (iPhone-ზე დააჭირე მას „ფაილებში“) და აქ აირჩიე <b>watched.csv</b> ან <b>ratings.csv</b>.<br><b>watchlist.csv</b> შენი სანახავი სიაა - ის ცალკე ფაილად შემოიტანე." },
+  es:{ backup_lists_missing:"No se crearon: {names}. Sus películas fueron a tu lista personal.", acct_btn:"Cuenta", lb_how:"Cómo exportar desde Letterboxd", lb_hint:"La exportación está en la web de Letterboxd: letterboxd.com → Settings → Data → Export Your Data.<br>Recibes un .zip. Ábrelo (en iPhone: tócalo en Archivos) y elige aquí <b>watched.csv</b> o <b>ratings.csv</b>.<br><b>watchlist.csv</b> es tu lista: impórtala como un archivo aparte." },
+  fr:{ backup_lists_missing:"Non créées : {names}. Leurs films sont allés dans ta liste personnelle.", acct_btn:"Compte", lb_how:"Comment exporter depuis Letterboxd", lb_hint:"L'export se fait sur le site Letterboxd : letterboxd.com → Settings → Data → Export Your Data.<br>Tu reçois un .zip. Ouvre-le (sur iPhone : touche-le dans Fichiers) et choisis ici <b>watched.csv</b> ou <b>ratings.csv</b>.<br><b>watchlist.csv</b>, c'est ta liste : importe-la comme un fichier à part." },
+  de:{ backup_lists_missing:"Nicht angelegt: {names}. Ihre Filme sind in deiner persönlichen Liste.", acct_btn:"Konto", lb_how:"So exportierst du aus Letterboxd", lb_hint:"Den Export gibt es auf der Letterboxd-Website: letterboxd.com → Settings → Data → Export Your Data.<br>Du bekommst eine .zip-Datei. Öffne sie (auf dem iPhone: in Dateien antippen) und wähle hier <b>watched.csv</b> oder <b>ratings.csv</b>.<br><b>watchlist.csv</b> ist deine Watchlist - importiere sie als eigene Datei." },
+  it:{ backup_lists_missing:"Non create: {names}. I loro film sono finiti nella tua lista personale.", acct_btn:"Account", lb_how:"Come esportare da Letterboxd", lb_hint:"L'esportazione è sul sito di Letterboxd: letterboxd.com → Settings → Data → Export Your Data.<br>Ricevi un file .zip. Aprilo (su iPhone: toccalo in File) e scegli qui <b>watched.csv</b> o <b>ratings.csv</b>.<br><b>watchlist.csv</b> è la tua watchlist: importala come file a parte." },
+  pt:{ backup_lists_missing:"Não criadas: {names}. Os filmes delas foram para a sua lista pessoal.", acct_btn:"Conta", lb_how:"Como exportar do Letterboxd", lb_hint:"A exportação fica no site do Letterboxd: letterboxd.com → Settings → Data → Export Your Data.<br>Você recebe um .zip. Abra-o (no iPhone: toque nele no app Arquivos) e escolha aqui <b>watched.csv</b> ou <b>ratings.csv</b>.<br><b>watchlist.csv</b> é a sua lista para ver: importe-a como um arquivo separado." },
+  tr:{ backup_lists_missing:"Oluşturulamadı: {names}. Filmleri kişisel listene eklendi.", acct_btn:"Hesap", lb_how:"Letterboxd'dan nasıl dışa aktarılır", lb_hint:"Dışa aktarma Letterboxd web sitesinde: letterboxd.com → Settings → Data → Export Your Data.<br>Bir .zip dosyası gelir. Onu aç (iPhone'da Dosyalar'da üzerine dokun) ve burada <b>watched.csv</b> ya da <b>ratings.csv</b> seç.<br><b>watchlist.csv</b> izleme listendir - onu ayrı bir dosya olarak içe aktar." },
+  ja:{ backup_lists_missing:"作成できませんでした: {names}。その映画は個人リストに入りました。", acct_btn:"アカウント", lb_how:"Letterboxdからの書き出し方法", lb_hint:"書き出しはLetterboxdのウェブサイトで行います: letterboxd.com → Settings → Data → Export Your Data。<br>.zipファイルが届きます。開いて（iPhoneでは「ファイル」でタップ）、ここで<b>watched.csv</b>または<b>ratings.csv</b>を選んでください。<br><b>watchlist.csv</b>は観たいリストです。別のファイルとして読み込んでください。" },
+};
+function _toggleHint(btn, id) {
+  const e = document.getElementById(id);
+  if (!e) return;
+  e.hidden = !e.hidden;
+  btn.setAttribute('aria-expanded', String(!e.hidden));
+}
 // Added 7 Sep 2026 after a real 806-film import saved 36 rows and then reported "Import
 // failed" - which was true of the run and false about the data, and left the user with no
 // idea that running it again was safe. A count and one sentence fix both.
@@ -5201,6 +5267,9 @@ const _I18N_NEW3 = {
   ja:{ auth_tagline:"映画を記録。<br>あなただけのおすすめ。<br>友だちとシェア。", sign_in_title:"おかえりなさい", sign_up_title:"アカウント作成", email:"メール", password:"パスワード", display_name:"表示名", back:"← 戻る", back_to_signin:"← ログインに戻る", new_here:"Cinemailは初めてですか?", create_acct_link:"アカウントを作成", have_acct:"アカウントをお持ちですか?", sign_in_link:"ログイン", check_inbox_title:"メールを確認してください", email_sent:"確認用のリンクをメールでお送りしました。<br>リンクを開くとアカウントが有効になります。", check_spam:"届きませんか? 迷惑メールフォルダをご確認ください。", sign_in:"ログイン", sign_up:"アカウント作成", close:"閉じる", sign_out:"ログアウト", tab_search:"検索", tab_picks:"おすすめ", tab_lists:"リスト", tab_inbox:"受信箱", tab_inbox_label:"受信箱", tab_watched:"✓ 視聴済み", new_list_tab:"+ 新規", stat_watched:"視聴済み", stat_to_watch:"これから観る", stat_avg:"平均 ★", stat_time:"視聴時間・タップ", cp_title:"あなたのシネマプロフィール", cp_dir:"よく観る監督", cp_cine:"よく観る撮影監督", cp_comp:"よく観る作曲家", cp_act:"よく観る俳優", search_btn:"検索", find_btn:"提案", search_people:"人物", search_films:"映画・ドラマ", your_rating:"あなたの評価", notes:"メモ", send_to:"送信先", msg_opt:"メッセージ(任意)", display_name_lbl:"表示名", backup_lbl:"バックアップ", friends_lbl:"友だち", add_friend:"追加", save:"保存", export_csv:"↓ CSVを書き出す", import_csv:"↑ CSVを読み込む", export_json:"↓ JSONを書き出す", backfill_crew:"作品情報を更新", ob0_body:"映画好きのためのメール。", ob1_title:"映画を探そう", ob1_body:"気になる映画があったら検索するだけ。あらすじや評価を読み、キャストの中に知っている名前を見つけましょう。気に入ったらリストへ。", ob2_title:"あなたのリスト", ob2_body:"「今度観よう」と思った映画を全部覚えておく必要はありません。今夜の一本を選ぶときに、ぴったりのリストを開きましょう。", ob3_title:"評価して発見", ob3_body:"観たら「視聴済み」にして、評価と感想を残しましょう。あなたのお気に入りの監督・作曲家・撮影監督・俳優が見えてきます。", ob4_title:"サウンドトラック", ob4_body:"音楽が気に入ったら? どの作品にもSpotify、Apple Music、YouTube Musicのサウンドトラックへの直接リンクがあります。", ob5_title:"人物をたどる", ob5_body:"監督、俳優、作曲家、撮影監督をタップすると、全作品が表示されます。「あの女優」と彼女の他の出演作を見つける一番の近道です。", ob6_title:"友だちとシェア", ob6_body:"友だちに映画を送ると、相手の受信箱に直接届きます。みんなに見せたいリストを作ったら、友だちを招待しましょう。出し惜しみはなしで。", ob7_title:"安心、あなたのもの", ob7_body:"リストやレビューが消えることはありません。アカウントに同期され、いつでも統計と一緒にExcelで書き出せます。", ob8_title:"おまかせ", ob8_body:"何を観るか迷ったら「おまかせ」をタップ。視聴済みの作品が多いほど、提案が良くなります。", ob9_title:"上映開始!", ob9_body:"準備完了。何を待っているんですか? 映画は勝手に観てはくれませんよ!", ob_next:"次へ", ob_start:"最初の一本を探す", ob_skip:"スキップ", empty_list_title:"リストは空です", empty_list_sub:"映画を検索してリストに追加しましょう", empty_list_btn:"映画を見る", empty_shared_sub:"映画を検索し、≡ をタップしてここに追加", nothing_yet:"まだ何もありません", mark_seen:"観た映画をチェック", save_to_list:"映画をリストに保存", surprise:"おまかせ", act_watched:"視聴済み", act_addlist:"リストに追加", act_inlist:"マイリスト", act_share:"シェア", lang_label:"言語", search_ph:"タイトル、人物、気分…", friend_search_ph:"名前で検索して追加…", invite_to_app:"友だちをCinemailに招待", delete_account:"アカウントを削除", replay_onboarding:"ようこそツアーをもう一度", about_privacy:"<a href='https://cinemail.app/privacy.html' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>プライバシーポリシー</a>", about_tmdb:"作品データ、ポスター、スタッフ情報は<a href='https://www.themoviedb.org' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>TMDB</a>から提供されています。CinemailはTMDB APIを使用していますが、TMDBによる推奨・認定を受けたものではありません。", about_author:"制作: <a href='https://dafaspace.com' target='_blank' rel='noopener' style='color:var(--accent-text);text-decoration:none'>@dafaspace</a>", empty_search_title:"次の一本を探そう", recs_ph:"ジャンル、国、年代、テーマ", empty_search_sub:"タイトルを入力して「検索」をタップ", shared_list_from:"がこのリストを共有しました", shared_all:"すべて選択", shared_none:"選択を解除", shared_add:"自分のリストに追加", shared_adding:"追加中…", shared_done:"追加しました", shared_failed:"追加できませんでした", shared_list_gone:"このリンクは無効になりました", tv_season:"シーズン", tv_seasons:"シーズン", tv_episode:"話", tv_episodes:"話", tv_next_episode:"次のエピソード", tv_status:"ステータス", tv_last_aired:"最終放送", tv_today:"今日", tv_tomorrow:"明日", tv_in_days:"{n}日後", list_share_out:"シェア", share_list_copied:"リンクをコピーしました", share_list_empty:"このリストは空です", share_list_failed:"リンクを作成できませんでした", share_needs_account:"リストを共有するにはログインしてください", list_rename:"名前を変更", list_invite:"招待", list_link:"リンク", list_delete:"削除", list_leave:"退出", list_members_title:"メンバー", list_remove:"外す", you_label:"(あなた)", role_owner:"オーナー", role_member:"メンバー", list_invite_to:"招待先", list_invite_link_for:"招待リンク:", list_select_friend:"友だちを選択:", list_generating:"作成中…", list_cancel:"キャンセル", inv_add_to_list:"リストに追加", inv_decline:"辞退", inv_from:"送信者:", inv_to:"宛先:", inv_declined:"辞退済み", inv_pending:"保留中", inv_added:"追加済み", inv_accepted:"承認済み", inv_sent:"送信済み", inv_added_to:"追加先:", inv_reaction:"リアクション", inv_invited_you:"があなたを招待しました", inv_join_list:"リストに参加", forgot_link:"パスワードをお忘れですか?", forgot_title:"パスワードの再設定", forgot_sub:"メールアドレスを入力してください。再設定用のリンクをお送りします。", forgot_send:"リンクを送信", reset_title:"新しいパスワードを設定", reset_newpass:"新しいパスワード", reset_confirm:"パスワードを確認", reset_update:"パスワードを更新", reset_email_sent:"パスワード再設定リンクの送信先:", reset_done:"パスワードを更新しました", err_enter_email:"メールアドレスを入力してください。", err_pass_short:"パスワードは6文字以上にしてください。", err_pass_match:"パスワードが一致しません。", err_enter_name:"名前を入力してください。", err_signin_fields:"メールアドレスとパスワードを入力してください。", err_name_taken:"「{name}」は使用されているため、名前は「{suggested}」になります。確認するにはもう一度「アカウント作成」を押してください。", email_sent_to:"確認リンクの送信先:", email_sent_activate:"リンクを開くとアカウントが有効になります。", ph_min6:"6文字以上", toast_session_expired:"セッションの有効期限が切れました。もう一度ログインしてください", alert_not_connected:"接続されていません。ログアウトして再度ログインしてください。", alert_session_expired:"セッションの有効期限が切れました。もう一度ログインしてください。", err_could_not_save:"保存できませんでした: ", err_could_not_delete:"削除できませんでした: ", toast_select_someone:"まず相手を検索して選択してください", toast_already_friends:"すでに友だちか、リクエストが保留中です", err_prefix:"エラー: ", toast_friend_added:"友だちを追加しました", toast_request_declined:"リクエストを辞退しました", toast_friend_removed:"友だちから外しました", toast_link_copied:"リンクをコピーしました", toast_invite_not_found:"招待が見つかりません", err_failed_to_send:"送信に失敗しました: ", toast_err_invite_not_found:"エラー: 招待が見つかりません", toast_feedback_reply:"フィードバックに返信が届きました", toast_name_empty:"名前を入力してください", toast_name_updated:"名前を更新しました", err_name_update:"名前を更新できませんでした: ", toast_nothing_export:"書き出すものがまだありません", err_export_failed:"書き出しに失敗しました: ", err_json_export_failed:"JSONの書き出しに失敗しました: ", toast_crew_complete:"すべての作品にスタッフ情報があります", toast_no_valid_entries:"このファイルに使えるデータがありません", toast_no_films_in_file:"このファイルに映画が見つかりません", toast_image_too_large:"画像が大きすぎます(最大5MB)", toast_write_something:"まず何か書いてください", toast_feedback_thanks:"受け取りました。すべて私自身が読んでいます", err_could_not_send:"送信できませんでした: ", join_invalid_token:"この招待リンクは無効です", join_expired_token:"この招待リンクは期限切れです", join_token_exhausted:"この招待リンクは使用済みです", ph_your_name:"あなたの名前", ph_feedback:"思ったことを聞かせてください…", ph_reply:"返信…", ph_new_list:"新しいリスト名…", ph_list_name:"リスト名…", confirm_delete:"削除しますか?", toast_enter_list_name:"リスト名を入力してください", toast_enter_a_name:"名前を入力してください", toast_member_removed:"メンバーを外しました", toast_new_friend_request:"新しい友だちリクエストがあります。アカウントを確認してください", feedback:"フィードバック", add_to_history:"履歴に追加", default_user:"ユーザー", about_cinemail:"Cinemailについて", fb_heading:"フィードバック", fb_sub:"ご意見や不具合をお知らせください", fb_type:"種類", fb_message_lbl:"メッセージ", fb_attach:"スクリーンショットを添付", fb_send:"送信", fb_previous:"これまでのメッセージ", retry:"再試行", picks_limit:"おすすめの上限に達しました", picks_limit_why:"週ごとの上限があるから、Cinemailは誰でも無料で使えます。", got_it:"OK", my_list:"マイリスト", tag_personal:"個人", tag_added:"追加済み", tag_active:"使用中", lbl_personal:"個人", tap_details:"タップで詳細", seasons_eps:"シーズン / エピソード", country_lang:"国 / 言語", av_emoji:"絵文字", av_color:"色", av_remove_emoji:"絵文字を外す", create:"作成", no_users_found:"ユーザーが見つかりません", add_friends_hint:"映画をシェアするには、アカウントで友だちを追加してください", sign_in_first:"先にログインしてください。", import_needs_session:"映画はCinemailのアカウントに保存されるため、読み込むにはログインが必要です。", fb_history_failed:"履歴を読み込めませんでした", del_acct_type_email:"確認のためメールアドレスを入力してください", del_acct_type_name:"確認のため名前を入力してください", limit_ip_shared:"お使いのネットワークは現在、共有の上限に達しています。リセット: {reset}。", limit_picks_reached:"おすすめの上限に達しました(週{n}回)。リセット: {reset}。", toast_friend_req_sent:"{name}さんに友だちリクエストを送りました", toast_list_created:"「{name}」を作成しました", toast_list_renamed:"「{name}」に名前を変更しました", toast_already_in_list:"すでに「{name}」に参加しています", toast_joined_list:"「{name}」に参加しました", toast_invite_sent:"{name}さんに招待を送りました", toast_list_deleted:"「{name}」を削除しました", toast_list_left:"「{name}」から退出しました", toast_film_added_yours:"「{title}」をリストに追加しました", toast_new_recs:"新しい映画のおすすめが{n}件あります", toast_they_added:"{name}さんが「{title}」をリストに追加しました", toast_film_declined:"「{title}」は辞退されました", toast_replied_to:"{name}さんが「{title}」について返信しました", toast_sent_friend_req:"{name}さんから友だちリクエストが届きました", toast_accepted_friend:"{name}さんが友だちリクエストを承認しました", toast_exported_n:"{n}件を書き出しました", toast_crew_updated_n:"{n}作品のスタッフ情報を更新しました", someone:"誰か", err_timeout:"時間がかかりすぎました。接続を確認して、もう一度お試しください。", reset_done_signin:"パスワードを変更しました。新しいパスワードでログインしてください。", err_link_expired:"このリンクは期限切れか使用済みです。下から新しいリンクをリクエストしてください。", err_email_taken:"このメールアドレスはすでに登録されています。ログインをお試しください。", err_email_bad:"メールアドレスが正しくないようです。", err_too_many:"試行回数が多すぎます。数分待ってからもう一度お試しください。", err_mail_failed:"確認メールを送信できませんでした。原因はこちら側にあります。", err_try_again:"問題が発生しました。もう一度お試しください。", write_support:"support@dafaspace.com までご連絡ください", cancel:"キャンセル", accept:"承認", copy:"コピー", share_invite:"招待をシェア", friend_wants:"が友だちになりたがっています", no_members:"まだメンバーがいません", no_lists:"リストはまだありません。作成して友だちとシェアしましょう。", no_friends_share:"Cinemailにまだ友だちがいません。下のリンクで招待しましょう。", select_friend_invite:"招待する友だちを選択:", add_friends_first:"招待するには、まず友だちを追加してください", invite_valid_48:"48時間有効", invite_connect_hint:"相手がリンクを開くと、ワンタップで友だちになれます。", join_list_q:"リストに参加", join_invited_sub:"共有の映画リストに招待されました", list_picker_title:"リストに追加", filter_friends:"友だちを絞り込む…", searching:"検索中…", not_found:"見つかりません", friends_empty:"まだ友だちがいません。下の招待リンクで、一緒に映画を観る人を追加しましょう。", friend_remove_suffix:"- 友だちから外しますか?", friends_no_match:"該当する友だちはいません", edit_modal_title:"レビューを編集", share_modal_title:"映画をおすすめ", send_btn:"送信", note_ph:"どうでしたか?", share_msg_ph:"きっと気に入る理由…", add_modal_seen:"視聴済みにする", add_modal_list:"リストに追加", ob8_picks:"あなたへのおすすめ", err_bad_login:"メールアドレスまたはパスワードが違います。", signin_create_cta:"初めての方はアカウントを作成", recs_empty_title:"あなたへのおすすめ", recs_empty_sub:"短い言葉がおすすめです(現在は英語のみ): korean thriller, films about cats, french new wave, sci-fi from the 70s", recs_thinking:"考え中…", recs_still_thinking:"まだ考えています。少々お待ちください…", based_on_label:"視聴済みの作品から", recs_hint_empty:"視聴済みの作品を追加すると、あなた向けのおすすめが届きます", picks_left_today:"今日の残りのおすすめ", picks_left_week:"今週の残りのおすすめ", why_theme:"あなた好みのテーマ: {theme}", why_same:"同じ{role}: {name}({films})", why_ignored:"使われなかった語: {words}", role_director:"監督", role_composer:"作曲家", role_dop:"撮影監督", role_actor:"キャスト", in_plan:"リストにあり", why_off_many:"お気に入り{n}本をもとにおすすめ: {films}", why_off_one:"{film}が気に入ったあなたに", why_season:"{season}の夜にぴったり", why_acclaimed:"高評価、{decade}の作品", why_for_query:"「{q}」に一致", why_person:"{name}出演", season_winter:"冬", season_spring:"春", season_summer:"夏", season_autumn:"秋", email_did_you_mean:"もしかして", toast_list_limit:"個人リストに加えて、自分のリストを{n}個まで作れます。共有されたリストは数えません。", lists_header:"リストに追加", mark_watched:"視聴済みにする", picks_exhausted:"今週のおすすめは使い切りました。来週また使えます。", toast_member_limit:"1つのリストに参加できるのは、あなたを含めて{n}人までです。", toast_list_full:"このリストは満員です(オーナーを含めて{n}人)。", picks_random:"ランダムなおすすめ", picks_tonight:"今夜のおすすめ", picks_for_you:"あなたへのおすすめ", where_to_watch:"配信・視聴先", watch_attrib:"配信データ: JustWatch", loading_lbl:"読み込み中…", err_no_results_title:"結果がありません", err_no_results_sub:"年を入れずにタイトルだけで試してください", err_connection:"接続エラー", err_generic:"エラー", report:"報告", report_prefill:"{name}さんからのメッセージを報告します。何がありましたか:", err_not_found_title:"見つかりません", err_no_results_for:"検索結果なし:", err_took_long_title:"時間がかかりすぎました", err_took_long_sub:"少し待ってからもう一度お試しください", recs_none_title:"おすすめが見つかりません", recs_none_sub:"ジャンル、国、年代、テーマなど短い言葉がおすすめです(現在は英語のみ)。例: korean thriller, films about cats, sci-fi from the 70s", recs_unavail_title:"おすすめを利用できません", recs_unavail_sub:"しばらくしてからもう一度お試しください", inbox_empty_title:"まだ会話はありません", inbox_empty_sub:"検索結果やリストから映画をシェアして、会話を始めましょう", continue_as_guest:"アカウントなしで始める", guest_label:"ゲスト", guest_banner:"この端末にのみ保存されています", guest_join_btn:"Cinemailに登録", guest_save_sub:"映画をすべての端末で安全に保存し、友だちとシェアできます。ずっと無料です。", guest_join_free:"無料で登録", guest_maybe_later:"あとで", guest_already_acct:"アカウントをお持ちですか?", del_acct_guest:"ゲストとして利用中のため、再ログイン用のメールアドレスがありません。この操作は元に戻せず、データは復元できません。", ob_mock_mylist:"マイリスト", ob_mock_name:"あなたの名前", block:"ブロック", block_q:"{name}さんをブロックしますか?", block_warn:"相手はあなたに映画、メッセージ、友だちリクエストを送れなくなります。アカウントからいつでも解除できます。", block_done:"ブロックしました", block_failed:"ブロックできませんでした", unblock:"ブロック解除", err_not_allowed:"処理できませんでした。", unblock_note:"ブロックを解除しても友だち関係は戻りません。相手が新しいリクエストを送る必要があります。", unblock_done:"ブロックを解除しました", blocked_header:"ブロック中のユーザー", block_someone:"誰か", del_acct_q:"アカウントを削除しますか?", del_acct_warn:"視聴履歴、すべてのリスト、友だち、アカウントのデータが完全に削除されます。元に戻すことはできません。", del_acct_confirm:"アカウントを削除する", del_acct_working:"削除中…", del_acct_done:"アカウントを削除しました。", del_acct_failed:"アカウントを削除できませんでした", picks_random_hint:"視聴済みの作品がないと、おすすめはランダムです。5〜10本を視聴済みにすると、あなたの好みに合わせたおすすめになります。", picks_hint_got:"OK", backup_hint:"リストをExcelでバックアップしたり、バックアップファイルから復元したりできます。", backup_json_nerd:"JSONバックアップ(上級者向け)", backup_restoring:"バックアップを復元中…", backup_err_lists:"リストを読み込めなかったため、何も変更していません。接続を確認して、もう一度お試しください。", backup_saving:"保存中…", backup_safe_hint:"アプリはそのまま使えます。終わるとメッセージが表示されます。アプリは閉じないでください。", lb_import_btn:"↑ Letterboxdから読み込む", lb_matching:"作品を照合中…", lb_not_lb:"LetterboxdのCSVではないようです。", imdb_import_btn:"↑ IMDbから読み込む", imdb_not_imdb:"IMDbのCSVではないようです。", imp_pick_imdb:"IMDbから書き出した.csvを選んでください(Your RatingsまたはWatchlist)。", imp_none_found:"このファイルに映画が見つかりません。", imp_found:"{n}本の作品が見つかりました。照合中…", imp_saving:"{n}本を保存中…", imp_added:"追加", imp_updated:"更新", imp_notfound:"見つからず", imp_nothing:"読み込まれた作品はありません", imp_failed:"読み込みに失敗しました", share_link_btn:"この作品のリンクをシェア", share_outside_lbl:"Cinemailを使っていない人には?", share_outside_hint:"誰でも開けるリンクを送れます。メッセージも一緒に届きます。", share_outside_btn:"どこにでも送れるリンクをコピー", surprise_need_title:"5本からあなた好みのおすすめに", picks_hint_early:"今のCinemailは、ジャンル・年代・国からあなたの好みを読み取っています。15本ほどになると好きな監督や作曲家が見えてきて、おすすめがぐっとあなた向けになります。現在{n}本です。", picks_hint_mid:"もう少しです。15本ほどで繰り返し登場する監督や作曲家が見えてきて、おすすめの精度がはっきり上がります。現在{n}本です。", surprise_need_sub:"{n} / {need} いくつかの作品を視聴済みにしましょう。多いほど、おすすめが良くなります。", sending:"送信中…", share_pick_friend:"友だちを1人以上選んでください", share_sent_to:"送信先:", share_failed:"送信できませんでした", share_link_copied:"リンクをコピーしました", imp_reading:"ファイルを読み込み中…", imp_where:"作品は{list}と{watched}にあります。", about_maps:"地図: <a href=\"maplibre-LICENSE.txt\" style=\"color:var(--accent-text);text-decoration:none\" target=\"_blank\" rel=\"noopener\">MapLibre GL</a>(BSDライセンス)、タイル: OpenFreeMap、© <a href=\"https://www.openstreetmap.org/copyright\" style=\"color:var(--accent-text);text-decoration:none\" target=\"_blank\" rel=\"noopener\">OpenStreetMap</a> contributors。撮影地: <a href=\"https://moviescenemap.com\" style=\"color:var(--accent-text);text-decoration:none\" target=\"_blank\" rel=\"noopener\">Movie Scene Map</a>経由のWikidata。場所の写真: <a href=\"https://commons.wikimedia.org\" style=\"color:var(--accent-text);text-decoration:none\" target=\"_blank\" rel=\"noopener\">Wikimedia Commons</a>(作者とライセンスは各写真に記載)。", maps_route:"ルート", maps_wiki:"Wikipedia", maps_city_more:"この街の他の場所({n})", maps_legend:"{s} 正確な場所(Wikidata) · {w} Wikipediaの記事に記載。どの場面がどこで撮影されたかは記録されていません。", maps_photo:"写真: {by}、{lic}、Wikimedia Commons", maps_find_me:"現在地を表示", maps_loc_off:"位置情報を利用できません", maps_loc_denied:"Cinemailは現在地を取得できません。ブラウザまたはスマートフォンの設定で位置情報を許可してください。", tab_maps:"地図", maps_all:"すべての作品", maps_stats:"{f}作品 · {p}か所", maps_hint:"地点をタップすると、そこで撮影された作品が表示されます。", maps_per_wiki:"Wikipediaによる", maps_place_note:"ここで撮影されました。どの場面かは記録されていません。", maps_film_note:"これらの場所で撮影されました。どの場面がどこかは記録されていません。", maps_more:"他{n}件", maps_loading:"地図を読み込み中…", maps_failed:"地図を読み込めませんでした。接続を確認して、タブを開き直してください。", maps_film_block:"撮影地", maps_on_map:"地図で見る", maps_also:"ほかの撮影地", maps_credit:"場所: Wikidata(Movie Scene Map経由)", maps_cat_city:"都市", maps_cat_landmark:"名所", maps_cat_nature:"自然", maps_cat_castle:"城", maps_cat_studio:"スタジオ", maps_cat_street:"通り・広場", maps_cat_bridge:"橋", maps_near:"近くの場所", maps_near_none:"50km以内に撮影地はありません。最寄り:", maps_cat_region:"地域", maps_cat_fiction:"架空の場所", search_city_row:"撮影地: {city}", list_invite_send:"招待を送信", list_invite_by_link:"リンクでも招待できます。開いた人はこのリストに参加し、作品を追加できます。あなたを含めて最大{n}人です。", invite_link_msg:"{name}さんがCinemailのリスト「{list}」にあなたを招待しています。参加して一緒に作品を追加しましょう。", search_picks_left:"今週の残りのおすすめ: {n}", cin_title:"上映中", cin_from:"{country}: {date}から上映", cin_showtimes:"近くの上映スケジュール", cin_imax:"近くのIMAX", cin_q:"上映スケジュール", search_surprise_none:"今回は新しい作品が見つかりませんでした。もう一度押すか、上の例を試してください。", search_strict_w:"すべての条件に合うのはこれだけです。「{w}」を除いた近い作品:", search_strict:"すべての条件に合うのはこれだけです。近い作品:", tab_library:"ライブラリ", search_try:"試す", search_examples:"korean thriller|french new wave|sci-fi from the 70s|films about cats", search_understood:"理解した条件", search_picks:"おすすめ", search_like:"{title}に似た作品", search_without:"「{w}」なし", search_relaxed_w:"すべてに合う作品はありません。「{w}」を除いた近い作品:", search_relaxed:"すべてに合う作品はありません。近い作品:", search_none_all:"すべてを同時に満たす作品はありません。条件を1つ外してみてください:", search_none_one:"該当する作品はありません。こちらは必ず見つかります:", search_that_all:"この検索の結果は以上です。", search_end:"この検索の結果はすべて表示しました。", search_more:"もっと見る", search_nothing:"そのタイトルの作品はなく、読み取れる言葉もありませんでした。こちらは必ず見つかります:", search_drop:"{w}を外す", surprise_btn:"おまかせ", imdb_how:"IMDbからの書き出し方", imdb_hint:"書き出しはIMDbのウェブサイトで行います(アプリにはありません)。<br><b>iPhone:</b> Safariでimdb.comを開き、aA → デスクトップ用Webサイトを表示。<br><b>Android:</b> Chromeのアドレスバーにimdb.comと入力します。リンクはタップしないでください(IMDbアプリが開きます)。それでもアプリに移動する場合: 設定 → アプリ → IMDb → デフォルトで開く → 対応リンクをオフ。<br>次にログイン → Your Ratings → Export、Your Watchlistでも同じ操作をします。どちらのファイルもimdb.com/exportsに表示されます。<br><b>ファイルが2つなので、2回読み込みます</b>。まず評価、次にウォッチリスト。", imp_failed_n:"保存できませんでした", imp_retry:"同じファイルをもう一度読み込んでください。追加済みの作品は重複せず更新されます。", imp_by_title:"残りをタイトルで検索中…", err_server_busy:"現在サーバーが応答していません。検索内容ではなく、こちら側の問題です。1分ほどしてからもう一度お試しください。", imp_server_err:"サーバーに接続できなかったため、残りは照合できませんでした。原因はこちら側にあります。数分後に同じファイルをもう一度お試しください。読み込み済みの作品はそのまま残ります。", imp_limit_day:"本日の照会上限に達したため、残りは照合できませんでした。明日、同じファイルをもう一度読み込んでください。読み込み済みの作品はそのまま残ります。", ob_inbox_sent:"が映画を送りました →", ob_inbox_note:"全体的に素晴らしい映画。でも本当の主役はサウンドトラック。ぜひ観てほしい。", backup_btn_download:"↓ ダウンロード", backup_btn_restore:"↑ 復元", rm_title:"Cinemail - 映画とリストのバックアップ", rm_subtitle:"映画とリストのバックアップ", rm_site:"ウェブサイト", rm_what_q:"このファイルについて", rm_what_a:"映画、評価、コメント、リストのバックアップです。Films、Lists、Membersの各タブにデータが入っています。", rm_how_q:"復元の方法", rm_how_a:"Cinemailを開き、プロフィール → 復元(↑)をタップ → このファイルを選択。リストと映画が元に戻ります。", rm_edit_q:"このファイルの編集", rm_edit_a:"Excel、Numbers、Googleスプレッドシートで編集できます。保存するときはExcel(.xlsx)形式のままにしてください。", rm_inside_q:"中身", rm_inside_films:"Films - 映画、評価、コメント", rm_inside_lists:"Lists - リスト", rm_inside_members:"Members - 共有リストのメンバー", rm_contact_q:"作者への連絡", rm_contact_a:"質問、アイデア、不具合、サポートはこちらへ:", notif_lbl:"通知", notif_hint:"新しいメッセージ、友だちリクエスト、フィードバックへの返信を通知します。", notif_enable:"オンにする", push_on:"通知はオンです", push_denied:"設定で通知をオンにしてください", push_native_only:"通知はアプリで利用できます", err_email_unconfirmed:"このアドレスはまだ確認されていません。確認メールのリンクを開いてください。迷惑メールフォルダもご確認ください。", resend_link:"リンクを再送信", link_used:"このリンクは期限切れか使用済みです。", guest_signin_q:"アカウントにログインしますか?", guest_signin_warn:"ゲストとして保存されているもの: {what}。ログインすると、このゲストアカウントは二度と開けなくなり、データはすべてそこに残ります。", guest_signin_backup:"先にバックアップをダウンロードし、アカウントで「{restore}」を押すと元に戻せます。", guest_signin_anyway:"引き継がずにログイン", err_entry_not_changed:"変更はありません。この項目は他のメンバーのものか、すでに削除されています", toast_film_already_in_list:"「{title}」はすでに「{name}」にあります", imp_running:"読み込みがすでに進行中です。終わるまでお待ちください。", imp_net_err:"接続が切れたため、残りは照合できませんでした。読み込み済みの作品はそのまま残ります。オンラインに戻ったら、同じファイルをもう一度読み込んでください。", personal_list_name:"{name}のリスト", app_invite_msg:"{name}さんがあなたをCinemailに招待しました。映画を記録して、あなた向けのおすすめを受け取り、友だちとシェアしましょう。", shared_list_default:"共有リスト", list_already_member:"{name}さんはすでにこのリストのメンバーです", list_already_invited:"{name}さんはすでにこのリストに招待されています", list_all_friends_in:"友だちは全員このリストに参加しています。ほかの人は下のリンクから参加できます。", inv_already_in:"「{title}」はすでにリストにあります: {list}", friend_link_q:"{name}さんを友だちに追加しますか?", friend_link_sub:"リクエストは{name}さんに届き、承認するかどうかは相手が決めます。", friend_link_yes:"リクエストを送信", toast_invite_declined:"招待を辞退しました", toast_rec_declined:"おすすめを辞退しました", inv_list_fallback:"共有リスト", msg_not_saved:"この会話は利用できなくなりました。メッセージは送信されていません。", push_failed:"通知をオンにできませんでした。しばらくしてからもう一度お試しください。", fb_shot_failed:"スクリーンショットをアップロードできませんでした。もう一度試すか、外して送信してください。", fb_uploading:"アップロード中…", fb_attach_change:"変更", fb_reply_lbl:"返信", fb_t_bug:"不具合", fb_t_idea:"アイデア", fb_t_other:"その他", heartbeats:"回の鼓動", tu_y:"{n}年", tu_mo:"{n}か月", tu_d:"{n}日", tu_h:"{n}時間", tu_m:"{n}分", dept_acting:"俳優", dept_directing:"監督", dept_writing:"脚本", dept_sound:"作曲", dept_camera:"撮影監督", dept_production:"製作", dept_editing:"編集", dept_art:"美術", dept_costume:"衣装・メイク", dept_vfx:"視覚効果", dept_lighting:"照明", dept_crew:"スタッフ", dept_creator:"クリエイター", grp_acting:"出演", grp_camera:"撮影", grp_sound:"音楽", grp_art:"美術", grp_self:"本人役", grp_mentions:"言及・小さなクレジット", crew_writers:"脚本", crew_cast:"キャスト", person_known_for:"代表作: {titles}", person_filmography:"出演・参加作品 · {n}", tv_seasons_few:"シーズン", tv_seasons_many:"シーズン", tv_episodes_few:"話", tv_episodes_many:"話", privacy_upd:"更新", plot_in_en:"日本語のあらすじはまだありません。", maps_back_all:"地図全体", maps_legend4:"{c} 複数の場所(数字は件数) · {s} 正確な場所(Wikidata) · {w} Wikipediaの記事に記載 · {t} この街のどこか。どの場面がどこで撮影されたかは記録されていません。", inv_collapse:"閉じる", av_done:"完了", search_clear:"クリア", picks_refine_hint:"1時間以内なら、このおすすめの絞り込みは無料です。", picks_free_refine:"前回のおすすめの絞り込み: カウントされません。", picks_free_repeat:"今週すでに検索済み: カウントされません。", ob_map_title:"撮影地はどこ", ob_map_body:"世界地図に3万か所以上の撮影地。作品を開けば撮影場所がわかり、<span class=\"ob-geo\" role=\"img\" aria-label=\"現在地を表示\"></span>をタップすれば近くで撮影された作品が見つかります。『オデュッセイア』だけでも、アイスランドからモロッコまで6か国で撮影されました。", maps_back_film:"作品に戻る", search_undo_drop:"「{w}」を戻す", search_back_to:"「{q}」に戻る", search_as_words:"単語からのおすすめ: {w}", search_did_you_mean:"そのタイトルの作品はありません。もしかして:", search_limit_title:"1日の上限に達しました", search_limit_day:"検索、おすすめ、作品ページは明日また使えます。", search_partial_limit:"1日の上限に達したため、すべての条件を確認できませんでした。リストは条件より少ないか、広すぎる可能性があります。明日には検索が完全に使えます。", search_partial:"一部のリクエストが完了しなかったため、このリストは不完全です。1分ほどしてからもう一度お試しください。", search_offline:"インターネットに接続されていません。確認して、もう一度お試しください。", imp_unchanged:"変更なし", imp_skipped:"スキップ", imp_no_rows:"このファイルに有効な行がありません", imp_nothing_changed:"変更はありません", imp_fetching:"取得中 {n}/{total}…", imp_saving_n:"保存中 {n}/{total}…", imp_title_imdb:"IMDbからの読み込み", exp_choose_where:"保存先を選択", exp_done:"書き出しました: {what}", hist_seen:"{films} 視聴済み", hist_avg:"平均: {avg}", hist_to_watch:"{films} これから観る", crew_updating:"更新中 {n}/{total}…" },
 };
 Object.keys(_I18N_NEW3).forEach(l => { I18N[l] = Object.assign(I18N[l] || {}, _I18N_NEW3[l]); });
+// Ключи, заведённые после 3 нояб сразу на одиннадцати языках: применяются после _I18N_NEW3, иначе
+// pt, tr и ja ещё нет, и проверка if (I18N[l]) молча их пропускает.
+Object.keys(_I18N_LB_HINT).forEach(l => { I18N[l] = Object.assign(I18N[l] || {}, _I18N_LB_HINT[l]); });
 // ·
 // ·
 // ·
@@ -5669,6 +5738,7 @@ function _applyI18nElement(container) {
     if (el.dataset.i18nHtml) el.innerHTML = v; else el.textContent = v;
   });
   container.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+  container.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
 }
 
 // Японские начертания: 206 КБ правил на 240 срезов, нужны только японскому интерфейсу (так же в
@@ -5695,6 +5765,8 @@ function _applyI18n() {
     if (el.dataset.i18nHtml) el.innerHTML = v; else el.textContent = v;
   });
   document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+  // Подпись для экранного диктора у кнопок-значков (крестик окна): без неё VoiceOver читал «кнопка».
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
   // Sync lang toggle
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === _lang));
 }
@@ -5954,12 +6026,14 @@ function _maybeShowOnboarding() {
   // второго три. Проверка кода 9 окт, #13.
   if (el && !_obSwipeWired) {
     _obSwipeWired = true;
-    let _obTouchX = null;
-    el.addEventListener('touchstart', e => { _obTouchX = e.touches[0].clientX; }, { passive: true });
+    let _obTouchX = null, _obTouchY = 0;
+    el.addEventListener('touchstart', e => { _obTouchX = e.touches[0].clientX; _obTouchY = e.touches[0].clientY; }, { passive: true });
     el.addEventListener('touchend', e => {
       if (_obTouchX === null) return;
-      const dx = e.changedTouches[0].clientX - _obTouchX;
+      const dx = e.changedTouches[0].clientX - _obTouchX, dy = e.changedTouches[0].clientY - _obTouchY;
       _obTouchX = null;
+      // Слайд на маленьком экране прокручивается (#128): вертикальный жест с косым ходом не листает.
+      if (Math.abs(dy) > Math.abs(dx)) return;
       if (dx < -40 && _obSlide < _obTotal() - 1) _obGoTo(_obSlide + 1);
       else if (dx > 40 && _obSlide > 0) _obGoTo(_obSlide - 1);
     }, { passive: true });
@@ -6438,6 +6512,9 @@ function _resetAccountState(prevUid, { wipeLocal = false } = {}) {
   // Проверка кода 9 окт, #5, второй круг.
   if (_chatViewPartnerId != null) { try { window.closeChat(); } catch (e) {} }
   _acctGen++;
+  // Идущий импорт принадлежит прежнему аккаунту (#22): без отмены он дописывал фильмы A в
+  // библиотеку B, а тост «900 добавлено» видел B. Каждый цикл записи проверяет отмену прогона.
+  try { if (ImportProgress.busy()) ImportProgress.cancel(); } catch (e) {}
   stopInboxPolling();
   currentUser = null;
   watchHistory = [];
@@ -7194,10 +7271,15 @@ async function tmdbSearch(q) {
     // Перевода нет, и TMDB отдаёт оригинал: «حياة الآخرين» в русской выдаче (проверка новыми
     // запросами, 19 окт). Название письмом, которого нет ни в одном нашем языке, заменяется
     // английским; оригинал остаётся в OrigTitle для точного совпадения.
-    const ours = /[\p{Script=Latin}\p{Script=Cyrillic}\p{Script=Georgian}]/u;
+    // Письмо самого интерфейса тоже своё (#9): японское название в японском интерфейсе менялось на
+    // английское («ジョーカー» на «Joker»), и запрос «ジョーカー» терял точное совпадение.
+    const ours = new RegExp('[\\p{Script=Latin}\\p{Script=Cyrillic}\\p{Script=Georgian}' + (_UI_SCRIPT[_lang] || '') + ']', 'u');
     return (m.EnTitle && !ours.test(m.Title) && ours.test(m.EnTitle)) ? { ...m, Title: m.EnTitle } : m;
   });
 }
+
+// Письмо языка интерфейса, которое не латиница, не кириллица и не грузинское (см. tmdbSearch, #9).
+const _UI_SCRIPT = { ja: '\\p{Script=Han}\\p{Script=Hiragana}\\p{Script=Katakana}', he: '\\p{Script=Hebrew}', ar: '\\p{Script=Arabic}' };
 
 // Оценка из одного-двух голосов - не оценка. «★ 10.0» у забытого вестерна 1951 года стояла
 // рядом с «Фарго» и выглядела выше него (проверка test-1, 11 окт). Меньше двадцати голосов -
@@ -7267,6 +7349,9 @@ async function tmdbDetail(id, type) {
   const composer = _uniqNames(credits.crew?.filter(c => ["Original Music Composer","Music","Composer"].includes(c.job)).map(c => c.name)).join(", ") || "";
   const cinematographer = _uniqNames(credits.crew?.filter(c => ["Director of Photography","Cinematography"].includes(c.job)).map(c => c.name)).join(", ") || "";
   return {
+    // Отказ на дневном лимите виден вызывающему (#26): поля при нём пустые, и без метки цикл догрузки
+    // принимал отказ за «у фильма нет команды» и шёл дальше до конца списка.
+    _limit: !!(detail && detail.error === 'limit_reached') || !!(credits && credits.error === 'limit_reached'),
     tmdbID: String(id), type,
     Title: detail.title || detail.name || "",
     OriginalTitle: detail.original_title || detail.original_name || "",
@@ -7566,6 +7651,9 @@ function _buildListChecklistHTML(tmdbID, type) {
 function _refreshDetailChecklist(tmdbID) {
   const el = document.getElementById('detail-list-checklist');
   if (!el) return;
+  // Только в карточке ТОГО ЖЕ фильма (#61): запись в базу идёт секунды, и за это время человек
+  // открывал фильм B, а в его блок «Списки» приходил чек-лист фильма A с его id в строках.
+  if (el.dataset.id !== String(tmdbID)) return;
   // Тип карточки лежит на самом чек-листе: openDetail ставит его туда (#78).
   const html = _buildListChecklistHTML(String(tmdbID), el.dataset.type || undefined);
   el.innerHTML = html;
@@ -8176,16 +8264,22 @@ async function _runQueryPicks(raw, c, showTitles, gen, free) {
   const outHTML = () => _srchSect(t('search_picks')) + _srchGot(c) + _picksOutHTML();
   if (free) spent = { ok: true };
   else if (_picksPaid(key) || _picksPaid(rawKey)) { spent = { ok: true }; freeWhy = 'repeat'; }
-  else if (_pickChainJoin(_pickFacets(c))) { spent = { ok: true }; freeWhy = 'refine'; }
-  else if (_picksRemaining === 0) spent = await _spendPick(key);
   else {
     // Цепочка открывается до подбора и списания: второй, похожий запрос, набранный, пока идёт
-    // первый, - уже уточнение, а не второе списание.
-    chain = _pickChainStart(_pickFacets(c));
-    toPay = true;
-    spent = { ok: true };
+    // первый, - уже уточнение, а не второе списание. Но пока первый не списан, цепочка ещё не
+    // оплачена (#69): второй её ПЕРЕНИМАЕТ и платит сам, а первый, увидев новое поколение, её не
+    // снимает. Раньше второй шёл бесплатным уточнением, первый снимал цепочку без списания, и
+    // подборка выходила даром.
+    const j = _pickChainJoin(_pickFacets(c), gen);
+    if (j && !j.pending) { spent = { ok: true }; freeWhy = 'refine'; }
+    else if (_picksRemaining === 0) spent = await _spendPick(key);
+    else {
+      chain = j ? j.t : _pickChainStart(_pickFacets(c), gen);
+      toPay = true;
+      spent = { ok: true };
+    }
   }
-  if (gen !== _srchGen) { if (toPay) _pickChainDrop(chain); return; }
+  if (gen !== _srchGen) { if (toPay) _pickChainDrop(chain, gen); return; }
   if (!spent.ok) {
     const box = document.getElementById('srch-picks');
     if (box) box.innerHTML = outHTML();
@@ -8193,14 +8287,16 @@ async function _runQueryPicks(raw, c, showTitles, gen, free) {
   }
   let list;
   try { list = await _searchByQuery(raw, 0, c); }
-  catch (e) { if (toPay) _pickChainDrop(chain); throw e; }
-  if (gen !== _srchGen) { if (toPay) _pickChainDrop(chain); return; }
+  catch (e) { if (toPay) _pickChainDrop(chain, gen); throw e; }
+  if (gen !== _srchGen) { if (toPay) _pickChainDrop(chain, gen); return; }
   const none = _srchAllDropped(c, list);
   if (toPay) {
-    if (none) _pickChainDrop(chain);
-    else {
+    if (none) _pickChainDrop(chain, gen);
+    else if (chain != null && _picksMem().chains.some(ch => ch.t === chain && !ch.pending)) {
+      spent = { ok: true }; freeWhy = 'refine';   // перенятую цепочку прежний успел оплатить
+    } else {
       spent = await _spendPick(key);
-      if (spent.ok) paidNow = chain != null; else _pickChainDrop(chain);
+      if (spent.ok) { paidNow = chain != null; _pickChainPaid(chain); } else _pickChainDrop(chain, gen);
       if (gen !== _srchGen) return;
       if (!spent.ok) {
         const box = document.getElementById('srch-picks');
@@ -8486,9 +8582,16 @@ async function _searchLike(id, type, title) {
   const box = document.getElementById('srch-picks');
   if (!box) return;
   const gen = _srchGen;
-  const spent = await _spendPick('like:' + type + id);
-  const freeWhy = spent.repeat ? 'repeat' : null;
-  if (!spent.ok) { box.innerHTML = _srchSect(t('search_like').replace('{title}', () => title)) + _picksOutHTML(); return; }
+  // Сначала подбор, потом списание (#70), как у подборки по словам: пустые рекомендации, пустые
+  // после фильтра библиотеки и отказ TMDB нажатия не стоят. Нажатий ноль - сервер скажет сразу.
+  const key = 'like:' + type + id, head = () => _srchSect(t('search_like').replace('{title}', () => title));
+  const repeat = _picksPaid(key);
+  if (!repeat && _picksRemaining === 0) {
+    const sp = await _spendPick(key);
+    if (gen !== _srchGen) return;
+    if (!sp.ok) { box.innerHTML = head() + _picksOutHTML(); return; }
+  }
+  const freeWhy = repeat ? 'repeat' : null;
   box.innerHTML = _srchSect(t('search_like').replace('{title}', () => title)) + loadingHTML(randQuote(), false);
   try {
     const r = await tmdbFetch(`/${type}/${encodeURIComponent(id)}/recommendations?language=${_tmdbLang()}`);
@@ -8501,6 +8604,11 @@ async function _searchLike(id, type, title) {
       Poster: x.poster_path ? TMDB_IMG + x.poster_path : '',
       Rating: _ratingOf(x), Genre: '', why: null,
     }));
+    if (list.length && !repeat) {
+      const sp = await _spendPick(key);
+      if (gen !== _srchGen) return;
+      if (!sp.ok) { box.innerHTML = head() + _picksOutHTML(); return; }
+    }
     await _enrichWhy(list, null);
     if (gen !== _srchGen) return;
     list.slice(0, 7).forEach(m => { m._enr = true; });
@@ -8661,6 +8769,53 @@ function navModalBack() {
 }
 function _clearModalStack() { _modalStack = []; _currentModal = null; }
 
+// ОКНО ФИЛЬМА И ЧЕЛОВЕКА ТЯНЕТСЯ ВНИЗ (#136). Ручка сверху обещала жест, а его не было. Тянуть можно,
+// когда окно прокручено к самому верху и палец идёт вниз больше, чем вбок (карусели актёров не
+// мешает). Дальше 110px или быстрым рывком - то же, что крестик; иначе окно возвращается.
+(function _installSheetDrag() {
+  const start = (e) => {
+    const m = e.currentTarget;
+    if (e.touches.length !== 1 || m.scrollTop > 0) return;
+    const t0 = e.touches[0];
+    m._drag = { x: t0.clientX, y: t0.clientY, t: performance.now(), dy: 0, on: false, off: false };
+  };
+  const move = (e) => {
+    const m = e.currentTarget, d = m._drag;
+    if (!d || d.off) return;
+    const t1 = e.touches[0], dx = t1.clientX - d.x, dy = t1.clientY - d.y;
+    if (!d.on) {
+      if (Math.abs(dy) < 8 && Math.abs(dx) < 8) return;
+      if (dy <= 0 || Math.abs(dx) > Math.abs(dy) || m.scrollTop > 0) { d.off = true; return; }
+      d.on = true; m.classList.add('dragging');
+    }
+    e.preventDefault();
+    d.dy = Math.max(0, dy);
+    m.style.transform = `translateY(${d.dy}px)`;
+  };
+  const end = (e) => {
+    const m = e.currentTarget, d = m._drag;
+    m._drag = null;
+    if (!d || !d.on) return;
+    m.classList.remove('dragging');
+    const fast = d.dy / Math.max(1, performance.now() - d.t) > 0.6;
+    if (d.dy > 110 || (fast && d.dy > 40)) {
+      m.style.transform = '';
+      navModalBack();
+      return;
+    }
+    m.classList.add('settling');
+    m.style.transform = '';
+    setTimeout(() => m.classList.remove('settling'), 240);
+  };
+  const wire = () => document.querySelectorAll('#detail-overlay > .modal, #person-overlay > .modal').forEach(m => {
+    m.addEventListener('touchstart', start, { passive: true });
+    m.addEventListener('touchmove', move, { passive: false });
+    m.addEventListener('touchend', end);
+    m.addEventListener('touchcancel', end);
+  });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire); else wire();
+})();
+
 // Слово при числе по правилам языка: base - ключ формы «один» ('tv_season'), base+'s' - «много»,
 // base+'s_few' и base+'s_many' - русские и украинские «2 сезона» и «5 сезонов». Выбор по
 // английскому n === 1 давал «5 сезона · 2 серий» (проверка кода 9 окт, #82). Категорию даёт
@@ -8782,7 +8937,7 @@ async function openDetail(id, type) {
     const showChecklist = !!_checklistHTML;
 
     const checklistSection = showChecklist
-      ? `<div class="list-check-section"><div class="list-check-header">${t('lists_header')}</div><div id="detail-list-checklist" data-type="${d.type === 'tv' ? 'tv' : 'movie'}">${_checklistHTML}</div></div>`
+      ? `<div class="list-check-section"><div class="list-check-header">${t('lists_header')}</div><div id="detail-list-checklist" data-id="${escapeHtml(String(id))}" data-type="${d.type === 'tv' ? 'tv' : 'movie'}">${_checklistHTML}</div></div>`
       : '';
 
     // Watched films show a status strip (date + rating) instead of a checklist
@@ -9467,10 +9622,14 @@ async function confirmAdd() {
   // участников. Проверка кода 9 окт, #26.
   if (!existing && currentAddStatus === 'plan' && currentAddListId
       && watchHistory.some(h => h.tmdbID === tmdbID && h.listId === currentAddListId)) {
-    closeAdd(); closeDetail();
+    // Карточку закрываем, только если она видна (#10, как ниже, #77): иначе closeDetail обнулял
+    // стек, и со страницы персоны крестик закрывал всё вместо возврата к фильму.
+    closeAdd();
+    const _dOv0 = document.getElementById("detail-overlay");
+    if (_dOv0 && getComputedStyle(_dOv0).display !== "none") closeDetail();
     showToast(t('toast_film_already_in_list')
       .replace('{title}', () => m.Title || '').replace('{name}', () => _getListName(currentAddListId)));
-    btn.textContent = "Save"; btn.disabled = false;
+    btn.textContent = t('save'); btn.disabled = false;
     return;
   }
   let _written = [];          // строки, которые вернула запись (#25)
@@ -10246,25 +10405,34 @@ function _pickChainsNow(o, now) {
 }
 // Уточнение: есть общее условие с цепочкой, оплаченной меньше часа назад. Условия уточнения
 // ложатся в цепочку: «вестерн 60-х» -> «вестерн 70-х» -> «фантастика 70-х» - одна череда.
-function _pickChainJoin(f) {
+// Цепочка, открытая до списания, - pending, и её владелец - поколение поиска, которое за неё
+// платит (#69). Присоединиться к pending - значит перенять её: { pending: true, t }.
+function _pickChainJoin(f, gen) {
   if (!f.length) return false;
   const o = _picksMem(), ch = _pickChainsNow(o, Date.now()).find(ch => f.some(x => ch.f.includes(x)));
   if (!ch) return false;
   ch.f = [...new Set([...ch.f, ...f])].slice(0, 60);
+  if (ch.pending) ch.owner = gen;
   _picksMemSave(o);
-  return true;
+  return { pending: !!ch.pending, t: ch.t };
 }
-function _pickChainStart(f) {
+function _pickChainStart(f, gen) {
   if (!f.length) return null;
   const o = _picksMem(), t = Date.now();
-  _pickChainsNow(o, t).push({ t, f });
+  _pickChainsNow(o, t).push({ t, f, pending: true, owner: gen });
   _picksMemSave(o);
   return t;
 }
-function _pickChainDrop(t) {
+function _pickChainPaid(t) {
+  if (t == null) return;
+  const o = _picksMem(), ch = o.chains.find(ch => ch.t === t);
+  if (ch) { delete ch.pending; delete ch.owner; _picksMemSave(o); }
+}
+// Снимает цепочку только её владелец: перенятую цепочку прежний поиск не трогает.
+function _pickChainDrop(t, gen) {
   if (t == null) return;
   const o = _picksMem();
-  o.chains = o.chains.filter(ch => ch.t !== t);
+  o.chains = o.chains.filter(ch => ch.t !== t || (ch.owner != null && gen != null && ch.owner !== gen));
   _picksMemSave(o);
 }
 function _spendPick(key) {
@@ -10595,11 +10763,11 @@ const _SUBJECT_FILMS = {
 };
 
 const _SUBJECTS = [
-  { k:'cat',          terms:'кошк коти котик кот коты кіт кішк котів котами кішок katze chat gato gatt კატ cat cats კატებ კატის' },
+  { k:'cat',          terms:'кошк коти котик кот коты кіт кішк котів котами кішок =кошек katze chat gato gatt კატ cat cats კატებ კატის' },
   { k:'dog',          terms:'собак пес псы собач щено hund chien perro cane ძაღლ dog dogs ძაღლებ' },
   { k:'horse',        terms:'лошад конь кон pferd cheval caballo cavallo ცხენ horse' },
   { k:'wolf',         terms:'волк вовк wolf loup lobo lupo მგელ' },
-  { k:'bear',         terms:'медвед ведмід baer bär ours oso orso bear' },
+  { k:'bear',         terms:'медвед ведмід ведмед baer bär ours oso orso bear' },
   { k:'shark',        terms:'акул hai requin tiburon squalo shark' },
   { k:'dinosaur',     terms:'динозавр dinosaur dinosaurier dinosaure dinosaurio' },
   { k:'bird',         terms:'птиц птах vogel oiseau pajaro uccell ფრინველ bird' },
@@ -10610,12 +10778,12 @@ const _SUBJECTS = [
   { k:'vampire',      terms:'вампир vampir vampire vampiro' },
   { k:'zombie',       terms:'зомби zombi' },
   { k:'ghost',        terms:'привид призрак привиден полтергейст geist fantome fantôme fantasma ghost' },
-  { k:'witch',        terms:'ведьм відьм hexe sorciere sorcière bruja strega witch' },
+  { k:'witch',        terms:'ведьм відьм =відьом hexe sorciere sorcière bruja strega witch' },
   { k:'dragon',       terms:'дракон drache dragon drago' },
   { k:'monster',      terms:'монстр чудовищ ungeheuer monstre monstruo mostro monster' },
   { k:'superhero',    terms:'супергеро superheld superheros superheroe supereroe superhero' },
   { k:'school',       terms:'школ шкіл schule ecole école escuela scuola სკოლ school' },
-  { k:'prison',       terms:'тюрьм вязниц gefangnis gefängnis prison carcel prigione' },
+  { k:'prison',       terms:'тюрьм вязниц gefangnis gefängnis prison prisoner carcel prigione' },
   { k:'hospital',     terms:'больниц лікарн krankenhaus hopital hôpital hospital ospedale' },
   { k:'train',        terms:'поезд потяг zug train tren treno მატარებ' },
   { k:'ship',         terms:'корабл судно судна schiff navire barco nave გემ ship' },
@@ -10641,7 +10809,7 @@ const _SUBJECTS = [
   { k:'war',          terms:'военн войн війн воен krieg guerre guerra ომი war wars' },
   { k:'love',         terms:'любовь любви любовн кохання кохан liebe amour amor amore სიყვარულ love love_story история_любви історія_кохання liebesgeschichte storia_d_amore histoire_d_amour historia_de_amor' },
   { k:'friendship',   terms:'дружб freundschaft amitie amitié amistad amicizia მეგობრ friendship' },
-  { k:'family',       terms:'семья семьи семейн сімʼя сімей familie famille familia famiglia ოჯახ family' },
+  { k:'family',       terms:'семья семьи семейн =семью =семье =семьей сімʼя сімей familie famille familia famiglia ოჯახ family' },
   { k:'revenge',      terms:'месть мести мстит мстител помста помсти rache vengeance venganza vendetta revenge' },
   { k:'survival',     terms:'выживан виживан uberleben überleben survie supervivencia sopravvivenza survival' },
   { k:'heist',        terms:'ограблен пограбуван raub braquage atraco rapina heist raubzug raububerfall' },
@@ -10651,7 +10819,9 @@ const _SUBJECTS = [
   { k:'boxing',       terms:'бокс boxen boxe boxeo pugilato boxing' },
   { k:'football',     terms:'футбол fussball fußball football futbol calcio' },
   { k:'chess',        terms:'шахмат шахів шахова =шахи ჭადრაკ schach echecs échecs ajedrez scacchi chess' },
-  { k:'music',        terms:'музык музик musik musique musica მუსიკ music' },
+  // Фразы с «классической» (#86): иначе прилагательное уходило в оценку classic, и план резал всё
+  // после 1979 года - «Амадея» и «Тар» в выдаче быть не могло. Слова фразы принадлежат ей.
+  { k:'music',        terms:'музык музик musik musique musica მუსიკ music musician классическ_музык класичн_музик classical_music classical_musician musique_classique musica_clasica klassische_musik musica_classica musica_classica კლასიკურ_მუსიკ' },
   { k:'rock band',    terms:'рокгруп рок_группа rockband rock_band groupe_de_rock banda_de_rock gruppo_rock rockgruppe' },
   { k:'painter',      terms:'художник маляр maler peintre pintor pittore მხატვ painter' },
   { k:'writer',       terms:'писател письмен schriftsteller ecrivain écrivain escritor scrittore მწერალ writer' },
@@ -10666,6 +10836,8 @@ const _SUBJECTS = [
   { k:'chef',         terms:'повар кухн koch cuisinier cocinero cuoco chef' },
   { k:'pilot',        terms:'пилот лётчик летчик pilot pilote piloto' },
   { k:'childhood',    terms:'детств дитинств kindheit enfance infancia infanzia ბავშვ childhood' },
+  // «alter ego» - фраза двойника, и «alter» в ней старость не включает (#80).
+  { k:'doppelganger', terms:'doppelganger двойник двойники двойника двійник двійники sosie doble doppio alter_ego' },
   { k:'old age',      terms:'старость старик пожилой пожилые alter vieillesse vejez vecchiaia old_age' },
   { k:'death',        terms:'смерт tod mort muerte morte სიკვდილ death' },
   { k:'illness',      terms:'болезн хвороб krankheit maladie enfermedad malattia illness' },
@@ -10678,7 +10850,7 @@ const _SUBJECTS = [
   { k:'bureaucracy',  terms:'бюрократ чиновник канцеляр burokratie bürokratie bureaucratie burocracia burocrazia bureaucracy bureaucracies' },
   { k:'jazz',         terms:'джаз jazz' },
   { k:'loneliness',   terms:'одиночеств одинок lonel einsamkeit solitude soledad solitudine loneliness' },
-  { k:'dream',        terms:'сновиден сюрреалист абсурдист traum reve rêve sueno sogno surreal dream surrealism surrealismo surrealismus' },
+  { k:'dream',        terms:'сновиден сюрреалист абсурдист =traum =traume =traumen reve rêve sueno sogno surreal dream surrealism surrealismo surrealismus' },
   { k:'skateboarding',terms:'скейт skateboard' },
   { k:'artist',       terms:'художник художниц искусств творчеств kunst artiste arte artist' },
   // silent_film: голое "film" было обрывком фразы и ловило "filmed" (проверка кода 9 окт, #89).
@@ -10819,18 +10991,25 @@ const _MOVEMENTS = [
   { c:'DE', y:[1919,1931], t:'немецкийэкспрессионизм экспрессионизм germanexpressionism expressionism deutscherexpressionismus' },
   { c:'SU,RU', y:[1924,1934], t:'советскиймонтаж монтажнаяшкола sovietmontage montagecinema' },
   { c:'FR', y:[1918,1930], t:'французскийавангард импрессионизм импрессионист frenchimpressionism frenchavantgarde avantgarde' },
-  { c:'FR,ES', y:[1924,1934], t:'сюрреализм surrealism surrealisme surrealismo' },
+  // Сюрреализм - манера, а не только парижский авангард 20-х (#81): «surrealism» давал Францию и
+  // Испанию 1924-1934, около десятка фильмов, а Бунюэль, Линч и Ходоровски туда не попадали. Отвечает
+  // полка «сновидческое», годы - вся история кино.
+  { c:'', y:[1924,2025], shelf:'dreamlike', t:'сюрреализм surrealism surrealisme surrealismo' },
   { c:'DE', y:[1921,1929], t:'каммершпиль kammerspiel chamberdrama' },
-  { c:'US', y:[1912,1929], t:'немоекино немаякомедия silentera silentcinema silentfilm slapstick' },
+  // gen - родовое слово, а не школа одной страны (#81): названная страна, десятилетие, год или
+  // человек сильнее страны и лет строки («советское немое кино», «японский нуар», «неонуар 2010-х»).
+  // era - годы строки и есть само слово (немое кино - до звука), и с другой страной они остаются; у
+  // остальных годы американские, и с другой страной окно тянется до сегодня (корейский неонуар - 2000-е).
+  { c:'US', y:[1912,1929], gen:1, era:1, t:'немоекино немаякомедия silentera silentcinema silentfilm slapstick' },
   { c:'US', y:[1929,1934], t:'прекод precode precodehollywood' },
   { c:'SU,RU', y:[1926,1935], t:'киноглаз kinoglaz kinopravda' },
   // ── classical ─────────────────────────────────────────────────────────────
   { c:'FR', y:[1934,1940], t:'поэтическийреализм poeticrealism realismepoetique' },
   { c:'US', y:[1930,1948], t:'золотойвекголливуда классическийголливуд goldenageofhollywood classicalhollywood' },
   { c:'US', y:[1934,1942], t:'скрюболл screwball screwballcomedy' },
-  { c:'US', y:[1940,1959], t:'нуар filmnoir noir ნუარ' },
+  { c:'US', y:[1940,1959], gen:1, g:'80', t:'нуар filmnoir noir ნუარ' },
   // "неонов" и "neonnoir" отсюда ушли: неоновое - это тема neon noir, а не неонуар (#94).
-  { c:'US', y:[1967,1999], t:'неонуар neonoir' },
+  { c:'US', y:[1967,1999], gen:1, g:'80', t:'неонуар neonoir' },
   // ── post-war ──────────────────────────────────────────────────────────────
   { c:'IT', y:[1943,1954], t:'неореализм итальянскийнеореализм neorealism italianneorealism neorealismo неореалізм італійськийнеореалізм ნეორეალიზმ' },
   { c:'GB', y:[1956,1963], t:'фрисинема freecinema' },
@@ -10860,7 +11039,8 @@ const _MOVEMENTS = [
   { c:'FR', y:[1981,1991], t:'синемадюлук cinemadulook' },
   { c:'DK', y:[1995,2005], t:'догма догма95 dogme dogme95 dogma95' },
   { c:'US', y:[1991,2000], t:'новоеквиркино newqueercinema' },
-  { c:'US', y:[1989,2005], t:'американскоенезависимое сандэнс americanindependent indiefilm sundance' },
+  // «indie film» - независимое кино вообще (тема independent film), как и «indie movies»; отсюда ушло (#81).
+  { c:'US', y:[1989,2005], t:'американскоенезависимое сандэнс americanindependent sundance' },
   { c:'IR', y:[1987,2005], t:'иранскоекино iraniancinema' },
   // ── two thousands onward ──────────────────────────────────────────────────
   { c:'RO', y:[2004,2015], t:'румынскаяноваяволна romaniannewwave' },
@@ -10889,7 +11069,9 @@ const _MOVEMENTS = [
 // Чего он НЕ делает, и это свойство алгоритма, а не недоделка: беглая гласная. "Подросток"
 // и "подростки" дают разные основы, потому что "о" в косвенных падежах исчезает. Такие
 // слова по-прежнему нужны в таблице обеими формами.
-const _SV = 'аеиоуыэюя';
+// і, ї, є - гласные украинского (#83): без них «лісі» и «ведмедів» не делились на области, и
+// украинские окончания не снимались. В русском этих букв нет, его основы не меняются.
+const _SV = 'аеиоуыэюяіїє';
 function _svRegions(w) {
   let i = 0;
   while (i < w.length && _SV.indexOf(w[i]) < 0) i++;
@@ -10914,7 +11096,9 @@ const _SW = {
   verb2: ['ила','ыла','ена','ейте','уйте','ите','или','ыли','ей','уй','ил','ыл','им','ым','ен',
           'ило','ыло','ено','ят','ует','уют','ит','ыт','ены','ить','ыть','ишь','ую','ю'],
   noun:  ['а','ев','ов','ие','ье','е','иями','ями','ами','еи','ии','и','ией','ей','ой','ий','й',
-          'иям','ям','ием','ем','ам','ом','о','у','ах','иях','ях','ы','ь','ию','ью','ю','ия','ья','я'],
+          'иям','ям','ием','ем','ам','ом','о','у','ах','иях','ях','ы','ь','ию','ью','ю','ия','ья','я',
+          // украинские (#83), только с буквами, которых в русском нет
+          'і','ів','ові','еві','єві','ї','ії','єю','ям','ями','ях'],
   der:   ['ост','ость'],
   sup:   ['ейш','ейше'],
 };
@@ -10958,19 +11142,78 @@ function _stemRu(word) {
 // Английский и остальные латинские: плоскостная нормализация окончаний. Полный Porter2 здесь
 // не нужен - таблицы уже написаны базовыми формами, а запросы приходят в единственном или
 // множественном числе.
+// #83: «wolves» давало 'wolv' и мимо wolf, «dancing» - 'danc' мимо dance, «chevaux» мимо cheval.
+// Теперь -ves -> -f, -aux -> -al, и немое -e в конце основы снимается у обоих (dance и dancing - 'danc').
 function _stemLat(word) {
   let w = String(word || '').toLowerCase();
   if (w.length < 4) return w;
+  if (w.length >= 6 && w.endsWith('aux')) return w.slice(0, -3) + 'al';
+  if (w.length >= 6 && w.endsWith('ves')) return w.slice(0, -3) + 'f';
   for (const e of ['ies', 'ing', 'ed', 'es', 's']) {
     if (w.length - e.length >= 3 && w.endsWith(e)) {
-      return e === 'ies' ? w.slice(0, -3) + 'y' : w.slice(0, w.length - e.length);
+      if (e === 'ies') return w.slice(0, -3) + 'y';
+      w = w.slice(0, w.length - e.length);
+      break;
     }
   }
+  if (w.length >= 5 && w.endsWith('e')) w = w.slice(0, -1);
   return w;
 }
-function _stem(word) { return /[а-яё]/i.test(word) ? _stemRu(word) : _stemLat(word); }
+// Грузинский: падеж и множественное - суффиксы (#83). «ტყეში» - ტყე + ში, «ცხენებზე» - ცხენ + ებ +
+// ზე, «ომზე» - ომ(ი) + ზე. Снимается один падежный суффикс, затем -ებ и именительное -ი/-ა.
+const _KA_CASE = ['ებიდან','ებთან','ებში','ებზე','ებით','ების','ებმა','ებს','ები','იდან','ში','ზე','თან','დან','ით','ად','ის','მა','ს'];
+function _stemKa(word) {
+  let w = String(word || '');
+  for (const e of _KA_CASE) if (w.length - e.length >= 2 && w.endsWith(e)) { w = w.slice(0, -e.length); break; }
+  if (w.length >= 4 && w.endsWith('ებ')) w = w.slice(0, -2);
+  if (w.length >= 3 && (w.endsWith('ი') || w.endsWith('ა'))) w = w.slice(0, -1);
+  return w;
+}
+function _stem(word) {
+  if (/[а-яёіїєґ]/i.test(word)) return _stemRu(word);
+  if (/[\u10a0-\u10ff]/.test(word)) return _stemKa(word);
+  return _stemLat(word);
+}
+// ДВЕ ОСНОВЫ - ОДНО СЛОВО (общая мерка для hit, отрицания и фраз). Порог в четыре буквы с обеих
+// сторон держит обрубки («воен» -> «во»), но резал самые частые короткие слова (#82): «котов», «коней»,
+// «умное», «тихая», «зимой» дают основу из трёх букв, равную термину, и мимо. Теперь:
+//   - кириллический термин из трёх букв - это само слово, и ему равна основа слова не длиннее семи букв;
+//   - грузинская основа может быть из двух букв («ომ» - война), письмо там суффиксное;
+//   - романские множественные: «cani» и «cane», «lupi» и «lupo» - одно слово без последней гласной.
+function _stemEq(w, ws, st) {
+  if (/[\u10a0-\u10ff]/.test(st)) { const s2 = _stemKa(st); return s2.length >= 2 && ws === s2; }
+  if (st.length === 3 && /[а-яёіїєґ]/i.test(st)) return w.length <= 7 && ws === st;
+  const ss = _stem(st);
+  if (ws.length >= 4 && ss.length >= 4 && ws === ss) return true;
+  if (/^[a-z]+$/.test(w) && /^[a-z]+$/.test(st) && /[aeio]$/.test(st) && st.length <= 6) {
+    const core = x => x.replace(/s$/, '').replace(/[aeio]$/, '');
+    const a = core(w), b = core(st);
+    return a.length >= 3 && a === b && w.length <= st.length + 1;
+  }
+  return false;
+}
 
-const _qNorm = s => String(s||"").toLowerCase().replace(/[ё]/g,'е').replace(/[^\p{L}\p{N} ]/gu,' ').replace(/\s+/g,' ').trim();
+// Апостроф внутри украинского слова - буква слова (#83): «сім'ю» резалось на «сім» и «ю». Он
+// приводится к ʼ (U+02BC), как в таблицах («сімʼя»); французское «d'horreur» не трогается.
+// Имена, после которых латинское слово - фамилия (#80, см. _splitQuery). Свёрнуты без ударений.
+const _FIRST_NAMES = new Set(('kevin kurt orson rachel samantha tod sebastian peter stephen steven john james robert michael ' +
+  'david richard thomas charles christopher daniel matthew anthony paul george edward brian ronald timothy jason ryan ' +
+  'jacob gary nicholas eric jonathan justin scott brandon benjamin gregory samuel alexander patrick dennis tyler aaron ' +
+  'adam henry nathan douglas kyle walter ethan jeremy harold keith roger noah carl sean arthur lawrence jesse ' +
+  'dylan bryan jordan billy bruce albert gabriel alan wayne ralph vincent russell louis philip johnny bradley joel ' +
+  'mary patricia jennifer linda elizabeth barbara susan jessica sarah karen nancy lisa margaret sandra ashley kimberly ' +
+  'emily donna michelle dorothy carol amanda melissa deborah stephanie rebecca sharon laura cynthia kathleen amy angela ' +
+  'helen anna brenda nicole emma katherine christine catherine janet ruth maria heather diane julie ' +
+  'olivia kelly christina lauren joan evelyn megan andrea hannah jacqueline frances gloria teresa kathryn sara alice ' +
+  'julia denise danielle sophia marie diana natalie isabella charlotte andrei alfred akira ingmar federico stanley ' +
+  'quentin martin sofia francis werner wim agnes pedro guillermo alejandro alfonso hayao yasujiro lars krzysztof ' +
+  'andrzej terrence pierre jacques francois claude marcel luis carlos miguel javier antonio giuseppe marco luca ' +
+  'giovanni paolo vittorio luchino roberto sergio hans klaus jurgen wolfgang rainer fritz ernst ingrid greta marlene ' +
+  'isabelle juliette marion monica sophie penelope audrey scarlett keira cate tilda meryl julianne charlize jodie ' +
+  'sigourney denzel leonardo brad tom ben matt keanu harrison clint ian hugh colin mads gael diego joaquin cillian ' +
+  'timothee saoirse emmanuelle juliette jessica jean luc wes jim michel gerard vincent nanni ken takeshi ' +
+  'hirokazu chantal abbas asghar jafar nuri bela andrey nikita elem aleksei aleksandr tarsem baz danny ridley tony').split(' '));
+const _qNorm = s => String(s||"").toLowerCase().replace(/[ё]/g,'е').replace(/([а-яіїєґ])['’`]([а-яіїєґ])/g,'$1ʼ$2').replace(/[^\p{L}\p{N} ]/gu,' ').replace(/\s+/g,' ').trim();
 
 // Strip the mood words out and hand back what is left, which is the subject.
 // Words that carry no subject and must be removed BEFORE matching, not after. Filtering them
@@ -11331,15 +11574,22 @@ function _splitQuery(q) {
   // и "трансильванию". Длинной основе русская морфология нужна целиком ("фантаст" обязан
   // ловить "фантастические", +7), а основа в четыре-пять букв - это уже почти слово, и
   // хвост длиннее окончания означает другое слово.
+  const _LAT_TAILS = new Set(['', 's', 'es', 'e', 'en', 'er', 'ed', 'd', 'a', 'i', 'o', 'os', 'as', 'is', 'y', 'ly', 'ir']);
   const _pfxHit = (w, st) => {
     if (st.length < 4) return false;
     if (!w.startsWith(st)) return false;
     if (/[^\u0000-ɏ]/.test(st))                     // кириллица, грузинский
       return st.length >= 6 || w.length - st.length <= (st.length === 5 ? 3 : 2);
-    return w.length - st.length <= 2;                  // латиница: только короткое окончание
+    // латиница: только короткое окончание, и это должно быть ОКОНЧАНИЕ (#80). Хвост в одну-две
+    // буквы ловил фамилии: russe - Russell, space - Spacey, orso - Orson, rache - Rachel, mort -
+    // Morton, dorf - Dorff, isla - islam. Окончания здесь - множественное и падеж наших латинских
+    // языков: -s, -es, -e, -en, -er, -n после -e, -ed, -d, -y, -ly, романские -a, -i, -o, -os, -as,
+    // -is и инфинитив -ir («réfléchir»).
+    const tail = w.slice(st.length);
+    if (tail.length > 2) return false;
+    return _LAT_TAILS.has(tail) || (tail === 'n' && st.endsWith('e'));
   };
-  const _partHit = (w, part) => part.length < 4 ? w === part
-    : (w === part || _pfxHit(w, part) || (_stem(w).length >= 4 && _stem(w) === _stem(part)));
+  const _partHit = (w, part) => w === part || _pfxHit(w, part) || _stemEq(w, _stem(w), part);
   // _QUALITY здесь с 9 нояб (обзор, #89): без него фразы оценки - «hidden gem», «obras maestras»,
   // «sous-estimé», «незаслуженно забытые» - не читались вовсе, хотя стояли в таблице.
   const _TABLES = [[_MOODS, 'genre'], [_GENRE_WORDS, 'genre'], [_SUBJECTS, 'subject'], [_COUNTRIES, 'country'], [_QUALITY, 'quality']];
@@ -11411,12 +11661,27 @@ function _splitQuery(q) {
   const _NEG_SKIP = new Set(['слишком', 'очень', 'особо', 'сильно', 'совсем', 'так', 'такой', 'такое', 'такие', 'про',
     'о', 'об', 'too', 'very', 'so', 'overly', 'any', 'a', 'an', 'the', 'about', 'of', 'zu', 'sehr', 'allzu', 'trop',
     'tres', 'de', 'du', 'des', 'd', 'un', 'une', 'demasiado', 'muy', 'tan', 'troppo', 'molto', 'cosi', 'di',
-    'занадто', 'дуже', 'надто', 'такий', 'таке', 'зовсім', 'ძალიან', 'ზედმეტად']);
+    'занадто', 'дуже', 'надто', 'такий', 'таке', 'зовсім', 'ძალიან', 'ზედმეტად',
+    // #77: «не такой уж страшный», «не самый страшный», «not that scary» - отрицание садилось на связку.
+    'уж', 'самый', 'самое', 'самая', 'самые', 'that', 'this', 'una', 'uno', 'el', 'la', 'le', 'les', 'il']);
+  // ИМЯ И ФАМИЛИЯ - ЧЕЛОВЕК, А НЕ ТЕМА (#80). Фамилия равна иностранному слову таблицы целиком:
+  // «peter berg» давал горы, «sebastian koch» поваров, «tod browning» смерть, «kevin spacey» космос.
+  // Латинское слово сразу после известного имени вместе с ним - имя: таблицы оба не читают, и
+  // они уходят в поиск человека. В списке только имена, которые не обычные слова и не места (нет mark,
+  // rose, will, guy, roman, christian, florence, victoria).
+  const _nameBusy = new Set();
+  allWords.forEach((w, i) => {
+    const nx = allWords[i + 1];
+    if (_FIRST_NAMES.has(w) && nx && /^[a-z]{2,}$/.test(nx) && !_isStop(nx)) { _nameBusy.add(i); _nameBusy.add(i + 1); }
+  });
   const _negPre = new Map();       // место отрицаемого слова -> места отрицания и связок перед ним
   allWords.forEach((w, i) => {
     if (_NEG.has(w)) {
+      // Стоп-слова («фильм», «кино», «film», «películas») - тоже связки (#77): hit() их не читает, и
+      // отрицание, севшее на «фильм», отпускало настоящее слово за ним включаться («только не фильм
+      // ужасов» давало ужасы). До четырёх связок: «pas un film d'horreur».
       let j = i + 1;
-      while (j < allWords.length && j - i <= 2 && _NEG_SKIP.has(allWords[j])) j++;
+      while (j < allWords.length && j - i <= 4 && (_NEG_SKIP.has(allWords[j]) || _isStop(allWords[j]))) j++;
       if (j < allWords.length && !_NEG.has(allWords[j]) && !_negPre.has(j))
         _negPre.set(j, Array.from({ length: j - i }, (_, k) => i + k));
     } else if (w === 'გარეშე' && i > 0 && !_negPre.has(i - 1)) _negPre.set(i - 1, [i]);
@@ -11459,12 +11724,11 @@ function _splitQuery(q) {
     let found = _phraseRows.has(row);
     words.forEach((w0, k) => {
       const w = _fold(w0), at = _wordIx[k];
-      if (_phraseWords.has(w) || _negBusy.has(at)) return;
+      if (_phraseWords.has(w) || _negBusy.has(at) || _nameBusy.has(at)) return;
       // Под отрицанием слово ничего своего не включает, а запоминается для разбора ниже.
       if (_negPre.has(at)) {
         const ws0 = _stem(w);
-        if (exact.includes(w) || stems.some(st => _pfxHit(w, st) || (st.length < 4 && w === st)
-              || (ws0.length >= 4 && _stem(st).length >= 4 && ws0 === _stem(st))))
+        if (exact.includes(w) || stems.some(st => _pfxHit(w, st) || (st.length < 4 && w === st) || _stemEq(w, ws0, st)))
           _negHits.push({ at, n: 1, tbl, row });
         return;
       }
@@ -11478,8 +11742,7 @@ function _splitQuery(q) {
       // обрубками - "воен", "учён", "осен", - а обрубок, пропущенный через стеммер, даёт
       // мусор: "воен" превращается в "во" и ловит воду, воздух и вокзал. Четыре символа с
       // обеих сторон: и у слова из запроса, и у термина после нормализации.
-      if (stems.some(st => _pfxHit(w, st) || (st.length < 4 && w === st)
-                        || (ws.length >= 4 && _stem(st).length >= 4 && ws === _stem(st))))
+      if (stems.some(st => _pfxHit(w, st) || (st.length < 4 && w === st) || _stemEq(w, ws, st)))
         { matchedWords.add(w0); if (!_kindOf.has(w)) _kindOf.set(w, kind); _mark(row, w); found = true; }
     });
     return found;
@@ -11930,7 +12193,7 @@ async function _personId(subject, subjectAll) {
     if (known) {
       seen.add(whole); tries++;
       const hit = await _personLookup(whole);
-      if (hit) return hit;
+      if (hit) return { ...hit, via: whole };
     } else if (all.length >= 2 && all.length <= 3 && all.some(x => x.length < 4) && /^[a-z ]+$/.test(whole)) {
       // Окном догадка не считается и двух попыток для многословных окон не занимает (#90,
       // второй круг); общий потолок в три обращения на неё действует.
@@ -11942,7 +12205,7 @@ async function _personId(subject, subjectAll) {
         const same = ((res && !res.error && res.results) || []).slice(0, 5)
           .filter(p => flatName(p.name) === flatName(whole))
           .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))[0];
-        if (same) return { id: same.id, name: same.name };
+        if (same) return { id: same.id, name: same.name, via: whole };
       } catch (e) { /* имя не нашлось - дальше обычные окна */ }
     }
   }
@@ -11988,7 +12251,7 @@ async function _personId(subject, subjectAll) {
     seen.add(w);
     tries++;
     const hit = await _personLookup(w);
-    if (hit) return hit;
+    if (hit) return { ...hit, via: w };   // via - какими словами нашлось имя (#93)
   }
   return null;
 }
@@ -12383,7 +12646,7 @@ async function _curatedSubject(key, taste, wantGenres, years, notGenres, rowsIn)
                Year: (m.release_date || '').slice(0, 4),
                Poster: m.poster_path ? TMDB_IMG + m.poster_path : '',
                Rating: _ratingOf(m), Genre: '',
-               _genres: (m.genres || []).map(x => String(x.id)),
+               _genres: (m.genres || []).map(x => String(x.id)), _hit: !!r.hit,
                why: r.hit ? _tallyWhy(r.hit) : null };
     } catch (e) { return null; }
   }));
@@ -12391,13 +12654,23 @@ async function _curatedSubject(key, taste, wantGenres, years, notGenres, rowsIn)
   // трёх - вызывающий отступит к поиску по теме, где исключение стоит в самом запросе.
   const _no = new Set((notGenres || []).map(String));
   const got = got0.filter(m => m && !m._genres.some(g => _no.has(g)));
-  if (!wantGenres || !wantGenres.length) return got.slice(0, 7);
+  // РЕЗЕРВ ДОХОДИТ ДО ЭКРАНА (#95). После сортировки по счёту перекличка вставала шестой и седьмой,
+  // а экран показывает пять: её было видно только после «Ещё», а с жанром slice(0, 7) отрезал её
+  // совсем, хотя за неё уже заплачено обращениями к TMDB. Теперь она стоит в первой пятёрке, в
+  // её конце: порядок полки впереди сохраняется.
+  const _shown = list => {
+    const h = list.filter(m => m._hit).slice(0, TASTE_W.reservedSlots);
+    const rest = list.filter(m => !h.includes(m));
+    const first = 5 - h.length;
+    return [...rest.slice(0, first), ...h, ...rest.slice(first)].slice(0, 7);
+  };
+  if (!wantGenres || !wantGenres.length) return _shown(got);
   const want = new Set(wantGenres.map(String));
   const fits = got.filter(m => m._genres.some(g => want.has(g)));
   // Only trust the narrowing when something survives it. Below three the filter has said more
   // about the sparseness of TMDB's tags than about the films, and the unfiltered list is the
   // better answer to a question we half understood.
-  return (fits.length >= 3 ? fits : got).slice(0, 7);
+  return _shown(fits.length >= 3 ? fits : got);
 }
 
 // ── ПОРОГ ГОЛОСОВ: ОДНА ПОЛИТИКА, А НЕ ПОРЯДОК ВЕТОК ────────────────────────
@@ -12592,15 +12865,22 @@ async function _constraintsFor(q) {
   };
 
   if (movements.length) { c.movement = movements[0]; c.matched = true; }
+  const _mvGen = !!(c.movement && c.movement.gen);
 
-  const person = movements.length ? null : await _personId(subject, subjectAll);
+  const person = (movements.length && !_mvGen) ? null : await _personId(subject, subjectAll);
   if (person) {
     c.person = person.id;
     c.personName = person.name;
     c.why = t('why_person').replace('{name}', () => person.name);
     c.matched = true;
-    // Имя собрано из того, что таблицы не поняли, - значит и кусок в «Понято» из тех же слов.
-    if (c.restToks.length) c.chips.push({ label: person.name, toks: c.restToks.slice(), kind: 'person' });
+    // Имя собрано из того, что таблицы не поняли, - значит и кусок в «Понято» из тех же слов. Но
+    // только из тех, которыми имя нашлось (#93): «wes anderson trains hotel» находит Андерсона по
+    // паре слов, и «hotel» не должно прятаться под его куском. Оставшееся идёт в «Не учтено».
+    const _via = new Set(String(person.via || '').split(' ').filter(Boolean));
+    const _nameToks = _via.size ? c.restToks.filter(i => _via.has(_qNorm(c.toks[i]).normalize('NFD').replace(/([a-z])[\u0300-\u036f]+/g, '$1').normalize('NFC'))) : [];
+    const _ownToks = _nameToks.length ? _nameToks : c.restToks.slice();
+    c.personLeft = c.restToks.filter(i => !_ownToks.includes(i)).map(i => c.toks[i]).join(' ');
+    if (c.restToks.length) c.chips.push({ label: person.name, toks: _ownToks, kind: 'person' });
   }
 
   // Свежесть решается ЗДЕСЬ, потому что только здесь известно, назван ли человек.
@@ -12632,6 +12912,20 @@ async function _constraintsFor(q) {
   c.genreAnd = genres.length >= 2;
   if (c.notGenreIds.length) c.matched = true;
 
+  // РОДОВОЕ ДВИЖЕНИЕ УСТУПАЕТ НАЗВАННОМУ (#81). Раньше движение выбрасывало страну, десятилетие, год
+  // и человека, а «Понято» их показывало: «советское немое кино» искало США 1912-1929. Теперь у
+  // родового слова (gen) названное заменяет страну и годы строки, а у нуара жанр «криминал» держит
+  // манеру, когда страна или годы уже не её.
+  if (_mvGen && (countries.length || decade || year || c.person)) {
+    const mv = { ...c.movement, over: true };
+    if (countries.length) mv.c = countries[0].c;
+    else if (c.person) mv.c = '';
+    const w = _yearWindow({ decade, year, yearSide, yearTo });
+    if (w) mv.y = [w[0] ?? mv.y[0], w[1] ?? new Date().getFullYear()];
+    else if (!mv.era) mv.y = [mv.y[0], new Date().getFullYear()];
+    c.movement = mv;
+    if (mv.g && !c.genreIds.length && !c.notGenreIds.includes(mv.g)) c.genreIds = [mv.g];
+  }
   if (!movements.length && decade) { c.decade = decade; c.matched = true; }
   c.quality = (quality && quality.length) ? quality[0].id : null;
   if (c.quality) c.matched = true;
@@ -12767,8 +13061,8 @@ async function _constraintsFor(q) {
   // Молчим, только если непрочитанное УШЛО В ДЕЛО: человеком или собственной темой.
   // Тема, найденная по НАШЕМУ словарю, остаток не оправдывает - на "лондон, 19 век"
   // строки не было вовсе, хотя не понято было всё.
-  const _leftUsed = c.person || (subjects.length === 0 && c.keywords && c.keywords.length);
-  c.subjectLeft = _leftUsed ? '' : (subject || '');
+  const _leftUsed = (c.person && !c.personLeft) || (!c.person && subjects.length === 0 && c.keywords && c.keywords.length);
+  c.subjectLeft = _leftUsed ? '' : c.person ? c.personLeft : (subject || '');
   c.mood = moods.length > 0;
   c.keyword = c.keywords.length > 0;
   c.pins = (c.movement ? 1 : 0) + (c.decade ? 1 : 0) + (c.country ? 1 : 0)
@@ -13281,10 +13575,14 @@ async function _searchByQuery(q, press = 0, pre = null) {
       const pp = new URLSearchParams(_asAsked.toString());
       pp.set('with_people', _taste.crewIds.map(x => x.id).join('|'));
       pp.delete('page');
-      pp.delete('with_keywords');
-      pp.set('vote_count.gte', '50');
+      // ТОТ ЖЕ ВОПРОС, А НЕ ДРУГОЙ (#92). Тема (with_keywords) снималась, а порог оценки ставился в
+      // 6.5 поверх названного: на «фильмы про лошадей» первыми шли лучшие фильмы любимого режиссёра
+      // без лошадей, на «шедевры» - фильмы от 6.5. Вкус решает порядок, а что подходит, решают слова:
+      // тема остаётся, порог оценки не ниже названного, а порог голосов опускается до 50, только
+      // если оценку не называли (у «шедевров» и «блокбастеров» голоса - часть вопроса).
+      if (!c.quality) pp.set('vote_count.gte', '50');
       if (!(c.genreIds || []).includes('99')) pp.set('without_genres', [pp.get('without_genres'), '99'].filter(Boolean).join(','));
-      pp.set('vote_average.gte', '6.5');
+      pp.set('vote_average.gte', String(Math.max(6.5, parseFloat(pp.get('vote_average.gte')) || 0)));
       const r2 = await tmdbFetch(`/discover/movie?${pp.toString()}`);
       const mine = ((r2 && !r2.error && r2.results) || [])
         .filter(x => !_lib.ids.has(String(x.id)) && !_lib.titles.has(_lib.norm(x.title || x.name)))
@@ -13299,8 +13597,6 @@ async function _searchByQuery(q, press = 0, pre = null) {
           Poster: x.poster_path ? TMDB_IMG + x.poster_path : '',
           Rating: _ratingOf(x), Genre: '',
           gids: (x.genre_ids || []).map(String),
-          // Этот запрос шёл БЕЗ темы (with_keywords снят выше): подпись не должна её обещать.
-          _noKw: true,
           // Имя без должности - половина ответа. Сообщено 26 сентября: "With Dave
           // Porter" не говорит, играл он или написал музыку, а он композитор.
           // Состав кандидата всё равно загружается для подписи, так что роль
@@ -14680,7 +14976,7 @@ function _showSharedListSheet(listName, sender, items) {
         ${items.map((it, i) => `
           <div onclick="_sharedToggle(${i})" data-si="${i}"
                style="display:flex;gap:11px;align-items:center;padding:7px 8px;border-radius:10px;cursor:pointer;min-height:44px">
-            <span class="shared-tick" style="flex-shrink:0;width:22px;height:22px;border-radius:6px;border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;background:var(--accent)">${icon('check',14)}</span>
+            <span class="shared-tick" style="flex-shrink:0;width:22px;height:22px;border-radius:6px;border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--on-accent)">${icon('check',14)}</span>
             ${posterHTML(it.poster, it.title, 34, 50, false)}
             <div style="flex:1;min-width:0">
               <div style="font-size:13px;line-height:1.3">${escapeHtml(it.title || '')}</div>
@@ -14704,6 +15000,7 @@ function _sharedPaint() {
     const tick = row.querySelector('.shared-tick');
     tick.style.background = on ? 'var(--accent)' : 'transparent';
     tick.style.borderColor = on ? 'var(--accent)' : 'var(--border)';
+    tick.style.color = on ? 'var(--on-accent)' : 'transparent';
     tick.style.opacity = on ? '1' : '.45';
     row.style.opacity = on ? '1' : '.55';
   });
@@ -14921,10 +15218,13 @@ async function _loadInviteLink(listId) {
   const el = document.getElementById('invite-link-content');
   if (!el) return;
   try {
-    // Reuse existing valid token or create new one
+    // Прежняя ссылка - только созданная в последний час (#39): иначе под QR писалось «Действует
+    // 48 часов», а ссылка, открытая на второй день, истекала через минуты. Срок задаёт база, поэтому
+    // мерка - возраст токена, а не догадка о его сроке.
     const { data: existing } = await sbClient.from('invite_tokens')
       .select('token,expires_at').eq('list_id', listId).eq('created_by', currentUser.id)
-      .gt('expires_at', new Date().toISOString()).order('created_at',{ascending:false}).limit(1);
+      .gt('expires_at', new Date().toISOString()).gt('created_at', new Date(Date.now() - 3600e3).toISOString())
+      .order('created_at',{ascending:false}).limit(1);
     let token = existing?.[0]?.token;
     if (!token) {
       const { data, error } = await sbClient.from('invite_tokens')
@@ -15188,10 +15488,10 @@ function _onListPicked(listId) {
   // Capture state BEFORE hiding the picker (closeListPicker wipes the callback)
   const cb = _listPickerCallback;
   const movie = _listPickerMovie, status = _listPickerStatus;
-  _listPickerCallback = null;
-  _listPickerNewMode = false;
-  const ov = document.getElementById('list-picker-overlay');
-  if (ov) ov.style.display = 'none';
+  // Через closeListPicker, а не display='none' напрямую (#3): обёрнутый слоем «Назад», он снимает
+  // свой уровень. Иначе невидимый 'picker' оставался в стеке, и первое системное «назад» после
+  // каждого добавления через выбор списка уходило вхолостую.
+  closeListPicker();
   if (cb) cb(listId);
   else openAdd(movie, status, listId);
 }
@@ -15380,8 +15680,8 @@ function _renderShareFriendsList() {
     const sel = currentShareToUsers.some(u => u.id === id);
     return `<div class="friend-pick-row${sel ? " selected" : ""}" onclick="selectFriendForShare('${id}','${escapeJsAttr(name)}')">
       ${_avatarMarkup(id, name, 36)}
-      <div style="flex:1;font-size:14px">${escapeHtml(name)}</div>
-      <span style="color:${sel ? 'var(--accent-text)' : 'var(--border)'};font-size:15px;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border:1.5px solid currentColor;border-radius:5px">${sel ? icon('check', 13) : ''}</span>
+      <div style="flex:1;min-width:0;font-size:14px;overflow-wrap:anywhere">${escapeHtml(name)}</div>
+      <span style="flex-shrink:0;color:${sel ? 'var(--accent-text)' : 'var(--border)'};font-size:15px;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border:1.5px solid currentColor;border-radius:5px">${sel ? icon('check', 13) : ''}</span>
     </div>`;
   }).join("");
 }
@@ -16404,15 +16704,19 @@ function _safeErr(e) {
   return m;
 }
 
+let _toastTimer = 0;
 function showToast(msg, isError=false, ms=2500) {
-  const existing=document.getElementById("toast");
-  if (existing){existing.classList.remove("show");}
   const t=document.getElementById("toast");
+  t.classList.remove("show");
+  // Таймер прошлого тоста гасил следующий раньше срока (#54); длинная фраза держится дольше, чем
+  // 2,5 секунды, иначе её не успеть дочитать (#53): около 18 знаков в секунду, не больше 8 секунд.
+  clearTimeout(_toastTimer);
+  ms = Math.max(ms, Math.min(8000, 1200 + String(msg).length * 55));
   t.textContent=msg;
   if (isError) { t.style.borderColor="rgba(248,113,113,0.4)"; t.style.color="#fca5a5"; t.style.background="#3b0a0a"; }
   else { t.style.borderColor="var(--border)"; t.style.color="var(--text)"; t.style.background="var(--surface2)"; }
   t.classList.add("show");
-  setTimeout(()=>{t.classList.remove("show");},ms);
+  _toastTimer = setTimeout(()=>{t.classList.remove("show");},ms);
 }
 
 // ── Account ───────────────────────────────────────────────────────────────────
@@ -16956,6 +17260,23 @@ async function applyBackupData(rows, onProgress, opts = {}) {
   // Sort first, write second. The old version decided and wrote in the same pass, which is
   // what forced one request per film - you cannot batch a decision you have not made yet.
   const toInsert = [], toUpdate = [];
+  // ПОВТОР ИЗ ФАЙЛА - ОДНА СТРОКА И ДЛЯ НОВОГО ФИЛЬМА (#21). Сливались только повторы с уже
+  // существующей строкой базы: фильм, которого в библиотеке нет, вставлялся столько раз, сколько
+  // раз стоял в файле (Alien дважды в diary.csv - две карточки, удвоенные счётчики и время). Мнение
+  // у фильма одно, поэтому просмотренные сливаются по фильму, а «посмотреть» - по фильму и месту.
+  // Остаётся самая поздняя запись: её оценка и дата, а заметка - первая непустая.
+  const _insAt = new Map();
+  const _insKey = e => [e.tmdbID, e.mediaType, e.status, e.status === 'watched' ? '' : (e.listId || '')].join('|');
+  const _pushInsert = e => {
+    const k = _insKey(e), prev = _insAt.get(k);
+    if (!prev) { _insAt.set(k, e); toInsert.push(e); return; }
+    skipped++;
+    if (String(e.addedAt || '') >= String(prev.addedAt || '')) {
+      if (e.stars > 0) prev.stars = e.stars;
+      if (e.addedAt) prev.addedAt = e.addedAt;
+    }
+    if (!prev.comment && e.comment) prev.comment = e.comment;
+  };
   for (const { r, st, match, move, skip } of items) {
     // ЧУЖОЙ КАТАЛОГ НЕ ВОЗВРАЩАЕТ ПРОСМОТРЕННОЕ В ПЛАН. Watchlist IMDb держит фильм, пока его не
     // оценят на самом IMDb, а весь watchlist.csv Letterboxd - это 'plan'. Статус патчился всегда,
@@ -16966,7 +17287,7 @@ async function applyBackupData(rows, onProgress, opts = {}) {
     if (match) {
       toUpdate.push([match.id, r, move]);
     } else {
-      toInsert.push({
+      _pushInsert({
         tmdbID: r.imdb_id, title: r.title, year: r.year,
         poster: r.poster || "",
         stars: parseFloat(r.stars) || 0,
@@ -17327,7 +17648,7 @@ async function backfillCrewData() {
   );
   if (!targets.length) { showToast(t('toast_crew_complete')); return; }
   if (btn) { btn.disabled = true; }
-  let updated = 0, processed = 0;
+  let updated = 0, processed = 0, limited = false;
   for (const h of targets) {
     processed++;
     if (btn) btn.textContent = t('crew_updating').replace('{n}', () => processed).replace('{total}', () => targets.length);
@@ -17337,6 +17658,9 @@ async function backfillCrewData() {
       // сериал 1399 получал режиссёра, оператора, композитора и хронометраж фильма 1399.
       // Проверка кода 9 окт, #21.
       const d = await tmdbDetail(h.tmdbID, h.mediaType || "movie");
+      // Дневной лимит TMDB: дальше каждый фильм - заведомо отклонённые запросы, а поиск и карточки
+      // до конца суток стоят. Останавливаемся на первом отказе, как _enrichFromTMDB (#26).
+      if (d && d._limit) { limited = true; break; }
       const patch = {};
       if (!h.cinematographer && d.Cinematographer) patch.cinematographer = d.Cinematographer;
       if (!h.composer        && d.Composer)        patch.composer        = d.Composer;
@@ -17358,7 +17682,7 @@ async function backfillCrewData() {
   _crewCheckedSave(Object.fromEntries(Object.entries(checked).filter(([id]) => _ids.has(id))));
   if (btn) { btn.textContent = t('backfill_crew'); btn.disabled = false; }
   _updateBackfillCrewVisibility(); // auto-hide the row if nothing else needs fixing
-  showToast(t('toast_crew_updated_n').replace('{n}', () => updated));
+  showToast(t('toast_crew_updated_n').replace('{n}', () => updated) + (limited ? ' · ' + t('imp_limit_day') : ''), limited);
 }
 
 async function backupImportCSV() {
@@ -17378,8 +17702,9 @@ async function backupImportCSV() {
     const enriched = await _enrichFromTMDB(rows, (done, total) => setLabel(_fetching(done, total)), run);
 
     // Step 2: save to Supabase
-    setLabel("Saving…");
+    setLabel(t('backup_saving'));
     const { added, updated, skipped, failed } = await applyBackupData(enriched, (d, tot) => setLabel(t('imp_saving_n').replace('{n}', () => d).replace('{total}', () => tot)), { run });
+    if (run && run.cancelled) return;   // после выхода библиотека уже чужая (#22)
 
     watchHistory = await loadHistoryFromDB();
     renderHistory();
@@ -17437,7 +17762,11 @@ function _parseLetterboxdRows(text, fileName) {
   const isWatchlist = /watchlist/i.test(fileName || "");
   return recs.map(r => {
     const rt = parseFloat(r['Rating']);
+    // Дата просмотра из файла (#27): у diary.csv - Watched Date, у остальных файлов выгрузки -
+    // Date (когда отмечено). Без неё 600 фильмов дневника за восемь лет датировались днём импорта.
+    const date = String(r['Watched Date'] || r['Date'] || '').trim();
     return {
+      added_at: /^\d{4}-\d{2}-\d{2}/.test(date) ? date.slice(0, 10) : null,
       title: (r['Name'] || "").trim(),
       year: String(r['Year'] || "").trim().slice(0, 4),
       stars: Number.isFinite(rt) ? Math.max(0, Math.min(5, rt)) : 0,
@@ -17548,9 +17877,10 @@ async function backupImportLetterboxd() {
       : "";
     setStatus(t('backup_restoring'));
     const { added, updated, failed } = await applyBackupData(ok, (d, tot) => setStatus(`${t('backup_restoring')} ${d}/${tot}`), { preserveLocal: true, run });
+    // Отменённый прогон молчит и библиотеку не перечитывает: после выхода она уже чужая (#22).
+    if (run.cancelled) return;
     watchHistory = await loadHistoryFromDB();
     renderHistory();
-    if (run.cancelled) return;   // отменённый прогон молчит: тост был бы о чужом импорте
     closeAccount();
     const parts = [];
     if (added)     parts.push(`✓ ${added} ${t('imp_added')}`);
@@ -17892,6 +18222,7 @@ async function backupImportIMDb() {
       (d, tot) => run.cancelled || ImportProgress.update(`${t("imp_saving").replace("{n}", () => tot)} ${d}/${tot}`, d, tot),
       // A foreign catalogue must never blank what the person wrote here.
       { preserveLocal: true, run });
+    if (run && run.cancelled) return;   // после выхода библиотека уже чужая (#22)
     watchHistory = await loadHistoryFromDB();
     renderHistory();
     // Отменённый прогон не пишет итог: его окно закрыто, а открытое сейчас - чужое, и finish()
@@ -18025,7 +18356,7 @@ async function _loadExcelJS() {
 // Returns { map: lowercasedName→id, created: N } so import can reattach films
 // to lists by their human name (and recreate any missing ones on restore).
 async function _ensureListsByName(names, memberOnly) {
-  const map = {};
+  const map = {}, notCreated = [];
   let created = 0;
   if (!currentUser || !names.length) return { map, created };
   // supabase-js RESOLVES with {data, error} - it does not throw - so the catch below
@@ -18072,16 +18403,23 @@ async function _ensureListsByName(names, memberOnly) {
     if (memberOnly && memberOnly.has(key)) continue;     // чужой список - своим не заводим
     try {
       const { data, error } = await sbClient.from('lists').insert({ name, owner_id: currentUser.id }).select().single();
-      if (error || !data) continue;
+      // Несозданный список называется (#23): отказ list_limit и любой другой глотались, и фильмы
+      // списка молча ложились в личный, а тост говорил «30 добавлено».
+      if (error || !data) { notCreated.push({ name, err: error }); continue; }
       // Unchecked, this left a list nobody was a member of - created, invisible, and
     // impossible to delete from the app. Two writes that must both land, so the second
     // one's failure has to be heard.
     const { error: memErr } = await sbClient.from('list_members').insert({ list_id: data.id, user_id: currentUser.id, role: 'owner' });
-    if (memErr) throw new Error(memErr.message);
+    if (memErr) {
+      // Список без участника не виден и не удаляется из приложения: снимаем его и называем (#23).
+      try { await sbClient.from('lists').delete().eq('id', data.id); } catch (e2) {}
+      notCreated.push({ name, err: memErr });
+      continue;
+    }
       map[key] = data.id; created++;
-    } catch(e) { /* skip this list, keep going */ }
+    } catch(e) { notCreated.push({ name, err: e }); }
   }
-  return { map, alts, created };
+  return { map, alts, created, notCreated };
 }
 
 // Render the Read me banner lockup (logo + CINEMAIL wordmark + subtitle) to a
@@ -18176,7 +18514,10 @@ async function backupExportXLSX() {
     await _loadExcelJS();
     const rows = await getBackupData();
     if (!rows.length) { showToast(t('toast_nothing_export')); return; }
-    if (!(_listsCache && _listsCache.length)) { try { await loadListsCache(); } catch(e) {} }
+    // Списки перечитываются всегда (#24): строки фильмов приходят из базы свежими, а имена списков
+    // брались из кэша, который при возврате во вкладку не обновляется. Список, созданный на другом
+    // устройстве, выходил без имени, и восстановление клало его фильмы в личный список второй раз.
+    try { await loadListsCache(); } catch(e) {}
     const listNameById = {};
     (_listsCache || []).forEach(l => { listNameById[l.id] = l.name; });
 
@@ -18443,10 +18784,11 @@ async function backupImportXLSX() {
     // Recreate lists and map their names → ids, then reattach films by name.
     const wantedLists = new Set(listNamesFromBackup);
     rows.forEach(r => { if (r.list_name) wantedLists.add(r.list_name); });
-    let listsCreated = 0;
+    let listsCreated = 0, listsMissing = [];
     if (wantedLists.size) {
       setLabel(t('backup_restoring'));
-      const { map, alts, created, failed } = await _ensureListsByName([...wantedLists], memberOnly);
+      const { map, alts, created, failed, notCreated } = await _ensureListsByName([...wantedLists], memberOnly);
+      listsMissing = notCreated || [];
       // Could not read the existing lists, so we cannot tell which need creating.
       // Restoring the films without their lists is recoverable; creating a second copy
       // of every list is not.
@@ -18471,6 +18813,7 @@ async function backupImportXLSX() {
     const enriched = await _enrichFromTMDB(rows, (done, total) => setLabel(`${t('backup_restoring')} ${done}/${total}`), run);
     setLabel(t('backup_saving'));
     const { added, updated, skipped, failed } = await applyBackupData(enriched, (d, tot) => setLabel(`${t('backup_saving')} ${d}/${tot}`), { run });
+    if (run && run.cancelled) return;   // после выхода библиотека уже чужая (#22)
     await loadListsCache();
     watchHistory = await loadHistoryFromDB();
     renderHistory();
@@ -18481,7 +18824,12 @@ async function backupImportXLSX() {
     if (failed)       parts.push(`✕ ${failed} ${t("imp_failed_n")} - ${t("imp_retry")}`);
     if (skipped)      parts.push(`${skipped} ${t('imp_unchanged')}`);
     if (listsCreated) parts.push(`+${listsCreated} ${_listsWord(listsCreated)}`);
-    showToast(parts.join(" · ") || t('imp_nothing_changed'));
+    if (listsMissing.length) {
+      parts.push(t('backup_lists_missing').replace('{names}', () => listsMissing.map(x => '«' + x.name + '»').join(', ')));
+      const lim = listsMissing.find(x => /list_limit/.test(String((x.err && x.err.message) || x.err || '')));
+      if (lim) parts.push(_listErrText(lim.err));
+    }
+    showToast(parts.join(" · ") || t('imp_nothing_changed'), listsMissing.length > 0);
   } catch(e) {
     if (e.message !== "cancelled") showToast(t("imp_failed") + ": " + e.message, true);
   } finally {
@@ -20294,7 +20642,9 @@ function _teachShowForms() {
         if (!n) continue;
         // Однословная форма - точным словом («=»), а не основой: основа «заговор» ловила «заговорил»,
         // «музыка» - «музыканта» (корпус поиска). Чипу нужна ровно его форма.
-        const term = kind === 'movement' ? n.replace(/ /g, '') : n.includes(' ') ? n.split(' ').join('_') : '=' + n;
+        // У движения апостроф тоже уходит: термины движений ищутся по склеенным словам запроса, где
+        // его нет («п’яте покоління» - «пятепокоління»), а _qNorm теперь держит его как ʼ (#83).
+        const term = kind === 'movement' ? n.replace(/[ ʼ]/g, '') : n.includes(' ') ? n.split(' ').join('_') : '=' + n;
         if (term.length > 2 && !have.has(term)) { have.add(term); row[field] = String(row[field] || '') + ' ' + term; }
       }
     }
